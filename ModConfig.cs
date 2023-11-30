@@ -5,10 +5,10 @@ namespace FoodStore
     public class ModConfig
     {
         public bool EnableMod { get; set; } = true;
-
         public bool EnablePrice { get; set; } = false;
         public bool EnableTip { get; set; } = false;
         public bool TipWhenNeaBy { get; set; } = true;
+        public bool RushHour { get; set; } = true;
 
         public int MinutesToHungry { get; set; } = 600;
         public float MoveToFoodChance { get; set; } = 0.01f;

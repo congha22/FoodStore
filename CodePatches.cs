@@ -22,17 +22,49 @@ namespace FoodStore
 		{
 			if (!Config.EnableMod)
 				return;
-			__instance.modData["aedenthorn.FoodOnTheTable/LastFood"] = "0";
+			__instance.modData["hapyke.FoodStore/LastFood"] = "0";
 			__instance.modData["hapyke.FoodStore/LastCheck"] = "0";
 			__instance.modData["hapyke.FoodStore/LocationControl"] = ",";
+            __instance.modData["hapyke.FoodStore/LastFoodTaste"] = "-1";
         }
 
 		private static void NPC_performTenMinuteUpdate_Postfix(NPC __instance)
 		{
+			if (Config.EnableMod && !Game1.eventUp && __instance.currentLocation is not null && __instance.isVillager() && !WantsToEat(__instance) && Microsoft.Xna.Framework.Vector2.Distance(__instance.getTileLocation(), Game1.player.getTileLocation()) < 30)
+			{
+				if (Game1.random.NextDouble() < 0.15)
+				{
+                    Random random = new Random();
+                    int randomIndex = random.Next(8);
+					string text = "Got food";
+
+                    if (__instance.modData["hapyke.FoodStore/LastFoodTaste"] == "0") //love
+					{
+                        text = SHelper.Translation.Get("foodstore.randomchat.love." + randomIndex);
+                    }
+                    else if (__instance.modData["hapyke.FoodStore/LastFoodTaste"] == "2") //like
+                    {
+                        text = SHelper.Translation.Get("foodstore.randomchat.like." + randomIndex);
+                    }
+                    else if (__instance.modData["hapyke.FoodStore/LastFoodTaste"] == "4") //dislike
+                    {
+                        text = SHelper.Translation.Get("foodstore.randomchat.dislike." + randomIndex);
+                    }
+                    else if (__instance.modData["hapyke.FoodStore/LastFoodTaste"] == "6") //hate
+                    {
+                        text = SHelper.Translation.Get("foodstore.randomchat.hate." + randomIndex);
+                    }
+                    else
+                    {
+                        text = SHelper.Translation.Get("foodstore.randomchat.neutral." + randomIndex);
+                    }
+                    __instance.showTextAboveHead(text);
+				}
+				return;
+			}
+			
 			if (!Config.EnableMod || Game1.eventUp || __instance.currentLocation is null || !__instance.isVillager() || !WantsToEat(__instance))
 				return;
-
-
 
             if (__instance.getTileLocation().X >= __instance.currentLocation.Map.DisplayWidth / 64 + 20 ||
                 __instance.getTileLocation().Y >= __instance.currentLocation.Map.DisplayHeight / 64  + 20||
@@ -41,81 +73,10 @@ namespace FoodStore
                 !__instance.IsReturningToEndPoint()
                 )
             {
-                //Game1.chatBox.addErrorMessage("HERE" + __instance.Name);
                 __instance.returnToEndPoint();
                 __instance.MovePosition(Game1.currentGameTime, Game1.viewport, __instance.currentLocation);
-
-//                Game1.chatBox.addInfoMessage(x.ToString());
-
-
-
             }
-            //__instance.CurrentDialogue.Push(new Dialogue("message", __instance));
-            //Game1.drawDialogue(__instance);
-
-
-            //Game1.warpCharacter(__instance, __instance.defaultMap, __instance.DefaultPosition);
-            //__instance.updateMovement(__instance.currentLocation, Game1.currentGameTime);
-            //Game1.chatBox.addInfoMessage($" HERE {__instance.Name}");
-
-
-            //if (
-            //	 //__instance.Name == "Caroline" 
-            //	 //&&
-            //	 (__instance.getTileLocation().X > 130 || __instance.getTileLocation().Y > 130)
-            //	)
-
-            //{
-            //             //Game1.warpCharacter(__instance, "Town", new Point(72, 72));
-            //             Game1.warpCharacter(__instance, "town", new Point(73, 73));
-            //             //__instance.controller = null ;
-            //	//__instance.temporaryController = null;
-            //	__instance.clearSchedule();
-            //             __instance.checkSchedule(Game1.timeOfDay);
-            //             __instance.updateMovement(__instance.currentLocation, Game1.currentGameTime);
-            //	__instance.moveCharacterOnSchedulePath();
-
-            //	//Game1.chatBox.addMessage($"MASTER: {__instance.currentLocation.map.DisplayWidth / 64}, {__instance.currentLocation.map.DisplayHeight / 64}", Color.Green);
-
-            //	//foreach (var entry in masterScheduleRawData)
-            //	//{
-            //	//    // Print key-value pairs
-            //	//    Game1.chatBox.addMessage($"Key: {entry.Key}, Value: {entry.Value}", Color.Green);
-            //	//    Game1.chatBox.addMessage($"---------------------------------------------", Color.White);
-            //	//}
-
-
-
-
-
-            //	//if (x != null)
-            //	//{
-            //	//    // Iterate through the schedule entries
-            //	//    foreach (var scheduleEntry in x)
-            //	//    {
-            //	//        // Print schedule information
-            //	//        Game1.chatBox.addInfoMessage($"Schedule for {Game1.currentSeason} - Day {Game1.dayOfMonth}:");
-
-            //	//        // Print route information
-            //	//        Game1.chatBox.addInfoMessage($"Route: {string.Join(" -> ", scheduleEntry.Value.route)}");
-
-            //	//        // Print facing direction
-            //	//        Game1.chatBox.addInfoMessage($"Facing Direction: {scheduleEntry.Value.facingDirection}");
-
-            //	//        // Print end of route behavior
-            //	//        Game1.chatBox.addInfoMessage($"End of Route Behavior: {scheduleEntry.Value.endOfRouteBehavior}");
-
-            //	//        // Print end of route message
-            //	//        Game1.chatBox.addInfoMessage($"End of Route Message: {scheduleEntry.Value.endOfRouteMessage}");
-
-            //	//        // Add a separator between schedule entries
-            //	//        Game1.chatBox.addInfoMessage("--------------------");
-            //	//    }
-            //	//}
-
-            //	//__instance.changeSchedulePathDirection();
-            //	//__instance.moveCharacterOnSchedulePath();
-            //}
+			//Game1.chatBox.addErrorMessage(Game1.timeOfDay.ToString());
             PlacedFoodData food = GetClosestFood(__instance, __instance.currentLocation);
 			TryToEatFood(__instance, food);
         }
@@ -125,15 +86,19 @@ namespace FoodStore
                 return;
 			foreach (NPC npc in __instance.characters)
 			{
-				if (npc.isVillager() && !npc.Name.EndsWith("_DA")
-					//aaaa&& npc.Name == "Linus"
-					)
+				if (npc.isVillager() && !npc.Name.EndsWith("_DA"))
 				{
 
 					NPC villager = npc;
-                    if (villager != null && WantsToEat(villager) && Game1.random.NextDouble() < Config.MoveToFoodChance / 100f 
+					double moveToFoodChance = Config.MoveToFoodChance;
+
+					if( Config.RushHour && (800 < Game1.timeOfDay  && Game1.timeOfDay < 930 || 1200 < Game1.timeOfDay && Game1.timeOfDay < 1300 || 1800 < Game1.timeOfDay && Game1.timeOfDay < 2000))
+					{
+						moveToFoodChance = moveToFoodChance * 1.5;
+					}
+
+                    if (villager != null && WantsToEat(villager) && Game1.random.NextDouble() < moveToFoodChance / 100f 
 						&& __instance.furniture.Count > 0 
-						//&& TimeDelayCheck(villager)
 						)
 					{
                         PlacedFoodData food = GetClosestFood(npc, __instance);
@@ -186,7 +151,6 @@ namespace FoodStore
 						{
                             Random random = new Random();
                             int randomIndex = random.Next(15);
-
                             string text = SHelper.Translation.Get("foodstore.coming." + randomIndex.ToString() , new { vName = villager.Name });
 
                             if (Game1.IsMultiplayer)
@@ -201,7 +165,6 @@ namespace FoodStore
                             villager.addedSpeed = 2 ;
 
                             npc.modData["hapyke.FoodStore/LastCheck"] = Game1.timeOfDay.ToString();
-                            //villager.modData["aedenthorn.HaPyke/TimeControl"] = Game1.timeOfDay.ToString();
                             villager.temporaryController = new PathFindController(villager, __instance, new Point((int)possibleLocation.X, (int)possibleLocation.Y), facingDirection, (character, location) => villager.updateMovement(villager.currentLocation, Game1.currentGameTime));
                         }
 

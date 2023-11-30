@@ -5,31 +5,34 @@
   "foodstore.config.minutetohungry": "Minutes To Hungry",
 
   "foodstore.config.minutetohungryText": "Minutes since last meal of each NPC. Default 600. Setting too low might cause weird path finding. Recommended above 60",
-  
+
   "foodstore.config.movetofoodchange": "Move To Food % Chance.",
   "foodstore.config.movetofoodchangeText": "Percent chance per tick to move to food if hungry. Default 0.01. Setting higher cause significantly lag and weird path finding. Greatly recommended under 0.1",
-  
+
   "foodstore.config.maxdistancetofindfood": "Max Distance to find food",
   "foodstore.config.maxdistancetofindfoodText": "Max distance in tiles from food that NPCs can find it. Default 40",
-  
+
   "foodstore.config.maxdistancetoeat": "Max Distance to Eat",
   "foodstore.config.maxdistancetoeatText": "Max distance in tiles from food to eat it. Default 4",
-  
+
+  "foodstore.config.rushhour": "Enable Rush Hour?",
+  "foodstore.config.rushhourText": "During rush hour, higher chance for customer and higher Tip, but slightly lower Price. Restock your store!!!",
+
   "foodstore.config.enableprice": "Enabled Price Option?",
   "foodstore.config.enablepriceText": "Default -1 for random value",
-  
+
   "foodstore.config.pricelovemulti": "Loved food sell price multiplier",
   "foodstore.config.pricelikemulti": "Liked food sell price multiplier",
   "foodstore.config.priceneutralmulti": "Neutral food sell price multiplier",
   "foodstore.config.pricedislikemulti": "Disliked food sell price multiplier",
   "foodstore.config.pricehatemulti": "Hated food sell price multiplier",
-  
+
   "foodstore.config.enabletip": "Enabled Tip Option?",
   "foodstore.config.enabletipText": "Tip value is a fraction of sale price. Default -1",
-  
+
   "foodstore.config.enabletipclose": "Only Tip when running the store?",
   "foodstore.config.enabletipcloseText": "When set to True, only receive Tip when player near the store",
-  
+
   "foodstore.config.enabletipcloselove": "Loved food tip value multiplier",
   "foodstore.config.enabletipcloselike": "Liked food tip value multiplier",
   "foodstore.config.enabletipcloseneutral": "Neutral food tip value multiplier",
@@ -169,7 +172,53 @@
 
   //
   "foodstore.tip": ". Here is your {{tipValue}}G tip",
-  "foodstore.sold": "   Sold {{foodObjName}} at {{locationString}} for {{saleString}}G"
+  "foodstore.sold": "   Sold {{foodObjName}} at {{locationString}} for {{saleString}}G",
+
+  //
+  "foodstore.randomchat.love.0": "Feeling immense love for this place!",
+  "foodstore.randomchat.love.1": "In love with their incredible dishes!",
+  "foodstore.randomchat.love.2": "This store steals my heart every time.",
+  "foodstore.randomchat.love.3": "Love the cozy vibes and friendly staff!",
+  "foodstore.randomchat.love.4": "Adore the special treats they offer!",
+  "foodstore.randomchat.love.5": "Passionate about their delightful menu!",
+  "foodstore.randomchat.love.6": "Head over heels for their desserts!",
+  "foodstore.randomchat.love.7": "Loving the unique flavors they provide!",
+
+  "foodstore.randomchat.like.0": "Really like the atmosphere here.",
+  "foodstore.randomchat.like.1": "Liked the variety of options available.",
+  "foodstore.randomchat.like.2": "Enjoyed the quick and efficient service.",
+  "foodstore.randomchat.like.3": "Like the quality of their fresh produce.",
+  "foodstore.randomchat.like.4": "Appreciate the affordable prices!",
+  "foodstore.randomchat.like.5": "Favorable experience with their staff.",
+  "foodstore.randomchat.like.6": "Liking the new items on the menu!",
+  "foodstore.randomchat.like.7": "Great place for a casual dining experience.",
+
+  "foodstore.randomchat.neutral.0": "Just normal about the store experience today.",
+  "foodstore.randomchat.neutral.1": "It was an okay visit to the store.",
+  "foodstore.randomchat.neutral.2": "Neither good nor bad, just a regular day.",
+  "foodstore.randomchat.neutral.3": "Couldn't decide how I felt about it.",
+  "foodstore.randomchat.neutral.4": "A neutral experience overall.",
+  "foodstore.randomchat.neutral.5": "Didn't leave a strong impression.",
+  "foodstore.randomchat.neutral.6": "Middle-of-the-road visit today.",
+  "foodstore.randomchat.neutral.7": "No strong feelings, just neutral.",
+
+  "foodstore.randomchat.dislike.0": "Didn't quite enjoy the food this time.",
+  "foodstore.randomchat.dislike.1": "Not a fan of the service today.",
+  "foodstore.randomchat.dislike.2": "Disliked the long wait at the checkout.",
+  "foodstore.randomchat.dislike.3": "Unimpressed with the quality of products.",
+  "foodstore.randomchat.dislike.4": "Disappointing experience overall.",
+  "foodstore.randomchat.dislike.5": "Frustrated with the lack of cleanliness.",
+  "foodstore.randomchat.dislike.6": "Didn't meet expectations this time.",
+  "foodstore.randomchat.dislike.7": "Feeling let down by the store today.",
+
+  "foodstore.randomchat.hate.0": "Hate the fact that they're always serve this kind of food!",
+  "foodstore.randomchat.hate.1": "Absolutely despise their customer service.",
+  "foodstore.randomchat.hate.2": "Can't stand the disorganization in this store.",
+  "foodstore.randomchat.hate.3": "Hate the constant out-of-stock items.",
+  "foodstore.randomchat.hate.4": "Despise the lack of cleanliness in the store.",
+  "foodstore.randomchat.hate.5": "Strongly dislike the quality of their food.",
+  "foodstore.randomchat.hate.6": "Can't tolerate their rude staff.",
+  "foodstore.randomchat.hate.7": "Hating the overall experience—never again!"
 
 
 

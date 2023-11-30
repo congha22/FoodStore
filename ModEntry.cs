@@ -118,6 +118,13 @@ namespace FoodStore
                 getValue: () => "" + Config.MaxDistanceToEat,
 				setValue: delegate (string value) { try { Config.MaxDistanceToEat = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
 			);
+            configMenu.AddBoolOption(
+                    mod: ModManifest,
+                    name: () => SHelper.Translation.Get("foodstore.config.rushhour"),
+                    tooltip: () => SHelper.Translation.Get("foodstore.config.rushhourText"),
+                    getValue: () => Config.RushHour,
+                    setValue: value => Config.RushHour = value
+                );
 
 
             {
@@ -328,6 +335,11 @@ namespace FoodStore
 
                         }
 
+                        if (Config.RushHour && (800 < Game1.timeOfDay && Game1.timeOfDay < 930 || 1200 < Game1.timeOfDay && Game1.timeOfDay < 1300 || 1800 < Game1.timeOfDay && Game1.timeOfDay < 2000))
+                        {
+                            salePrice = (int)(salePrice * 0.8);
+                            tip = (int)(tip * 2);
+                        }
 
                         if (Config.TipWhenNeaBy && Vector2.Distance(Game1.player.getTileLocation(), food.foodTile) > 10) { tip = 0;}
 
@@ -369,9 +381,10 @@ namespace FoodStore
 
 
                         Game1.player.Money += salePrice + tip;
-                        __instance.modData["aedenthorn.FoodOnTheTable/LastFood"] = Game1.timeOfDay.ToString();
+                        __instance.modData["hapyke.FoodStore/LastFood"] = Game1.timeOfDay.ToString();
+                        __instance.modData["hapyke.FoodStore/LastFoodTaste"] = taste.ToString();
 
-                        
+
                         return true;
 					}
 				}
@@ -456,12 +469,12 @@ namespace FoodStore
 		}
         private static bool WantsToEat(NPC npc)
 		{
-			if (!npc.modData.ContainsKey("aedenthorn.FoodOnTheTable/LastFood") || npc.modData["aedenthorn.FoodOnTheTable/LastFood"].Length == 0  )
+			if (!npc.modData.ContainsKey("hapyke.FoodStore/LastFood") || npc.modData["hapyke.FoodStore/LastFood"].Length == 0  )
 			{
 				return true;
 			}
 
-            int lastFoodTime = int.Parse(npc.modData["aedenthorn.FoodOnTheTable/LastFood"]);
+            int lastFoodTime = int.Parse(npc.modData["hapyke.FoodStore/LastFood"]);
             int minutesSinceLastFood = GetMinutes(Game1.timeOfDay) - GetMinutes(lastFoodTime);
 
             // Check if either the time since the last food or the time since the last check is greater than the configured thresholds
