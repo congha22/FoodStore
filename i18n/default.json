@@ -1,0 +1,177 @@
+{
+  // CONFIG
+  "foodstore.config.enable": "Mod Enabled?",
+
+  "foodstore.config.minutetohungry": "Minutes To Hungry",
+
+  "foodstore.config.minutetohungryText": "Minutes since last meal of each NPC. Default 600. Setting too low might cause weird path finding. Recommended above 60",
+  
+  "foodstore.config.movetofoodchange": "Move To Food % Chance.",
+  "foodstore.config.movetofoodchangeText": "Percent chance per tick to move to food if hungry. Default 0.01. Setting higher cause significantly lag and weird path finding. Greatly recommended under 0.1",
+  
+  "foodstore.config.maxdistancetofindfood": "Max Distance to find food",
+  "foodstore.config.maxdistancetofindfoodText": "Max distance in tiles from food that NPCs can find it. Default 40",
+  
+  "foodstore.config.maxdistancetoeat": "Max Distance to Eat",
+  "foodstore.config.maxdistancetoeatText": "Max distance in tiles from food to eat it. Default 4",
+  
+  "foodstore.config.enableprice": "Enabled Price Option?",
+  "foodstore.config.enablepriceText": "Default -1 for random value",
+  
+  "foodstore.config.pricelovemulti": "Loved food sell price multiplier",
+  "foodstore.config.pricelikemulti": "Liked food sell price multiplier",
+  "foodstore.config.priceneutralmulti": "Neutral food sell price multiplier",
+  "foodstore.config.pricedislikemulti": "Disliked food sell price multiplier",
+  "foodstore.config.pricehatemulti": "Hated food sell price multiplier",
+  
+  "foodstore.config.enabletip": "Enabled Tip Option?",
+  "foodstore.config.enabletipText": "Tip value is a fraction of sale price. Default -1",
+  
+  "foodstore.config.enabletipclose": "Only Tip when running the store?",
+  "foodstore.config.enabletipcloseText": "When set to True, only receive Tip when player near the store",
+  
+  "foodstore.config.enabletipcloselove": "Loved food tip value multiplier",
+  "foodstore.config.enabletipcloselike": "Liked food tip value multiplier",
+  "foodstore.config.enabletipcloseneutral": "Neutral food tip value multiplier",
+  "foodstore.config.enabletipclosedislike": "Disliked food tip value multiplier",
+  "foodstore.config.enabletipclosehate": "Hated food tip value multiplier",
+
+
+  // 15 Coming
+  "foodstore.coming.0": "In a delightful twist, {{vName}} is heading to our store for an unexpected visit.",
+  "foodstore.coming.1": "{{vName}} is strolling our way, curious about our store's offerings.",
+  "foodstore.coming.2": "Amidst their day, {{vName}} is choosing to spend some time at our store.",
+  "foodstore.coming.3": "{{vName}} is making an unplanned visit to our store, breaking from the routine.",
+  "foodstore.coming.4": "{{vName}} is leisurely heading to our store, expecting a delightful experience.",
+  "foodstore.coming.5": "Breaking free from tasks, {{vName}} is on the way to explore our store.",
+  "foodstore.coming.6": "{{vName}} is navigating toward our store, seeking a unique shopping experience.",
+  "foodstore.coming.7": "Spontaneously, {{vName}} is making their way to our store for a pleasant surprise.",
+  "foodstore.coming.8": "{{vName}} is steering towards our store, eager to discover something new.",
+  "foodstore.coming.9": "With excitement, {{vName}} is heading to our store for an impromptu visit.",
+  "foodstore.coming.10": "{{vName}} is veering off course to visit our store, anticipating something special.",
+  "foodstore.coming.11": "In the midst of their day, {{vName}} decided to drop by our store for a while.",
+  "foodstore.coming.12": "{{vName}} is casually making their way to our store, anticipating a good time.",
+  "foodstore.coming.13": "{{vName}} is diverting from the norm to visit our store and enjoy the offerings.",
+  "foodstore.coming.14": "{{vName}} is making a spontaneous detour to our store, eager for a unique experience.",
+
+
+  // Love Rep
+  "foodstore.loverep.0": "My taste buds dance with joy at each flavorful bite!",
+  "foodstore.loverep.1": "Savoring this dish is like a warm hug for my senses.",
+  "foodstore.loverep.2": "Exquisite taste that lingers, a true culinary delight.",
+  "foodstore.loverep.3": "A symphony of flavors that perfectly harmonize.",
+  "foodstore.loverep.4": "Indulge in the rich perfection of this savory delight.",
+  "foodstore.loverep.5": "A culinary journey leaving an indelible impression.",
+  "foodstore.loverep.6": "Mouthwatering joy in every bite, a true delight.",
+  "foodstore.loverep.7": "Delight in the culinary magic of this crafted perfection.",
+  "foodstore.loverep.8": "Elevates dining to an art, a masterpiece on my plate.",
+  "foodstore.loverep.9": "A delicious escape into a world of gastronomic wonder.",
+  "foodstore.loverep.10": "Tantalizing my taste buds with a perfect blend of flavors.",
+  "foodstore.loverep.11": "A savory sensation that captivates my palate.",
+  "foodstore.loverep.12": "Unveiling the artistry of taste, a dish to be remembered.",
+  "foodstore.loverep.13": "Gourmet perfection in every mouthful, a culinary triumph.",
+  "foodstore.loverep.14": "An enticing melody of flavors that dances on my tongue.",
+  "foodstore.loverep.15": "A culinary masterpiece, pure love on my plate.",
+  "foodstore.loverep.16": "Captivating flavors, a true love affair for my taste buds.",
+  "foodstore.loverep.17": "Enchanting dish, love at first bite every time.",
+  "foodstore.loverep.18": "A love letter to gastronomy; this dish is divine.",
+  "foodstore.loverep.19": "Passionately in love with the perfection of this creation.",
+
+
+  // Like rep
+  "foodstore.likerep.0": "A dish I enjoy on occasion, it's quite good.",
+  "foodstore.likerep.1": "Consistently decent; I don't mind ordering it.",
+  "foodstore.likerep.2": "A solid option that I find myself choosing.",
+  "foodstore.likerep.3": "This dish is good; I like its simplicity.",
+  "foodstore.likerep.4": "An okay choice; it satisfies my taste buds.",
+  "foodstore.likerep.5": "It's not bad; I find it to be reliably tasty.",
+  "foodstore.likerep.6": "A decent dish; it's a safe and satisfying pick.",
+  "foodstore.likerep.7": "I don't mind this dish; it's reliably enjoyable.",
+  "foodstore.likerep.8": "Not my favorite, but I find it quite palatable.",
+  "foodstore.likerep.9": "It's alright; a dish I don't mind having.",
+  "foodstore.likerep.10": "Consistently good; I appreciate its flavor.",
+  "foodstore.likerep.11": "This dish is okay; I find it reliably tasty.",
+  "foodstore.likerep.12": "A decent option; I don't mind having it.",
+  "foodstore.likerep.13": "It's fine; a dish I occasionally enjoy.",
+  "foodstore.likerep.14": "An acceptable choice when I'm in the mood.",
+  "foodstore.likerep.15": "I find this dish okay; it's decently satisfying.",
+  "foodstore.likerep.16": "Not bad at all; it's a dish I can enjoy.",
+  "foodstore.likerep.17": "A decent choice that I occasionally go for.",
+  "foodstore.likerep.18": "It's alright; I don't mind this dish.",
+  "foodstore.likerep.19": "An acceptable option; it's fairly enjoyable.",
+
+
+  // Neutral rep
+  "foodstore.neutralrep.0": "A standard dish; it's neither good nor bad.",
+  "foodstore.neutralrep.1": "It's okay; a dish I neither love nor dislike.",
+  "foodstore.neutralrep.2": "A regular choice; it doesn't stand out much.",
+  "foodstore.neutralrep.3": "This dish is average; nothing exceptional.",
+  "foodstore.neutralrep.4": "Not bad, not great; a middle-of-the-road option.",
+  "foodstore.neutralrep.5": "A neutral pick; it doesn't leave a strong impression.",
+  "foodstore.neutralrep.6": "It's decent; a standard choice for a meal.",
+  "foodstore.neutralrep.7": "Neither here nor there; a passable dish.",
+  "foodstore.neutralrep.8": "An ordinary option; it doesn't excite or disappoint.",
+  "foodstore.neutralrep.9": "It's alright; a dish that doesn't draw much attention.",
+  "foodstore.neutralrep.10": "In the middle of the spectrum; neither love nor hate.",
+  "foodstore.neutralrep.11": "A common choice; it doesn't sway my taste buds much.",
+  "foodstore.neutralrep.12": "Not exceptional, but not bad either; a regular dish.",
+  "foodstore.neutralrep.13": "Average in every way; it's a straightforward option.",
+  "foodstore.neutralrep.14": "A typical choice; it doesn't leave a lasting impression.",
+  "foodstore.neutralrep.15": "Neither good nor bad; it's just an average dish.",
+  "foodstore.neutralrep.16": "A standard option; it doesn't evoke strong feelings.",
+  "foodstore.neutralrep.17": "Not outstanding, not disappointing; just a regular dish.",
+  "foodstore.neutralrep.18": "Balanced between liking and disliking; it's okay.",
+  "foodstore.neutralrep.19": "A middle-of-the-road dish; it doesn't stand out much.",
+
+  // dislike rep
+  "foodstore.dislikerep.0": "Not my favorite; I find this dish lacking.",
+  "foodstore.dislikerep.1": "It's tolerable, but I'm not a fan of this dish.",
+  "foodstore.dislikerep.2": "An underwhelming choice; it falls short for me.",
+  "foodstore.dislikerep.3": "This dish is mediocre; I wouldn't recommend it.",
+  "foodstore.dislikerep.4": "I can eat it, but it's not a dish I enjoy much.",
+  "foodstore.dislikerep.5": "A passable option; I don't particularly like it.",
+  "foodstore.dislikerep.6": "It's edible, but I don't look forward to this dish.",
+  "foodstore.dislikerep.7": "I have tried it, but it's not to my liking.",
+  "foodstore.dislikerep.8": "A so-so choice; I don't find it very appetizing.",
+  "foodstore.dislikerep.9": "It's not the worst, but I'm not a fan of this dish.",
+  "foodstore.dislikerep.10": "This dish is average; I have had better options.",
+  "foodstore.dislikerep.11": "I can manage it, but it's not my preferred choice.",
+  "foodstore.dislikerep.12": "An okay option; I'm not excited about this dish.",
+  "foodstore.dislikerep.13": "Tolerable, but it lacks the appeal for me.",
+  "foodstore.dislikerep.14": "It's edible, but I wouldn't choose this dish willingly.",
+  "foodstore.dislikerep.15": "Not terrible, but I don't enjoy this dish much.",
+  "foodstore.dislikerep.16": "A subpar choice; there are better options available.",
+  "foodstore.dislikerep.17": "It falls short for me; I don't find it appetizing.",
+  "foodstore.dislikerep.18": "I can eat it, but it's not my preferred dish.",
+  "foodstore.dislikerep.19": "An average option; it's not something I enjoy.",
+
+  // hate rep
+  "foodstore.haterep.0": "This dish is simply dreadful; I can't stand it.",
+  "foodstore.haterep.1": "An absolute disappointment; this dish is awful.",
+  "foodstore.haterep.2": "I strongly dislike this dish; it's unappetizing.",
+  "foodstore.haterep.3": "A terrible choice; I can't stomach this dish.",
+  "foodstore.haterep.4": "I loathe this dish; it's utterly repulsive.",
+  "foodstore.haterep.5": "This dish is revolting; I can't bear the taste.",
+  "foodstore.haterep.6": "Absolutely detestable; this dish is inedible.",
+  "foodstore.haterep.7": "I despise this dish; it's truly abhorrent.",
+  "foodstore.haterep.8": "Disgusting; I regret trying this wretched dish.",
+  "foodstore.haterep.9": "A culinary disaster; this dish is unbearable.",
+  "foodstore.haterep.10": "I hate this dish; it's a complete letdown.",
+  "foodstore.haterep.11": "Absolutely awful; I can't express my disdain enough.",
+  "foodstore.haterep.12": "This dish is repugnant; I can't fathom its appeal.",
+  "foodstore.haterep.13": "A nauseating experience; I strongly advise against it.",
+  "foodstore.haterep.14": "I detest this dish; it's a gastronomic nightmare.",
+  "foodstore.haterep.15": "This dish is vile; I can't find any redeeming qualities.",
+  "foodstore.haterep.16": "Abysmal; this dish is the epitome of culinary failure.",
+  "foodstore.haterep.17": "I abhor this dish; it's a taste bud massacre.",
+  "foodstore.haterep.18": "An offensive choice; I regret even trying it.",
+  "foodstore.haterep.19": "I despise this dish; it's a culinary catastrophe.",
+
+  //
+  "foodstore.tip": ". Here is your {{tipValue}}G tip",
+  "foodstore.sold": "   Sold {{foodObjName}} at {{locationString}} for {{saleString}}G"
+
+
+
+
+}

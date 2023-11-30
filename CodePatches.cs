@@ -32,6 +32,8 @@ namespace FoodStore
 			if (!Config.EnableMod || Game1.eventUp || __instance.currentLocation is null || !__instance.isVillager() || !WantsToEat(__instance))
 				return;
 
+
+
             if (__instance.getTileLocation().X >= __instance.currentLocation.Map.DisplayWidth / 64 + 20 ||
                 __instance.getTileLocation().Y >= __instance.currentLocation.Map.DisplayHeight / 64  + 20||
                 __instance.getTileLocation().X <= -20 ||
@@ -40,7 +42,7 @@ namespace FoodStore
                 )
             {
                 //Game1.chatBox.addErrorMessage("HERE" + __instance.Name);
-                 __instance.returnToEndPoint();
+                __instance.returnToEndPoint();
                 __instance.MovePosition(Game1.currentGameTime, Game1.viewport, __instance.currentLocation);
 
 //                Game1.chatBox.addInfoMessage(x.ToString());
@@ -182,39 +184,18 @@ namespace FoodStore
 							&& TimeDelayCheck(villager)
 							)
 						{
-
-                            ArrayList heading = new ArrayList();
-                            heading.AddRange(new string[]
-                            {
-								$"{villager.Name} is strolling our way, curious about our store's offerings.",
-								$"Amidst their day, {villager.Name} is choosing to spend some time at our store.",
-								$"{villager.Name} is making an unplanned visit to our store, breaking from the routine.",
-								$"{villager.Name} is leisurely heading to our store, expecting a delightful experience.",
-								$"Breaking free from tasks, {villager.Name} is on the way to explore our store.",
-								$"{villager.Name} is navigating toward our store, seeking a unique shopping experience.",
-								$"Spontaneously, {villager.Name} is making their way to our store for a pleasant surprise.",
-								$"{villager.Name} is steering towards our store, eager to discover something new.",
-								$"With excitement, {villager.Name} is heading to our store for an impromptu visit.",
-								$"{villager.Name} is veering off course to visit our store, anticipating something special.",
-								$"In the midst of their day, {villager.Name} decided to drop by our store for a while.",
-								$"{villager.Name} is casually making their way to our store, anticipating a good time.",
-								$"{villager.Name} is diverting from the norm to visit our store and enjoy the offerings.",
-								$"{villager.Name} is making a spontaneous detour to our store, eager for a unique experience.",
-								$"In a delightful twist, {villager.Name} is heading to our store for an unexpected visit."
-                            });
-
-
                             Random random = new Random();
-                            int randomIndex = random.Next(heading.Count);
-                            var randomHeading = heading[randomIndex];
+                            int randomIndex = random.Next(15);
+
+                            string text = SHelper.Translation.Get("foodstore.coming." + randomIndex.ToString() , new { vName = villager.Name });
 
                             if (Game1.IsMultiplayer)
                             {
-                                Game1.chatBox.globalInfoMessage($"   {randomHeading}");
+                                Game1.chatBox.globalInfoMessage($"   {text}");
                             }
                             else
                             {
-                                Game1.chatBox.addInfoMessage($"   {randomHeading}");
+                                Game1.chatBox.addInfoMessage($"   {text}");
                             }
 
                             villager.addedSpeed = 2 ;
