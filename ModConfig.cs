@@ -9,8 +9,9 @@ namespace FoodStore
         public bool EnableTip { get; set; } = false;
         public bool TipWhenNeaBy { get; set; } = true;
         public bool RushHour { get; set; } = true;
+        public bool EnableDecor { get; set; } = true;
 
-        public int MinutesToHungry { get; set; } = 600;
+        public int MinutesToHungry { get; set; } = 240;
         public float MoveToFoodChance { get; set; } = 0.01f;
         public float MaxDistanceToFind{ get; set; } = 40;
         public float MaxDistanceToEat { get; set; } = 4f;

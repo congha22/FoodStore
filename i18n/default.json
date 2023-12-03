@@ -4,7 +4,7 @@
 
   "foodstore.config.minutetohungry": "Minutes To Hungry",
 
-  "foodstore.config.minutetohungryText": "Minutes since last meal of each NPC. Default 600. Setting too low might cause weird path finding. Recommended above 60",
+  "foodstore.config.minutetohungryText": "Minutes since last meal of each NPC. Default 240. Setting too low might cause weird path finding. Recommended above 60",
 
   "foodstore.config.movetofoodchange": "Move To Food % Chance.",
   "foodstore.config.movetofoodchangeText": "Percent chance per tick to move to food if hungry. Default 0.01. Setting higher cause significantly lag and weird path finding. Greatly recommended under 0.1",
@@ -218,7 +218,107 @@
   "foodstore.randomchat.hate.4": "Despise the lack of cleanliness in the store.",
   "foodstore.randomchat.hate.5": "Strongly dislike the quality of their food.",
   "foodstore.randomchat.hate.6": "Can't tolerate their rude staff.",
-  "foodstore.randomchat.hate.7": "Hating the overall experience—never again!"
+  "foodstore.randomchat.hate.7": "Hating the overall experience—never again!",
+
+
+  //---------------------------- End of v1.1.0-----------------------------
+
+  //
+  "foodstore.config.saleprice": "Sale Price",
+  "foodstore.config.tipvalue": "Tip Value",
+
+  "foodstore.config.enabledecor": "Enable Decoration?",
+  "foodstore.config.enabledecorText": "When set to True, Decoration and Atmosphere affect the sale price",
+
+  //
+  "foodstore.positiveTasteString.0": "About the food: Mouthwatering delight",
+  "foodstore.positiveTasteString.1": "With the food: Savory perfection",
+  "foodstore.positiveTasteString.2": "With the food: Exquisite flavor burst",
+  "foodstore.positiveTasteString.3": "In the food aspect: Irresistibly delicious",
+  "foodstore.positiveTasteString.4": "With the food: Tantalizing taste sensation",
+
+  "foodstore.normalTasteString.0": "In the food aspect: Balanced goodness",
+  "foodstore.normalTasteString.1": "With the food: Familiar satisfaction",
+  "foodstore.normalTasteString.2": "About the food: Everyday deliciousness",
+  "foodstore.normalTasteString.3": "With the food: Classic flavor harmony",
+  "foodstore.normalTasteString.4": "With the food: Common culinary delight",
+
+  "foodstore.negativeTasteString.0": "In the food aspect: Unpleasant aftertaste",
+  "foodstore.negativeTasteString.1": "With the food: Disappointing flavor",
+  "foodstore.negativeTasteString.2": "About the food: Bland and unappealing",
+  "foodstore.negativeTasteString.3": "About the food: Unpalatable mixture",
+  "foodstore.negativeTasteString.4": "In the food aspect: Unpleasant culinary experience",
+
+  //
+  "foodstore.positiveDecorString.0": "Decoration in my eye: Elegant ambiance",
+  "foodstore.positiveDecorString.1": "About the view: Cozy and inviting setting",
+  "foodstore.positiveDecorString.2": "With decoration: Charming atmosphere",
+  "foodstore.positiveDecorString.3": "The atmosphere: Stylish and relaxing vibes",
+  "foodstore.positiveDecorString.4": "About the view: Picturesque surroundings",
+
+  "foodstore.normalDecorString.0": "Decoration in my eye: Simple and tasteful design",
+  "foodstore.normalDecorString.1": "About the view: Standard yet pleasant atmosphere",
+  "foodstore.normalDecorString.2": "With decoration: Regular and comfortable setting",
+  "foodstore.normalDecorString.3": "The atmosphere: Everyday cozy ambiance",
+  "foodstore.normalDecorString.4": "About the view: Typical restaurant surroundings",
+
+  "foodstore.negativeDecorString.0": "Decoration in my eye: Dull and uninspiring decor",
+  "foodstore.negativeDecorString.1": "About the view: Lackluster and unimpressive setting",
+  "foodstore.negativeDecorString.2": "With decoration: Unattractive and mismatched design",
+  "foodstore.negativeDecorString.3": "The atmosphere: Uninviting and uncomfortable vibes",
+  "foodstore.negativeDecorString.4": "About the view: Unpleasant surroundings",
+
+  //
+  "foodstore.willVisit.0": "Absolutely will drop by and visit the store",
+  "foodstore.willVisit.1": "Definitely planning to stop by the store soon",
+  "foodstore.willVisit.2": "Certainly looking forward to visiting the store",
+
+  "foodstore.mayVisit.0": "Might consider dropping by the shop",
+  "foodstore.mayVisit.1": "Possibly planning to visit the shop soon",
+  "foodstore.mayVisit.2": "Could stop by and explore the shop",
+
+  "foodstore.noVisit.0": "Currently have no intention to visit the shop",
+  "foodstore.noVisit.1": "No immediate plans or desire to drop by the shop",
+  "foodstore.noVisit.2": "Not considering a visit to the shop in the foreseeable future",
+
+  //
+  "foodstore.gooddecor.0": "Lovely ambiance! I wonder how their food taste!",
+  "foodstore.gooddecor.1": "The decor is amazing here. How does the food match up?",
+  "foodstore.gooddecor.2": "Great atmosphere! Curious about the taste of their dishes.",
+  "foodstore.gooddecor.3": "Beautiful decor. I'm eager to find out about their food!",
+  "foodstore.gooddecor.4": "This place has a fantastic vibe. Wondering about the food quality!",
+
+  "foodstore.baddecor.0": "Not a fan of the decor. Is it reflected in their food quality?",
+  "foodstore.baddecor.1": "The ambiance here is lacking. I hope their food is better.",
+  "foodstore.baddecor.2": "Poor decor choices. I wonder if their food choices are better.",
+  "foodstore.baddecor.3": "The place doesn't look inviting. Are their food standards up to par?",
+  "foodstore.baddecor.4": "The decor is disappointing. I hope the food isn't the same!",
+
+  //
+  "foodstore.dishweek.0": "Hey, did you hear? The featured dish of the week is {{dishWeek}}!",
+  "foodstore.dishweek.1": "Guess what's on the menu this week? It's the featured dish: {{dishWeek}}!",
+  "foodstore.dishweek.2": "I just found out that {{dishWeek}} is the star of the week at the restaurant!",
+  "foodstore.dishweek.3": "You won't believe it! This week's highlight is {{dishWeek}}. Exciting, right?",
+  "foodstore.dishweek.4": "Have you tried the featured dish, {{dishWeek}}, yet? It's the talk of the town!",
+
+  "foodstore.dishday.0": "Have you heard? The featured dish today is {{dishToday}}!",
+  "foodstore.dishday.1": "Today's special is none other than {{dishToday}}. Exciting, right?",
+  "foodstore.dishday.2": "Breaking news: {{dishToday}} is the star of today's menu!",
+  "foodstore.dishday.3": "Guess what's cooking today? It's the featured dish: {{dishToday}}!",
+  "foodstore.dishday.4": "I just found out that {{dishToday}} is today's highlight. Let's give it a try!",
+  "foodstore.dishday.5": "Quick heads up: {{dishToday}} is stealing the spotlight today!",
+  "foodstore.dishday.6": "Can you believe it? Today's star is none other than {{dishToday}}!",
+  "foodstore.dishday.7": "Today just got better with the featured dish: {{dishToday}}!",
+  "foodstore.dishday.8": "Let's spice up today with a taste of {{dishToday}}! It's the special.",
+  "foodstore.dishday.9": "The talk of the town: {{dishToday}} is today's must-try dish!"
+
+
+
+
+
+
+
+
 
 
 
