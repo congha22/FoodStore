@@ -7,7 +7,7 @@
   "foodstore.config.minutetohungryText": "Minutes since last meal of each NPC. Default 240. Setting too low might cause weird path finding. Recommended above 60",
 
   "foodstore.config.movetofoodchange": "Move To Food % Chance.",
-  "foodstore.config.movetofoodchangeText": "Percent chance per tick to move to food if hungry. Default 0.01. Setting higher cause significantly lag and weird path finding. Greatly recommended under 0.1",
+  "foodstore.config.movetofoodchangeText": "Percent chance per tick to move to food if hungry. Default 0.01. Setting higher cause significantly lag and weird path finding. Greatly recommended under 0.05",
 
   "foodstore.config.maxdistancetofindfood": "Max Distance to find food",
   "foodstore.config.maxdistancetofindfoodText": "Max distance in tiles from food that NPCs can find it. Default 40",
@@ -39,7 +39,6 @@
   "foodstore.config.enabletipclosedislike": "Disliked food tip value multiplier",
   "foodstore.config.enabletipclosehate": "Hated food tip value multiplier",
 
-
   // 15 Coming
   "foodstore.coming.0": "In a delightful twist, {{vName}} is heading to our store for an unexpected visit.",
   "foodstore.coming.1": "{{vName}} is strolling our way, curious about our store's offerings.",
@@ -56,7 +55,6 @@
   "foodstore.coming.12": "{{vName}} is casually making their way to our store, anticipating a good time.",
   "foodstore.coming.13": "{{vName}} is diverting from the norm to visit our store and enjoy the offerings.",
   "foodstore.coming.14": "{{vName}} is making a spontaneous detour to our store, eager for a unique experience.",
-
 
   // Love Rep
   "foodstore.loverep.0": "My taste buds dance with joy at each flavorful bite!",
@@ -80,7 +78,6 @@
   "foodstore.loverep.18": "A love letter to gastronomy; this dish is divine.",
   "foodstore.loverep.19": "Passionately in love with the perfection of this creation.",
 
-
   // Like rep
   "foodstore.likerep.0": "A dish I enjoy on occasion, it's quite good.",
   "foodstore.likerep.1": "Consistently decent; I don't mind ordering it.",
@@ -102,7 +99,6 @@
   "foodstore.likerep.17": "A decent choice that I occasionally go for.",
   "foodstore.likerep.18": "It's alright; I don't mind this dish.",
   "foodstore.likerep.19": "An acceptable option; it's fairly enjoyable.",
-
 
   // Neutral rep
   "foodstore.neutralrep.0": "A standard dish; it's neither good nor bad.",
@@ -220,7 +216,6 @@
   "foodstore.randomchat.hate.6": "Can't tolerate their rude staff.",
   "foodstore.randomchat.hate.7": "Hating the overall experience—never again!",
 
-
   //---------------------------- End of v1.1.0-----------------------------
 
   //
@@ -310,17 +305,11 @@
   "foodstore.dishday.6": "Can you believe it? Today's star is none other than {{dishToday}}!",
   "foodstore.dishday.7": "Today just got better with the featured dish: {{dishToday}}!",
   "foodstore.dishday.8": "Let's spice up today with a taste of {{dishToday}}! It's the special.",
-  "foodstore.dishday.9": "The talk of the town: {{dishToday}} is today's must-try dish!"
+  "foodstore.dishday.9": "The talk of the town: {{dishToday}} is today's must-try dish!",
 
+  //---------------------------- End of v1.2.0-----------------------------
 
-
-
-
-
-
-
-
-
-
-
+  //
+  "foodstore.config.chat": "Disable non-important message?",
+  "foodstore.thankyou": "[144] Thank you for using Food Store! [144] If you're enjoying the mod, your support means the world. Show some love by voting and following for future updates. Your enthusiasm fuels our kitchen of creativity!!! [43] #FoodStore"
 }

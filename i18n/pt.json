@@ -1,0 +1,316 @@
+{
+  // CONFIGURA��O
+  "foodstore.config.enable": "Mod Habilitado?",
+
+  "foodstore.config.minutetohungry": "Minutos Para Fome",
+
+  "foodstore.config.minutetohungryText": "Minutos desde a �ltima refei��o de cada NPC. Padr�o 240. Definir muito baixo pode causar um comportamento estranho na navega��o. Recomendado acima de 60",
+
+  "foodstore.config.movetofoodchange": "Mover Para Chance de Comida %",
+  "foodstore.config.movetofoodchangeText": "Chance percentual por tick de se mover para a comida se estiver com fome. Padr�o 0.01. Configurar mais alto pode causar lag significativo e comportamento estranho na navega��o. Altamente recomendado abaixo de 0.05",
+
+  "foodstore.config.maxdistancetofindfood": "Dist�ncia M�xima para Encontrar Comida",
+  "foodstore.config.maxdistancetofindfoodText": "Dist�ncia m�xima em tiles a partir da comida que NPCs podem encontr�-la. Padr�o 40",
+
+  "foodstore.config.maxdistancetoeat": "Dist�ncia M�xima para Comer",
+  "foodstore.config.maxdistancetoeatText": "Dist�ncia m�xima em tiles da comida para com�-la. Padr�o 4",
+
+  "foodstore.config.rushhour": "Habilitar Hora do Rush?",
+  "foodstore.config.rushhourText": "Durante a hora do rush, maior chance para clientes e gorjeta maior, mas pre�o ligeiramente mais baixo. Reabaste�a sua loja!!!",
+
+  "foodstore.config.enableprice": "Habilitar Op��o de Pre�o?",
+  "foodstore.config.enablepriceText": "Padr�o -1 para valor aleat�rio",
+
+  "foodstore.config.pricelovemulti": "Multiplicador de pre�o de venda para comida adorada",
+  "foodstore.config.pricelikemulti": "Multiplicador de pre�o de venda para comida gostada",
+  "foodstore.config.priceneutralmulti": "Multiplicador de pre�o de venda para comida neutra",
+  "foodstore.config.pricedislikemulti": "Multiplicador de pre�o de venda para comida n�o gostada",
+  "foodstore.config.pricehatemulti": "Multiplicador de pre�o de venda para comida odiada",
+
+  "foodstore.config.enabletip": "Habilitar Op��o de Gorjeta?",
+  "foodstore.config.enabletipText": "O valor da gorjeta � uma fra��o do pre�o de venda. Padr�o -1",
+
+  "foodstore.config.enabletipclose": "Apenas Gorjeta quando a loja est� aberta?",
+  "foodstore.config.enabletipcloseText": "Quando definido como Verdadeiro, receba gorjeta apenas quando o jogador estiver pr�ximo � loja",
+
+  "foodstore.config.enabletipcloselove": "Multiplicador de gorjeta para comida adorada",
+  "foodstore.config.enabletipcloselike": "Multiplicador de gorjeta para comida gostada",
+  "foodstore.config.enabletipcloseneutral": "Multiplicador de gorjeta para comida neutra",
+  "foodstore.config.enabletipclosedislike": "Multiplicador de gorjeta para comida n�o gostada",
+  "foodstore.config.enabletipclosehate": "Multiplicador de gorjeta para comida odiada",
+
+  // 15 Vindo
+  "foodstore.coming.0": "Numa reviravolta encantadora, {{vName}} est� a caminho de nossa loja para uma visita inesperada.",
+  "foodstore.coming.1": "{{vName}} est� passeando em nossa dire��o, curioso sobre as ofertas de nossa loja.",
+  "foodstore.coming.2": "No meio de seu dia, {{vName}} est� escolhendo passar algum tempo em nossa loja.",
+  "foodstore.coming.3": "{{vName}} est� fazendo uma visita n�o planejada � nossa loja, quebrando a rotina.",
+  "foodstore.coming.4": "{{vName}} est� se dirigindo tranquilamente � nossa loja, esperando uma experi�ncia encantadora.",
+  "foodstore.coming.5": "Liberando-se das tarefas, {{vName}} est� a caminho de explorar nossa loja.",
+  "foodstore.coming.6": "{{vName}} est� navegando em dire��o � nossa loja, buscando uma experi�ncia de compra �nica.",
+  "foodstore.coming.7": "Espontaneamente, {{vName}} est� se dirigindo � nossa loja para uma surpresa agrad�vel.",
+  "foodstore.coming.8": "{{vName}} est� se dirigindo � nossa loja, ansioso para descobrir algo novo.",
+  "foodstore.coming.9": "Com empolga��o, {{vName}} est� a caminho de nossa loja para uma visita improvisada.",
+  "foodstore.coming.10": "{{vName}} est� desviando o curso para visitar nossa loja, antecipando algo especial.",
+  "foodstore.coming.11": "No meio de seu dia, {{vName}} decidiu passar por nossa loja por um tempo.",
+  "foodstore.coming.12": "{{vName}} est� indo casualmente em dire��o � nossa loja, antecipando um bom momento.",
+  "foodstore.coming.13": "{{vName}} est� se desviando da norma para visitar nossa loja e aproveitar as ofertas.",
+  "foodstore.coming.14": "{{vName}} est� fazendo um desvio espont�neo para nossa loja, ansioso por uma experi�ncia �nica.",
+
+  // Amor pela Comida
+  "foodstore.loverep.0": "Meus bot�es de gosto dan�am de alegria a cada mordida saborosa!",
+  "foodstore.loverep.1": "Degustar este prato � como um abra�o caloroso para os meus sentidos.",
+  "foodstore.loverep.2": "Sabor requintado que perdura, uma verdadeira del�cia culin�ria.",
+  "foodstore.loverep.3": "Uma sinfonia de sabores que se harmonizam perfeitamente.",
+  "foodstore.loverep.4": "Indulge na perfei��o rica desta del�cia salgada.",
+  "foodstore.loverep.5": "Uma jornada culin�ria que deixa uma impress�o indel�vel.",
+  "foodstore.loverep.6": "Alegria irresist�vel em cada mordida, uma verdadeira del�cia.",
+  "foodstore.loverep.7": "Deleite-se na magia culin�ria desta perfei��o elaborada.",
+  "foodstore.loverep.8": "Eleva a refei��o a uma arte, uma obra-prima em meu prato.",
+  "foodstore.loverep.9": "Uma fuga deliciosa para um mundo de maravilhas gastron�micas.",
+  "foodstore.loverep.10": "Provocando meus bot�es de gosto com uma mistura perfeita de sabores.",
+  "foodstore.loverep.11": "Uma sensa��o salgada que cativa meu paladar.",
+  "foodstore.loverep.12": "Revelando a arte do gosto, um prato a ser lembrado.",
+  "foodstore.loverep.13": "Perfei��o gourmet em cada bocado, um triunfo culin�rio.",
+  "foodstore.loverep.14": "Uma melodia tentadora de sabores que dan�a na minha l�ngua.",
+  "foodstore.loverep.15": "Uma obra-prima culin�ria, puro amor em meu prato.",
+  "foodstore.loverep.16": "Sabores cativantes, um verdadeiro caso de amor para os meus bot�es de gosto.",
+  "foodstore.loverep.17": "Prato encantador, amor � primeira mordida sempre.",
+  "foodstore.loverep.18": "Uma carta de amor � gastronomia; este prato � divino.",
+  "foodstore.loverep.19": "Apaixonadamente enamorado pela perfei��o desta cria��o.",
+
+  // Gostar Rep
+  "foodstore.likerep.0": "Um prato que aprecio de vez em quando, � bastante bom.",
+  "foodstore.likerep.1": "Consistentemente decente; n�o me importo de pedir.",
+  "foodstore.likerep.2": "Uma op��o s�lida que eu me vejo escolhendo.",
+  "foodstore.likerep.3": "Este prato � bom; gosto de sua simplicidade.",
+  "foodstore.likerep.4": "Uma escolha razo�vel; satisfaz meu paladar.",
+  "foodstore.likerep.5": "N�o � ruim; acho que � confiavelmente saboroso.",
+  "foodstore.likerep.6": "Um prato decente; � uma escolha segura e satisfat�ria.",
+  "foodstore.likerep.7": "N�o me importo com este prato; � confiavelmente agrad�vel.",
+  "foodstore.likerep.8": "N�o � o meu favorito, mas acho bastante palat�vel.",
+  "foodstore.likerep.9": "Est� bom; um prato que n�o me importo de ter.",
+  "foodstore.likerep.10": "Consistentemente bom; aprecio seu sabor.",
+  "foodstore.likerep.11": "Este prato � razo�vel; acho que � confiavelmente saboroso.",
+  "foodstore.likerep.12": "Uma op��o decente; n�o me importo de t�-lo.",
+  "foodstore.likerep.13": "Est� bom; um prato que aprecio ocasionalmente.",
+  "foodstore.likerep.14": "Uma escolha aceit�vel quando estou com vontade.",
+  "foodstore.likerep.15": "Acho este prato razo�vel; � satisfat�rio.",
+  "foodstore.likerep.16": "N�o � ruim de todo; � um prato que posso apreciar.",
+  "foodstore.likerep.17": "Uma escolha decente pela qual ocasionalmente opto.",
+  "foodstore.likerep.18": "Est� bom; n�o me importo com este prato.",
+  "foodstore.likerep.19": "Uma op��o aceit�vel; � bastante agrad�vel.",
+
+  // Rep Neutro
+  "foodstore.neutralrep.0": "Um prato padr�o; nem � bom nem ruim.",
+  "foodstore.neutralrep.1": "Est� bom; um prato que nem amo nem desgosto.",
+  "foodstore.neutralrep.2": "Uma escolha regular; n�o se destaca muito.",
+  "foodstore.neutralrep.3": "Este prato � m�dio; nada excepcional.",
+  "foodstore.neutralrep.4": "N�o � ruim, n�o � �timo; uma op��o mediana.",
+  "foodstore.neutralrep.5": "Uma escolha neutra; n�o deixa uma forte impress�o.",
+  "foodstore.neutralrep.6": "Est� decente; uma escolha padr�o para uma refei��o.",
+  "foodstore.neutralrep.7": "Nem aqui nem l�; um prato aceit�vel.",
+  "foodstore.neutralrep.8": "Uma op��o comum; n�o empolga nem decepciona.",
+  "foodstore.neutralrep.9": "Est� bom; um prato que n�o chama muita aten��o.",
+  "foodstore.neutralrep.10": "No meio do espectro; nem amor nem �dio.",
+  "foodstore.neutralrep.11": "Uma escolha comum; n�o influencia muito meu paladar.",
+  "foodstore.neutralrep.12": "N�o excepcional, mas tamb�m n�o � ruim; um prato regular.",
+  "foodstore.neutralrep.13": "M�dio em todos os aspectos; � uma op��o direta.",
+  "foodstore.neutralrep.14": "Uma escolha t�pica; n�o deixa uma impress�o duradoura.",
+  "foodstore.neutralrep.15": "Nem bom nem ruim; � apenas um prato m�dio.",
+  "foodstore.neutralrep.16": "Uma op��o padr�o; n�o evoca sentimentos fortes.",
+  "foodstore.neutralrep.17": "N�o impressionante, nem decepcionante; apenas um prato comum.",
+  "foodstore.neutralrep.18": "Equilibrado entre gostar e n�o gostar; est� bom.",
+  "foodstore.neutralrep.19": "Um prato comum; n�o se destaca muito.",
+
+  // Repulsa Rep
+  "foodstore.dislikerep.0": "N�o � o meu favorito; acho que este prato deixa a desejar.",
+  "foodstore.dislikerep.1": "� toler�vel, mas n�o sou f� deste prato.",
+  "foodstore.dislikerep.2": "Uma escolha decepcionante; fica aqu�m para mim.",
+  "foodstore.dislikerep.3": "Este prato � med�ocre; eu n�o o recomendaria.",
+  "foodstore.dislikerep.4": "Eu posso com�-lo, mas n�o � um prato que eu aprecio muito.",
+  "foodstore.dislikerep.5": "Uma op��o razo�vel; eu n�o gosto particularmente dele.",
+  "foodstore.dislikerep.6": "� comest�vel, mas eu n�o estou ansioso por este prato.",
+  "foodstore.dislikerep.7": "Eu experimentei, mas n�o � do meu agrado.",
+  "foodstore.dislikerep.8": "Uma escolha mais ou menos; eu n�o acho muito apetitoso.",
+  "foodstore.dislikerep.9": "N�o � o pior, mas n�o sou f� deste prato.",
+  "foodstore.dislikerep.10": "Este prato � m�dio; j� tive op��es melhores.",
+  "foodstore.dislikerep.11": "Eu consigo com�-lo, mas n�o � minha escolha preferida.",
+  "foodstore.dislikerep.12": "Uma op��o razo�vel; n�o estou empolgado com este prato.",
+  "foodstore.dislikerep.13": "Toler�vel, mas falta o apelo para mim.",
+  "foodstore.dislikerep.14": "� comest�vel, mas n�o escolheria este prato voluntariamente.",
+  "foodstore.dislikerep.15": "N�o � terr�vel, mas eu n�o aprecio muito este prato.",
+  "foodstore.dislikerep.16": "Uma escolha abaixo da m�dia; h� op��es melhores dispon�veis.",
+  "foodstore.dislikerep.17": "Fica aqu�m para mim; eu n�o acho apetitoso.",
+  "foodstore.dislikerep.18": "Eu posso com�-lo, mas n�o � minha escolha preferida.",
+  "foodstore.dislikerep.19": "Uma op��o m�dia; n�o � algo que eu aprecie.",
+
+  // Odiar Rep
+  "foodstore.haterep.0": "Este prato � simplesmente terr�vel; eu n�o suporto.",
+  "foodstore.haterep.1": "Uma completa decep��o; este prato � horr�vel.",
+  "foodstore.haterep.2": "Eu realmente n�o gosto deste prato; � pouco apetitoso.",
+  "foodstore.haterep.3": "Uma escolha terr�vel; eu n�o consigo suportar este prato.",
+  "foodstore.haterep.4": "Eu detesto este prato; � totalmente repulsivo.",
+  "foodstore.haterep.5": "Este prato � revoltante; eu n�o suporto o sabor.",
+  "foodstore.haterep.6": "Absolutamente detest�vel; este prato � intrag�vel.",
+  "foodstore.haterep.7": "Eu desprezo este prato; � verdadeiramente abomin�vel.",
+  "foodstore.haterep.8": "Nojento; eu me arrependo de experimentar este prato miser�vel.",
+  "foodstore.haterep.9": "Um desastre culin�rio; este prato � insuport�vel.",
+  "foodstore.haterep.10": "Eu odeio este prato; � uma completa decep��o.",
+  "foodstore.haterep.11": "Absolutamente horr�vel; eu n�o consigo expressar meu desd�m o suficiente.",
+  "foodstore.haterep.12": "Este prato � repugnante; eu n�o consigo entender seu apelo.",
+  "foodstore.haterep.13": "Uma experi�ncia nauseante; eu aconselho fortemente contra isso.",
+  "foodstore.haterep.14": "Eu detesto este prato; � um pesadelo gastron�mico.",
+  "foodstore.haterep.15": "Este prato � vil; eu n�o encontro qualidades redentoras.",
+  "foodstore.haterep.16": "Abismal; este prato � o ep�tome do fracasso culin�rio.",
+  "foodstore.haterep.17": "Eu abomino este prato; � um massacre para minhas papilas gustativas.",
+  "foodstore.haterep.18": "Uma escolha ofensiva; eu me arrependo at� mesmo de experimentar.",
+  "foodstore.haterep.19": "Eu desprezo este prato; � uma cat�strofe culin�ria.",
+
+  //
+  "foodstore.tip": ". Aqui est� a sua gorjeta de {{tipValue}}G",
+  "foodstore.sold": "   Vendido {{foodObjName}} em {{locationString}} por {{saleString}}G",
+
+  //
+  "foodstore.randomchat.love.0": "Sentindo um amor imenso por este lugar!",
+  "foodstore.randomchat.love.1": "Apaixonado(a) pelos pratos incr�veis deles!",
+  "foodstore.randomchat.love.2": "Esta loja rouba meu cora��o toda vez.",
+  "foodstore.randomchat.love.3": "Amo as vibra��es acolhedoras e a equipe amig�vel!",
+  "foodstore.randomchat.love.4": "Adoro as guloseimas especiais que oferecem!",
+  "foodstore.randomchat.love.5": "Apaixonado(a) pelo delicioso card�pio deles!",
+  "foodstore.randomchat.love.6": "Perdidamente apaixonado(a) pelos seus doces!",
+  "foodstore.randomchat.love.7": "Adorando os sabores �nicos que eles proporcionam!",
+
+  "foodstore.randomchat.like.0": "Realmente gosto da atmosfera aqui.",
+  "foodstore.randomchat.like.1": "Gostei da variedade de op��es dispon�veis.",
+  "foodstore.randomchat.like.2": "Aproveitei o servi�o r�pido e eficiente.",
+  "foodstore.randomchat.like.3": "Gosto da qualidade dos produtos frescos deles.",
+  "foodstore.randomchat.like.4": "Aprecio os pre�os acess�veis!",
+  "foodstore.randomchat.like.5": "Experi�ncia favor�vel com a equipe deles.",
+  "foodstore.randomchat.like.6": "Gostando dos novos itens no card�pio!",
+  "foodstore.randomchat.like.7": "�timo lugar para uma experi�ncia de jantar casual.",
+
+  "foodstore.randomchat.neutral.0": "Apenas normal sobre a experi�ncia na loja hoje.",
+  "foodstore.randomchat.neutral.1": "Foi uma visita ok � loja.",
+  "foodstore.randomchat.neutral.2": "Nem bom nem ruim, apenas um dia comum.",
+  "foodstore.randomchat.neutral.3": "N�o consegui decidir como me senti sobre isso.",
+  "foodstore.randomchat.neutral.4": "Uma experi�ncia neutra no geral.",
+  "foodstore.randomchat.neutral.5": "N�o deixou uma impress�o forte.",
+  "foodstore.randomchat.neutral.6": "Visita mediana hoje.",
+  "foodstore.randomchat.neutral.7": "Sem sentimentos fortes, apenas neutro.",
+
+  "foodstore.randomchat.dislike.0": "N�o gostei muito da comida desta vez.",
+  "foodstore.randomchat.dislike.1": "N�o sou f� do servi�o hoje.",
+  "foodstore.randomchat.dislike.2": "N�o gostei da longa espera no caixa.",
+  "foodstore.randomchat.dislike.3": "N�o impressionado(a) com a qualidade dos produtos.",
+  "foodstore.randomchat.dislike.4": "Experi�ncia decepcionante no geral.",
+  "foodstore.randomchat.dislike.5": "Frustrado(a) com a falta de limpeza.",
+  "foodstore.randomchat.dislike.6": "N�o atendeu �s expectativas desta vez.",
+  "foodstore.randomchat.dislike.7": "Me sentindo decepcionado(a) com a loja hoje.",
+
+  "foodstore.randomchat.hate.0": "Odeio o fato de eles sempre servirem esse tipo de comida!",
+  "foodstore.randomchat.hate.1": "Absolutamente desprezo o atendimento ao cliente deles.",
+  "foodstore.randomchat.hate.2": "N�o suporto a desorganiza��o nesta loja.",
+  "foodstore.randomchat.hate.3": "Odeio os constantes itens fora de estoque.",
+  "foodstore.randomchat.hate.4": "Desprezo a falta de limpeza na loja.",
+  "foodstore.randomchat.hate.5": "N�o suporto a qualidade da comida deles.",
+  "foodstore.randomchat.hate.6": "N�o consigo tolerar a grosseria da equipe.",
+  "foodstore.randomchat.hate.7": "Odiando a experi�ncia geral � nunca mais!",
+
+  //---------------------------- End of v1.1.0-----------------------------
+
+  //
+  "foodstore.config.saleprice": "Pre�o de Venda",
+  "foodstore.config.tipvalue": "Valor da Gorjeta",
+
+  "foodstore.config.enabledecor": "Ativar Decora��o?",
+  "foodstore.config.enabledecorText": "Quando definido como Verdadeiro, Decora��o e Ambiente afetam o pre�o de venda",
+
+  //
+  "foodstore.positiveTasteString.0": "Sobre a comida: Del�cia que faz �gua na boca",
+  "foodstore.positiveTasteString.1": "Com a comida: Perfei��o saborosa",
+  "foodstore.positiveTasteString.2": "Com a comida: Explos�o de sabor requintado",
+  "foodstore.positiveTasteString.3": "No aspecto da comida: Irresistivelmente deliciosa",
+  "foodstore.positiveTasteString.4": "Com a comida: Sensa��o de sabor irresist�vel",
+
+  "foodstore.normalTasteString.0": "No aspecto da comida: Bondade equilibrada",
+  "foodstore.normalTasteString.1": "Com a comida: Satisfa��o familiar",
+  "foodstore.normalTasteString.2": "Sobre a comida: Deliciosidade cotidiana",
+  "foodstore.normalTasteString.3": "Com a comida: Harmonia cl�ssica de sabores",
+  "foodstore.normalTasteString.4": "Com a comida: Del�cia culin�ria comum",
+
+  "foodstore.negativeTasteString.0": "No aspecto da comida: Gosto desagrad�vel",
+  "foodstore.negativeTasteString.1": "Com a comida: Sabor decepcionante",
+  "foodstore.negativeTasteString.2": "Sobre a comida: Sem gra�a e pouco atraente",
+  "foodstore.negativeTasteString.3": "Sobre a comida: Mistura intrag�vel",
+  "foodstore.negativeTasteString.4": "No aspecto da comida: Experi�ncia culin�ria desagrad�vel",
+
+  //
+  "foodstore.positiveDecorString.0": "Decora��o aos meus olhos: Ambiente elegante",
+  "foodstore.positiveDecorString.1": "Sobre a vista: Ambiente acolhedor e convidativo",
+  "foodstore.positiveDecorString.2": "Com a decora��o: Atmosfera encantadora",
+  "foodstore.positiveDecorString.3": "A atmosfera: Vibra��es elegantes e relaxantes",
+  "foodstore.positiveDecorString.4": "Sobre a vista: Arredores pitorescos",
+
+  "foodstore.normalDecorString.0": "Decora��o aos meus olhos: Design simples e elegante",
+  "foodstore.normalDecorString.1": "Sobre a vista: Ambiente padr�o, mas agrad�vel",
+  "foodstore.normalDecorString.2": "Com a decora��o: Ambiente regular e confort�vel",
+  "foodstore.normalDecorString.3": "A atmosfera: Ambiente acolhedor do dia a dia",
+  "foodstore.normalDecorString.4": "Sobre a vista: Arredores t�picos de restaurante",
+
+  "foodstore.negativeDecorString.0": "Decora��o aos meus olhos: Decora��o sem gra�a e sem inspira��o",
+  "foodstore.negativeDecorString.1": "Sobre a vista: Ambiente sem brilho e pouco impressionante",
+  "foodstore.negativeDecorString.2": "Com a decora��o: Design pouco atraente e descoordenado",
+  "foodstore.negativeDecorString.3": "A atmosfera: Vibra��es pouco convidativas e desconfort�veis",
+  "foodstore.negativeDecorString.4": "Sobre a vista: Arredores desagrad�veis",
+
+  //
+  "foodstore.willVisit.0": "Com certeza vou passar e visitar a loja",
+  "foodstore.willVisit.1": "Definitivamente planejo passar pela loja em breve",
+  "foodstore.willVisit.2": "Certamente estou ansioso para visitar a loja",
+
+  "foodstore.mayVisit.0": "Posso considerar dar uma passada na loja",
+  "foodstore.mayVisit.1": "Possivelmente planejando visitar a loja em breve",
+  "foodstore.mayVisit.2": "Poderia passar e explorar a loja",
+
+  "foodstore.noVisit.0": "Atualmente n�o tenho inten��o de visitar a loja",
+  "foodstore.noVisit.1": "Sem planos imediatos ou desejo de passar pela loja",
+  "foodstore.noVisit.2": "N�o estou considerando uma visita � loja num futuro pr�ximo",
+
+  //
+  "foodstore.gooddecor.0": "Ambiente ador�vel! Fico curioso sobre o sabor da comida!",
+  "foodstore.gooddecor.1": "A decora��o aqui � incr�vel. Como ser� o sabor da comida?",
+  "foodstore.gooddecor.2": "�tima atmosfera! Curioso sobre o sabor dos pratos deles.",
+  "foodstore.gooddecor.3": "Decora��o linda. Estou ansioso para saber sobre a comida!",
+  "foodstore.gooddecor.4": "Este lugar tem uma vibe fant�stica. Curioso sobre a qualidade da comida!",
+
+  "foodstore.baddecor.0": "N�o sou f� da decora��o. Ser� que isso se reflete na qualidade da comida?",
+  "foodstore.baddecor.1": "A atmosfera aqui est� deixando a desejar. Espero que a comida seja melhor.",
+  "foodstore.baddecor.2": "Escolhas de decora��o ruins. Ser� que as escolhas de comida s�o melhores?",
+  "foodstore.baddecor.3": "O lugar n�o parece convidativo. Ser� que os padr�es da comida est�o � altura?",
+  "foodstore.baddecor.4": "A decora��o � decepcionante. Espero que a comida n�o seja igual!",
+
+  //
+  "foodstore.dishweek.0": "Ei, voc� ouviu? O prato em destaque desta semana � {{dishWeek}}!",
+  "foodstore.dishweek.1": "Adivinhe o que est� no card�pio desta semana? � o prato em destaque: {{dishWeek}}!",
+  "foodstore.dishweek.2": "Acabei de descobrir que {{dishWeek}} � a estrela da semana no restaurante!",
+  "foodstore.dishweek.3": "Voc� n�o vai acreditar! O destaque desta semana � {{dishWeek}}. Empolgante, n�o �?",
+  "foodstore.dishweek.4": "J� experimentou o prato em destaque, {{dishWeek}}, ainda? � o assunto da cidade!",
+
+  "foodstore.dishday.0": "Voc� ouviu? O prato em destaque hoje � {{dishToday}}!",
+  "foodstore.dishday.1": "A especialidade de hoje � nada menos que {{dishToday}}. Empolgante, n�o?",
+  "foodstore.dishday.2": "�ltimas not�cias: {{dishToday}} � a estrela do card�pio de hoje!",
+  "foodstore.dishday.3": "Adivinhe o que est� cozinhando hoje? � o prato em destaque: {{dishToday}}!",
+  "foodstore.dishday.4": "Acabei de descobrir que {{dishToday}} � o destaque de hoje. Vamos experimentar!",
+  "foodstore.dishday.5": "Aviso r�pido: {{dishToday}} est� roubando a cena hoje!",
+  "foodstore.dishday.6": "Voc� acredita nisso? A estrela de hoje � nada menos que {{dishToday}}!",
+  "foodstore.dishday.7": "Hoje ficou melhor com o prato em destaque: {{dishToday}}!",
+  "foodstore.dishday.8": "Vamos apimentar hoje com um pouco de {{dishToday}}! � a especialidade.",
+  "foodstore.dishday.9": "O assunto da cidade: {{dishToday}} � o prato imperd�vel de hoje!",
+
+  //---------------------------- End of v1.2.0-----------------------------
+
+  //
+  "foodstore.config.chat": "Desativar mensagens n�o importantes?",
+  "foodstore.thankyou": "[144]Obrigado por usar o Food Store![144] Se voc� est� curtindo o mod, seu apoio significa o mundo. Demonstre seu carinho votando e seguindo para futuras atualiza��es. Sua empolga��o alimenta nossa cozinha da criatividade![43] #FoodStore"
+
+}

@@ -165,6 +165,12 @@ namespace FoodStore
                 setValue: value => Config.TipWhenNeaBy = value
             );
 
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.chat"),
+                getValue: () => Config.DisableChat,
+                setValue: value => Config.DisableChat = value
+            );
 
             configMenu.AddPageLink(mod: ModManifest, "salePrice", () => SHelper.Translation.Get("foodstore.config.saleprice"));
             configMenu.AddPageLink(mod: ModManifest, "tipValue", () => SHelper.Translation.Get("foodstore.config.tipvalue"));
@@ -269,8 +275,12 @@ namespace FoodStore
 				{
 					while (enumerator.MoveNext())
 					{
-
-                        int taste = __instance.getGiftTasteForThisItem(food.foodObject);
+                        int taste = 8;
+                        try
+                        {
+                            taste = __instance.getGiftTasteForThisItem(food.foodObject);
+                        }
+                        catch (NullReferenceException) { }
 						string reply;
 						int salePrice = food.foodObject.sellToStorePrice();
 						int tip = 0;
@@ -407,26 +417,32 @@ namespace FoodStore
                             MyMessage messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.sold", new { foodObjName = food.foodObject.Name, locationString = __instance.currentLocation.Name, saleString = salePrice }));
                             SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
 
-                            if (tip != 0)
+                            if (!Config.DisableChat)
                             {
-                                Game1.chatBox.addInfoMessage($"   {__instance.Name}: " + reply + SHelper.Translation.Get("foodstore.tip", new { tipValue = tip }));
-                                messageToSend = new MyMessage($"   {__instance.Name}: " + reply + SHelper.Translation.Get("foodstore.tip", new { tipValue = tip }));
-                                SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
-                            }
-                            else
-                            {
-                                Game1.chatBox.addInfoMessage($"   {__instance.Name}: " + reply);
-                                messageToSend = new MyMessage($"   {__instance.Name}: " + reply);
-                                SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
+                                if (tip != 0)
+                                {
+                                    Game1.chatBox.addInfoMessage($"   {__instance.Name}: " + reply + SHelper.Translation.Get("foodstore.tip", new { tipValue = tip }));
+                                    messageToSend = new MyMessage($"   {__instance.Name}: " + reply + SHelper.Translation.Get("foodstore.tip", new { tipValue = tip }));
+                                    SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
+                                }
+                                else
+                                {
+                                    Game1.chatBox.addInfoMessage($"   {__instance.Name}: " + reply);
+                                    messageToSend = new MyMessage($"   {__instance.Name}: " + reply);
+                                    SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
+                                }
                             }
                         }
                         else
                         {
                             Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.sold", new { foodObjName = food.foodObject.Name, locationString = __instance.currentLocation.Name, saleString = salePrice }));
-                            if (tip != 0)
-                                Game1.chatBox.addInfoMessage($"   {__instance.Name}: " + reply + SHelper.Translation.Get("foodstore.tip", new { tipValue = tip }));
-                            else
-                                Game1.chatBox.addInfoMessage($"   {__instance.Name}: " + reply);
+                            if (!Config.DisableChat)
+                            {
+                                if (tip != 0)
+                                    Game1.chatBox.addInfoMessage($"   {__instance.Name}: " + reply + SHelper.Translation.Get("foodstore.tip", new { tipValue = tip }));
+                                else
+                                    Game1.chatBox.addInfoMessage($"   {__instance.Name}: " + reply);
+                            }
                         }
 
 
@@ -636,8 +652,17 @@ namespace FoodStore
         public static void SaySomething(NPC thisCharacter, GameLocation thisLocation, double lastTasteRate, double lastDecorRate)
         {
             double chanceToVisit = lastTasteRate + lastDecorRate;
+            double localNpcCount = 0.6;
+
             Random rand = new Random();
             double getChance = rand.NextDouble();
+
+            foreach (NPC newCharacter in thisLocation.characters)
+            {
+                if (Utility.isThereAFarmerOrCharacterWithinDistance(new Microsoft.Xna.Framework.Vector2(thisCharacter.getTileLocation().X, thisCharacter.getTileLocation().Y), 13, thisCharacter.currentLocation) != null
+                    && localNpcCount > 0.2) localNpcCount -= 0.0175;
+
+            }
 
             foreach (NPC newCharacter in thisLocation.characters)
             {
@@ -662,29 +687,37 @@ namespace FoodStore
                     //do the work
                     if (getChance < chanceToVisit && lastTasteRate > 0.3 && lastDecorRate > 0)          //Will visit, positive Food, positive Decor
                     {
+                        thisCharacter.showTextAboveHead(tasteString + ". " + decorString, -1, 2, 8000);
+                        if (rand.NextDouble() > localNpcCount) continue;
+
                         if (newCharacter.modData["hapyke.FoodStore/LastFood"] == null) newCharacter.modData["hapyke.FoodStore/LastFood"] = "0";
                         newCharacter.modData["hapyke.FoodStore/LastFood"] = (Int32.Parse(newCharacter.modData["hapyke.FoodStore/LastFood"]) - Config.MinutesToHungry + 30).ToString();
-                        thisCharacter.showTextAboveHead(tasteString + ". " + decorString, -1, 2, 7000);
                         newCharacter.showTextAboveHead(SHelper.Translation.Get("foodstore.willVisit." + randomIndex2), -1, 2, 7000);
                     }
                     else if (getChance < chanceToVisit)                                                 //Will visit, normal or negative Food , Decor
                     {
+                        thisCharacter.showTextAboveHead(tasteString + ". " + decorString, -1, 2, 8000);
+                        if (rand.NextDouble() > localNpcCount) continue;
+
                         if (newCharacter.modData["hapyke.FoodStore/LastFood"] == null) newCharacter.modData["hapyke.FoodStore/LastFood"] = "0";
                         if (Config.MinutesToHungry >= 60)
                             newCharacter.modData["hapyke.FoodStore/LastFood"] = (Int32.Parse(newCharacter.modData["hapyke.FoodStore/LastFood"]) - Config.MinutesToHungry / 2).ToString();
-                        thisCharacter.showTextAboveHead(tasteString + ". " + decorString, -1, 2, 7000);
                         newCharacter.showTextAboveHead(SHelper.Translation.Get("foodstore.mayVisit." + randomIndex2), -1, 2, 7000);
                     }
                     else if (getChance >= chanceToVisit && lastTasteRate < 0.3 && lastDecorRate < 0)     //No visit, negative Food, negative Decor
                     {
+                        thisCharacter.showTextAboveHead(tasteString + ". " + decorString, -1, 2, 8000);
+                        if (rand.NextDouble() > localNpcCount) continue;
+
                         if (newCharacter.modData["hapyke.FoodStore/LastFood"] == null) newCharacter.modData["hapyke.FoodStore/LastFood"] = "2600";
                         newCharacter.modData["hapyke.FoodStore/LastFood"] = "2600";
-                        thisCharacter.showTextAboveHead(tasteString + ". " + decorString, -1, 2, 7000);
                         newCharacter.showTextAboveHead(SHelper.Translation.Get("foodstore.noVisit." + randomIndex2), -1, 2, 7000);
                     }
                     else if (getChance >= chanceToVisit)                                                 //No visit, normal or positive Food, Decor
                     {
-                        thisCharacter.showTextAboveHead(tasteString + ". " + decorString, -1, 2, 7000);
+                        thisCharacter.showTextAboveHead(tasteString + ". " + decorString, -1, 2, 8000);
+                        if (rand.NextDouble() > localNpcCount) continue;
+
                         newCharacter.showTextAboveHead(SHelper.Translation.Get("foodstore.mayVisit." + randomIndex2), -1, 2, 7000);
                     }
                     else { }    //Handle

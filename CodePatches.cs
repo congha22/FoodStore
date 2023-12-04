@@ -32,7 +32,8 @@ namespace FoodStore
 		{
 			if (!Config.EnableMod)
 				return;
-			__instance.modData["hapyke.FoodStore/LastFood"] = "0";
+
+            __instance.modData["hapyke.FoodStore/LastFood"] = "0";
 			__instance.modData["hapyke.FoodStore/LastCheck"] = "0";
 			__instance.modData["hapyke.FoodStore/LocationControl"] = ",";
             __instance.modData["hapyke.FoodStore/LastFoodTaste"] = "-1";
@@ -41,6 +42,13 @@ namespace FoodStore
 
             if (__instance.Name == "Lewis")
             {
+                if (Game1.dayOfMonth == 1 || Game1.dayOfMonth == 15)
+                {
+                    Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.thankyou"));
+                    MyMessage messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.thankyou"));
+                    SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
+                }
+
                 DishPrefer.dishDay = GetRandomDish();
                 if (Game1.dayOfMonth == 1 || Game1.dayOfMonth == 8 || Game1.dayOfMonth == 15 || Game1.dayOfMonth == 22)
                 {
@@ -51,7 +59,8 @@ namespace FoodStore
 
 		private static void NPC_performTenMinuteUpdate_Postfix(NPC __instance)
 		{
-            if(__instance.Name == "Lewis" && Game1.timeOfDay == 800)
+
+            if (__instance.Name == "Lewis" && Game1.timeOfDay == 900)
             {
                 Random random = new Random();
                 int randomIndex = random.Next(10);
@@ -62,7 +71,7 @@ namespace FoodStore
 
             if (Config.EnableMod && !Game1.eventUp && __instance.currentLocation is not null && __instance.isVillager() && !WantsToEat(__instance) && Microsoft.Xna.Framework.Vector2.Distance(__instance.getTileLocation(), Game1.player.getTileLocation()) < 30)
 			{
-                if (Game1.random.NextDouble() < 0.2)
+                if (Game1.random.NextDouble() < 0.1)
                 {
                     Random random = new Random();
                     int randomIndex = random.Next(8);
@@ -125,22 +134,22 @@ namespace FoodStore
                     else if (lastTaste == 2) //like
                     {
                         __instance.showTextAboveHead(SHelper.Translation.Get("foodstore.randomchat.like." + randomIndex));
-                        if (shareIdea < 0.1 + lastDecor / 2) SaySomething(__instance, __instance.currentLocation, lastTasteRate, lastDecorRate);
+                        if (shareIdea < 0.15 + lastDecor / 2) SaySomething(__instance, __instance.currentLocation, lastTasteRate, lastDecorRate);
                     }
                     else if (lastTaste == 4) //dislike
                     {
                         __instance.showTextAboveHead(SHelper.Translation.Get("foodstore.randomchat.dislike." + randomIndex));
-                        if (shareIdea < Math.Abs( -0.1 + lastDecor / 2)) SaySomething(__instance, __instance.currentLocation, lastTasteRate, lastDecorRate);
+                        if (shareIdea < Math.Abs( -0.15 + lastDecor / 2.5)) SaySomething(__instance, __instance.currentLocation, lastTasteRate, lastDecorRate);
                     }
                     else if (lastTaste == 6) //hate
                     {
                         __instance.showTextAboveHead(SHelper.Translation.Get("foodstore.randomchat.hate." + randomIndex));
-                        if (shareIdea < Math.Abs(-0.3 + lastDecor / 2)) SaySomething(__instance, __instance.currentLocation, lastTasteRate, lastDecorRate);
+                        if (shareIdea < Math.Abs(-0.3 + lastDecor / 2.5)) SaySomething(__instance, __instance.currentLocation, lastTasteRate, lastDecorRate);
                     }
                     else if (lastTaste == 8) //neutral
                     {
                         __instance.showTextAboveHead(SHelper.Translation.Get("foodstore.randomchat.neutral." + randomIndex));
-                        if (shareIdea < Math.Abs( lastDecor / 2)) SaySomething(__instance, __instance.currentLocation, lastTasteRate, lastDecorRate);
+                        if (shareIdea < Math.Abs( lastDecor / 2.5)) SaySomething(__instance, __instance.currentLocation, lastTasteRate, lastDecorRate);
                     }
                     else { }
                 }
@@ -167,12 +176,18 @@ namespace FoodStore
         {
             foreach (NPC npc in __instance.characters)
 			{
+                double talkChance = 0.00003;
                 Random randomSayChance = new Random();
-                if (randomSayChance.NextDouble() < 0.0002
+
+                if (randomSayChance.NextDouble() < talkChance
                     && WantsToSay(npc, 360)
-                    && Utility.isThereAFarmerWithinDistance(new Microsoft.Xna.Framework.Vector2(npc.getTileLocation().X, npc.getTileLocation().Y), 15, npc.currentLocation) != null)
+                    && Utility.isThereAFarmerWithinDistance(new Microsoft.Xna.Framework.Vector2(npc.getTileLocation().X, npc.getTileLocation().Y), 20, npc.currentLocation) != null
+                    && npc.isVillager())
                 {
                     PlacedFoodData tempFood = GetClosestFood(npc, npc.currentLocation);
+
+                    int localNpcCount = 2;
+                    if (Utility.isThereAFarmerOrCharacterWithinDistance(new Microsoft.Xna.Framework.Vector2(npc.getTileLocation().X, npc.getTileLocation().Y), 10, npc.currentLocation) != null) localNpcCount += 1;
 
                     Random random = new Random();
                     int randomIndex = random.Next(5);
@@ -187,14 +202,17 @@ namespace FoodStore
                         { 
                             npc.showTextAboveHead(SHelper.Translation.Get("foodstore.gooddecor." + randomIndex.ToString()), -1, 2, 5000);
                             npc.modData["hapyke.FoodStore/LastSay"] = Game1.timeOfDay.ToString();
+                            continue;
                         }
                         else if (decorPointComment <= 0)
                         {
                             npc.showTextAboveHead(SHelper.Translation.Get("foodstore.baddecor." + randomIndex.ToString()), -1 , 2, 5000);
                             npc.modData["hapyke.FoodStore/LastSay"] = Game1.timeOfDay.ToString();
+                            continue;
                         }
                     }
-                    else
+
+                    if (randomSayChance.NextDouble() < (talkChance / localNpcCount / 1.5)) 
                     {
                         npc.showTextAboveHead(SHelper.Translation.Get("foodstore.dishweek." + randomIndex.ToString(), new { dishWeek = DishPrefer.dishWeek }), -1, 2, 8000);
                         npc.modData["hapyke.FoodStore/LastSay"] = Game1.timeOfDay.ToString();
@@ -261,17 +279,20 @@ namespace FoodStore
 							}
 							tries++;
 						}
-						if (tries < 3 && TimeDelayCheck(villager))
-						{
+                        if (tries < 3 && TimeDelayCheck(villager))
+                        {
                             //Send message
-                            Random random = new Random();
-                            int randomIndex = random.Next(15);
-                            text = SHelper.Translation.Get("foodstore.coming." + randomIndex.ToString() , new { vName = villager.Name });
+                            if (!Config.DisableChat) 
+                            {
+                                Random random = new Random();
+                                int randomIndex = random.Next(15);
+                                text = SHelper.Translation.Get("foodstore.coming." + randomIndex.ToString(), new { vName = villager.Name });
 
-                            Game1.chatBox.addInfoMessage(text);
-                            MyMessage messageToSend = new MyMessage(text);
-                            SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
+                                Game1.chatBox.addInfoMessage(text);
+                                MyMessage messageToSend = new MyMessage(text);
+                                SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
 
+                            }
                             //Update LastCheck
                             npc.modData["hapyke.FoodStore/LastCheck"] = Game1.timeOfDay.ToString();
 
