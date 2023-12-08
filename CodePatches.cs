@@ -15,6 +15,13 @@ using Object = StardewValley.Object;
 using StardewValley.GameData;
 using StardewModdingAPI;
 using static System.Net.Mime.MediaTypeNames;
+using StardewValley.Menus;
+using static StardewValley.Minigames.TargetGame;
+using System.Xml.Linq;
+using Netcode;
+using StardewValley.Network;
+using System.Xml.Serialization;
+using Microsoft.Xna.Framework.Input;
 
 namespace FoodStore
 {
@@ -39,27 +46,66 @@ namespace FoodStore
             __instance.modData["hapyke.FoodStore/LastFoodTaste"] = "-1";
             __instance.modData["hapyke.FoodStore/LastFoodDecor"] = "-1";
             __instance.modData["hapyke.FoodStore/LastSay"] = "0";
+            __instance.modData["hapyke.FoodStore/TotalCustomerResponse"] = "0";
 
             if (__instance.Name == "Lewis")
             {
-                if (Game1.dayOfMonth == 1 || Game1.dayOfMonth == 15)
-                {
-                    Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.thankyou"));
-                    MyMessage messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.thankyou"));
-                    SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
-                }
 
                 DishPrefer.dishDay = GetRandomDish();
                 if (Game1.dayOfMonth == 1 || Game1.dayOfMonth == 8 || Game1.dayOfMonth == 15 || Game1.dayOfMonth == 22)
                 {
-                    DishPrefer.dishWeek = GetRandomDish();
+                    DishPrefer.dishWeek = GetRandomDish();      //Get dish of the week
+
+                    //Send thanks
+                    Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.thankyou"));
+                    MyMessage messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.thankyou"));
+                    SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
+
+                    //Send mod Note
+                    string modNote = SHelper.Translation.Get("foodstore.note");
+                    if (modNote != "")
+                    {
+                        Game1.chatBox.addInfoMessage(modNote);
+                        messageToSend = new MyMessage(modNote);
+                        SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
+                    }
+
+                    //Send hidden reveal
+                    Random random = new Random();
+                    int randomIndex = random.Next(11);
+                    Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.hidden." + randomIndex.ToString()));
+                    messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.hidden." + randomIndex.ToString()));
+                    SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
                 }
             }
         }
 
-		private static void NPC_performTenMinuteUpdate_Postfix(NPC __instance)
-		{
+        private static void NPC_performTenMinuteUpdate_Postfix(NPC __instance)
+        {
 
+            //Validate player talked to NPC
+            Farmer farmerInstance = Game1.player;
+            NetStringDictionary<Friendship, NetRef<Friendship>> friendshipData = farmerInstance.friendshipData;
+
+            if (friendshipData.TryGetValue(__instance.Name, out var friendship))
+            {
+                if (friendshipData[__instance.Name].TalkedToToday)
+                {
+                    try
+                    {
+                        if (__instance.CurrentDialogue.Count == 0)
+                        {
+                            Random random = new Random();
+                            int randomIndex = random.Next(19);
+                            __instance.CurrentDialogue.Push(new Dialogue(SHelper.Translation.Get("foodstore.customerresponse." + randomIndex), __instance));
+                            __instance.modData["hapyke.FoodStore/TotalCustomerResponse"] = (Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) + 1).ToString();
+                        }
+                    }
+                    catch (Exception ex) { }
+                }
+            }
+
+            //Send dish of the day
             if (__instance.Name == "Lewis" && Game1.timeOfDay == 900)
             {
                 Random random = new Random();
@@ -69,6 +115,7 @@ namespace FoodStore
                 SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
             }
 
+            //Get taste and decoration score, call to SaySomething for NPC to send bubble text
             if (Config.EnableMod && !Game1.eventUp && __instance.currentLocation is not null && __instance.isVillager() && !WantsToEat(__instance) && Microsoft.Xna.Framework.Vector2.Distance(__instance.getTileLocation(), Game1.player.getTileLocation()) < 30)
 			{
                 if (Game1.random.NextDouble() < 0.1)
@@ -156,6 +203,8 @@ namespace FoodStore
 				return;
 			}
 			
+
+            //Fix position, do eating food
 			if (!Config.EnableMod || Game1.eventUp || __instance.currentLocation is null || !__instance.isVillager() || !WantsToEat(__instance))
 				return;
 
@@ -169,6 +218,7 @@ namespace FoodStore
                 __instance.returnToEndPoint();
                 __instance.MovePosition(Game1.currentGameTime, Game1.viewport, __instance.currentLocation);
             }
+
             PlacedFoodData food = GetClosestFood(__instance, __instance.currentLocation);
 			TryToEatFood(__instance, food);
         }
@@ -179,6 +229,7 @@ namespace FoodStore
                 double talkChance = 0.00003;
                 Random randomSayChance = new Random();
 
+                //Send bubble about decoration, decor, dish of the week
                 if (randomSayChance.NextDouble() < talkChance
                     && WantsToSay(npc, 360)
                     && Utility.isThereAFarmerWithinDistance(new Microsoft.Xna.Framework.Vector2(npc.getTileLocation().X, npc.getTileLocation().Y), 20, npc.currentLocation) != null
@@ -220,9 +271,8 @@ namespace FoodStore
                 }
 
 
-
+                //Control NPC walking to the food
                 string text = "";
-
                 if (npc.isVillager() && !npc.Name.EndsWith("_DA"))
 				{
                     NPC villager = npc;

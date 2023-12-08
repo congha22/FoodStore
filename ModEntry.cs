@@ -9,6 +9,7 @@ using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Locations;
+using StardewValley.Menus;
 using StardewValley.Minigames;
 using StardewValley.Objects;
 using StardewValley.Tools;
@@ -20,6 +21,8 @@ using System.Data.SqlTypes;
 using System.Globalization;
 using System.Linq;
 using System.Net;
+using static FoodStore.ModEntry;
+using static FoodStore.PlayerChat;
 using static System.Net.Mime.MediaTypeNames;
 using Object = StardewValley.Object;
 
@@ -49,6 +52,7 @@ namespace FoodStore
             helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
             helper.Events.GameLoop.SaveLoaded += GameLoop_SaveLoaded;
             helper.Events.Multiplayer.ModMessageReceived += this.OnModMessageReceived;
+            helper.Events.GameLoop.UpdateTicked += GameLoop_UpdateTicked;
 
 
             var harmony = new Harmony(ModManifest.UniqueID);
@@ -56,10 +60,10 @@ namespace FoodStore
                original: AccessTools.Method(typeof(NPC), nameof(NPC.performTenMinuteUpdate)),
                postfix: new HarmonyMethod(typeof(ModEntry), nameof(NPC_performTenMinuteUpdate_Postfix))
             );
-           harmony.Patch(
-               original: AccessTools.Method(typeof(NPC), nameof(NPC.dayUpdate)),
-               postfix: new HarmonyMethod(typeof(ModEntry), nameof(NPC_dayUpdate_Postfix))
-            );
+            harmony.Patch(
+                original: AccessTools.Method(typeof(NPC), nameof(NPC.dayUpdate)),
+                postfix: new HarmonyMethod(typeof(ModEntry), nameof(NPC_dayUpdate_Postfix))
+             );
             harmony.Patch(
                original: AccessTools.Method(typeof(GameLocation), nameof(GameLocation.updateEvenIfFarmerIsntHere)),
                postfix: new HarmonyMethod(typeof(ModEntry), nameof(FarmHouse_updateEvenIfFarmerIsntHere_Postfix))
@@ -68,17 +72,22 @@ namespace FoodStore
 
 
         }
+        private void GameLoop_UpdateTicked(object sender, UpdateTickedEventArgs e)
+        {
+            PlayerChat playerChatInstance = new PlayerChat();
+            playerChatInstance.Validate();
+        }
 
         public class MyMessage
         {
             public string MessageContent { get; set; }
-            public MyMessage() {}
+            public MyMessage() { }
 
             public MyMessage(string content)
             {
                 MessageContent = content;
             }
-        }
+        }       //Send and receive message
 
         public void OnModMessageReceived(object sender, ModMessageReceivedEventArgs e)
         {
@@ -88,7 +97,7 @@ namespace FoodStore
                 Game1.chatBox.addInfoMessage(message.MessageContent);
                 // handle message fields here
             }
-        }
+        }       //Send and receive message
 
         private void GameLoop_GameLaunched(object sender, StardewModdingAPI.Events.GameLaunchedEventArgs e)
         {
@@ -119,13 +128,13 @@ namespace FoodStore
                 getValue: () => Config.MinutesToHungry,
                 setValue: value => Config.MinutesToHungry = value
             );
-			configMenu.AddTextOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("foodstore.config.movetofoodchange"),
+            configMenu.AddTextOption(
+                mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.movetofoodchange"),
                 tooltip: () => SHelper.Translation.Get("foodstore.config.movetofoodchangeText"),
                 getValue: () => "" + Config.MoveToFoodChance,
-				setValue: delegate (string value) { try { Config.MoveToFoodChance = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
-			);
+                setValue: delegate (string value) { try { Config.MoveToFoodChance = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
+            );
 
             configMenu.AddTextOption(
                 mod: ModManifest,
@@ -135,12 +144,12 @@ namespace FoodStore
                 setValue: delegate (string value) { try { Config.MaxDistanceToFind = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
             );
             configMenu.AddTextOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("foodstore.config.maxdistancetoeat"),
+                mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.maxdistancetoeat"),
                 tooltip: () => SHelper.Translation.Get("foodstore.config.maxdistancetoeatText"),
                 getValue: () => "" + Config.MaxDistanceToEat,
-				setValue: delegate (string value) { try { Config.MaxDistanceToEat = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
-			);
+                setValue: delegate (string value) { try { Config.MaxDistanceToEat = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
+            );
             configMenu.AddBoolOption(
                     mod: ModManifest,
                     name: () => SHelper.Translation.Get("foodstore.config.rushhour"),
@@ -267,23 +276,24 @@ namespace FoodStore
         }
 
 
-		private static bool TryToEatFood(NPC __instance, PlacedFoodData food)
-		{
+        private static bool TryToEatFood(NPC __instance, PlacedFoodData food)
+        {
             if (food != null && Vector2.Distance(food.foodTile, __instance.getTileLocation()) < Config.MaxDistanceToEat && !__instance.Name.EndsWith("_DA"))
-			{
+            {
                 using (IEnumerator<Furniture> enumerator = __instance.currentLocation.furniture.GetEnumerator())
-				{
-					while (enumerator.MoveNext())
-					{
+                {
+                    while (enumerator.MoveNext())
+                    {
                         int taste = 8;
                         try
                         {
                             taste = __instance.getGiftTasteForThisItem(food.foodObject);
+                            if (__instance.Name == "Gus" && (taste == 0 || taste == 2)) taste = 8;
                         }
                         catch (NullReferenceException) { }
-						string reply;
-						int salePrice = food.foodObject.sellToStorePrice();
-						int tip = 0;
+                        string reply;
+                        int salePrice = food.foodObject.sellToStorePrice();
+                        int tip = 0;
                         double decorPoint = GetDecorPoint(food.foodTile, __instance.currentLocation);
                         Random rand = new Random();
 
@@ -382,10 +392,10 @@ namespace FoodStore
 
 
                         //Multiply with decoration point
-                        if(Config.EnableDecor) salePrice = (int)(salePrice * (1 + decorPoint));
+                        if (Config.EnableDecor) salePrice = (int)(salePrice * (1 + decorPoint));
 
                         //Feature dish
-                        if(food.foodObject.Name == DishPrefer.dishDay) { salePrice = (int)(salePrice * 1.2); }
+                        if (food.foodObject.Name == DishPrefer.dishDay) { salePrice = (int)(salePrice * 1.2); }
                         if (food.foodObject.Name == DishPrefer.dishWeek) { salePrice = (int)(salePrice * 1.1); }
 
                         //Config Rush hours Price
@@ -395,58 +405,112 @@ namespace FoodStore
                             tip = (int)(tip * 2);
                         }
 
-                        //Config Tip when nearby
-                        if (Config.TipWhenNeaBy && Utility.isThereAFarmerWithinDistance(food.foodTile, 15, __instance.currentLocation) == null) { tip = 0;}
+                        //Number of customer interaction
+                        try
+                        {
+                            if (__instance.modData["hapyke.FoodStore/TotalCustomerResponse"] != null)
+                            {
+                                Game1.chatBox.addErrorMessage(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]);
+                                double totalInteract = (Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) / 100);
+                                if (totalInteract > 0.25) totalInteract = 0.25;
+                                salePrice = (int)(salePrice * (1 + totalInteract));
+                            }
+                        }
+                        catch (Exception e) { }
 
-                        if (enumerator.Current.boundingBox.Value != food.furniture.boundingBox.Value)
-							continue;
+                        //Config Tip when nearby
+                        if (Config.TipWhenNeaBy && Utility.isThereAFarmerWithinDistance(food.foodTile, 15, __instance.currentLocation) == null) { tip = 0; }
 
                         //Remove food
+                        if (enumerator.Current.boundingBox.Value != food.furniture.boundingBox.Value)
+                            continue;
                         enumerator.Current.heldObject.Value = null;
 
-                        //Generate chat box
-                        if (tip != 0)
-                            __instance.showTextAboveHead(reply + SHelper.Translation.Get("foodstore.tip", new { tipValue = tip }), default, default, 7000);
-                        else
-                            __instance.showTextAboveHead(reply, default, default, 7000);
-
-                        //Generate chat box
-                        if (Game1.IsMultiplayer)
+                        //Money on/off farm
+                        if (__instance.currentLocation is not FarmHouse && __instance.currentLocation is not Farm)
                         {
-                            Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.sold", new { foodObjName = food.foodObject.Name, locationString = __instance.currentLocation.Name, saleString = salePrice }));
-                            MyMessage messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.sold", new { foodObjName = food.foodObject.Name, locationString = __instance.currentLocation.Name, saleString = salePrice }));
-                            SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
+                            //Generate chat box
+                            if (tip != 0)
+                                __instance.showTextAboveHead(reply + SHelper.Translation.Get("foodstore.tip", new { tipValue = tip }), default, default, 7000);
+                            else
+                                __instance.showTextAboveHead(reply, default, default, 7000);
 
-                            if (!Config.DisableChat)
+                            //Generate chat box
+                            if (Game1.IsMultiplayer)
                             {
-                                if (tip != 0)
+                                Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.sold", new { foodObjName = food.foodObject.Name, locationString = __instance.currentLocation.Name, saleString = salePrice }));
+                                MyMessage messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.sold", new { foodObjName = food.foodObject.Name, locationString = __instance.currentLocation.Name, saleString = salePrice }));
+                                SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
+
+                                if (!Config.DisableChat)
                                 {
-                                    Game1.chatBox.addInfoMessage($"   {__instance.Name}: " + reply + SHelper.Translation.Get("foodstore.tip", new { tipValue = tip }));
-                                    messageToSend = new MyMessage($"   {__instance.Name}: " + reply + SHelper.Translation.Get("foodstore.tip", new { tipValue = tip }));
-                                    SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
-                                }
-                                else
-                                {
-                                    Game1.chatBox.addInfoMessage($"   {__instance.Name}: " + reply);
-                                    messageToSend = new MyMessage($"   {__instance.Name}: " + reply);
-                                    SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
+                                    if (tip != 0)
+                                    {
+                                        Game1.chatBox.addInfoMessage($"   {__instance.Name}: " + reply + SHelper.Translation.Get("foodstore.tip", new { tipValue = tip }));
+                                        messageToSend = new MyMessage($"   {__instance.Name}: " + reply + SHelper.Translation.Get("foodstore.tip", new { tipValue = tip }));
+                                        SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
+                                    }
+                                    else
+                                    {
+                                        Game1.chatBox.addInfoMessage($"   {__instance.Name}: " + reply);
+                                        messageToSend = new MyMessage($"   {__instance.Name}: " + reply);
+                                        SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
+                                    }
                                 }
                             }
-                        }
+                            else
+                            {
+                                Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.sold", new { foodObjName = food.foodObject.Name, locationString = __instance.currentLocation.Name, saleString = salePrice }));
+                                if (!Config.DisableChat)
+                                {
+                                    if (tip != 0)
+                                        Game1.chatBox.addInfoMessage($"   {__instance.Name}: " + reply + SHelper.Translation.Get("foodstore.tip", new { tipValue = tip }));
+                                    else
+                                        Game1.chatBox.addInfoMessage($"   {__instance.Name}: " + reply);
+                                }
+                            }
+                        }           //Food outside farmhouse
+
                         else
                         {
-                            Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.sold", new { foodObjName = food.foodObject.Name, locationString = __instance.currentLocation.Name, saleString = salePrice }));
-                            if (!Config.DisableChat)
+                            if (__instance.currentLocation is FarmHouse)
                             {
-                                if (tip != 0)
-                                    Game1.chatBox.addInfoMessage($"   {__instance.Name}: " + reply + SHelper.Translation.Get("foodstore.tip", new { tipValue = tip }));
-                                else
-                                    Game1.chatBox.addInfoMessage($"   {__instance.Name}: " + reply);
+                                Farmer owner = (__instance.currentLocation as FarmHouse).owner;
+                                if (owner.friendshipData.ContainsKey(__instance.Name))
+                                {
+                                    int points = 10;
+                                    switch (food.value)
+                                    {
+                                        case 0:
+                                            points = 30;
+                                            break;
+                                        case 2:
+                                            points = 20;
+                                            break;
+                                        case 4:
+                                            points = 0;
+                                            break;
+                                        case 6:
+                                            points = -10;
+                                            break;
+                                        case 8:
+                                            points = 10;
+                                            break;
+                                        default:
+                                            __instance.doEmote(20);
+                                            break;
+                                    }
+                                    if (owner.Name == "HaPyke" || owner.Name == "d5a1lamdtd") points = (int)(points * 2);
+                                    owner.friendshipData[__instance.Name].Points += (int)(points);
+                                }
                             }
-                        }
 
+                            Random random = new Random();
+                            int randomNumber = random.Next(12);
+                            salePrice = tip = 0;
 
-
+                            __instance.showTextAboveHead(SHelper.Translation.Get("foodstore.spouseeat." + randomNumber));
+                        }           //Food in farmhouse
 
                         Game1.player.Money += salePrice + tip;
                         __instance.modData["hapyke.FoodStore/LastFood"] = Game1.timeOfDay.ToString();
@@ -454,23 +518,23 @@ namespace FoodStore
                         __instance.modData["hapyke.FoodStore/LastFoodDecor"] = decorPoint.ToString();
 
                         return true;
-					}
-				}
-			}
-			return false;
-		}
+                    }
+                }
+            }
+            return false;
+        }
 
         private static PlacedFoodData GetClosestFood(NPC npc, GameLocation location)
-		{
+        {
 
-			List<PlacedFoodData> foodList = new List<PlacedFoodData>();
+            List<PlacedFoodData> foodList = new List<PlacedFoodData>();
 
-			foreach (var f in location.furniture)
-			{
-				if (f.heldObject.Value != null && f.heldObject.Value.Edibility > 0)
-				{
-					int xLocation = f.boundingBox.X / 64 + (f.boundingBox.Width) / 64 / 2;
-					int yLocation = f.boundingBox.Y / 64 + (f.boundingBox.Height) / 64 / 2;
+            foreach (var f in location.furniture)
+            {
+                if (f.heldObject.Value != null && f.heldObject.Value.Edibility > 0)
+                {
+                    int xLocation = f.boundingBox.X / 64 + (f.boundingBox.Width) / 64 / 2;
+                    int yLocation = f.boundingBox.Y / 64 + (f.boundingBox.Height) / 64 / 2;
                     var fLocation = new Vector2(xLocation, yLocation);
 
 
@@ -478,68 +542,68 @@ namespace FoodStore
                     {
                         foodList.Add(new PlacedFoodData(f, fLocation, f.heldObject.Value, -1));
                     }
-				}
+                }
             }
             if (foodList.Count == 0)
-			{
-				//SMonitor.Log("Got no food");
-				return null;
-			}
-			List<string> favList = new List<string>(Game1.NPCGiftTastes["Universal_Love"].Split(' '));
-			List<string> likeList = new List<string>(Game1.NPCGiftTastes["Universal_Like"].Split(' '));
-			List<string> okayList = new List<string>(Game1.NPCGiftTastes["Universal_Neutral"].Split(' '));
+            {
+                //SMonitor.Log("Got no food");
+                return null;
+            }
+            List<string> favList = new List<string>(Game1.NPCGiftTastes["Universal_Love"].Split(' '));
+            List<string> likeList = new List<string>(Game1.NPCGiftTastes["Universal_Like"].Split(' '));
+            List<string> okayList = new List<string>(Game1.NPCGiftTastes["Universal_Neutral"].Split(' '));
             List<string> dislikeList = new List<string>(Game1.NPCGiftTastes["Universal_Dislike"].Split(' '));
             List<string> hateList = new List<string>(Game1.NPCGiftTastes["Universal_Hate"].Split(' '));
 
             if (Game1.NPCGiftTastes.TryGetValue(npc.Name, out string NPCLikes) && NPCLikes != null)
-			{
-				favList.AddRange(NPCLikes.Split('/')[1].Split(' '));
-				likeList.AddRange(NPCLikes.Split('/')[3].Split(' '));
-				okayList.AddRange(NPCLikes.Split('/')[5].Split(' '));
+            {
+                favList.AddRange(NPCLikes.Split('/')[1].Split(' '));
+                likeList.AddRange(NPCLikes.Split('/')[3].Split(' '));
+                okayList.AddRange(NPCLikes.Split('/')[5].Split(' '));
                 dislikeList.AddRange(NPCLikes.Split('/')[7].Split(' '));
                 hateList.AddRange(NPCLikes.Split('/')[9].Split(' '));
             }
 
             for (int i = foodList.Count - 1; i >= 0; i--)
-			{
+            {
                 foodList[i].value = 0;
             }
 
             if (foodList.Count == 0)
-			{
+            {
                 //Game1.chatBox.addInfoMessage($"Got no food");
-				return null;
-			}
+                return null;
+            }
 
-			foodList.Sort(delegate (PlacedFoodData a, PlacedFoodData b)
-			{
-				var compare = b.value.CompareTo(a.value);
-				if (compare != 0)
-					return compare;
+            foodList.Sort(delegate (PlacedFoodData a, PlacedFoodData b)
+            {
+                var compare = b.value.CompareTo(a.value);
+                if (compare != 0)
+                    return compare;
                 return (Vector2.Distance(a.foodTile, npc.getTileLocation()).CompareTo(Vector2.Distance(b.foodTile, npc.getTileLocation())));
-			});
+            });
             return foodList[0];
-		}
-		private static Object GetObjectFromID(string id, int amount, int quality)
-		{
-			if (int.TryParse(id, out int index))
-			{
-				//SMonitor.Log($"Spawning object with index {id}");
-				return new Object(index, amount, false, -1, quality);
-			}
-			foreach (var kvp in Game1.objectInformation)
-			{
-				if (kvp.Value.StartsWith(id + "/"))
-					return new Object(kvp.Key, amount, false, -1, quality);
-			}
-			return null;
-		}
+        }
+        private static Object GetObjectFromID(string id, int amount, int quality)
+        {
+            if (int.TryParse(id, out int index))
+            {
+                //SMonitor.Log($"Spawning object with index {id}");
+                return new Object(index, amount, false, -1, quality);
+            }
+            foreach (var kvp in Game1.objectInformation)
+            {
+                if (kvp.Value.StartsWith(id + "/"))
+                    return new Object(kvp.Key, amount, false, -1, quality);
+            }
+            return null;
+        }
         private static bool WantsToEat(NPC npc)
-		{
-			if (!npc.modData.ContainsKey("hapyke.FoodStore/LastFood") || npc.modData["hapyke.FoodStore/LastFood"].Length == 0  )
-			{
-				return true;
-			}
+        {
+            if (!npc.modData.ContainsKey("hapyke.FoodStore/LastFood") || npc.modData["hapyke.FoodStore/LastFood"].Length == 0)
+            {
+                return true;
+            }
 
             int lastFoodTime = int.Parse(npc.modData["hapyke.FoodStore/LastFood"]);
             int minutesSinceLastFood = GetMinutes(Game1.timeOfDay) - GetMinutes(lastFoodTime);
@@ -573,13 +637,13 @@ namespace FoodStore
             int minutesSinceLastCheck = GetMinutes(Game1.timeOfDay) - GetMinutes(lastCheckTime);
 
             // Check if either the time since the last food or the time since the last check is greater than the configured thresholds
-            return minutesSinceLastCheck >  20;
+            return minutesSinceLastCheck > 20;
         }
 
         private static int GetMinutes(int timeOfDay)
-		{
-			return timeOfDay % 100 + timeOfDay / 100 * 60;
-		}
+        {
+            return timeOfDay % 100 + timeOfDay / 100 * 60;
+        }
 
         public static double GetDecorPoint(Vector2 foodLoc, GameLocation gameLocation)
         {
@@ -750,7 +814,7 @@ namespace FoodStore
                 return randomElement;
             }
 
-            return "Farmer's Lunch"; 
+            return "Farmer's Lunch";
         }
     }
 }

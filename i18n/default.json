@@ -1,5 +1,48 @@
 {
-  // CONFIG
+  //          *************** TRANSLATOR NOTE *****************
+  //  This section contain text that CONSTANTL CHANGER BETWEEN VERSION. Which mean 
+  //  you have to check this section first, and then move to the bottom to translate
+  //  the new version added text but that will not change in later version
+
+  //
+  "foodstore.note": "",
+
+  //
+  "foodstore.hidden.0": "And weekly tip: Villager more likely to promote when ate loved food, and more criticise when are hated food.",
+  "foodstore.hidden.1": "And weekly tip: The lower sale price can be 32% of the base price, while the highest is 520%.",
+  "foodstore.hidden.2": "And weekly tip: ____________",
+  "foodstore.hidden.3": "And weekly tip: You can only get information about dish of the week from villager chat.",
+  "foodstore.hidden.4": "And weekly tip: Gus only rate your dish as neutral dish at the best. He graciously paid the full price without expressing his dissatisfaction and he chose to keep his opinion about the taste to himself.",
+  "foodstore.hidden.5": "And weekly tip: Not every visitor may find the food appealing; some quickly turn away, perhaps perceiving it as less enticing and not up to their standards.",
+  "foodstore.hidden.6": "And weekly tip: There is no tip for a hated dish because it is hated!!!",
+  "foodstore.hidden.7": "And weekly tip: You will receive double amount of friendship point if you character name match with my name. Enjoy [43]",
+  "foodstore.hidden.8": "And weekly tip: Talk with customer will increase the price they pay for the dish. You can now talk with them unlimited time.",
+  "foodstore.hidden.9": "And weekly tip: Villager can answer some of your questions. Stand close by one of them and type 'help' to show available options.",
+  "foodstore.hidden.10": "And weekly tip: The better the location, the higher the price (close by decorration, water, or the pink tree)",
+
+  //
+  "foodstore.help.0": "Interact with villager by stand close to them, and type in your message. Some special question required to have the keyword in the message!!",
+  "foodstore.help.1": "To invite villager to visit tomorrow, the message must contains ALL those keyword: 'house', 'invite', 'tomorrow'.",
+  "foodstore.help.2": "Ask villager about dish of the day. The message must contains at least a keyword. For example 'special today' or 'recommened today'.",
+  "foodstore.help.3": "Ask villager how do they feel about their last dish by include keyword 'last dish' or 'dish taste'.",
+  "foodstore.help.4": "To set up your first store, simply place donw a table at a busy location, and then put a dish on it!!!",
+
+
+
+
+
+  //          *************** END OF NOTE *****************
+
+
+
+
+
+
+  //     *************** ANY TRANSLATION AFTER THIS DO NOT CHANGE *****************
+  //    Which mean you only have to move to the bottom to translate the newest version
+
+
+  // First Release
   "foodstore.config.enable": "Mod Enabled?",
 
   "foodstore.config.minutetohungry": "Minutes To Hungry",
@@ -39,7 +82,7 @@
   "foodstore.config.enabletipclosedislike": "Disliked food tip value multiplier",
   "foodstore.config.enabletipclosehate": "Hated food tip value multiplier",
 
-  // 15 Coming
+  //
   "foodstore.coming.0": "In a delightful twist, {{vName}} is heading to our store for an unexpected visit.",
   "foodstore.coming.1": "{{vName}} is strolling our way, curious about our store's offerings.",
   "foodstore.coming.2": "Amidst their day, {{vName}} is choosing to spend some time at our store.",
@@ -56,7 +99,7 @@
   "foodstore.coming.13": "{{vName}} is diverting from the norm to visit our store and enjoy the offerings.",
   "foodstore.coming.14": "{{vName}} is making a spontaneous detour to our store, eager for a unique experience.",
 
-  // Love Rep
+  //
   "foodstore.loverep.0": "My taste buds dance with joy at each flavorful bite!",
   "foodstore.loverep.1": "Savoring this dish is like a warm hug for my senses.",
   "foodstore.loverep.2": "Exquisite taste that lingers, a true culinary delight.",
@@ -78,7 +121,7 @@
   "foodstore.loverep.18": "A love letter to gastronomy; this dish is divine.",
   "foodstore.loverep.19": "Passionately in love with the perfection of this creation.",
 
-  // Like rep
+  //
   "foodstore.likerep.0": "A dish I enjoy on occasion, it's quite good.",
   "foodstore.likerep.1": "Consistently decent; I don't mind ordering it.",
   "foodstore.likerep.2": "A solid option that I find myself choosing.",
@@ -100,7 +143,7 @@
   "foodstore.likerep.18": "It's alright; I don't mind this dish.",
   "foodstore.likerep.19": "An acceptable option; it's fairly enjoyable.",
 
-  // Neutral rep
+  //
   "foodstore.neutralrep.0": "A standard dish; it's neither good nor bad.",
   "foodstore.neutralrep.1": "It's okay; a dish I neither love nor dislike.",
   "foodstore.neutralrep.2": "A regular choice; it doesn't stand out much.",
@@ -122,7 +165,7 @@
   "foodstore.neutralrep.18": "Balanced between liking and disliking; it's okay.",
   "foodstore.neutralrep.19": "A middle-of-the-road dish; it doesn't stand out much.",
 
-  // dislike rep
+  //
   "foodstore.dislikerep.0": "Not my favorite; I find this dish lacking.",
   "foodstore.dislikerep.1": "It's tolerable, but I'm not a fan of this dish.",
   "foodstore.dislikerep.2": "An underwhelming choice; it falls short for me.",
@@ -144,7 +187,7 @@
   "foodstore.dislikerep.18": "I can eat it, but it's not my preferred dish.",
   "foodstore.dislikerep.19": "An average option; it's not something I enjoy.",
 
-  // hate rep
+  //
   "foodstore.haterep.0": "This dish is simply dreadful; I can't stand it.",
   "foodstore.haterep.1": "An absolute disappointment; this dish is awful.",
   "foodstore.haterep.2": "I strongly dislike this dish; it's unappetizing.",
@@ -311,5 +354,75 @@
 
   //
   "foodstore.config.chat": "Disable non-important message?",
-  "foodstore.thankyou": "[144] Thank you for using Food Store! [144] If you're enjoying the mod, your support means the world. Show some love by voting and following for future updates. Your enthusiasm fuels our kitchen of creativity!!! [43] #FoodStore"
+  "foodstore.thankyou": "[144] Thank you for using Food Store! [144] If you're enjoying the mod, your support means the world. Show some love by voting and following for future updates. Your enthusiasm fuels our kitchen of creativity!!! [43] #FoodStore",
+
+  //---------------------------- End of v1.2.1-----------------------------
+
+  //
+  "foodstore.spouseeat.0": "Thank you!",
+  "foodstore.spouseeat.1": "Oh food!!!",
+  "foodstore.spouseeat.2": "Yummy yummy!",
+  "foodstore.spouseeat.3": "You read my mind!",
+  "foodstore.spouseeat.4": "I appreciate it!",
+  "foodstore.spouseeat.5": "Feeling blessed! Thanks!",
+  "foodstore.spouseeat.6": "You're too kind!",
+  "foodstore.spouseeat.7": "I love food!",
+  "foodstore.spouseeat.8": "You're a culinary genius!",
+  "foodstore.spouseeat.9": "This looks amazing!",
+  "foodstore.spouseeat.10": "Grateful for this treat!",
+  "foodstore.spouseeat.11": "I was just getting hungry!",
+
+  //
+  "foodstore.customerresponse.0": "Oh, hi!",
+  "foodstore.customerresponse.1": "Do you have anything on sale?",
+  "foodstore.customerresponse.2": "Looking for something specific today?",
+  "foodstore.customerresponse.3": "Hi there! What's good here?",
+  "foodstore.customerresponse.4": "Any recommendations for a quick bite?",
+  "foodstore.customerresponse.5": "Is this place known for any special dishes?",
+  "foodstore.customerresponse.6": "Hey! What's the daily special?",
+  "foodstore.customerresponse.7": "I'm hungry! What do you suggest?",
+  "foodstore.customerresponse.8": "Hello! Any vegetarian options?",
+  "foodstore.customerresponse.9": "What's the most popular item on the menu?",
+  "foodstore.customerresponse.10": "Hi! Is the food here spicy?",
+  "foodstore.customerresponse.11": "Any desserts to satisfy my sweet tooth?",
+  "foodstore.customerresponse.12": "Do you offer any gluten-free options?",
+  "foodstore.customerresponse.13": "I heard the weather is great today! Any outdoor seating?",
+  "foodstore.customerresponse.14": "I love the cozy decor in here. It's so inviting!",
+  "foodstore.customerresponse.15": "By the way, how's the air quality around here?",
+  "foodstore.customerresponse.16": "I'm trying to stay healthy. Any low-calorie options?",
+  "foodstore.customerresponse.17": "What's the vibe like in this place? I'm into cool atmospheres.",
+  "foodstore.customerresponse.18": "The weather outside is amazing! Perfect day for a meal.",
+
+  //
+  "foodstore.asktaste.empty.0": "I have not have a chance to try yet",
+  "foodstore.asktaste.empty.1": "I was on a hurry. I will try it another time",
+  "foodstore.asktaste.empty.2": "Probally I will try the dish some time late today",
+
+  "foodstore.asktaste.love.0": "Oh, that dish was amazing. I love that!",
+  "foodstore.asktaste.love.1": "That dish was the best ever! I can't get enough of it.",
+  "foodstore.asktaste.love.2": "I absolutely adore the flavors in that dish. It's a new favorite of mine!",
+
+  "foodstore.asktaste.like.0": "I really enjoyed that dish. It's quite likable!",
+  "foodstore.asktaste.like.1": "The taste was good, I like it. I would definitely have it again.",
+  "foodstore.asktaste.like.2": "It's a dish I genuinely like. The flavors are quite appealing.",
+
+  "foodstore.asktaste.neutral.0": "The taste was okay, nothing special. It's a neutral experience for me.",
+  "foodstore.asktaste.neutral.1": "It was decent, neither good nor bad. Just a neutral taste for me.",
+  "foodstore.asktaste.neutral.2": "I don't have strong feelings about the taste. It's a neutral choice for me.",
+
+  "foodstore.asktaste.dislike.0": "I didn't enjoy the taste much. It's not really to my liking.",
+  "foodstore.asktaste.dislike.1": "The flavor didn't appeal to me. I would say I dislike it.",
+  "foodstore.asktaste.dislike.2": "It's not my favorite. I found the taste a bit off, and I dislike it.",
+
+  "foodstore.asktaste.hate.0": "I couldn't stand the taste. I hate it.",
+  "foodstore.asktaste.hate.1": "Ugh, that dish was awful. I really hate the taste.",
+  "foodstore.asktaste.hate.2": "I can confidently say I hate the taste. It's not something I would ever want to eat again."
+
+
+
+
+
+
+
+
 }
