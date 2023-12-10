@@ -1,16 +1,16 @@
 {
   //          *************** TRANSLATOR NOTE *****************
-  //  This section contain text that CONSTANTL CHANGER BETWEEN VERSION. Which mean 
+  //  This section contain text that CONSTANTLY CHANGER BETWEEN VERSION. Which mean 
   //  you have to check this section first, and then move to the bottom to translate
   //  the new version added text but that will not change in later version
 
   //
-  "foodstore.note": "",
+  "foodstore.note": "Exciting News! The upcoming major update will unveil a spectacular 'Market Town' complete with a charming Restaurant, captivating Museum, delightful Flower Shop, and more! Your voice matters! Participate in the Town Layout Vote - Beach Map, Serene Island, Enchanting Jungle, or something else? Share your imaginative ideas on the FORUM located on the Mod page. Let's shape this town together!",
 
   //
   "foodstore.hidden.0": "And weekly tip: Villager more likely to promote when ate loved food, and more criticise when are hated food.",
   "foodstore.hidden.1": "And weekly tip: The lower sale price can be 32% of the base price, while the highest is 520%.",
-  "foodstore.hidden.2": "And weekly tip: ____________",
+  "foodstore.hidden.2": "And weekly tip: Food Store might change name to ''Market Town''. What does that mean? It mean Food Store is not the only shop you can open!!",
   "foodstore.hidden.3": "And weekly tip: You can only get information about dish of the week from villager chat.",
   "foodstore.hidden.4": "And weekly tip: Gus only rate your dish as neutral dish at the best. He graciously paid the full price without expressing his dissatisfaction and he chose to keep his opinion about the taste to himself.",
   "foodstore.hidden.5": "And weekly tip: Not every visitor may find the food appealing; some quickly turn away, perhaps perceiving it as less enticing and not up to their standards.",
@@ -22,7 +22,7 @@
 
   //
   "foodstore.help.0": "Interact with villager by stand close to them, and type in your message. Some special question required to have the keyword in the message!!",
-  "foodstore.help.1": "To invite villager to visit tomorrow, the message must contains ALL those keyword: 'house', 'invite', 'tomorrow'.",
+  "foodstore.help.1": "To invite villager come over tomorrow, send a message contains 2 keyword: 'invite' and 'tomorrow'.",
   "foodstore.help.2": "Ask villager about dish of the day. The message must contains at least a keyword. For example 'special today' or 'recommened today'.",
   "foodstore.help.3": "Ask villager how do they feel about their last dish by include keyword 'last dish' or 'dish taste'.",
   "foodstore.help.4": "To set up your first store, simply place donw a table at a busy location, and then put a dish on it!!!",
@@ -50,7 +50,7 @@
   "foodstore.config.minutetohungryText": "Minutes since last meal of each NPC. Default 240. Setting too low might cause weird path finding. Recommended above 60",
 
   "foodstore.config.movetofoodchange": "Move To Food % Chance.",
-  "foodstore.config.movetofoodchangeText": "Percent chance per tick to move to food if hungry. Default 0.01. Setting higher cause significantly lag and weird path finding. Greatly recommended under 0.05",
+  "foodstore.config.movetofoodchangeText": "Percent chance per tick to move to food if hungry. Default 0.005. Setting higher cause significantly lag and weird path finding. Greatly recommended under 0.05",
 
   "foodstore.config.maxdistancetofindfood": "Max Distance to find food",
   "foodstore.config.maxdistancetofindfoodText": "Max distance in tiles from food that NPCs can find it. Default 40",
@@ -416,7 +416,56 @@
 
   "foodstore.asktaste.hate.0": "I couldn't stand the taste. I hate it.",
   "foodstore.asktaste.hate.1": "Ugh, that dish was awful. I really hate the taste.",
-  "foodstore.asktaste.hate.2": "I can confidently say I hate the taste. It's not something I would ever want to eat again."
+  "foodstore.asktaste.hate.2": "I can confidently say I hate the taste. It's not something I would ever want to eat again.",
+
+  //
+  "foodstore.visitcome.0": "Thank you for inviting me! Your home is lovely.",
+  "foodstore.visitcome.1": "I appreciate your hospitality. The aroma is amazing!",
+  "foodstore.visitcome.2": "It's a pleasure to be here. Your place is so welcoming.",
+  "foodstore.visitcome.3": "Thanks for having me over. Your house is charming.",
+  "foodstore.visitcome.4": "I'm grateful for the invitation. Your home is delightful.",
+  "foodstore.visitcome.5": "This is wonderful! Thank you for welcoming me into your home.",
+  "foodstore.visitcome.6": "I'm enjoying the warm atmosphere. Your place feels like a cozy retreat.",
+
+  "foodstore.visitleave.0": "I had a great time. Thank you for the lovely evening!",
+  "foodstore.visitleave.1": "Leaving with a full heart and a full stomach. Thanks for everything!",
+  "foodstore.visitleave.2": "I appreciate your hospitality. Until next time!",
+  "foodstore.visitleave.3": "It was wonderful being here. Thanks for a memorable visit!",
+  "foodstore.visitleave.4": "Saying goodbye is hard, but I'll cherish the moments spent here. Thank you!",
+  "foodstore.visitleave.5": "I'm leaving with a smile. Your company and home are truly delightful.",
+  "foodstore.visitleave.6": "Until we meet again. Thanks for a fantastic time and delicious food!",
+
+  //
+  "foodstore.noinvitevisit.0": "Appreciate the invite, but I don't know you well enough to visit.",
+  "foodstore.noinvitevisit.1": "Thanks, but I only visit places where I know the host.",
+  "foodstore.noinvitevisit.2": "I'm selective about engagements, and I don't know you, so I can't visit.",
+  "foodstore.noinvitevisit.3": "Can't accept, as I don't feel comfortable visiting someone I don't know.",
+  "foodstore.noinvitevisit.4": "Value my privacy, won't visit since I don't know you.",
+  "foodstore.noinvitevisit.5": "Thanks, but I only attend events hosted by familiar faces. Won't visit this time.",
+  "foodstore.noinvitevisit.6": "Prefer familiar environments, won't visit since we're not acquainted.",
+
+  "foodstore.cannotinvitevisit.0": "Appreciate the invite, but I cannot visit as I'm currently busy.",
+  "foodstore.cannotinvitevisit.1": "Thanks for the invite, but I'm swamped right now and cannot visit.",
+  "foodstore.cannotinvitevisit.2": "I'm tied up with other obligations, so unfortunately, I cannot visit.",
+  "foodstore.cannotinvitevisit.3": "Busy schedule prevents me from accepting the invitation.",
+  "foodstore.cannotinvitevisit.4": "I'm currently occupied with tasks and cannot make it to visit. Thanks for understanding.",
+  "foodstore.cannotinvitevisit.5": "Unfortunately, I'm too busy to accept the invitation at the moment.",
+  "foodstore.cannotinvitevisit.6": "Appreciate the invite, but my current workload doesn't allow me to visit. Maybe another time.",
+
+  "foodstore.willinvitevisit.0": "Sure, I'd love to visit! Let me know the details.",
+  "foodstore.willinvitevisit.1": "Absolutely, I'm interested! When and where?",
+  "foodstore.willinvitevisit.2": "I'd be happy to visit! Could you provide more information?",
+  "foodstore.willinvitevisit.3": "Count me in! I'm looking forward to the visit.",
+  "foodstore.willinvitevisit.4": "Yes, I'll visit! Please share the specifics.",
+  "foodstore.willinvitevisit.5": "I'm interested! Let me know the details for the visit.",
+  "foodstore.willinvitevisit.6": "Certainly, I'll visit! Just share the necessary details.",
+
+  //
+  "foodstore.config.invitetime": "Invitation Time",
+  "foodstore.config.invitecometime": "Time villager arrive.",
+  "foodstore.config.inviteleavetime": "Time villager start to leave."
+
+
 
 
 

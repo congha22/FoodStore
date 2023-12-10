@@ -53,7 +53,9 @@ namespace FoodStore
             helper.Events.GameLoop.SaveLoaded += GameLoop_SaveLoaded;
             helper.Events.Multiplayer.ModMessageReceived += this.OnModMessageReceived;
             helper.Events.GameLoop.UpdateTicked += GameLoop_UpdateTicked;
-
+            helper.Events.GameLoop.TimeChanged += this.OnTimeChange;
+            helper.Events.Player.Warped += FarmOutside.PlayerWarp;
+            helper.Events.GameLoop.DayEnding += GameLoop_DayEnding;
 
             var harmony = new Harmony(ModManifest.UniqueID);
             harmony.Patch(
@@ -68,14 +70,14 @@ namespace FoodStore
                original: AccessTools.Method(typeof(GameLocation), nameof(GameLocation.updateEvenIfFarmerIsntHere)),
                postfix: new HarmonyMethod(typeof(ModEntry), nameof(FarmHouse_updateEvenIfFarmerIsntHere_Postfix))
             );
-
-
-
         }
         private void GameLoop_UpdateTicked(object sender, UpdateTickedEventArgs e)
         {
-            PlayerChat playerChatInstance = new PlayerChat();
-            playerChatInstance.Validate();
+            if (e.IsMultipleOf(6))
+            {
+                PlayerChat playerChatInstance = new PlayerChat();
+                playerChatInstance.Validate();
+            }
         }
 
         public class MyMessage
@@ -181,11 +183,30 @@ namespace FoodStore
                 setValue: value => Config.DisableChat = value
             );
 
+            configMenu.AddPageLink(mod: ModManifest, "inviteTime", () => SHelper.Translation.Get("foodstore.config.invitetime"));
             configMenu.AddPageLink(mod: ModManifest, "salePrice", () => SHelper.Translation.Get("foodstore.config.saleprice"));
             configMenu.AddPageLink(mod: ModManifest, "tipValue", () => SHelper.Translation.Get("foodstore.config.tipvalue"));
+
+
+            //Villager invite
+            configMenu.AddPage(mod: ModManifest, "inviteTime", () => SHelper.Translation.Get("foodstore.config.invitetime"));
+
+            configMenu.AddTextOption(
+                mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.invitecometime"),
+                getValue: () => "" + Config.InviteComeTime,
+                setValue: delegate (string value) { try { Config.InviteComeTime = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
+            );
+            configMenu.AddTextOption(
+                mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.inviteleavetime"),
+                getValue: () => "" + Config.InviteLeaveTime,
+                setValue: delegate (string value) { try { Config.InviteLeaveTime = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
+            );
+
             //sell multiplier
 
-            configMenu.AddPage(mod: ModManifest, "salePrice", () => "Sale Price");
+            configMenu.AddPage(mod: ModManifest, "salePrice", () => SHelper.Translation.Get("foodstore.config.saleprice"));
             configMenu.AddBoolOption(
                 mod: ModManifest,
                 name: () => SHelper.Translation.Get("foodstore.config.enableprice"),
@@ -228,7 +249,7 @@ namespace FoodStore
             //Tip
 
 
-            configMenu.AddPage(mod: ModManifest, "tipValue", () => "Tip Value");
+            configMenu.AddPage(mod: ModManifest, "tipValue", () => SHelper.Translation.Get("foodstore.config.tipvalue"));
             configMenu.AddBoolOption(
                 mod: ModManifest,
                 name: () => SHelper.Translation.Get("foodstore.config.enabletip"),
@@ -273,8 +294,61 @@ namespace FoodStore
         {
             if (!Config.EnableMod)
                 return;
+
+            //Generate Dish of day and dish of week on Save Loaded
+            DishPrefer.dishDay = GetRandomDish();
+            if (Game1.dayOfMonth == 1 || Game1.dayOfMonth == 8 || Game1.dayOfMonth == 15 || Game1.dayOfMonth == 22)
+            {
+                DishPrefer.dishWeek = GetRandomDish();      //Get dish of the week
+
+                //Send thanks
+                Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.thankyou"));
+                MyMessage messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.thankyou"));
+                SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
+
+                // ******** Send mod Note ********
+                string modNote = SHelper.Translation.Get("foodstore.note");
+                if (modNote != "")
+                {
+                    Game1.chatBox.addInfoMessage(modNote);
+                    messageToSend = new MyMessage(modNote);
+                    SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
+                }
+
+                //Send hidden reveal
+                Random random = new Random();
+                int randomIndex = random.Next(11);
+                Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.hidden." + randomIndex.ToString()));
+                messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.hidden." + randomIndex.ToString()));
+                SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
+            }
+
+            //Assign visit value
+            foreach (NPC __instance in Utility.getAllCharacters())
+            {
+                if (__instance.isVillager())
+                {
+                    __instance.modData["hapyke.FoodStore/invited"] = "false";
+                    __instance.modData["hapyke.FoodStore/inviteDate"] = "-99";
+                }
+            }
         }
 
+        private void GameLoop_DayEnding(object sender, DayEndingEventArgs e)    //Wipe invitation on the day supposed to visit
+        {
+            try
+            {
+                foreach (NPC __instance in Utility.getAllCharacters())
+                {
+                    if (__instance.isVillager() && __instance.modData["hapyke.FoodStore/invited"] == "true"
+                        && __instance.modData["hapyke.FoodStore/inviteDate"] == (DishPrefer.todayDayPlayed - 1).ToString())
+                    {
+                        __instance.modData["hapyke.FoodStore/invited"] = "false";
+                        __instance.modData["hapyke.FoodStore/inviteDate"] = "-99";
+                    }
+                }
+            } catch { }
+        }
 
         private static bool TryToEatFood(NPC __instance, PlacedFoodData food)
         {
@@ -410,7 +484,6 @@ namespace FoodStore
                         {
                             if (__instance.modData["hapyke.FoodStore/TotalCustomerResponse"] != null)
                             {
-                                Game1.chatBox.addErrorMessage(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]);
                                 double totalInteract = (Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) / 100);
                                 if (totalInteract > 0.25) totalInteract = 0.25;
                                 salePrice = (int)(salePrice * (1 + totalInteract));
@@ -478,23 +551,23 @@ namespace FoodStore
                                 Farmer owner = (__instance.currentLocation as FarmHouse).owner;
                                 if (owner.friendshipData.ContainsKey(__instance.Name))
                                 {
-                                    int points = 10;
-                                    switch (food.value)
+                                    int points = 5;
+                                    switch (taste)
                                     {
                                         case 0:
-                                            points = 30;
+                                            points = 15;
                                             break;
                                         case 2:
-                                            points = 20;
+                                            points = 10;
                                             break;
                                         case 4:
                                             points = 0;
                                             break;
                                         case 6:
-                                            points = -10;
+                                            points = -5;
                                             break;
                                         case 8:
-                                            points = 10;
+                                            points = 5;
                                             break;
                                         default:
                                             __instance.doEmote(20);
@@ -816,5 +889,30 @@ namespace FoodStore
 
             return "Farmer's Lunch";
         }
+
+
+        private void OnTimeChange(object sender, TimeChangedEventArgs e)
+        {
+            if (Game1.timeOfDay > Config.InviteComeTime)
+            {
+                foreach (NPC c in Utility.getAllCharacters())
+                {
+                    if (c.isVillager() && c.currentLocation.Name == "Farm" && c.modData["hapyke.FoodStore/invited"] == "true" && c.modData["hapyke.FoodStore/inviteDate"] == (DishPrefer.todayDayPlayed - 1).ToString())
+                    {
+                        FarmOutside.WalkAroundFarm(c.Name);
+                    }
+
+                    if (c.isVillager() && c.currentLocation.Name == "FarmHouse" && c.modData["hapyke.FoodStore/invited"] == "true" && c.modData["hapyke.FoodStore/inviteDate"] == (DishPrefer.todayDayPlayed - 1).ToString())
+                    {
+                        FarmOutside.WalkAroundHouse(c.Name);
+                    }
+                }
+            }
+        }
+
+        public static bool IsOutside { get; internal set; }
+        internal static List<string> FurnitureList { get; private set; } = new();
+        internal static List<string> Animals { get; private set; } = new();
+        internal static Dictionary<int, string> Crops { get; private set; } = new();
     }
 }

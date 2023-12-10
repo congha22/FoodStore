@@ -88,7 +88,7 @@ namespace FoodStore
 
             string[] helpListKey = {"h_ask_villager", "h_invite", "h_today_dish", "h_taste", "h_set_up" };
 
-            string[] inviteKey = { "house", "invite", "tomorrow" };
+            string[] inviteKey = { "invite", "tomorrow" };
 
             string[] foodKey = { "dish of the day", "today dish", "dish today", "today special", 
                 "special today", "popular today", "today popular", "best food today", "today best food", 
@@ -115,7 +115,7 @@ namespace FoodStore
 
 
             // Handle text message
-            if (askHelp || askHelpIndex || askFood || askVisit || askTaste)
+            if (npc.isVillager() && (askHelp || askHelpIndex || askFood || askVisit || askTaste))
             {
                 if (askHelp)       // Show main help option
                 {
@@ -128,9 +128,40 @@ namespace FoodStore
                 {
                     npc.showTextAboveHead(SHelper.Translation.Get("foodstore.help." + index), default, default, 7000);
                 }                       // Invite to visit
-                else if (askVisit)
+                else if (askVisit && !bool.Parse(npc.modData["hapyke.FoodStore/inviteTried"]) && !bool.Parse(npc.modData["hapyke.FoodStore/invited"]))
                 {
-                    npc.showTextAboveHead("Maybe");
+                    Random rand = new Random();
+                    int heartLevel = Game1.player.getFriendshipHeartLevelForNPC(npc.Name);
+
+                    int inviteIndex = rand.Next(7);
+
+                    if (heartLevel < 2) 
+                    {
+                        npc.showTextAboveHead(SHelper.Translation.Get("foodstore.noinvitevisit." + inviteIndex), default, default, 5000);
+                    }
+                    else if (heartLevel <= 5)
+                    {
+                        if (rand.NextDouble() > 0.5) 
+                        {
+                            npc.showTextAboveHead(SHelper.Translation.Get("foodstore.willinvitevisit." + inviteIndex), default, default, 5000);
+                            npc.modData["hapyke.FoodStore/invited"] = "true";
+                            npc.modData["hapyke.FoodStore/inviteDate"] = DishPrefer.todayDayPlayed.ToString();
+                        }
+                        else npc.showTextAboveHead(SHelper.Translation.Get("foodstore.cannotinvitevisit." + inviteIndex), default, default, 5000);
+
+                    }
+                    else
+                    {
+                        if (rand.NextDouble() > 0.25)
+                        {
+                            npc.showTextAboveHead(SHelper.Translation.Get("foodstore.willinvitevisit." + inviteIndex), default, default, 5000);
+                            npc.modData["hapyke.FoodStore/invited"] = "true";
+                            npc.modData["hapyke.FoodStore/inviteDate"] = DishPrefer.todayDayPlayed.ToString();
+                        }
+                        else npc.showTextAboveHead(SHelper.Translation.Get("foodstore.cannotinvitevisit." + inviteIndex), default, default, 5000);
+
+                    }
+                    npc.modData["hapyke.FoodStore/inviteTried"] = "true";
                 }
                 else if (askFood)       // Ask dish of the day
                 {

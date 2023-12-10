@@ -22,6 +22,7 @@ using Netcode;
 using StardewValley.Network;
 using System.Xml.Serialization;
 using Microsoft.Xna.Framework.Input;
+using System.ComponentModel;
 
 namespace FoodStore
 {
@@ -33,7 +34,7 @@ namespace FoodStore
             // Declare a public static variable
             public static string dishDay = "Farmer's Lunch";
             public static string dishWeek = "Farmer's Lunch";
-
+            public static uint todayDayPlayed = 0;
         }
         private static void NPC_dayUpdate_Postfix(NPC __instance)
 		{
@@ -47,11 +48,14 @@ namespace FoodStore
             __instance.modData["hapyke.FoodStore/LastFoodDecor"] = "-1";
             __instance.modData["hapyke.FoodStore/LastSay"] = "0";
             __instance.modData["hapyke.FoodStore/TotalCustomerResponse"] = "0";
+            __instance.modData["hapyke.FoodStore/inviteTried"] = "false";
 
             if (__instance.Name == "Lewis")
             {
+                DishPrefer.todayDayPlayed = Game1.stats.daysPlayed;
 
                 DishPrefer.dishDay = GetRandomDish();
+
                 if (Game1.dayOfMonth == 1 || Game1.dayOfMonth == 8 || Game1.dayOfMonth == 15 || Game1.dayOfMonth == 22)
                 {
                     DishPrefer.dishWeek = GetRandomDish();      //Get dish of the week
@@ -61,7 +65,7 @@ namespace FoodStore
                     MyMessage messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.thankyou"));
                     SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
 
-                    //Send mod Note
+                    // ******** Send mod Note ********
                     string modNote = SHelper.Translation.Get("foodstore.note");
                     if (modNote != "")
                     {
@@ -82,6 +86,48 @@ namespace FoodStore
 
         private static void NPC_performTenMinuteUpdate_Postfix(NPC __instance)
         {
+            try             //Warp invited NPC to and away
+            {
+                if (__instance.isVillager() && !Utility.isFestivalDay(Game1.dayOfMonth, Game1.currentSeason) && __instance.modData["hapyke.FoodStore/inviteDate"] == (DishPrefer.todayDayPlayed - 1).ToString())
+                {
+                    Random rand = new Random();
+                    int index = rand.Next(7);
+                    if (__instance.modData["hapyke.FoodStore/invited"] == "true" && Game1.timeOfDay == Config.InviteComeTime && __instance.currentLocation.Name != "Farm" && __instance.currentLocation.Name != "FarmHouse")
+                    {
+                        Game1.drawDialogue(__instance, SHelper.Translation.Get("foodstore.visitcome." + index));
+                        Game1.globalFadeToBlack();
+
+
+                        var door = Game1.getFarm().GetMainFarmHouseEntry();
+                        door.X += 3 - index;
+                        door.Y += 2;
+                        var name = "Farm";
+
+                        Game1.warpCharacter(__instance, name, door);
+
+                        __instance.faceDirection(2);
+
+                        door.X--;
+                        __instance.controller = new PathFindController(__instance, Game1.getFarm(), door, 2);
+
+                    }
+
+                    if (__instance.modData["hapyke.FoodStore/invited"] == "true" && ( __instance.currentLocation.Name == "Farm" || __instance.currentLocation.Name == "FarmHouse")
+                        && (Game1.timeOfDay == Config.InviteLeaveTime || Game1.timeOfDay == Config.InviteLeaveTime + 30 || Game1.timeOfDay == Config.InviteLeaveTime + 100 || Game1.timeOfDay == Config.InviteLeaveTime + 130))
+                    {
+                        Game1.drawDialogue(__instance, SHelper.Translation.Get("foodstore.visitleave." + index));
+                        Game1.globalFadeToBlack();
+
+                        __instance.modData["hapyke.FoodStore/invited"] = "false";
+                        __instance.controller = null;
+                        __instance.clearSchedule();
+                        __instance.ignoreScheduleToday = true;
+                        Game1.warpCharacter(__instance, __instance.DefaultMap, new Point ((int)__instance.DefaultPosition.X / 64, (int)__instance.DefaultPosition.Y/64));
+                    }
+                }
+            }
+            catch {}
+
 
             //Validate player talked to NPC
             Farmer farmerInstance = Game1.player;
@@ -263,7 +309,7 @@ namespace FoodStore
                         }
                     }
 
-                    if (randomSayChance.NextDouble() < (talkChance / localNpcCount / 1.5)) 
+                    if (randomSayChance.NextDouble() < (talkChance / localNpcCount / 2)) 
                     {
                         npc.showTextAboveHead(SHelper.Translation.Get("foodstore.dishweek." + randomIndex.ToString(), new { dishWeek = DishPrefer.dishWeek }), -1, 2, 8000);
                         npc.modData["hapyke.FoodStore/LastSay"] = Game1.timeOfDay.ToString();

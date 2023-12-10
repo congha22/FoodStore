@@ -29,6 +29,11 @@ namespace FoodStore
         public float TipDislike { get; set; } = -1f;
         public float TipHate { get; set; } = -1f;
 
+        public float InviteComeTime { get; set; } = 1000;
+        public float InviteLeaveTime { get; set; } = 2000;
+
+
+
 
     }
 }
