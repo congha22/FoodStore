@@ -131,40 +131,6 @@ namespace FoodStore
             }
             catch {}
 
-
-            //Validate player talked to NPC
-            Farmer farmerInstance = Game1.player;
-            NetStringDictionary<Friendship, NetRef<Friendship>> friendshipData = farmerInstance.friendshipData;
-
-            if (friendshipData.TryGetValue(__instance.Name, out var friendship))
-            {
-                if (friendshipData[__instance.Name].TalkedToToday)
-                {
-                    try
-                    {
-                        if (__instance.CurrentDialogue.Count == 0)
-                        {
-                            Random random = new Random();
-                            int randomIndex = random.Next(19);
-                            __instance.CurrentDialogue.Push(new Dialogue(SHelper.Translation.Get("foodstore.customerresponse." + randomIndex), __instance));
-                            __instance.modData["hapyke.FoodStore/TotalCustomerResponse"] = (Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) + 1).ToString();
-
-
-                            var formattedQuestion = string.Format(SHelper.Translation.Get("foodstore.responselist.main"), __instance);
-                            var entryQuestion = new EntryQuestion(formattedQuestion, ResponseList, ActionList);
-                            Game1.activeClickableMenu = entryQuestion;
-
-                            var pc = new PlayerChat();
-                            ActionList.Add(() => pc.OnPlayerSend(__instance, "hi"));
-                            ActionList.Add(() => pc.OnPlayerSend(__instance, "invite"));
-                            ActionList.Add(() => pc.OnPlayerSend(__instance, "last dish"));
-                            ActionList.Add(() => pc.OnPlayerSend(__instance, "special today"));
-                        }
-                    }
-                    catch (Exception ex) { }
-                }
-            }
-
             //Send dish of the day
             if (__instance.Name == "Lewis" && Game1.timeOfDay == 900 && !Config.DisableChatAll)
             {

@@ -4,6 +4,7 @@ using HarmonyLib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
+using Netcode;
 using Newtonsoft.Json;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
@@ -11,6 +12,7 @@ using StardewValley;
 using StardewValley.Locations;
 using StardewValley.Menus;
 using StardewValley.Minigames;
+using StardewValley.Network;
 using StardewValley.Objects;
 using StardewValley.Tools;
 using System;
@@ -82,6 +84,50 @@ namespace FoodStore
             {
                 PlayerChat playerChatInstance = new PlayerChat();
                 playerChatInstance.Validate();
+            }
+
+            if(Game1.hasLoadedGame && e.IsMultipleOf(30))
+            {
+
+                Farmer farmerInstance = Game1.player;
+                NetStringDictionary<Friendship, NetRef<Friendship>> friendshipData = farmerInstance.friendshipData;
+
+                try
+                {
+                    foreach (NPC __instance in Utility.getAllCharacters())
+                    {
+                        if (__instance.isVillager() && friendshipData.TryGetValue(__instance.Name, out var friendship))
+                        {
+                            if (friendshipData[__instance.Name].TalkedToToday)
+                            {
+                                try
+                                {
+                                    if (__instance.CurrentDialogue.Count == 0)
+                                    {
+                                        Random random = new Random();
+                                        int randomIndex = random.Next(19);
+                                        __instance.CurrentDialogue.Push(new Dialogue(SHelper.Translation.Get("foodstore.customerresponse." + randomIndex), __instance));
+                                        __instance.modData["hapyke.FoodStore/TotalCustomerResponse"] = (Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) + 1).ToString();
+
+
+                                        var formattedQuestion = string.Format(SHelper.Translation.Get("foodstore.responselist.main"), __instance);
+                                        var entryQuestion = new EntryQuestion(formattedQuestion, ResponseList, ActionList);
+                                        Game1.activeClickableMenu = entryQuestion;
+
+                                        var pc = new PlayerChat();
+                                        ActionList.Add(() => pc.OnPlayerSend(__instance, "hi"));
+                                        ActionList.Add(() => pc.OnPlayerSend(__instance, "invite"));
+                                        ActionList.Add(() => pc.OnPlayerSend(__instance, "last dish"));
+                                        ActionList.Add(() => pc.OnPlayerSend(__instance, "special today"));
+                                    }
+                                }
+                                catch (Exception ex) { }
+                            }
+                        }
+                    }
+                }
+                catch (NullReferenceException) { }
+
             }
         }
 
@@ -484,7 +530,7 @@ namespace FoodStore
                         {
                             if (__instance.modData["hapyke.FoodStore/TotalCustomerResponse"] != null)
                             {
-                                double totalInteract = (Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) / 100);
+                                double totalInteract = (Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) / 150);
                                 if (totalInteract > 0.25) totalInteract = 0.25;
                                 salePrice = (int)(salePrice * (1 + totalInteract));
                             }
