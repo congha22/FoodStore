@@ -22,7 +22,7 @@
 
   //
   "foodstore.help.0": "Interact with villager by stand close to them, and type in your message. Some special question required to have the keyword in the message!!",
-  "foodstore.help.1": "To invite villager come over tomorrow, send a message contains 2 keyword: 'invite' and 'tomorrow'.",
+  "foodstore.help.1": "To invite villager come over tomorrow, send a message contains keyword: 'invite'.",
   "foodstore.help.2": "Ask villager about dish of the day. The message must contains at least a keyword. For example 'special today' or 'recommened today'.",
   "foodstore.help.3": "Ask villager how do they feel about their last dish by include keyword 'last dish' or 'dish taste'.",
   "foodstore.help.4": "To set up your first store, simply place donw a table at a busy location, and then put a dish on it!!!",
@@ -463,8 +463,23 @@
   //
   "foodstore.config.invitetime": "Invitation Time",
   "foodstore.config.invitecometime": "Time villager arrive.",
-  "foodstore.config.inviteleavetime": "Time villager start to leave."
+  "foodstore.config.inviteleavetime": "Time villager start to leave.",
 
+  //---------------------------- End of v2.0.2-----------------------------
+
+  //
+  "foodstore.config.disableallmessage": "Disable ALL message.",
+  "foodstore.config.disableallmessageText": "Set to True to disable ALL message, including chatbox and bubble. The functions still working, just the text will not be displayed. Not recommended",
+
+  //
+  "foodstore.responselist.main": "Do you need anything else?",
+  "foodstore.responselist.talk": "Talk",
+  "foodstore.responselist.invite": "Invite for a visit",
+  "foodstore.responselist.foodtaste": "How was the food?",
+  "foodstore.responselist.dailydish": "Dish of the Day"
+
+
+  //---------------------------- End of v2.1.0-----------------------------
 
 
 

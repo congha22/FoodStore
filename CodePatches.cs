@@ -60,26 +60,29 @@ namespace FoodStore
                 {
                     DishPrefer.dishWeek = GetRandomDish();      //Get dish of the week
 
-                    //Send thanks
-                    Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.thankyou"));
-                    MyMessage messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.thankyou"));
-                    SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
-
-                    // ******** Send mod Note ********
-                    string modNote = SHelper.Translation.Get("foodstore.note");
-                    if (modNote != "")
+                    if (!Config.DisableChatAll)
                     {
-                        Game1.chatBox.addInfoMessage(modNote);
-                        messageToSend = new MyMessage(modNote);
+                        //Send thanks
+                        Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.thankyou"));
+                        MyMessage messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.thankyou"));
+                        SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
+
+                        // ******** Send mod Note ********
+                        string modNote = SHelper.Translation.Get("foodstore.note");
+                        if (modNote != "")
+                        {
+                            Game1.chatBox.addInfoMessage(modNote);
+                            messageToSend = new MyMessage(modNote);
+                            SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
+                        }
+
+                        //Send hidden reveal
+                        Random random = new Random();
+                        int randomIndex = random.Next(11);
+                        Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.hidden." + randomIndex.ToString()));
+                        messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.hidden." + randomIndex.ToString()));
                         SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
                     }
-
-                    //Send hidden reveal
-                    Random random = new Random();
-                    int randomIndex = random.Next(11);
-                    Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.hidden." + randomIndex.ToString()));
-                    messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.hidden." + randomIndex.ToString()));
-                    SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
                 }
             }
         }
@@ -145,6 +148,17 @@ namespace FoodStore
                             int randomIndex = random.Next(19);
                             __instance.CurrentDialogue.Push(new Dialogue(SHelper.Translation.Get("foodstore.customerresponse." + randomIndex), __instance));
                             __instance.modData["hapyke.FoodStore/TotalCustomerResponse"] = (Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) + 1).ToString();
+
+
+                            var formattedQuestion = string.Format(SHelper.Translation.Get("foodstore.responselist.main"), __instance);
+                            var entryQuestion = new EntryQuestion(formattedQuestion, ResponseList, ActionList);
+                            Game1.activeClickableMenu = entryQuestion;
+
+                            var pc = new PlayerChat();
+                            ActionList.Add(() => pc.OnPlayerSend(__instance, "hi"));
+                            ActionList.Add(() => pc.OnPlayerSend(__instance, "invite"));
+                            ActionList.Add(() => pc.OnPlayerSend(__instance, "last dish"));
+                            ActionList.Add(() => pc.OnPlayerSend(__instance, "special today"));
                         }
                     }
                     catch (Exception ex) { }
@@ -152,7 +166,7 @@ namespace FoodStore
             }
 
             //Send dish of the day
-            if (__instance.Name == "Lewis" && Game1.timeOfDay == 900)
+            if (__instance.Name == "Lewis" && Game1.timeOfDay == 900 && !Config.DisableChatAll)
             {
                 Random random = new Random();
                 int randomIndex = random.Next(10);
@@ -162,7 +176,7 @@ namespace FoodStore
             }
 
             //Get taste and decoration score, call to SaySomething for NPC to send bubble text
-            if (Config.EnableMod && !Game1.eventUp && __instance.currentLocation is not null && __instance.isVillager() && !WantsToEat(__instance) && Microsoft.Xna.Framework.Vector2.Distance(__instance.getTileLocation(), Game1.player.getTileLocation()) < 30)
+            if (Config.EnableMod && !Game1.eventUp && __instance.currentLocation is not null && __instance.isVillager() && !WantsToEat(__instance) && Microsoft.Xna.Framework.Vector2.Distance(__instance.getTileLocation(), Game1.player.getTileLocation()) < 30 && !Config.DisableChatAll)
 			{
                 if (Game1.random.NextDouble() < 0.1)
                 {
@@ -276,10 +290,11 @@ namespace FoodStore
                 Random randomSayChance = new Random();
 
                 //Send bubble about decoration, decor, dish of the week
-                if (randomSayChance.NextDouble() < talkChance
+                if (npc.isVillager()
+                    && randomSayChance.NextDouble() < talkChance
                     && WantsToSay(npc, 360)
                     && Utility.isThereAFarmerWithinDistance(new Microsoft.Xna.Framework.Vector2(npc.getTileLocation().X, npc.getTileLocation().Y), 20, npc.currentLocation) != null
-                    && npc.isVillager())
+                    && !Config.DisableChatAll)
                 {
                     PlacedFoodData tempFood = GetClosestFood(npc, npc.currentLocation);
 
@@ -378,7 +393,7 @@ namespace FoodStore
                         if (tries < 3 && TimeDelayCheck(villager))
                         {
                             //Send message
-                            if (!Config.DisableChat) 
+                            if (!Config.DisableChat || !Config.DisableChatAll) 
                             {
                                 Random random = new Random();
                                 int randomIndex = random.Next(15);

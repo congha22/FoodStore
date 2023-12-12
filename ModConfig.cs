@@ -11,6 +11,7 @@ namespace FoodStore
         public bool RushHour { get; set; } = true;
         public bool EnableDecor { get; set; } = true;
         public bool DisableChat { get; set; } = false;
+        public bool DisableChatAll { get; set; } = false;
 
         public int MinutesToHungry { get; set; } = 240;
         public float MoveToFoodChance { get; set; } = 0.005f;

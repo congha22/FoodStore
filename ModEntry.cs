@@ -18,9 +18,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.SqlTypes;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Net;
+using System.Runtime.CompilerServices;
 using static FoodStore.ModEntry;
 using static FoodStore.PlayerChat;
 using static System.Net.Mime.MediaTypeNames;
@@ -37,6 +39,9 @@ namespace FoodStore
         public static ModConfig Config;
 
         public static ModEntry context;
+
+        internal static List<Response> ResponseList { get; private set; } = new();
+        internal static List<Action> ActionList { get; private set; } = new();
 
         /// <summary>The mod entry point, called after the mod is first loaded.</summary>
         /// <param name="helper">Provides simplified APIs for writing mods.</param>
@@ -93,7 +98,7 @@ namespace FoodStore
 
         public void OnModMessageReceived(object sender, ModMessageReceivedEventArgs e)
         {
-            if (e.FromModID == this.ModManifest.UniqueID && e.Type == "ExampleMessageType")
+            if (e.FromModID == this.ModManifest.UniqueID && e.Type == "ExampleMessageType" && !Config.DisableChatAll)
             {
                 MyMessage message = e.ReadAs<MyMessage>();
                 Game1.chatBox.addInfoMessage(message.MessageContent);
@@ -181,6 +186,14 @@ namespace FoodStore
                 name: () => SHelper.Translation.Get("foodstore.config.chat"),
                 getValue: () => Config.DisableChat,
                 setValue: value => Config.DisableChat = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.disableallmessage"), 
+                tooltip: () => SHelper.Translation.Get("foodstore.config.disableallmessageText"),
+                getValue: () => Config.DisableChatAll,
+                setValue: value => Config.DisableChatAll = value
             );
 
             configMenu.AddPageLink(mod: ModManifest, "inviteTime", () => SHelper.Translation.Get("foodstore.config.invitetime"));
@@ -295,32 +308,19 @@ namespace FoodStore
             if (!Config.EnableMod)
                 return;
 
+            if (ResponseList?.Count is not 4)
+            {
+                ResponseList.Add(new Response("Talk", SHelper.Translation.Get("foodstore.responselist.talk")));
+                ResponseList.Add(new Response("Invite", SHelper.Translation.Get("foodstore.responselist.invite")));
+                ResponseList.Add(new Response("FoodTaste", SHelper.Translation.Get("foodstore.responselist.foodtaste")));
+                ResponseList.Add(new Response("DailyDish", SHelper.Translation.Get("foodstore.responselist.dailydish")));
+            }
+           
             //Generate Dish of day and dish of week on Save Loaded
             DishPrefer.dishDay = GetRandomDish();
             if (Game1.dayOfMonth == 1 || Game1.dayOfMonth == 8 || Game1.dayOfMonth == 15 || Game1.dayOfMonth == 22)
             {
                 DishPrefer.dishWeek = GetRandomDish();      //Get dish of the week
-
-                //Send thanks
-                Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.thankyou"));
-                MyMessage messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.thankyou"));
-                SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
-
-                // ******** Send mod Note ********
-                string modNote = SHelper.Translation.Get("foodstore.note");
-                if (modNote != "")
-                {
-                    Game1.chatBox.addInfoMessage(modNote);
-                    messageToSend = new MyMessage(modNote);
-                    SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
-                }
-
-                //Send hidden reveal
-                Random random = new Random();
-                int randomIndex = random.Next(11);
-                Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.hidden." + randomIndex.ToString()));
-                messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.hidden." + randomIndex.ToString()));
-                SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
             }
 
             //Assign visit value
@@ -500,7 +500,7 @@ namespace FoodStore
                         enumerator.Current.heldObject.Value = null;
 
                         //Money on/off farm
-                        if (__instance.currentLocation is not FarmHouse && __instance.currentLocation is not Farm)
+                        if (__instance.currentLocation is not FarmHouse && __instance.currentLocation is not Farm && !Config.DisableChatAll)
                         {
                             //Generate chat box
                             if (tip != 0)
@@ -582,7 +582,7 @@ namespace FoodStore
                             int randomNumber = random.Next(12);
                             salePrice = tip = 0;
 
-                            __instance.showTextAboveHead(SHelper.Translation.Get("foodstore.spouseeat." + randomNumber));
+                            if(!Config.DisableChatAll) __instance.showTextAboveHead(SHelper.Translation.Get("foodstore.spouseeat." + randomNumber));
                         }           //Food in farmhouse
 
                         Game1.player.Money += salePrice + tip;
@@ -687,6 +687,7 @@ namespace FoodStore
 
         private static bool WantsToSay(NPC npc, int time)
         {
+            if (Config.DisableChatAll ) { return false; }
             if (!npc.modData.ContainsKey("hapyke.FoodStore/LastSay") || npc.modData["hapyke.FoodStore/LastSay"].Length == 0)
             {
                 return true;
@@ -803,7 +804,7 @@ namespace FoodStore
 
             foreach (NPC newCharacter in thisLocation.characters)
             {
-                if (Vector2.Distance(newCharacter.getTileLocation(), thisCharacter.getTileLocation()) <= (float)15 && newCharacter.Name != thisCharacter.Name)
+                if (Vector2.Distance(newCharacter.getTileLocation(), thisCharacter.getTileLocation()) <= (float)15 && newCharacter.Name != thisCharacter.Name && !Config.DisableChatAll)
                 {
                     Random random = new Random();
                     int randomIndex = random.Next(5);

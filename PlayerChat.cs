@@ -71,24 +71,23 @@ namespace FoodStore
                     {
                         npc.facePlayer(Game1.player);
                     }
-                    OnPlayerSend(npc, _TextInput, _Target);
+                    OnPlayerSend(npc, _TextInput);
                     this.NpcMap.Clear();
                 }
             }
             catch (Exception){}
         }
 
-        private void OnPlayerSend(NPC npc, string textInput, string npcName)
+        public void OnPlayerSend(NPC npc, string textInput)
         {
-
+            
             Random random = new Random();
-
             // Available option
             string helpKey = "help";
 
             string[] helpListKey = {"h_ask_villager", "h_invite", "h_today_dish", "h_taste", "h_set_up" };
 
-            string[] inviteKey = { "invite", "tomorrow" };
+            string[] inviteKey = { "invite" };
 
             string[] foodKey = { "dish of the day", "today dish", "dish today", "today special", 
                 "special today", "popular today", "today popular", "best food today", "today best food", 
@@ -122,11 +121,11 @@ namespace FoodStore
                     string listKey = "";
                     foreach (string key in helpListKey)
                         listKey += key + " | ";
-                    npc.showTextAboveHead(listKey, default, default, 7000);
+                    if (!Config.DisableChatAll) npc.showTextAboveHead(listKey, default, default, 7000);
                 }
                 else if(askHelpIndex)        // Show detail of help option
                 {
-                    npc.showTextAboveHead(SHelper.Translation.Get("foodstore.help." + index), default, default, 7000);
+                    if (!Config.DisableChatAll) npc.showTextAboveHead(SHelper.Translation.Get("foodstore.help." + index), default, default, 7000);
                 }                       // Invite to visit
                 else if (askVisit && !bool.Parse(npc.modData["hapyke.FoodStore/inviteTried"]) && !bool.Parse(npc.modData["hapyke.FoodStore/invited"]))
                 {
@@ -137,28 +136,30 @@ namespace FoodStore
 
                     if (heartLevel < 2) 
                     {
-                        npc.showTextAboveHead(SHelper.Translation.Get("foodstore.noinvitevisit." + inviteIndex), default, default, 5000);
+                        if (!Config.DisableChatAll) npc.showTextAboveHead(SHelper.Translation.Get("foodstore.noinvitevisit." + inviteIndex), default, default, 5000);
                     }
                     else if (heartLevel <= 5)
                     {
                         if (rand.NextDouble() > 0.5) 
                         {
-                            npc.showTextAboveHead(SHelper.Translation.Get("foodstore.willinvitevisit." + inviteIndex), default, default, 5000);
+                            if (!Config.DisableChatAll) npc.showTextAboveHead(SHelper.Translation.Get("foodstore.willinvitevisit." + inviteIndex), default, default, 5000);
                             npc.modData["hapyke.FoodStore/invited"] = "true";
                             npc.modData["hapyke.FoodStore/inviteDate"] = DishPrefer.todayDayPlayed.ToString();
                         }
-                        else npc.showTextAboveHead(SHelper.Translation.Get("foodstore.cannotinvitevisit." + inviteIndex), default, default, 5000);
+                        else
+                            if (!Config.DisableChatAll) npc.showTextAboveHead(SHelper.Translation.Get("foodstore.cannotinvitevisit." + inviteIndex), default, default, 5000);
 
                     }
                     else
                     {
                         if (rand.NextDouble() > 0.25)
                         {
-                            npc.showTextAboveHead(SHelper.Translation.Get("foodstore.willinvitevisit." + inviteIndex), default, default, 5000);
+                            if (!Config.DisableChatAll) npc.showTextAboveHead(SHelper.Translation.Get("foodstore.willinvitevisit." + inviteIndex), default, default, 5000);
                             npc.modData["hapyke.FoodStore/invited"] = "true";
                             npc.modData["hapyke.FoodStore/inviteDate"] = DishPrefer.todayDayPlayed.ToString();
                         }
-                        else npc.showTextAboveHead(SHelper.Translation.Get("foodstore.cannotinvitevisit." + inviteIndex), default, default, 5000);
+                        else
+                            if (!Config.DisableChatAll) npc.showTextAboveHead(SHelper.Translation.Get("foodstore.cannotinvitevisit." + inviteIndex), default, default, 5000);
 
                     }
                     npc.modData["hapyke.FoodStore/inviteTried"] = "true";
@@ -166,7 +167,7 @@ namespace FoodStore
                 else if (askFood)       // Ask dish of the day
                 {
                     int randomIndex = random.Next(10);
-                    npc.showTextAboveHead(SHelper.Translation.Get("foodstore.dishday." + randomIndex.ToString(), new { dishToday = DishPrefer.dishDay }), default, default, 5000);
+                    if (!Config.DisableChatAll) npc.showTextAboveHead(SHelper.Translation.Get("foodstore.dishday." + randomIndex.ToString(), new { dishToday = DishPrefer.dishDay }), default, default, 5000);
                 }
                 else if (askTaste)       // Ask taste of the last dish
                 {
@@ -196,14 +197,15 @@ namespace FoodStore
                             break;
                     }
 
-                    npc.showTextAboveHead(dishTaste, default, default, 5000);
+                    if (!Config.DisableChatAll) npc.showTextAboveHead(dishTaste, default, default, 5000);
                 }
             }
             else                        // All other message
             {
                 int randomIndex = random.Next(19);
-                npc.showTextAboveHead(SHelper.Translation.Get("foodstore.customerresponse." + randomIndex.ToString()), default, default, 5000);
+                if (!Config.DisableChatAll) npc.showTextAboveHead(SHelper.Translation.Get("foodstore.customerresponse." + randomIndex.ToString()), default, default, 5000);
             }
+            ActionList.Clear();
         }
 
         internal async void Validate()
@@ -287,5 +289,23 @@ namespace FoodStore
             }
         }
 
+    }
+    internal class EntryQuestion : DialogueBox
+    {
+        private readonly List<Action> ResponseActions;
+        internal EntryQuestion(string dialogue, List<Response> responses, List<Action> Actions) : base(dialogue, responses)
+        {
+            this.ResponseActions = Actions;
+        }
+        public override void receiveLeftClick(int x, int y, bool playSound = true)
+        {
+            int responseIndex = this.selectedResponse;
+            base.receiveLeftClick(x, y, playSound);
+
+            if (base.safetyTimer <= 0 && responseIndex > -1 && responseIndex < this.ResponseActions.Count && this.ResponseActions[responseIndex] != null)
+            {
+                this.ResponseActions[responseIndex]();
+            }
+        }
     }
 }
