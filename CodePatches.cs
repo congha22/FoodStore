@@ -34,7 +34,6 @@ namespace FoodStore
             // Declare a public static variable
             public static string dishDay = "Farmer's Lunch";
             public static string dishWeek = "Farmer's Lunch";
-            public static uint todayDayPlayed = 0;
         }
         private static void NPC_dayUpdate_Postfix(NPC __instance)
 		{
@@ -52,7 +51,6 @@ namespace FoodStore
 
             if (__instance.Name == "Lewis")
             {
-                DishPrefer.todayDayPlayed = Game1.stats.daysPlayed;
 
                 DishPrefer.dishDay = GetRandomDish();
 
@@ -91,7 +89,7 @@ namespace FoodStore
         {
             try             //Warp invited NPC to and away
             {
-                if (__instance.isVillager() && !Utility.isFestivalDay(Game1.dayOfMonth, Game1.currentSeason) && __instance.modData["hapyke.FoodStore/inviteDate"] == (DishPrefer.todayDayPlayed - 1).ToString())
+                if (__instance.isVillager() && !Utility.isFestivalDay(Game1.dayOfMonth, Game1.currentSeason) && __instance.modData["hapyke.FoodStore/inviteDate"] == (Game1.stats.daysPlayed - 1).ToString())
                 {
                     Random rand = new Random();
                     int index = rand.Next(7);
@@ -359,7 +357,7 @@ namespace FoodStore
                         if (tries < 3 && TimeDelayCheck(villager))
                         {
                             //Send message
-                            if (!Config.DisableChat || !Config.DisableChatAll) 
+                            if (!Config.DisableChat || !Config.DisableChatAll && (villager.currentLocation.Name != "Farm" && villager.currentLocation.Name != "FarmHouse"))
                             {
                                 Random random = new Random();
                                 int randomIndex = random.Next(15);

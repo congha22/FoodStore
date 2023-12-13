@@ -144,7 +144,7 @@ namespace FoodStore
                         {
                             if (!Config.DisableChatAll) npc.showTextAboveHead(SHelper.Translation.Get("foodstore.willinvitevisit." + inviteIndex), default, default, 5000);
                             npc.modData["hapyke.FoodStore/invited"] = "true";
-                            npc.modData["hapyke.FoodStore/inviteDate"] = DishPrefer.todayDayPlayed.ToString();
+                            npc.modData["hapyke.FoodStore/inviteDate"] = Game1.stats.daysPlayed.ToString();
                         }
                         else
                             if (!Config.DisableChatAll) npc.showTextAboveHead(SHelper.Translation.Get("foodstore.cannotinvitevisit." + inviteIndex), default, default, 5000);
@@ -156,7 +156,7 @@ namespace FoodStore
                         {
                             if (!Config.DisableChatAll) npc.showTextAboveHead(SHelper.Translation.Get("foodstore.willinvitevisit." + inviteIndex), default, default, 5000);
                             npc.modData["hapyke.FoodStore/invited"] = "true";
-                            npc.modData["hapyke.FoodStore/inviteDate"] = DishPrefer.todayDayPlayed.ToString();
+                            npc.modData["hapyke.FoodStore/inviteDate"] = Game1.stats.daysPlayed.ToString();
                         }
                         else
                             if (!Config.DisableChatAll) npc.showTextAboveHead(SHelper.Translation.Get("foodstore.cannotinvitevisit." + inviteIndex), default, default, 5000);

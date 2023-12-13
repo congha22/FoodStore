@@ -96,7 +96,7 @@ namespace FoodStore
                 {
                     foreach (NPC __instance in Utility.getAllCharacters())
                     {
-                        if (__instance.isVillager() && friendshipData.TryGetValue(__instance.Name, out var friendship))
+                        if (__instance.isVillager() && friendshipData.TryGetValue(__instance.Name, out var friendship) && !Game1.isFestival())
                         {
                             if (friendshipData[__instance.Name].TalkedToToday)
                             {
@@ -108,7 +108,6 @@ namespace FoodStore
                                         int randomIndex = random.Next(19);
                                         __instance.CurrentDialogue.Push(new Dialogue(SHelper.Translation.Get("foodstore.customerresponse." + randomIndex), __instance));
                                         __instance.modData["hapyke.FoodStore/TotalCustomerResponse"] = (Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) + 1).ToString();
-
 
                                         var formattedQuestion = string.Format(SHelper.Translation.Get("foodstore.responselist.main"), __instance);
                                         var entryQuestion = new EntryQuestion(formattedQuestion, ResponseList, ActionList);
@@ -387,7 +386,7 @@ namespace FoodStore
                 foreach (NPC __instance in Utility.getAllCharacters())
                 {
                     if (__instance.isVillager() && __instance.modData["hapyke.FoodStore/invited"] == "true"
-                        && __instance.modData["hapyke.FoodStore/inviteDate"] == (DishPrefer.todayDayPlayed - 1).ToString())
+                        && __instance.modData["hapyke.FoodStore/inviteDate"] == (Game1.stats.daysPlayed - 1).ToString())
                     {
                         __instance.modData["hapyke.FoodStore/invited"] = "false";
                         __instance.modData["hapyke.FoodStore/inviteDate"] = "-99";
@@ -944,12 +943,12 @@ namespace FoodStore
             {
                 foreach (NPC c in Utility.getAllCharacters())
                 {
-                    if (c.isVillager() && c.currentLocation.Name == "Farm" && c.modData["hapyke.FoodStore/invited"] == "true" && c.modData["hapyke.FoodStore/inviteDate"] == (DishPrefer.todayDayPlayed - 1).ToString())
+                    if (c.isVillager() && c.currentLocation.Name == "Farm" && c.modData["hapyke.FoodStore/invited"] == "true" && c.modData["hapyke.FoodStore/inviteDate"] == (Game1.stats.daysPlayed - 1).ToString())
                     {
                         FarmOutside.WalkAroundFarm(c.Name);
                     }
 
-                    if (c.isVillager() && c.currentLocation.Name == "FarmHouse" && c.modData["hapyke.FoodStore/invited"] == "true" && c.modData["hapyke.FoodStore/inviteDate"] == (DishPrefer.todayDayPlayed - 1).ToString())
+                    if (c.isVillager() && c.currentLocation.Name == "FarmHouse" && c.modData["hapyke.FoodStore/invited"] == "true" && c.modData["hapyke.FoodStore/inviteDate"] == (Game1.stats.daysPlayed - 1).ToString())
                     {
                         FarmOutside.WalkAroundHouse(c.Name);
                     }
