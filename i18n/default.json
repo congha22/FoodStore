@@ -476,12 +476,13 @@
   "foodstore.responselist.talk": "Talk",
   "foodstore.responselist.invite": "Invite for a visit",
   "foodstore.responselist.foodtaste": "How was the food?",
-  "foodstore.responselist.dailydish": "Dish of the Day"
+  "foodstore.responselist.dailydish": "Dish of the Day",
 
 
   //---------------------------- End of v2.1.0-----------------------------
 
-
+  //
+  "foodstore.config.enablevisitinside": "Enable visitor inside Farm House?"
 
 
 

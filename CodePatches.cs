@@ -48,6 +48,7 @@ namespace FoodStore
             __instance.modData["hapyke.FoodStore/LastSay"] = "0";
             __instance.modData["hapyke.FoodStore/TotalCustomerResponse"] = "0";
             __instance.modData["hapyke.FoodStore/inviteTried"] = "false";
+            __instance.modData["hapyke.FoodStore/finishedDailyChat"] = "false";
 
             if (__instance.Name == "Lewis")
             {

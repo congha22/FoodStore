@@ -50,6 +50,8 @@ namespace FoodStore
             //if (!ModEntry.Config.WalkOnFarm)
             //    return; //if npcs can't follow or there's no visit
 
+            if (isFarmHouse && !ModEntry.Config.EnableVisitInside)      //If not enable visit inside
+                return;
 
             string name = null;
             Point door = new();

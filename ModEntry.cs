@@ -109,15 +109,19 @@ namespace FoodStore
                                         __instance.CurrentDialogue.Push(new Dialogue(SHelper.Translation.Get("foodstore.customerresponse." + randomIndex), __instance));
                                         __instance.modData["hapyke.FoodStore/TotalCustomerResponse"] = (Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) + 1).ToString();
 
-                                        var formattedQuestion = string.Format(SHelper.Translation.Get("foodstore.responselist.main"), __instance);
-                                        var entryQuestion = new EntryQuestion(formattedQuestion, ResponseList, ActionList);
-                                        Game1.activeClickableMenu = entryQuestion;
+                                        if (__instance.modData["hapyke.FoodStore/finishedDailyChat"] == "true")
+                                        {
+                                            var formattedQuestion = string.Format(SHelper.Translation.Get("foodstore.responselist.main"), __instance);
+                                            var entryQuestion = new EntryQuestion(formattedQuestion, ResponseList, ActionList);
+                                            Game1.activeClickableMenu = entryQuestion;
 
-                                        var pc = new PlayerChat();
-                                        ActionList.Add(() => pc.OnPlayerSend(__instance, "hi"));
-                                        ActionList.Add(() => pc.OnPlayerSend(__instance, "invite"));
-                                        ActionList.Add(() => pc.OnPlayerSend(__instance, "last dish"));
-                                        ActionList.Add(() => pc.OnPlayerSend(__instance, "special today"));
+                                            var pc = new PlayerChat();
+                                            ActionList.Add(() => pc.OnPlayerSend(__instance, "hi"));
+                                            ActionList.Add(() => pc.OnPlayerSend(__instance, "invite"));
+                                            ActionList.Add(() => pc.OnPlayerSend(__instance, "last dish"));
+                                            ActionList.Add(() => pc.OnPlayerSend(__instance, "special today"));
+                                        }
+                                        __instance.modData["hapyke.FoodStore/finishedDailyChat"] = "true";
                                     }
                                 }
                                 catch (Exception ex) { }
@@ -248,7 +252,12 @@ namespace FoodStore
 
             //Villager invite
             configMenu.AddPage(mod: ModManifest, "inviteTime", () => SHelper.Translation.Get("foodstore.config.invitetime"));
-
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.enablevisitinside"),
+                getValue: () => Config.EnableVisitInside,
+                setValue: value => Config.EnableVisitInside = value
+            );
             configMenu.AddTextOption(
                 mod: ModManifest,
                 name: () => SHelper.Translation.Get("foodstore.config.invitecometime"),
@@ -375,6 +384,7 @@ namespace FoodStore
                 {
                     __instance.modData["hapyke.FoodStore/invited"] = "false";
                     __instance.modData["hapyke.FoodStore/inviteDate"] = "-99";
+                    __instance.modData["hapyke.FoodStore/finishedDailyChat"] = "false";
                 }
             }
         }
