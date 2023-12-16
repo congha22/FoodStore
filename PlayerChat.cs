@@ -234,22 +234,25 @@ namespace FoodStore
             this.NpcMap.Clear();
             foreach (NPC npc in Game1.currentLocation.characters)
             {
-                string displayName = ((Character)npc).displayName;
-                if (this.NpcMap.ContainsKey(displayName))
+                if (npc.isVillager())
                 {
-                    NPC newNPC = npc;
-                    NPC oldNPC = this.NpcMap[displayName];
-                    Microsoft.Xna.Framework.Vector2 val = Microsoft.Xna.Framework.Vector2.Subtract(((Character)Game1.player).getTileLocation(), ((Character)oldNPC).getTileLocation());
-                    float oldDistance = ((Microsoft.Xna.Framework.Vector2)(val)).Length();
-                    val = Microsoft.Xna.Framework.Vector2.Subtract(((Character)Game1.player).getTileLocation(), ((Character)newNPC).getTileLocation());
-                    float newDistance = ((Microsoft.Xna.Framework.Vector2)(val)).Length();
-                    if (oldDistance < newDistance)
+                    string displayName = ((Character)npc).displayName;
+                    if (this.NpcMap.ContainsKey(displayName))
                     {
-                        continue;
+                        NPC newNPC = npc;
+                        NPC oldNPC = this.NpcMap[displayName];
+                        Microsoft.Xna.Framework.Vector2 val = Microsoft.Xna.Framework.Vector2.Subtract(((Character)Game1.player).getTileLocation(), ((Character)oldNPC).getTileLocation());
+                        float oldDistance = ((Microsoft.Xna.Framework.Vector2)(val)).Length();
+                        val = Microsoft.Xna.Framework.Vector2.Subtract(((Character)Game1.player).getTileLocation(), ((Character)newNPC).getTileLocation());
+                        float newDistance = ((Microsoft.Xna.Framework.Vector2)(val)).Length();
+                        if (oldDistance < newDistance)
+                        {
+                            continue;
+                        }
+                        this.NpcMap.Remove(displayName);
                     }
-                    this.NpcMap.Remove(displayName);
+                    this.NpcMap.Add(displayName, npc);
                 }
-                this.NpcMap.Add(displayName, npc);
             }
         }
 
@@ -278,11 +281,11 @@ namespace FoodStore
         {
             foreach (NPC npc in Game1.currentLocation.characters)
             {
-                if (((Character)npc).displayName != this.Target && ((Character)npc).isGlowing)
+                if (npc.isVillager() && ((Character)npc).displayName != this.Target && ((Character)npc).isGlowing)
                 {
                     ((Character)npc).stopGlowing();
                 }
-                else if (((Character)npc).displayName == this.Target && !((Character)npc).isGlowing)
+                else if (npc.isVillager() && ((Character)npc).displayName == this.Target && !((Character)npc).isGlowing)
                 {
                     ((Character)npc).startGlowing(Color.Purple, false, 0.01f);
                 }

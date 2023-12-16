@@ -32,8 +32,8 @@ namespace FoodStore
 
         public float InviteComeTime { get; set; } = 1000;
         public float InviteLeaveTime { get; set; } = 2000;
-
         public bool EnableVisitInside { get; set; } = true;
+        public int DialogueTime { get; set; } = 2;
 
 
     }

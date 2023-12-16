@@ -23,6 +23,8 @@ using StardewValley.Network;
 using System.Xml.Serialization;
 using Microsoft.Xna.Framework.Input;
 using System.ComponentModel;
+using Microsoft.Xna.Framework.Graphics;
+using System.Reflection.Metadata;
 
 namespace FoodStore
 {
@@ -49,6 +51,7 @@ namespace FoodStore
             __instance.modData["hapyke.FoodStore/TotalCustomerResponse"] = "0";
             __instance.modData["hapyke.FoodStore/inviteTried"] = "false";
             __instance.modData["hapyke.FoodStore/finishedDailyChat"] = "false";
+            __instance.modData["hapyke.FoodStore/chatDone"] = "0";
 
             if (__instance.Name == "Lewis")
             {
@@ -85,7 +88,16 @@ namespace FoodStore
                 }
             }
         }
-
+        private static void KidJoin(Dictionary<string, int> todaySelectedKid)
+        {
+            foreach (var kvp in todaySelectedKid)
+            {
+                NPC __instance = Game1.getCharacterFromName(kvp.Key);
+                __instance.modData["hapyke.FoodStore/invited"] = "true";
+                __instance.modData["hapyke.FoodStore/inviteDate"] = (Game1.stats.daysPlayed - 1).ToString();
+                Game1.drawDialogue(__instance, SHelper.Translation.Get("foodstore.kidresponselist.yay"));
+            }
+        }
         private static void NPC_performTenMinuteUpdate_Postfix(NPC __instance)
         {
             try             //Warp invited NPC to and away

@@ -482,7 +482,21 @@
   //---------------------------- End of v2.1.0-----------------------------
 
   //
-  "foodstore.config.enablevisitinside": "Enable visitor inside Farm House?"
+  "foodstore.config.enablevisitinside": "Enable visitor inside Farm House?",
+
+  //---------------------------- End of v2.1.2-----------------------------
+
+  //
+  "foodstore.config.dialoguetime": "Daily dialogue box time each NPC?",
+  "foodstore.config.dialoguetimeText": "Default 2. This number limit how many time the invite box appear for each NPC daily. You still can talk and invite NPC using chatbox when passed the limit",
+
+  //
+  "foodstore.kidask": "{{kidName}}: Pwease, can I play on your farm today? Pretty pwease with sprinkles on top!!",
+  "foodstore.groupkidask": "Heyyy, can we all pretty-pretty-please play on your super-duper farm today? Cross my heart, we won't even touch the flowers!",
+  "foodstore.kidresponselist.yes": "Absolutely! And guess what? I've got some special candy, just for you!!",
+  "foodstore.kidresponselist.no": "Oh! I think you've got some super important school stuff today, don'tcha?",
+  "foodstore.kidresponselist.yay": "Yayyy!! Hooray for fun times!",
+  "foodstore.kidresponselist.boring": "Booo...ringgg!! Seriously? That sounds like a super-duper snoozefest!"
 
 
 
