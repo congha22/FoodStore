@@ -1,31 +1,31 @@
-﻿using StardewModdingAPI;
-using StardewValley.Menus;
-using StardewValley;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FoodStore;
+﻿using FoodStore;
+using HarmonyLib;
 using Microsoft.Xna.Framework;
-using StardewValley.Locations;
-using StardewValley.Objects;
+using StardewModdingAPI;
+using StardewValley;
 using StardewValley.Characters;
+using StardewValley.GameData;
+using StardewValley.Locations;
+using StardewValley.Menus;
+using StardewValley.Minigames;
+using StardewValley.Objects;
+using StardewValley.SDKs;
+using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
 using System.Numerics;
 using System.Security.AccessControl;
-using xTile.Dimensions;
-using Object = StardewValley.Object;
-using StardewValley.GameData;
-using static System.Net.Mime.MediaTypeNames;
-using StardewValley.Minigames;
+using System.Text;
 using System.Threading;
-using StardewValley.SDKs;
+using System.Threading.Tasks;
+using xTile.Dimensions;
 using static FoodStore.ModEntry;
-using System.ComponentModel;
-using HarmonyLib;
 using static StardewValley.Minigames.TargetGame;
 using static System.Collections.Specialized.BitVector32;
+using static System.Net.Mime.MediaTypeNames;
+using Object = StardewValley.Object;
 
 namespace FoodStore
 {
@@ -75,22 +75,22 @@ namespace FoodStore
                     this.NpcMap.Clear();
                 }
             }
-            catch (Exception){}
+            catch (Exception) { }
         }
 
         public void OnPlayerSend(NPC npc, string textInput)
         {
-            
+
             Random random = new Random();
             // Available option
             string helpKey = "help";
 
-            string[] helpListKey = {"h_ask_villager", "h_invite", "h_today_dish", "h_taste", "h_set_up" };
+            string[] helpListKey = { "h_ask_villager", "h_invite", "h_today_dish", "h_taste", "h_set_up" };
 
             string[] inviteKey = { "invite" };
 
-            string[] foodKey = { "dish of the day", "today dish", "dish today", "today special", 
-                "special today", "popular today", "today popular", "best food today", "today best food", 
+            string[] foodKey = { "dish of the day", "today dish", "dish today", "today special",
+                "special today", "popular today", "today popular", "best food today", "today best food",
                 "today's special", "special today", "today's dish",
                 "chef's recommendation", "featured dish", "daily special", "what's good today",
                 "recommended today", "today's highlight", "top pick today", "today's favorite" };
@@ -123,7 +123,7 @@ namespace FoodStore
                         listKey += key + " | ";
                     if (!Config.DisableChatAll) npc.showTextAboveHead(listKey, default, default, 7000);
                 }
-                else if(askHelpIndex)        // Show detail of help option
+                else if (askHelpIndex)        // Show detail of help option
                 {
                     if (!Config.DisableChatAll) npc.showTextAboveHead(SHelper.Translation.Get("foodstore.help." + index), default, default, 7000);
                 }                       // Invite to visit
@@ -134,13 +134,13 @@ namespace FoodStore
 
                     int inviteIndex = rand.Next(7);
 
-                    if (heartLevel < 2) 
+                    if (heartLevel < 2)
                     {
                         if (!Config.DisableChatAll) npc.showTextAboveHead(SHelper.Translation.Get("foodstore.noinvitevisit." + inviteIndex), default, default, 5000);
                     }
                     else if (heartLevel <= 5)
                     {
-                        if (rand.NextDouble() > 0.5) 
+                        if (rand.NextDouble() > 0.5)
                         {
                             if (!Config.DisableChatAll) npc.showTextAboveHead(SHelper.Translation.Get("foodstore.willinvitevisit." + inviteIndex), default, default, 5000);
                             npc.modData["hapyke.FoodStore/invited"] = "true";
@@ -172,7 +172,7 @@ namespace FoodStore
                 else if (askTaste)       // Ask taste of the last dish
                 {
                     string dishTaste = "";
-                    if (npc.modData.ContainsKey("hapyke.FoodStore/LastFoodTaste"))  dishTaste = npc.modData["hapyke.FoodStore/LastFoodTaste"];
+                    if (npc.modData.ContainsKey("hapyke.FoodStore/LastFoodTaste")) dishTaste = npc.modData["hapyke.FoodStore/LastFoodTaste"];
                     int randomIndex = random.Next(3);
 
                     switch (dishTaste)
@@ -242,9 +242,9 @@ namespace FoodStore
                         NPC newNPC = npc;
                         NPC oldNPC = this.NpcMap[displayName];
                         Microsoft.Xna.Framework.Vector2 val = Microsoft.Xna.Framework.Vector2.Subtract(((Character)Game1.player).getTileLocation(), ((Character)oldNPC).getTileLocation());
-                        float oldDistance = ((Microsoft.Xna.Framework.Vector2)(val)).Length();
+                        float oldDistance = ((Microsoft.Xna.Framework.Vector2)val).Length();
                         val = Microsoft.Xna.Framework.Vector2.Subtract(((Character)Game1.player).getTileLocation(), ((Character)newNPC).getTileLocation());
-                        float newDistance = ((Microsoft.Xna.Framework.Vector2)(val)).Length();
+                        float newDistance = ((Microsoft.Xna.Framework.Vector2)val).Length();
                         if (oldDistance < newDistance)
                         {
                             continue;
@@ -267,7 +267,7 @@ namespace FoodStore
             foreach (KeyValuePair<string, NPC> pair in this.NpcMap)
             {
                 Microsoft.Xna.Framework.Vector2 val = Microsoft.Xna.Framework.Vector2.Subtract(((Character)Game1.player).getTileLocation(), ((Character)pair.Value).getTileLocation());
-                float distance = ((Microsoft.Xna.Framework.Vector2)(val)).Length(); 
+                float distance = ((Microsoft.Xna.Framework.Vector2)val).Length();
                 if (distance <= bestDistance)
                 {
                     bestDistance = distance;

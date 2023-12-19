@@ -1,30 +1,30 @@
 ﻿using FoodStore;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using Netcode;
+using StardewModdingAPI;
 using StardewValley;
-using StardewValley.Locations;
-using StardewValley.Objects;
 using StardewValley.Characters;
+using StardewValley.GameData;
+using StardewValley.Locations;
+using StardewValley.Menus;
+using StardewValley.Network;
+using StardewValley.Objects;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Numerics;
-using System.Security.AccessControl;
-using xTile.Dimensions;
-using Object = StardewValley.Object;
-using StardewValley.GameData;
-using StardewModdingAPI;
-using static System.Net.Mime.MediaTypeNames;
-using StardewValley.Menus;
-using static StardewValley.Minigames.TargetGame;
-using System.Xml.Linq;
-using Netcode;
-using StardewValley.Network;
-using System.Xml.Serialization;
-using Microsoft.Xna.Framework.Input;
-using System.ComponentModel;
-using Microsoft.Xna.Framework.Graphics;
 using System.Reflection.Metadata;
+using System.Security.AccessControl;
+using System.Xml.Linq;
+using System.Xml.Serialization;
+using xTile.Dimensions;
+using static StardewValley.Minigames.TargetGame;
+using static System.Net.Mime.MediaTypeNames;
+using Object = StardewValley.Object;
 
 namespace FoodStore
 {
@@ -38,13 +38,13 @@ namespace FoodStore
             public static string dishWeek = "Farmer's Lunch";
         }
         private static void NPC_dayUpdate_Postfix(NPC __instance)
-		{
-			if (!Config.EnableMod)
-				return;
+        {
+            if (!Config.EnableMod)
+                return;
 
             __instance.modData["hapyke.FoodStore/LastFood"] = "0";
-			__instance.modData["hapyke.FoodStore/LastCheck"] = "0";
-			__instance.modData["hapyke.FoodStore/LocationControl"] = ",";
+            __instance.modData["hapyke.FoodStore/LastCheck"] = "0";
+            __instance.modData["hapyke.FoodStore/LocationControl"] = ",";
             __instance.modData["hapyke.FoodStore/LastFoodTaste"] = "-1";
             __instance.modData["hapyke.FoodStore/LastFoodDecor"] = "-1";
             __instance.modData["hapyke.FoodStore/LastSay"] = "0";
@@ -126,7 +126,7 @@ namespace FoodStore
 
                     }
 
-                    if (__instance.modData["hapyke.FoodStore/invited"] == "true" && ( __instance.currentLocation.Name == "Farm" || __instance.currentLocation.Name == "FarmHouse")
+                    if (__instance.modData["hapyke.FoodStore/invited"] == "true" && (__instance.currentLocation.Name == "Farm" || __instance.currentLocation.Name == "FarmHouse")
                         && (Game1.timeOfDay == Config.InviteLeaveTime || Game1.timeOfDay == Config.InviteLeaveTime + 30 || Game1.timeOfDay == Config.InviteLeaveTime + 100 || Game1.timeOfDay == Config.InviteLeaveTime + 130))
                     {
                         Game1.drawDialogue(__instance, SHelper.Translation.Get("foodstore.visitleave." + index));
@@ -136,11 +136,11 @@ namespace FoodStore
                         __instance.controller = null;
                         __instance.clearSchedule();
                         __instance.ignoreScheduleToday = true;
-                        Game1.warpCharacter(__instance, __instance.DefaultMap, new Point ((int)__instance.DefaultPosition.X / 64, (int)__instance.DefaultPosition.Y/64));
+                        Game1.warpCharacter(__instance, __instance.DefaultMap, new Point((int)__instance.DefaultPosition.X / 64, (int)__instance.DefaultPosition.Y / 64));
                     }
                 }
             }
-            catch {}
+            catch { }
 
             //Send dish of the day
             if (__instance.Name == "Lewis" && Game1.timeOfDay == 900 && !Config.DisableChatAll)
@@ -154,7 +154,7 @@ namespace FoodStore
 
             //Get taste and decoration score, call to SaySomething for NPC to send bubble text
             if (Config.EnableMod && !Game1.eventUp && __instance.currentLocation is not null && __instance.isVillager() && !WantsToEat(__instance) && Microsoft.Xna.Framework.Vector2.Distance(__instance.getTileLocation(), Game1.player.getTileLocation()) < 30 && !Config.DisableChatAll)
-			{
+            {
                 if (Game1.random.NextDouble() < 0.1)
                 {
                     Random random = new Random();
@@ -213,43 +213,43 @@ namespace FoodStore
                     if (lastTaste == 0) //love
                     {
                         __instance.showTextAboveHead(SHelper.Translation.Get("foodstore.randomchat.love." + randomIndex));
-                        if (shareIdea < 0.3 + lastDecor / 2) SaySomething(__instance, __instance.currentLocation, lastTasteRate, lastDecorRate);
+                        if (shareIdea < 0.3 + (lastDecor / 2)) SaySomething(__instance, __instance.currentLocation, lastTasteRate, lastDecorRate);
                     }
                     else if (lastTaste == 2) //like
                     {
                         __instance.showTextAboveHead(SHelper.Translation.Get("foodstore.randomchat.like." + randomIndex));
-                        if (shareIdea < 0.15 + lastDecor / 2) SaySomething(__instance, __instance.currentLocation, lastTasteRate, lastDecorRate);
+                        if (shareIdea < 0.15 + (lastDecor / 2)) SaySomething(__instance, __instance.currentLocation, lastTasteRate, lastDecorRate);
                     }
                     else if (lastTaste == 4) //dislike
                     {
                         __instance.showTextAboveHead(SHelper.Translation.Get("foodstore.randomchat.dislike." + randomIndex));
-                        if (shareIdea < Math.Abs( -0.15 + lastDecor / 2.5)) SaySomething(__instance, __instance.currentLocation, lastTasteRate, lastDecorRate);
+                        if (shareIdea < Math.Abs(-0.15 + (lastDecor / 2.5))) SaySomething(__instance, __instance.currentLocation, lastTasteRate, lastDecorRate);
                     }
                     else if (lastTaste == 6) //hate
                     {
                         __instance.showTextAboveHead(SHelper.Translation.Get("foodstore.randomchat.hate." + randomIndex));
-                        if (shareIdea < Math.Abs(-0.3 + lastDecor / 2.5)) SaySomething(__instance, __instance.currentLocation, lastTasteRate, lastDecorRate);
+                        if (shareIdea < Math.Abs(-0.3 + (lastDecor / 2.5))) SaySomething(__instance, __instance.currentLocation, lastTasteRate, lastDecorRate);
                     }
                     else if (lastTaste == 8) //neutral
                     {
                         __instance.showTextAboveHead(SHelper.Translation.Get("foodstore.randomchat.neutral." + randomIndex));
-                        if (shareIdea < Math.Abs( lastDecor / 2.5)) SaySomething(__instance, __instance.currentLocation, lastTasteRate, lastDecorRate);
+                        if (shareIdea < Math.Abs(lastDecor / 2.5)) SaySomething(__instance, __instance.currentLocation, lastTasteRate, lastDecorRate);
                     }
                     else { }
                 }
-				return;
-			}
-			
+                return;
+            }
+
 
             //Fix position, do eating food
-			if (!Config.EnableMod || Game1.eventUp || __instance.currentLocation is null || !__instance.isVillager() || !WantsToEat(__instance))
-				return;
+            if (!Config.EnableMod || Game1.eventUp || __instance.currentLocation is null || !__instance.isVillager() || !WantsToEat(__instance))
+                return;
 
-            if (__instance.getTileLocation().X >= __instance.currentLocation.Map.DisplayWidth / 64 + 20 ||
-                __instance.getTileLocation().Y >= __instance.currentLocation.Map.DisplayHeight / 64  + 20||
+            if (__instance.getTileLocation().X >= (__instance.currentLocation.Map.DisplayWidth / 64) + 20 ||
+                __instance.getTileLocation().Y >= (__instance.currentLocation.Map.DisplayHeight / 64) + 20 ||
                 __instance.getTileLocation().X <= -20 ||
-                __instance.getTileLocation().Y <= -20 &&
-                !__instance.IsReturningToEndPoint()
+                (__instance.getTileLocation().Y <= -20 &&
+                !__instance.IsReturningToEndPoint())
                 )
             {
                 __instance.returnToEndPoint();
@@ -257,12 +257,12 @@ namespace FoodStore
             }
 
             PlacedFoodData food = GetClosestFood(__instance, __instance.currentLocation);
-			TryToEatFood(__instance, food);
+            TryToEatFood(__instance, food);
         }
         private static void FarmHouse_updateEvenIfFarmerIsntHere_Postfix(GameLocation __instance)
         {
             foreach (NPC npc in __instance.characters)
-			{
+            {
                 double talkChance = 0.00003;
                 Random randomSayChance = new Random();
 
@@ -288,20 +288,20 @@ namespace FoodStore
                         //Send message
 
                         if (decorPointComment >= 0.2)
-                        { 
+                        {
                             npc.showTextAboveHead(SHelper.Translation.Get("foodstore.gooddecor." + randomIndex.ToString()), -1, 2, 5000);
                             npc.modData["hapyke.FoodStore/LastSay"] = Game1.timeOfDay.ToString();
                             continue;
                         }
                         else if (decorPointComment <= 0)
                         {
-                            npc.showTextAboveHead(SHelper.Translation.Get("foodstore.baddecor." + randomIndex.ToString()), -1 , 2, 5000);
+                            npc.showTextAboveHead(SHelper.Translation.Get("foodstore.baddecor." + randomIndex.ToString()), -1, 2, 5000);
                             npc.modData["hapyke.FoodStore/LastSay"] = Game1.timeOfDay.ToString();
                             continue;
                         }
                     }
 
-                    if (randomSayChance.NextDouble() < (talkChance / localNpcCount / 2)) 
+                    if (randomSayChance.NextDouble() < (talkChance / localNpcCount / 2))
                     {
                         npc.showTextAboveHead(SHelper.Translation.Get("foodstore.dishweek." + randomIndex.ToString(), new { dishWeek = DishPrefer.dishWeek }), -1, 2, 8000);
                         npc.modData["hapyke.FoodStore/LastSay"] = Game1.timeOfDay.ToString();
@@ -312,65 +312,65 @@ namespace FoodStore
                 //Control NPC walking to the food
                 string text = "";
                 if (npc.isVillager() && !npc.Name.EndsWith("_DA"))
-				{
+                {
                     NPC villager = npc;
-					double moveToFoodChance = Config.MoveToFoodChance;
+                    double moveToFoodChance = Config.MoveToFoodChance;
 
-					if( Config.RushHour && (800 < Game1.timeOfDay  && Game1.timeOfDay < 930 || 1200 < Game1.timeOfDay && Game1.timeOfDay < 1300 || 1800 < Game1.timeOfDay && Game1.timeOfDay < 2000))
-					{
-						moveToFoodChance = moveToFoodChance * 1.5;
-					}
+                    if (Config.RushHour && ((800 < Game1.timeOfDay && Game1.timeOfDay < 930) || (1200 < Game1.timeOfDay && Game1.timeOfDay < 1300) || (1800 < Game1.timeOfDay && Game1.timeOfDay < 2000)))
+                    {
+                        moveToFoodChance = moveToFoodChance * 1.5;
+                    }
 
-                    if ((villager != null && WantsToEat(villager) && Game1.random.NextDouble() < moveToFoodChance / 100f && __instance.furniture.Count > 0))
-					{
+                    if (villager != null && WantsToEat(villager) && Game1.random.NextDouble() < moveToFoodChance / 100f && __instance.furniture.Count > 0)
+                    {
                         PlacedFoodData food = GetClosestFood(npc, __instance);
-						if (food == null)
-							return;
-						if (TryToEatFood(villager, food))
-							return;
+                        if (food == null)
+                            return;
+                        if (TryToEatFood(villager, food))
+                            return;
 
                         Microsoft.Xna.Framework.Vector2 possibleLocation;
                         possibleLocation = food.foodTile;
-						int tries = 0;
-						int facingDirection = -3;
+                        int tries = 0;
+                        int facingDirection = -3;
 
 
                         while (tries < 3)
-						{
-							int xMove = Game1.random.Next(-1, 2);
-							int yMove = Game1.random.Next(-1, 2);
+                        {
+                            int xMove = Game1.random.Next(-1, 2);
+                            int yMove = Game1.random.Next(-1, 2);
 
                             possibleLocation.X += xMove;
-							if (xMove == 0)
-							{
-								possibleLocation.Y += yMove;
-							}
-							if (xMove == -1)
-							{
-								facingDirection = 1;
-							}
-							else if (xMove == 1)
-							{
-								facingDirection = 3;
-							}
-							else if (yMove == -1)
-							{
-								facingDirection = 2;
-							}
-							else if (yMove == 1)
-							{
-								facingDirection = 0;
-							}
-							if (__instance.isTileLocationTotallyClearAndPlaceable(possibleLocation))
-							{
-								break;
-							}
-							tries++;
-						}
+                            if (xMove == 0)
+                            {
+                                possibleLocation.Y += yMove;
+                            }
+                            if (xMove == -1)
+                            {
+                                facingDirection = 1;
+                            }
+                            else if (xMove == 1)
+                            {
+                                facingDirection = 3;
+                            }
+                            else if (yMove == -1)
+                            {
+                                facingDirection = 2;
+                            }
+                            else if (yMove == 1)
+                            {
+                                facingDirection = 0;
+                            }
+                            if (__instance.isTileLocationTotallyClearAndPlaceable(possibleLocation))
+                            {
+                                break;
+                            }
+                            tries++;
+                        }
                         if (tries < 3 && TimeDelayCheck(villager))
                         {
                             //Send message
-                            if (!Config.DisableChat || !Config.DisableChatAll && (villager.currentLocation.Name != "Farm" && villager.currentLocation.Name != "FarmHouse"))
+                            if (!Config.DisableChat || (!Config.DisableChatAll && villager.currentLocation.Name != "Farm" && villager.currentLocation.Name != "FarmHouse"))
                             {
                                 Random random = new Random();
                                 int randomIndex = random.Next(15);

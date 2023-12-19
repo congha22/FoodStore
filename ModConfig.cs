@@ -15,7 +15,7 @@ namespace FoodStore
 
         public int MinutesToHungry { get; set; } = 240;
         public float MoveToFoodChance { get; set; } = 0.005f;
-        public float MaxDistanceToFind{ get; set; } = 40;
+        public float MaxDistanceToFind { get; set; } = 40;
         public float MaxDistanceToEat { get; set; } = 4f;
 
         public float LoveMultiplier { get; set; } = -1f;

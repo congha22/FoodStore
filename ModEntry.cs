@@ -93,7 +93,7 @@ namespace FoodStore
                 playerChatInstance.Validate();
             }
 
-            if(Game1.hasLoadedGame && e.IsMultipleOf(30))
+            if (Game1.hasLoadedGame && e.IsMultipleOf(30))
             {
 
                 Farmer farmerInstance = Game1.player;
@@ -116,10 +116,10 @@ namespace FoodStore
                                         __instance.CurrentDialogue.Push(new Dialogue(SHelper.Translation.Get("foodstore.customerresponse." + randomIndex), __instance));
                                         __instance.modData["hapyke.FoodStore/TotalCustomerResponse"] = (Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) + 1).ToString();
 
-                                        if (__instance.modData["hapyke.FoodStore/finishedDailyChat"] == "true" 
-                                            && Int32.Parse(__instance.modData["hapyke.FoodStore/chatDone"]) < Config.DialogueTime )
+                                        if (__instance.modData["hapyke.FoodStore/finishedDailyChat"] == "true"
+                                            && Int32.Parse(__instance.modData["hapyke.FoodStore/chatDone"]) < Config.DialogueTime)
                                         {
-                                            __instance.modData["hapyke.FoodStore/chatDone"] = (Int32.Parse(__instance.modData["hapyke.FoodStore/chatDone"]) + 1).ToString() ;
+                                            __instance.modData["hapyke.FoodStore/chatDone"] = (Int32.Parse(__instance.modData["hapyke.FoodStore/chatDone"]) + 1).ToString();
                                             var formattedQuestion = string.Format(SHelper.Translation.Get("foodstore.responselist.main"), __instance);
                                             var entryQuestion = new EntryQuestion(formattedQuestion, ResponseList, ActionList);
                                             Game1.activeClickableMenu = entryQuestion;
@@ -248,7 +248,7 @@ namespace FoodStore
 
             configMenu.AddBoolOption(
                 mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.disableallmessage"), 
+                name: () => SHelper.Translation.Get("foodstore.config.disableallmessage"),
                 tooltip: () => SHelper.Translation.Get("foodstore.config.disableallmessageText"),
                 getValue: () => Config.DisableChatAll,
                 setValue: value => Config.DisableChatAll = value
@@ -410,7 +410,7 @@ namespace FoodStore
                     __instance.modData["hapyke.FoodStore/chatDone"] = "0";
                 }
 
-                if(__instance.Age == 2)
+                if (__instance.Age == 2)
                 {
                     GlobalKidList.Add(__instance.Name);
                 }
@@ -430,7 +430,8 @@ namespace FoodStore
                         __instance.modData["hapyke.FoodStore/inviteDate"] = "-99";
                     }
                 }
-            } catch { }
+            }
+            catch { }
         }
 
         private static bool TryToEatFood(NPC __instance, PlacedFoodData food)
@@ -481,7 +482,7 @@ namespace FoodStore
 
                                 if (Config.LikeMultiplier == -1 || !Config.EnablePrice)
                                 {
-                                    salePrice = (int)(salePrice * (1.25 + rand.NextDouble() / 2));
+                                    salePrice = (int)(salePrice * (1.25 + (rand.NextDouble() / 2)));
                                 }
                                 else salePrice = (int)(salePrice * Config.LikeMultiplier);
 
@@ -499,7 +500,7 @@ namespace FoodStore
 
                                 if (Config.DislikeMultiplier == -1 || !Config.EnablePrice)
                                 {
-                                    salePrice = (int)(salePrice * (0.75 + rand.NextDouble() / 3));
+                                    salePrice = (int)(salePrice * (0.75 + (rand.NextDouble() / 3)));
                                 }
                                 else salePrice = (int)(salePrice * Config.DislikeMultiplier);
 
@@ -532,7 +533,7 @@ namespace FoodStore
 
                                 if (Config.NeutralMultiplier == -1 || !Config.EnablePrice)
                                 {
-                                    salePrice = (int)(salePrice * (1 + rand.NextDouble() / 5));
+                                    salePrice = (int)(salePrice * (1 + (rand.NextDouble() / 5)));
                                 }
                                 else salePrice = (int)(salePrice * Config.NeutralMultiplier);
 
@@ -556,7 +557,7 @@ namespace FoodStore
                         if (food.foodObject.Name == DishPrefer.dishWeek) { salePrice = (int)(salePrice * 1.1); }
 
                         //Config Rush hours Price
-                        if (Config.RushHour && (800 < Game1.timeOfDay && Game1.timeOfDay < 930 || 1200 < Game1.timeOfDay && Game1.timeOfDay < 1300 || 1800 < Game1.timeOfDay && Game1.timeOfDay < 2000))
+                        if (Config.RushHour && ((800 < Game1.timeOfDay && Game1.timeOfDay < 930) || (1200 < Game1.timeOfDay && Game1.timeOfDay < 1300) || (1800 < Game1.timeOfDay && Game1.timeOfDay < 2000)))
                         {
                             salePrice = (int)(salePrice * 0.8);
                             tip = (int)(tip * 2);
@@ -567,12 +568,12 @@ namespace FoodStore
                         {
                             if (__instance.modData["hapyke.FoodStore/TotalCustomerResponse"] != null)
                             {
-                                double totalInteract = (Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) / 150);
+                                double totalInteract = Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) / 150;
                                 if (totalInteract > 0.25) totalInteract = 0.25;
                                 salePrice = (int)(salePrice * (1 + totalInteract));
                             }
                         }
-                        catch (Exception e) { }
+                        catch (Exception) { }
 
                         //Config Tip when nearby
                         if (Config.TipWhenNeaBy && Utility.isThereAFarmerWithinDistance(food.foodTile, 15, __instance.currentLocation) == null) { tip = 0; }
@@ -657,7 +658,7 @@ namespace FoodStore
                                             break;
                                     }
                                     if (owner.Name == "HaPyke" || owner.Name == "d5a1lamdtd") points = (int)(points * 2);
-                                    owner.friendshipData[__instance.Name].Points += (int)(points);
+                                    owner.friendshipData[__instance.Name].Points += (int)points;
                                 }
                             }
 
@@ -665,7 +666,7 @@ namespace FoodStore
                             int randomNumber = random.Next(12);
                             salePrice = tip = 0;
 
-                            if(!Config.DisableChatAll) __instance.showTextAboveHead(SHelper.Translation.Get("foodstore.spouseeat." + randomNumber));
+                            if (!Config.DisableChatAll) __instance.showTextAboveHead(SHelper.Translation.Get("foodstore.spouseeat." + randomNumber));
                         }           //Food in farmhouse
 
                         Game1.player.Money += salePrice + tip;
@@ -689,8 +690,8 @@ namespace FoodStore
             {
                 if (f.heldObject.Value != null && f.heldObject.Value.Edibility > 0)
                 {
-                    int xLocation = f.boundingBox.X / 64 + (f.boundingBox.Width) / 64 / 2;
-                    int yLocation = f.boundingBox.Y / 64 + (f.boundingBox.Height) / 64 / 2;
+                    int xLocation = (f.boundingBox.X / 64) + (f.boundingBox.Width / 64 / 2);
+                    int yLocation = (f.boundingBox.Y / 64) + (f.boundingBox.Height / 64 / 2);
                     var fLocation = new Vector2(xLocation, yLocation);
 
 
@@ -736,7 +737,7 @@ namespace FoodStore
                 var compare = b.value.CompareTo(a.value);
                 if (compare != 0)
                     return compare;
-                return (Vector2.Distance(a.foodTile, npc.getTileLocation()).CompareTo(Vector2.Distance(b.foodTile, npc.getTileLocation())));
+                return Vector2.Distance(a.foodTile, npc.getTileLocation()).CompareTo(Vector2.Distance(b.foodTile, npc.getTileLocation()));
             });
             return foodList[0];
         }
@@ -770,7 +771,7 @@ namespace FoodStore
 
         private static bool WantsToSay(NPC npc, int time)
         {
-            if (Config.DisableChatAll ) { return false; }
+            if (Config.DisableChatAll) { return false; }
             if (!npc.modData.ContainsKey("hapyke.FoodStore/LastSay") || npc.modData["hapyke.FoodStore/LastSay"].Length == 0)
             {
                 return true;
@@ -799,7 +800,7 @@ namespace FoodStore
 
         private static int GetMinutes(int timeOfDay)
         {
-            return timeOfDay % 100 + timeOfDay / 100 * 60;
+            return (timeOfDay % 100) + (timeOfDay / 100 * 60);
         }
 
         public static double GetDecorPoint(Vector2 foodLoc, GameLocation gameLocation)
@@ -895,15 +896,15 @@ namespace FoodStore
 
                     //taste string
                     string tasteString = "string";
-                    if (lastTasteRate > 0.3) tasteString = (SHelper.Translation.Get("foodstore.positiveTasteString." + randomIndex));
-                    else if (lastTasteRate == 0.3) tasteString = (SHelper.Translation.Get("foodstore.normalTasteString." + randomIndex));
-                    else if (lastTasteRate < 0.3) tasteString = (SHelper.Translation.Get("foodstore.negativeTasteString." + randomIndex));
+                    if (lastTasteRate > 0.3) tasteString = SHelper.Translation.Get("foodstore.positiveTasteString." + randomIndex);
+                    else if (lastTasteRate == 0.3) tasteString = SHelper.Translation.Get("foodstore.normalTasteString." + randomIndex);
+                    else if (lastTasteRate < 0.3) tasteString = SHelper.Translation.Get("foodstore.negativeTasteString." + randomIndex);
 
                     //decor string
                     string decorString = "string";
-                    if (lastDecorRate > 0) decorString = (SHelper.Translation.Get("foodstore.positiveDecorString." + randomIndex));
-                    else if (lastDecorRate == 0) decorString = (SHelper.Translation.Get("foodstore.normalDecorString." + randomIndex));
-                    else if (lastDecorRate < 0) decorString = (SHelper.Translation.Get("foodstore.negativeDecorString." + randomIndex));
+                    if (lastDecorRate > 0) decorString = SHelper.Translation.Get("foodstore.positiveDecorString." + randomIndex);
+                    else if (lastDecorRate == 0) decorString = SHelper.Translation.Get("foodstore.normalDecorString." + randomIndex);
+                    else if (lastDecorRate < 0) decorString = SHelper.Translation.Get("foodstore.negativeDecorString." + randomIndex);
 
                     //do the work
                     if (getChance < chanceToVisit && lastTasteRate > 0.3 && lastDecorRate > 0)          //Will visit, positive Food, positive Decor
@@ -922,7 +923,7 @@ namespace FoodStore
 
                         if (newCharacter.modData["hapyke.FoodStore/LastFood"] == null) newCharacter.modData["hapyke.FoodStore/LastFood"] = "0";
                         if (Config.MinutesToHungry >= 60)
-                            newCharacter.modData["hapyke.FoodStore/LastFood"] = (Int32.Parse(newCharacter.modData["hapyke.FoodStore/LastFood"]) - Config.MinutesToHungry / 2).ToString();
+                            newCharacter.modData["hapyke.FoodStore/LastFood"] = (Int32.Parse(newCharacter.modData["hapyke.FoodStore/LastFood"]) - (Config.MinutesToHungry / 2)).ToString();
                         newCharacter.showTextAboveHead(SHelper.Translation.Get("foodstore.mayVisit." + randomIndex2), -1, 2, 7000);
                     }
                     else if (getChance >= chanceToVisit && lastTasteRate < 0.3 && lastDecorRate < 0)     //No visit, negative Food, negative Decor
@@ -1008,19 +1009,19 @@ namespace FoodStore
                         switch (friendshipLevel)
                         {
                             case int lv when lv < 2:
-                                 addKid = 0.2;
+                                addKid = 0.2;
                                 break;
 
                             case int lv when lv >= 2 && lv < 4:
-                                 addKid = 0.4;
+                                addKid = 0.4;
                                 break;
 
                             case int lv when lv >= 4 && lv < 6:
-                                 addKid = 0.6;
+                                addKid = 0.6;
                                 break;
 
                             case int lv when lv >= 6:
-                                 addKid = 0.8;
+                                addKid = 0.8;
                                 break;
                             default:
                                 break;
@@ -1039,7 +1040,7 @@ namespace FoodStore
 
                     var entryQuestion = new EntryQuestion(formattedQuestion, KidResponseList, ActionList);
                     Game1.activeClickableMenu = entryQuestion;
-                    
+
                     ActionList.Add(() => KidJoin(TodaySelectedKid));
                     ActionList.Add(() => Game1.drawDialogue(Game1.getCharacterFromName(randomKey), SHelper.Translation.Get("foodstore.kidresponselist.boring")));
 

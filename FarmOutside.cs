@@ -23,8 +23,8 @@ namespace FoodStore
             {
                 if (who.isVillager() && who.currentLocation.Name == "Farm" && who.modData["hapyke.FoodStore/invited"] == "true")
                 {
-                     x = ((int)(who.Position.X / 64));
-                     y = ((int)(who.Position.Y / 64));
+                    x = (int)(who.Position.X / 64);
+                    y = (int)(who.Position.Y / 64);
                 }
             }
 
@@ -107,7 +107,7 @@ namespace FoodStore
                 c.PathToOnFarm(newspot);
 
             }
-            catch {}
+            catch { }
         }
 
         internal static void WalkAroundHouse(string who)
