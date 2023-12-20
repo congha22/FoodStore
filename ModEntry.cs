@@ -113,8 +113,21 @@ namespace FoodStore
                                     {
                                         Random random = new Random();
                                         int randomIndex = random.Next(19);
-                                        __instance.CurrentDialogue.Push(new Dialogue(SHelper.Translation.Get("foodstore.customerresponse." + randomIndex), __instance));
-                                        __instance.modData["hapyke.FoodStore/TotalCustomerResponse"] = (Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) + 1).ToString();
+                                        if (!Game1.player.friendshipData[__instance.Name].IsMarried())
+                                        {
+                                            __instance.CurrentDialogue.Push(new Dialogue(SHelper.Translation.Get("foodstore.customerresponse." + __instance.Age + "." + randomIndex.ToString()), __instance));
+                                            __instance.modData["hapyke.FoodStore/TotalCustomerResponse"] = (Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) + 1).ToString();
+                                        }
+                                        else
+                                        {
+                                            if(Game1.timeOfDay == 900 || Game1.timeOfDay == 1200 || Game1.timeOfDay == 1500 || Game1.timeOfDay == 1800 || Game1.timeOfDay == 2100 || Game1.timeOfDay == 2400)
+                                            {
+                                                __instance.CurrentDialogue.Push(new Dialogue(SHelper.Translation.Get("foodstore.customerresponse." + __instance.Age + "." + randomIndex.ToString()), __instance));
+                                                __instance.modData["hapyke.FoodStore/TotalCustomerResponse"] = (Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) + 1).ToString();
+                                            }
+                                        }
+
+
 
                                         if (__instance.modData["hapyke.FoodStore/finishedDailyChat"] == "true"
                                             && Int32.Parse(__instance.modData["hapyke.FoodStore/chatDone"]) < Config.DialogueTime)

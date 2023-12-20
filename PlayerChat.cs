@@ -203,7 +203,7 @@ namespace FoodStore
             else                        // All other message
             {
                 int randomIndex = random.Next(19);
-                if (!Config.DisableChatAll) npc.showTextAboveHead(SHelper.Translation.Get("foodstore.customerresponse." + randomIndex.ToString()), default, default, 5000);
+                if (!Config.DisableChatAll) npc.showTextAboveHead(SHelper.Translation.Get("foodstore.customerresponse." + npc.Age + "." + randomIndex.ToString()), default, default, 5000);
             }
             ActionList.Clear();
         }
