@@ -701,8 +701,9 @@ namespace FoodStore
 
             foreach (var f in location.furniture)
             {
-                if (f.heldObject.Value != null && f.heldObject.Value.Edibility > 0)
+                if (f.heldObject.Value != null && f.heldObject.Value.Edibility > 0 )         // ***** Validate edible items *****
                 {
+                    //Game1.chatBox.addInfoMessage(f.heldObject.Value.Category.ToString());
                     int xLocation = (f.boundingBox.X / 64) + (f.boundingBox.Width / 64 / 2);
                     int yLocation = (f.boundingBox.Y / 64) + (f.boundingBox.Height / 64 / 2);
                     var fLocation = new Vector2(xLocation, yLocation);
@@ -719,30 +720,10 @@ namespace FoodStore
                 //SMonitor.Log("Got no food");
                 return null;
             }
-            List<string> favList = new List<string>(Game1.NPCGiftTastes["Universal_Love"].Split(' '));
-            List<string> likeList = new List<string>(Game1.NPCGiftTastes["Universal_Like"].Split(' '));
-            List<string> okayList = new List<string>(Game1.NPCGiftTastes["Universal_Neutral"].Split(' '));
-            List<string> dislikeList = new List<string>(Game1.NPCGiftTastes["Universal_Dislike"].Split(' '));
-            List<string> hateList = new List<string>(Game1.NPCGiftTastes["Universal_Hate"].Split(' '));
-
-            if (Game1.NPCGiftTastes.TryGetValue(npc.Name, out string NPCLikes) && NPCLikes != null)
-            {
-                favList.AddRange(NPCLikes.Split('/')[1].Split(' '));
-                likeList.AddRange(NPCLikes.Split('/')[3].Split(' '));
-                okayList.AddRange(NPCLikes.Split('/')[5].Split(' '));
-                dislikeList.AddRange(NPCLikes.Split('/')[7].Split(' '));
-                hateList.AddRange(NPCLikes.Split('/')[9].Split(' '));
-            }
 
             for (int i = foodList.Count - 1; i >= 0; i--)
             {
                 foodList[i].value = 0;
-            }
-
-            if (foodList.Count == 0)
-            {
-                //Game1.chatBox.addInfoMessage($"Got no food");
-                return null;
             }
 
             foodList.Sort(delegate (PlacedFoodData a, PlacedFoodData b)
@@ -754,20 +735,7 @@ namespace FoodStore
             });
             return foodList[0];
         }
-        private static Object GetObjectFromID(string id, int amount, int quality)
-        {
-            if (int.TryParse(id, out int index))
-            {
-                //SMonitor.Log($"Spawning object with index {id}");
-                return new Object(index, amount, false, -1, quality);
-            }
-            foreach (var kvp in Game1.objectInformation)
-            {
-                if (kvp.Value.StartsWith(id + "/"))
-                    return new Object(kvp.Key, amount, false, -1, quality);
-            }
-            return null;
-        }
+
         private static bool WantsToEat(NPC npc)
         {
             if (!npc.modData.ContainsKey("hapyke.FoodStore/LastFood") || npc.modData["hapyke.FoodStore/LastFood"].Length == 0)
