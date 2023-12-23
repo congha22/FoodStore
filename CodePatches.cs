@@ -1,4 +1,4 @@
-﻿using FoodStore;
+﻿using MarketTown;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -153,7 +153,9 @@ namespace FoodStore
             }
 
             //Get taste and decoration score, call to SaySomething for NPC to send bubble text
-            if (Config.EnableMod && !Game1.eventUp && __instance.currentLocation is not null && __instance.isVillager() && !WantsToEat(__instance) && Microsoft.Xna.Framework.Vector2.Distance(__instance.getTileLocation(), Game1.player.getTileLocation()) < 30 && !Config.DisableChatAll)
+            if (Config.EnableMod && !Game1.eventUp && __instance.currentLocation is not null && __instance.isVillager() && !WantsToEat(__instance) 
+                && Microsoft.Xna.Framework.Vector2.Distance(__instance.getTileLocation(), Game1.player.getTileLocation()) < 30
+                && __instance.modData["hapyke.FoodStore/LastFoodTaste"] != "-1" && !Config.DisableChatAll)
             {
                 if (Game1.random.NextDouble() < 0.1)
                 {
@@ -266,7 +268,7 @@ namespace FoodStore
                 double talkChance = 0.00003;
                 Random randomSayChance = new Random();
 
-                //Send bubble about decoration, decor, dish of the week
+                //Send bubble about decoration, dish of the week
                 if (npc.isVillager()
                     && randomSayChance.NextDouble() < talkChance
                     && WantsToSay(npc, 360)
@@ -285,7 +287,27 @@ namespace FoodStore
                         var decorPointComment = GetDecorPoint(tempFood.foodTile, npc.currentLocation);
 
 
-                        //Send message
+                        //Send decorPoint message
+
+                        if (decorPointComment >= 0.2)
+                        {
+                            npc.showTextAboveHead(SHelper.Translation.Get("foodstore.gooddecor." + randomIndex.ToString()), -1, 2, 5000);
+                            npc.modData["hapyke.FoodStore/LastSay"] = Game1.timeOfDay.ToString();
+                            continue;
+                        }
+                        else if (decorPointComment <= 0)
+                        {
+                            npc.showTextAboveHead(SHelper.Translation.Get("foodstore.baddecor." + randomIndex.ToString()), -1, 2, 5000);
+                            npc.modData["hapyke.FoodStore/LastSay"] = Game1.timeOfDay.ToString();
+                            continue;
+                        }
+                    }
+                    else if (tempFood == null)
+                    {
+                        var decorPointComment = GetDecorPoint(npc.getTileLocation(), npc.currentLocation);
+
+
+                        //Send decorPoint message
 
                         if (decorPointComment >= 0.2)
                         {
@@ -301,7 +323,7 @@ namespace FoodStore
                         }
                     }
 
-                    if (randomSayChance.NextDouble() < (talkChance / localNpcCount / 2))
+                    if (randomSayChance.NextDouble() < (talkChance / localNpcCount / 2))            //Send Dish of Week message
                     {
                         npc.showTextAboveHead(SHelper.Translation.Get("foodstore.dishweek." + randomIndex.ToString(), new { dishWeek = DishPrefer.dishWeek }), -1, 2, 8000);
                         npc.modData["hapyke.FoodStore/LastSay"] = Game1.timeOfDay.ToString();
@@ -324,7 +346,7 @@ namespace FoodStore
                     if (villager != null && WantsToEat(villager) && Game1.random.NextDouble() < moveToFoodChance / 100f && __instance.furniture.Count > 0)
                     {
                         PlacedFoodData food = GetClosestFood(npc, __instance);
-                        if (food == null)
+                        if (food == null || ( !Config.AllowRemoveNonFood && food.foodObject.Edibility <= 0))
                             return;
                         if (TryToEatFood(villager, food))
                             return;
@@ -370,7 +392,7 @@ namespace FoodStore
                         if (tries < 3 && TimeDelayCheck(villager))
                         {
                             //Send message
-                            if (!Config.DisableChat || (!Config.DisableChatAll && villager.currentLocation.Name != "Farm" && villager.currentLocation.Name != "FarmHouse"))
+                            if (villager.currentLocation.Name != "Farm" && villager.currentLocation.Name != "FarmHouse" && !Config.DisableChat && !Config.DisableChatAll)
                             {
                                 Random random = new Random();
                                 int randomIndex = random.Next(15);

@@ -1,5 +1,4 @@
-﻿using FoodStore;
-using HarmonyLib;
+﻿using HarmonyLib;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewValley;
@@ -27,7 +26,7 @@ using static System.Collections.Specialized.BitVector32;
 using static System.Net.Mime.MediaTypeNames;
 using Object = StardewValley.Object;
 
-namespace FoodStore
+namespace MarketTown
 {
     internal class PlayerChat
     {
@@ -39,40 +38,40 @@ namespace FoodStore
 
         private async Task TryToInitAsync()
         {
-            if (!this.bHasInit && Context.IsWorldReady)
+            if (!bHasInit && Context.IsWorldReady)
             {
-                ((TextBox)Game1.chatBox.chatBox).OnEnterPressed += new TextBoxEvent(ChatBox_OnEnterPressed);
+                Game1.chatBox.chatBox.OnEnterPressed += new TextBoxEvent(ChatBox_OnEnterPressed);
                 await Task.Delay(1);
-                this.bHasInit = true;
+                bHasInit = true;
             }
         }
 
         private void ChatBox_OnEnterPressed(TextBox sender)     //get player sent text
         {
-            this.bHasInit = true;
-            if (this.TextInput.Length == 0 || this.Target.Length == 0)
+            bHasInit = true;
+            if (TextInput.Length == 0 || Target.Length == 0)
             {
                 return;
             }
-            string _TextInput = this.TextInput;
-            string _Target = this.Target;
+            string _TextInput = TextInput;
+            string _Target = Target;
             try
             {
-                if (this.NpcMap.ContainsKey(_Target))
+                if (NpcMap.ContainsKey(_Target))
                 {
-                    NPC npc2 = this.NpcMap[_Target];
+                    NPC npc2 = NpcMap[_Target];
                 }
 
-                if (this.NpcMap.ContainsKey(_Target))
+                if (NpcMap.ContainsKey(_Target))
                 {
-                    NPC npc = this.NpcMap[_Target];
+                    NPC npc = NpcMap[_Target];
 
-                    if (!((Character)npc).isMoving())
+                    if (!npc.isMoving())
                     {
                         npc.facePlayer(Game1.player);
                     }
                     OnPlayerSend(npc, _TextInput);
-                    this.NpcMap.Clear();
+                    NpcMap.Clear();
                 }
             }
             catch (Exception) { }
@@ -202,8 +201,59 @@ namespace FoodStore
             }
             else                        // All other message
             {
-                int randomIndex = random.Next(19);
-                if (!Config.DisableChatAll) npc.showTextAboveHead(SHelper.Translation.Get("foodstore.customerresponse." + npc.Age + "." + randomIndex.ToString()), default, default, 5000);
+                int randomIndex = random.Next(1, 8);
+                string npcAge, npcManner, npcSocial;
+
+                int age = npc.Age;
+                int manner = npc.Manners;
+                int social = npc.SocialAnxiety;
+
+                switch (age)
+                {
+                    case 0:
+                        npcAge = "adult.";
+                        break;
+                    case 1:
+                        npcAge = "teens.";
+                        break;
+                    case 2:
+                        npcAge = "child.";
+                        break;
+                    default:
+                        npcAge = "adult.";
+                        break;
+                }
+                switch (manner)
+                {
+                    case 0:
+                        npcManner = "neutral.";
+                        break;
+                    case 1:
+                        npcManner = "polite.";
+                        break;
+                    case 2:
+                        npcManner = "rude.";
+                        break;
+                    default:
+                        npcManner = "neutral.";
+                        break;
+                }
+                switch (social)
+                {
+                    case 0:
+                        npcSocial = "outgoing.";
+                        break;
+                    case 1:
+                        npcSocial = "shy.";
+                        break;
+                    case 2:
+                        npcSocial = "neutral.";
+                        break;
+                    default:
+                        npcSocial = "neutral";
+                        break;
+                }
+                if (!Config.DisableChatAll) npc.showTextAboveHead(SHelper.Translation.Get("foodstore.general." + npcAge + npcManner + npcSocial + randomIndex.ToString()), default, default, 5000);
             }
             ActionList.Clear();
         }
@@ -212,12 +262,12 @@ namespace FoodStore
         {
             await TryToInitAsync();
 
-            if (this.bHasInit && Game1.currentLocation != null)
+            if (bHasInit && Game1.currentLocation != null)
             {
-                this.Validate_TextInput();
-                this.Validate_NPCMap();
-                this.Validate_Target();
-                this.Validate_Glow();
+                Validate_TextInput();
+                Validate_NPCMap();
+                Validate_Target();
+                Validate_Glow();
             }
         }
 
@@ -225,53 +275,53 @@ namespace FoodStore
         {
             if (Game1.chatBox.chatBox.finalText.Count > 0)
             {
-                this.TextInput = Game1.chatBox.chatBox.finalText[0].message;
+                TextInput = Game1.chatBox.chatBox.finalText[0].message;
             }
         }
 
         private void Validate_NPCMap()          //Get NPC in map
         {
-            this.NpcMap.Clear();
+            NpcMap.Clear();
             foreach (NPC npc in Game1.currentLocation.characters)
             {
                 if (npc.isVillager())
                 {
-                    string displayName = ((Character)npc).displayName;
-                    if (this.NpcMap.ContainsKey(displayName))
+                    string displayName = npc.displayName;
+                    if (NpcMap.ContainsKey(displayName))
                     {
                         NPC newNPC = npc;
-                        NPC oldNPC = this.NpcMap[displayName];
-                        Microsoft.Xna.Framework.Vector2 val = Microsoft.Xna.Framework.Vector2.Subtract(((Character)Game1.player).getTileLocation(), ((Character)oldNPC).getTileLocation());
+                        NPC oldNPC = NpcMap[displayName];
+                        Microsoft.Xna.Framework.Vector2 val = Microsoft.Xna.Framework.Vector2.Subtract(Game1.player.getTileLocation(), oldNPC.getTileLocation());
                         float oldDistance = ((Microsoft.Xna.Framework.Vector2)val).Length();
-                        val = Microsoft.Xna.Framework.Vector2.Subtract(((Character)Game1.player).getTileLocation(), ((Character)newNPC).getTileLocation());
+                        val = Microsoft.Xna.Framework.Vector2.Subtract(Game1.player.getTileLocation(), newNPC.getTileLocation());
                         float newDistance = ((Microsoft.Xna.Framework.Vector2)val).Length();
                         if (oldDistance < newDistance)
                         {
                             continue;
                         }
-                        this.NpcMap.Remove(displayName);
+                        NpcMap.Remove(displayName);
                     }
-                    this.NpcMap.Add(displayName, npc);
+                    NpcMap.Add(displayName, npc);
                 }
             }
         }
 
         private void Validate_Target()          //Get distance from NPC to Player
         {
-            this.Target = "";
+            Target = "";
             if (!Game1.chatBox.isActive())
             {
                 return;
             }
             float bestDistance = 6;
-            foreach (KeyValuePair<string, NPC> pair in this.NpcMap)
+            foreach (KeyValuePair<string, NPC> pair in NpcMap)
             {
-                Microsoft.Xna.Framework.Vector2 val = Microsoft.Xna.Framework.Vector2.Subtract(((Character)Game1.player).getTileLocation(), ((Character)pair.Value).getTileLocation());
+                Microsoft.Xna.Framework.Vector2 val = Microsoft.Xna.Framework.Vector2.Subtract(Game1.player.getTileLocation(), pair.Value.getTileLocation());
                 float distance = ((Microsoft.Xna.Framework.Vector2)val).Length();
                 if (distance <= bestDistance)
                 {
                     bestDistance = distance;
-                    this.Target = pair.Key;
+                    Target = pair.Key;
                 }
 
             }
@@ -281,13 +331,13 @@ namespace FoodStore
         {
             foreach (NPC npc in Game1.currentLocation.characters)
             {
-                if (npc.isVillager() && ((Character)npc).displayName != this.Target && ((Character)npc).isGlowing)
+                if (npc.isVillager() && npc.displayName != Target && npc.isGlowing)
                 {
-                    ((Character)npc).stopGlowing();
+                    npc.stopGlowing();
                 }
-                else if (npc.isVillager() && ((Character)npc).displayName == this.Target && !((Character)npc).isGlowing)
+                else if (npc.isVillager() && npc.displayName == Target && !npc.isGlowing)
                 {
-                    ((Character)npc).startGlowing(Color.Purple, false, 0.01f);
+                    npc.startGlowing(Color.Purple, false, 0.01f);
                 }
             }
         }
@@ -298,16 +348,16 @@ namespace FoodStore
         private readonly List<Action> ResponseActions;
         internal EntryQuestion(string dialogue, List<Response> responses, List<Action> Actions) : base(dialogue, responses)
         {
-            this.ResponseActions = Actions;
+            ResponseActions = Actions;
         }
         public override void receiveLeftClick(int x, int y, bool playSound = true)
         {
-            int responseIndex = this.selectedResponse;
+            int responseIndex = selectedResponse;
             base.receiveLeftClick(x, y, playSound);
 
-            if (base.safetyTimer <= 0 && responseIndex > -1 && responseIndex < this.ResponseActions.Count && this.ResponseActions[responseIndex] != null)
+            if (safetyTimer <= 0 && responseIndex > -1 && responseIndex < ResponseActions.Count && ResponseActions[responseIndex] != null)
             {
-                this.ResponseActions[responseIndex]();
+                ResponseActions[responseIndex]();
             }
         }
     }

@@ -2,7 +2,7 @@
 using StardewValley;
 using StardewValley.Objects;
 
-namespace FoodStore
+namespace MarketTown
 {
     internal class PlacedFoodData
     {

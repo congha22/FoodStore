@@ -10,7 +10,7 @@ using System;
 using System.Linq;
 using lv = StardewModdingAPI.LogLevel;
 
-namespace FoodStore
+namespace MarketTown
 {
     internal class FarmOutside
     {

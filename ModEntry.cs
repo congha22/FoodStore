@@ -1,6 +1,5 @@
-﻿
-using FoodStore;
-using HarmonyLib;
+﻿using HarmonyLib;
+using MarketTown;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
@@ -26,7 +25,7 @@ using System.Linq;
 using System.Net;
 using System.Runtime.CompilerServices;
 using static FoodStore.ModEntry;
-using static FoodStore.PlayerChat;
+using static MarketTown.PlayerChat;
 using static System.Net.Mime.MediaTypeNames;
 using Object = StardewValley.Object;
 
@@ -112,17 +111,70 @@ namespace FoodStore
                                     if (__instance.CurrentDialogue.Count == 0 && __instance.Name != "Krobus" && __instance.Name != "Dwarf")
                                     {
                                         Random random = new Random();
-                                        int randomIndex = random.Next(19);
+                                        int randomIndex = random.Next(1, 8);
+
+                                        string npcAge, npcManner, npcSocial;
+
+                                        int age = __instance.Age;
+                                        int manner = __instance.Manners;
+                                        int social = __instance.SocialAnxiety;
+
+                                        switch (age)
+                                        {
+                                            case 0:
+                                                npcAge = "adult.";
+                                                break;
+                                            case 1:
+                                                npcAge = "teens.";
+                                                break;
+                                            case 2:
+                                                npcAge = "child.";
+                                                break;
+                                            default:
+                                                npcAge = "adult.";
+                                                break;
+                                        }
+                                        switch (manner)
+                                        {
+                                            case 0:
+                                                npcManner = "neutral.";
+                                                break;
+                                            case 1:
+                                                npcManner = "polite.";
+                                                break;
+                                            case 2:
+                                                npcManner = "rude.";
+                                                break;
+                                            default:
+                                                npcManner = "neutral.";
+                                                break;
+                                        }
+                                        switch (social)
+                                        {
+                                            case 0:
+                                                npcSocial = "outgoing.";
+                                                break;
+                                            case 1:
+                                                npcSocial = "shy.";
+                                                break;
+                                            case 2:
+                                                npcSocial = "neutral.";
+                                                break;
+                                            default:
+                                                npcSocial = "neutral";
+                                                break;
+                                        }
+
                                         if (!Game1.player.friendshipData[__instance.Name].IsMarried())
                                         {
-                                            __instance.CurrentDialogue.Push(new Dialogue(SHelper.Translation.Get("foodstore.customerresponse." + __instance.Age + "." + randomIndex.ToString()), __instance));
+                                            __instance.CurrentDialogue.Push(new Dialogue(SHelper.Translation.Get("foodstore.general." + npcAge + npcManner+ npcSocial + randomIndex.ToString()), __instance));
                                             __instance.modData["hapyke.FoodStore/TotalCustomerResponse"] = (Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) + 1).ToString();
                                         }
                                         else
                                         {
                                             if(Game1.timeOfDay == 900 || Game1.timeOfDay == 1200 || Game1.timeOfDay == 1500 || Game1.timeOfDay == 1800 || Game1.timeOfDay == 2100 || Game1.timeOfDay == 2400)
                                             {
-                                                __instance.CurrentDialogue.Push(new Dialogue(SHelper.Translation.Get("foodstore.customerresponse." + __instance.Age + "." + randomIndex.ToString()), __instance));
+                                                __instance.CurrentDialogue.Push(new Dialogue(SHelper.Translation.Get("foodstore.general." + npcAge + npcManner + npcSocial + randomIndex.ToString()), __instance));
                                                 __instance.modData["hapyke.FoodStore/TotalCustomerResponse"] = (Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) + 1).ToString();
                                             }
                                         }
@@ -197,6 +249,14 @@ namespace FoodStore
                 name: () => SHelper.Translation.Get("foodstore.config.enable"),
                 getValue: () => Config.EnableMod,
                 setValue: value => Config.EnableMod = value
+            );
+
+            configMenu.AddBoolOption(
+            mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.disablenonfoodonfarm"),
+                tooltip: () => SHelper.Translation.Get("foodstore.config.disablenonfoodonfarmText"),
+                getValue: () => Config.AllowRemoveNonFood,
+                setValue: value => Config.AllowRemoveNonFood = value
             );
 
             configMenu.AddNumberOption(
@@ -451,6 +511,10 @@ namespace FoodStore
         {
             if (food != null && Vector2.Distance(food.foodTile, __instance.getTileLocation()) < Config.MaxDistanceToEat && !__instance.Name.EndsWith("_DA"))
             {
+                if ((__instance.currentLocation is Farm || __instance.currentLocation is FarmHouse) && !Config.AllowRemoveNonFood && food.foodObject.Edibility <= 0)
+                {
+                    return false;
+                }
                 using (IEnumerator<Furniture> enumerator = __instance.currentLocation.furniture.GetEnumerator())
                 {
                     while (enumerator.MoveNext())
@@ -468,7 +532,7 @@ namespace FoodStore
                         double decorPoint = GetDecorPoint(food.foodTile, __instance.currentLocation);
                         Random rand = new Random();
 
-
+                        if (food.foodObject.Category == -7)
                         {
                             // Get Reply, Sale Price, Tip for each taste
                             if (taste == 0)         //Love
@@ -560,8 +624,29 @@ namespace FoodStore
 
                             }                          //neutral
                         } // **** SALE and TIP block ****
-
-
+                        else    // Non-food case
+                        {
+                            tip = 0;
+                            switch (food.foodObject.Quality)
+                            {
+                                case 4:
+                                    reply = SHelper.Translation.Get("foodstore.nonfood." + food.foodObject.Quality.ToString() + "." + rand.Next(9));
+                                    salePrice = (int)(salePrice * 3);
+                                    break;
+                                case 2:
+                                    reply = SHelper.Translation.Get("foodstore.nonfood." + food.foodObject.Quality.ToString() + "." + rand.Next(9));
+                                    salePrice = (int)(salePrice * 2.5);
+                                    break;
+                                case 1:
+                                    reply = SHelper.Translation.Get("foodstore.nonfood." + food.foodObject.Quality.ToString() + "." + rand.Next(9));
+                                    salePrice = (int)(salePrice * 2);
+                                    break;
+                                default:
+                                    reply = SHelper.Translation.Get("foodstore.nonfood." + food.foodObject.Quality.ToString() + "." + rand.Next(9));
+                                    salePrice = (int)(salePrice * 1.5);
+                                    break;
+                            }
+                        }
                         //Multiply with decoration point
                         if (Config.EnableDecor) salePrice = (int)(salePrice * (1 + decorPoint));
 
@@ -679,12 +764,20 @@ namespace FoodStore
                             int randomNumber = random.Next(12);
                             salePrice = tip = 0;
 
-                            if (!Config.DisableChatAll) __instance.showTextAboveHead(SHelper.Translation.Get("foodstore.spouseeat." + randomNumber));
+                            if (!Config.DisableChatAll && food.foodObject.Edibility > 0 ) __instance.showTextAboveHead(SHelper.Translation.Get("foodstore.visitoreat." + randomNumber));
+                            else if (!Config.DisableChatAll && food.foodObject.Edibility <= 0) __instance.showTextAboveHead(SHelper.Translation.Get("foodstore.visitorpickup." + randomNumber));
                         }           //Food in farmhouse
 
                         Game1.player.Money += salePrice + tip;
                         __instance.modData["hapyke.FoodStore/LastFood"] = Game1.timeOfDay.ToString();
-                        __instance.modData["hapyke.FoodStore/LastFoodTaste"] = taste.ToString();
+                        if (food.foodObject.Category == -7)
+                        {
+                            __instance.modData["hapyke.FoodStore/LastFoodTaste"] = taste.ToString();
+                        }
+                        else
+                        {
+                            __instance.modData["hapyke.FoodStore/LastFoodTaste"] = "-1";
+                        }
                         __instance.modData["hapyke.FoodStore/LastFoodDecor"] = decorPoint.ToString();
 
                         return true;
@@ -696,14 +789,17 @@ namespace FoodStore
 
         private static PlacedFoodData GetClosestFood(NPC npc, GameLocation location)
         {
+            List<int> categoryKeys = new List<int> { -81, -80, -79, -75, -74, -28, -27, -26, -23, -22, -21, -20, -19, -18, -17, -16, -15, -12, -8, -7, -6, -5, -4, -2};
 
             List<PlacedFoodData> foodList = new List<PlacedFoodData>();
 
             foreach (var f in location.furniture)
             {
-                if (f.heldObject.Value != null && f.heldObject.Value.Edibility > 0 )         // ***** Validate edible items *****
+                if (f.heldObject.Value != null 
+                    && categoryKeys.Contains(f.heldObject.Value.Category)
+                    //&& f.heldObject.Value.Edibility > 0 
+                    )         // ***** Validate edible items *****
                 {
-                    //Game1.chatBox.addInfoMessage(f.heldObject.Value.Category.ToString());
                     int xLocation = (f.boundingBox.X / 64) + (f.boundingBox.Width / 64 / 2);
                     int yLocation = (f.boundingBox.Y / 64) + (f.boundingBox.Height / 64 / 2);
                     var fLocation = new Vector2(xLocation, yLocation);
