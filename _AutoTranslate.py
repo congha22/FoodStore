@@ -13,7 +13,7 @@ with open('asdasd.json', 'r', encoding='utf-8') as file:
 def translate_text(text, target_language='vi'):
     response = client.completions.create(model="gpt-3.5-turbo-instruct",  # or the latest model you want to use
     prompt=f"Translate the following English text to {target_language}: {text}",
-    max_tokens=60)
+    max_tokens=300)
     return response.choices[0].text.strip()
 
 # Translate each text

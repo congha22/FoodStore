@@ -1059,15 +1059,19 @@ namespace FoodStore
             {
                 foreach (NPC c in Utility.getAllCharacters())
                 {
-                    if (c.isVillager() && c.currentLocation.Name == "Farm" && c.modData["hapyke.FoodStore/invited"] == "true" && c.modData["hapyke.FoodStore/inviteDate"] == (Game1.stats.daysPlayed - 1).ToString())
+                    try
                     {
-                        FarmOutside.WalkAroundFarm(c.Name);
-                    }
+                        if (c.isVillager() && c.currentLocation.Name == "Farm" && c.modData["hapyke.FoodStore/invited"] == "true" && c.modData["hapyke.FoodStore/inviteDate"] == (Game1.stats.daysPlayed - 1).ToString())
+                        {
+                            FarmOutside.WalkAroundFarm(c.Name);
+                        }
 
-                    if (c.isVillager() && c.currentLocation.Name == "FarmHouse" && c.modData["hapyke.FoodStore/invited"] == "true" && c.modData["hapyke.FoodStore/inviteDate"] == (Game1.stats.daysPlayed - 1).ToString())
-                    {
-                        FarmOutside.WalkAroundHouse(c.Name);
+                        if (c.isVillager() && c.currentLocation.Name == "FarmHouse" && c.modData["hapyke.FoodStore/invited"] == "true" && c.modData["hapyke.FoodStore/inviteDate"] == (Game1.stats.daysPlayed - 1).ToString())
+                        {
+                            FarmOutside.WalkAroundHouse(c.Name);
+                        }
                     }
+                    catch { }
                 }
             }
 

@@ -41,14 +41,16 @@ namespace MarketTown
          */
         internal static void PlayerWarp(object sender, WarpedEventArgs e)
         {
+            if (!e.Player.IsMainPlayer)
+            {
+                return;
+            }
+
             var isFarm = e.NewLocation.IsFarm;
             var isFarmHouse = e.NewLocation.Name.StartsWith("FarmHouse");
 
             if (!isFarm && !isFarmHouse) //if its neither the farm nor the farmhouse
                 return;
-
-            //if (!ModEntry.Config.WalkOnFarm)
-            //    return; //if npcs can't follow or there's no visit
 
             if (isFarmHouse && !ModEntry.Config.EnableVisitInside)      //If not enable visit inside
                 return;
@@ -79,20 +81,23 @@ namespace MarketTown
 
             foreach (NPC visit in Utility.getAllCharacters())
             {
-                if (visit.isVillager() && (visit.currentLocation.Name == "Farm" || visit.currentLocation.Name == "FarmHouse") && visit.modData["hapyke.FoodStore/invited"] == "true" && Game1.timeOfDay > ModEntry.Config.InviteComeTime)
+                try
                 {
-                    if (visit.controller is not null)
-                        visit.Halt();
+                    if (visit.isVillager() && (visit.currentLocation.Name == "Farm" || visit.currentLocation.Name == "FarmHouse") && visit.modData["hapyke.FoodStore/invited"] == "true" && Game1.timeOfDay > ModEntry.Config.InviteComeTime)
+                    {
+                        if (visit.controller is not null)
+                            visit.Halt();
 
-                    Game1.warpCharacter(visit, name, door);
+                        Game1.warpCharacter(visit, name, door);
 
-                    visit.faceDirection(2);
+                        visit.faceDirection(2);
 
-                    door.X--;
-                    visit.controller = new PathFindController(visit, Game1.getFarm(), door, 2); //(this was made as test, but will stay commented-out just in case.) */
+                        door.X--;
+                        visit.controller = new PathFindController(visit, Game1.getFarm(), door, 2); //(this was made as test, but will stay commented-out just in case.) */
+                    }
                 }
+                catch { }
             }
-
         }
 
         internal static void WalkAroundFarm(string who)
