@@ -20,7 +20,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using xTile.Dimensions;
-using static FoodStore.ModEntry;
+using static MarketTown.ModEntry;
 using static StardewValley.Minigames.TargetGame;
 using static System.Collections.Specialized.BitVector32;
 using static System.Net.Mime.MediaTypeNames;

@@ -592,5 +592,9 @@
   "foodstore.general.child.rude.neutral.4": "Ai, você não consegue ver que estou brincando? Se não é algo divertido, não me incomode.",
   "foodstore.general.child.rude.neutral.5": "Olha, não estou com vontade de conversas. Se não for divertido, não desta vez.",
   "foodstore.general.child.rude.neutral.6": "Por que você ainda está aqui? Se você não está trazendo histórias legais ou brinquedos, caia fora.",
-  "foodstore.general.child.rude.neutral.7": "Sério mesmo? Se não estiver aqui com algo divertido, não estou interessado."
+  "foodstore.general.child.rude.neutral.7": "Sério mesmo? Se não estiver aqui com algo divertido, não estou interessado.",
+  "foodstore.weaponText": "muito bom",
+  "foodstore.config.dialogue":     "Configuração de diálogo",
+  "foodstore.config.disablekidask": "Desative as crianças e peça para brincar",
+  "foodstore.config.enablesaleweapon": "permitir a venda de armas"
 }

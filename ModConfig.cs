@@ -35,5 +35,8 @@ namespace MarketTown
         public bool EnableVisitInside { get; set; } = true;
         public int DialogueTime { get; set; } = 2;
         public bool AllowRemoveNonFood { get; set; } = false;
+
+        public bool DisableKidAsk { get; set; } = false;
+        public bool EnableSaleWeapon { get; set; } = true;
     }
 }

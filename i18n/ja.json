@@ -592,5 +592,9 @@
   "foodstore.general.child.rude.neutral.4": "ああ、わからない？ わたし遊んでいるんだよ。楽しいものがないなら、私を邪魔しないでね。",
   "foodstore.general.child.rude.neutral.5": "見て、私は会話する気分じゃないんだ。もし楽しくないなら、今回はやめておいて。",
   "foodstore.general.child.rude.neutral.6": "なぜまだここにいますか？クールな話やおもちゃを持っていないなら、さっさと去ってください。",
-  "foodstore.general.child.rude.neutral.7": "あの、本当に？楽しいことがないなら、興味ありません。"
+  "foodstore.general.child.rude.neutral.7": "あの、本当に？楽しいことがないなら、興味ありません。",
+  "foodstore.weaponText": "偉大な者",
+  "foodstore.config.dialogue":     "ダイアログ設定",
+  "foodstore.config.disablekidask": "子供が遊びたいと頼むのを無効にする",
+  "foodstore.config.enablesaleweapon": "武器の販売を可能にする"
 }

@@ -592,5 +592,9 @@
   "foodstore.general.child.rude.neutral.4": "Ờ, bạn không thấy tôi đang chơi à? Nếu bạn không có đồ vui vẻ, đừng làm phiền tôi.",
   "foodstore.general.child.rude.neutral.5": "Hãy xem, tôi không đang có tâm trạng nói chuyện. Nếu bạn không vui vẻ, thì lần này không được.",
   "foodstore.general.child.rude.neutral.6": "Tại sao bạn vẫn còn ở đây? Nếu bạn không đem theo những câu chuyện hay hoặc đồ chơi thú vị, hãy đi ra ngoài.",
-  "foodstore.general.child.rude.neutral.7": "Ờ, thật á? Nếu bạn không mang theo điều gì vui vẻ, tôi không quan tâm."
+  "foodstore.general.child.rude.neutral.7": "Ờ, thật á? Nếu bạn không mang theo điều gì vui vẻ, tôi không quan tâm.",
+  "foodstore.weaponText": "Rất tốt",
+  "foodstore.config.dialogue":     "Cài đặt hội thoại",
+  "foodstore.config.disablekidask": "Từ chối trẻ em hỏi",
+  "foodstore.config.enablesaleweapon": "Cho phép bán vũ khí"
 }

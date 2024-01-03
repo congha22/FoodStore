@@ -26,7 +26,7 @@ using static StardewValley.Minigames.TargetGame;
 using static System.Net.Mime.MediaTypeNames;
 using Object = StardewValley.Object;
 
-namespace FoodStore
+namespace MarketTown
 {
     /// <summary>The mod entry point.</summary>
     public partial class ModEntry

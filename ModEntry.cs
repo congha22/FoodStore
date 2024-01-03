@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
+using StardewValley.Buildings;
 using StardewValley.Locations;
 using StardewValley.Menus;
 using StardewValley.Minigames;
@@ -21,17 +22,20 @@ using System.ComponentModel;
 using System.Data.SqlTypes;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Runtime.CompilerServices;
-using static FoodStore.ModEntry;
+using System.Xml.Serialization;
+using static MarketTown.ModEntry;
 using static MarketTown.PlayerChat;
 using static System.Net.Mime.MediaTypeNames;
 using Object = StardewValley.Object;
 
-namespace FoodStore
+namespace MarketTown
 {
     /// <summary>The mod entry point.</summary>
+
     public partial class ModEntry : Mod
     {
 
@@ -64,11 +68,13 @@ namespace FoodStore
 
             helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
             helper.Events.GameLoop.SaveLoaded += GameLoop_SaveLoaded;
-            helper.Events.Multiplayer.ModMessageReceived += this.OnModMessageReceived;
             helper.Events.GameLoop.UpdateTicked += GameLoop_UpdateTicked;
             helper.Events.GameLoop.TimeChanged += this.OnTimeChange;
-            helper.Events.Player.Warped += FarmOutside.PlayerWarp;
             helper.Events.GameLoop.DayEnding += GameLoop_DayEnding;
+
+            helper.Events.Multiplayer.ModMessageReceived += this.OnModMessageReceived;
+
+            helper.Events.Player.Warped += FarmOutside.PlayerWarp;
 
             var harmony = new Harmony(ModManifest.UniqueID);
             harmony.Patch(
@@ -83,6 +89,28 @@ namespace FoodStore
                original: AccessTools.Method(typeof(GameLocation), nameof(GameLocation.updateEvenIfFarmerIsntHere)),
                postfix: new HarmonyMethod(typeof(ModEntry), nameof(FarmHouse_updateEvenIfFarmerIsntHere_Postfix))
             );
+
+            // Patch furniture's pick up, drop item, and render functionality to support weapons.
+            harmony.Patch(original: AccessTools.Method(typeof(StardewValley.Objects.Furniture), nameof(StardewValley.Objects.Furniture.clicked)),
+                          prefix: new HarmonyMethod(typeof(FurniturePatches), nameof(FurniturePatches.clicked_Prefix)));
+            harmony.Patch(original: AccessTools.Method(typeof(StardewValley.Objects.Furniture), nameof(StardewValley.Objects.Furniture.performObjectDropInAction)),
+                          postfix: new HarmonyMethod(typeof(FurniturePatches), nameof(FurniturePatches.performObjectDropInAction_Postfix)));
+            harmony.Patch(original: AccessTools.Method(typeof(StardewValley.Objects.Furniture), nameof(StardewValley.Objects.Furniture.draw),
+                          new Type[] { typeof(SpriteBatch), typeof(int), typeof(int), typeof(float) }),
+                          prefix: new HarmonyMethod(typeof(FurniturePatches), nameof(FurniturePatches.draw_Prefix)));
+
+            // Pass the game's action button functionality to allow weapons to be dropped onto furniture.
+            harmony.Patch(original: AccessTools.Method(typeof(StardewValley.Game1), nameof(StardewValley.Game1.pressActionButton)),
+                          prefix: new HarmonyMethod(typeof(Game1Patches), nameof(Game1Patches.pressActionButton_Prefix)));
+
+            // Patch the game location's "check action" to allow weapons to be dropped onto tables.
+            harmony.Patch(original: AccessTools.Method(typeof(StardewValley.GameLocation), nameof(StardewValley.GameLocation.checkAction)),
+                          prefix: new HarmonyMethod(typeof(GameLocationPatches), nameof(GameLocationPatches.checkAction_Prefix)));
+
+            // Save handlers to prevent custom objects from being saved to file.
+            helper.Events.GameLoop.Saving += (s, e) => makePlaceholderObjects();
+            helper.Events.GameLoop.Saved += (s, e) => restorePlaceholderObjects();
+            helper.Events.GameLoop.SaveLoaded += (s, e) => restorePlaceholderObjects();
         }
         private void GameLoop_UpdateTicked(object sender, UpdateTickedEventArgs e)
         {
@@ -92,7 +120,13 @@ namespace FoodStore
                 playerChatInstance.Validate();
             }
 
-            if (Game1.hasLoadedGame && e.IsMultipleOf(30))
+            if (Game1.hasLoadedGame && e.IsMultipleOf(30)
+                && !(Game1.player.isRidingHorse()
+                    || Game1.currentLocation == null
+                    || Game1.eventUp
+                    || Game1.isFestival()
+                    || Game1.IsFading()
+                    || Game1.menuUp))
             {
 
                 Farmer farmerInstance = Game1.player;
@@ -102,7 +136,7 @@ namespace FoodStore
                 {
                     foreach (NPC __instance in Utility.getAllCharacters())
                     {
-                        if (__instance.isVillager() && friendshipData.TryGetValue(__instance.Name, out var friendship) && !Game1.isFestival())
+                        if (__instance != null && __instance.isVillager() && friendshipData.TryGetValue(__instance.Name, out var friendship))
                         {
                             if (friendshipData[__instance.Name].TalkedToToday)
                             {
@@ -258,6 +292,12 @@ namespace FoodStore
                 getValue: () => Config.AllowRemoveNonFood,
                 setValue: value => Config.AllowRemoveNonFood = value
             );
+            configMenu.AddBoolOption(
+            mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.enablesaleweapon"),
+                getValue: () => Config.EnableSaleWeapon,
+                setValue: value => Config.EnableSaleWeapon = value
+            );
 
             configMenu.AddNumberOption(
                 mod: ModManifest,
@@ -312,13 +352,32 @@ namespace FoodStore
                 setValue: value => Config.TipWhenNeaBy = value
             );
 
+            configMenu.AddPageLink(mod: ModManifest, "dialogue", () => SHelper.Translation.Get("foodstore.config.dialogue"));
+            configMenu.AddPageLink(mod: ModManifest, "inviteTime", () => SHelper.Translation.Get("foodstore.config.invitetime"));
+            configMenu.AddPageLink(mod: ModManifest, "salePrice", () => SHelper.Translation.Get("foodstore.config.saleprice"));
+            configMenu.AddPageLink(mod: ModManifest, "tipValue", () => SHelper.Translation.Get("foodstore.config.tipvalue"));
+
+            //Dialogue setting
+            configMenu.AddPage(mod: ModManifest, "dialogue", () => SHelper.Translation.Get("foodstore.config.dialogue"));
+            configMenu.AddTextOption(
+                mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.dialoguetime"),
+                tooltip: () => SHelper.Translation.Get("foodstore.config.dialoguetimeText"),
+                getValue: () => "" + Config.DialogueTime,
+                setValue: delegate (string value) { try { Config.DialogueTime = Int32.Parse(value, CultureInfo.InvariantCulture); } catch { } }
+            );
             configMenu.AddBoolOption(
                 mod: ModManifest,
                 name: () => SHelper.Translation.Get("foodstore.config.chat"),
                 getValue: () => Config.DisableChat,
                 setValue: value => Config.DisableChat = value
             );
-
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.disablekidask"),
+                getValue: () => Config.DisableKidAsk,
+                setValue: value => Config.DisableKidAsk = value
+            );
             configMenu.AddBoolOption(
                 mod: ModManifest,
                 name: () => SHelper.Translation.Get("foodstore.config.disableallmessage"),
@@ -327,20 +386,9 @@ namespace FoodStore
                 setValue: value => Config.DisableChatAll = value
             );
 
-            configMenu.AddPageLink(mod: ModManifest, "inviteTime", () => SHelper.Translation.Get("foodstore.config.invitetime"));
-            configMenu.AddPageLink(mod: ModManifest, "salePrice", () => SHelper.Translation.Get("foodstore.config.saleprice"));
-            configMenu.AddPageLink(mod: ModManifest, "tipValue", () => SHelper.Translation.Get("foodstore.config.tipvalue"));
-
 
             //Villager invite
             configMenu.AddPage(mod: ModManifest, "inviteTime", () => SHelper.Translation.Get("foodstore.config.invitetime"));
-            configMenu.AddTextOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.dialoguetime"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.dialoguetimeText"),
-                getValue: () => "" + Config.DialogueTime,
-                setValue: delegate (string value) { try { Config.DialogueTime = Int32.Parse(value, CultureInfo.InvariantCulture); } catch { } }
-            );
             configMenu.AddBoolOption(
                 mod: ModManifest,
                 name: () => SHelper.Translation.Get("foodstore.config.enablevisitinside"),
@@ -522,18 +570,20 @@ namespace FoodStore
                         int taste = 8;
                         try
                         {
-                            taste = __instance.getGiftTasteForThisItem(food.foodObject);
+                            if (food.foodObject is not WeaponProxy) taste = __instance.getGiftTasteForThisItem(food.foodObject);
                             if (__instance.Name == "Gus" && (taste == 0 || taste == 2)) taste = 8;
                         }
                         catch (NullReferenceException) { }
-                        string reply;
+                        string reply = "";
                         int salePrice = food.foodObject.sellToStorePrice();
                         int tip = 0;
                         double decorPoint = GetDecorPoint(food.foodTile, __instance.currentLocation);
                         Random rand = new Random();
+                        String itemName = "";
 
                         if (food.foodObject.Category == -7)
                         {
+                            itemName = food.foodObject.Name;
                             // Get Reply, Sale Price, Tip for each taste
                             if (taste == 0)         //Love
                             {
@@ -624,8 +674,21 @@ namespace FoodStore
 
                             }                          //neutral
                         } // **** SALE and TIP block ****
+                        else if (food.foodObject is WeaponProxy)
+                        {
+
+                            WeaponProxy weaponProxy = (WeaponProxy)food.foodObject;
+                            string weaponName = weaponProxy.WeaponName;
+                            int weaponSalePrice = weaponProxy.SalePrice;
+
+                            itemName = weaponName;
+                            reply = SHelper.Translation.Get("foodstore.weaponText");
+                            salePrice = (int)(weaponSalePrice * 1.5);
+                            tip = 0;
+                        }
                         else    // Non-food case
                         {
+                            itemName = food.foodObject.Name;
                             tip = 0;
                             switch (food.foodObject.Quality)
                             {
@@ -647,6 +710,7 @@ namespace FoodStore
                                     break;
                             }
                         }
+
                         //Multiply with decoration point
                         if (Config.EnableDecor) salePrice = (int)(salePrice * (1 + decorPoint));
 
@@ -655,7 +719,7 @@ namespace FoodStore
                         if (food.foodObject.Name == DishPrefer.dishWeek) { salePrice = (int)(salePrice * 1.1); }
 
                         //Config Rush hours Price
-                        if (Config.RushHour && ((800 < Game1.timeOfDay && Game1.timeOfDay < 930) || (1200 < Game1.timeOfDay && Game1.timeOfDay < 1300) || (1800 < Game1.timeOfDay && Game1.timeOfDay < 2000)))
+                        if (Config.RushHour && tip != 0 && ((800 < Game1.timeOfDay && Game1.timeOfDay < 930) || (1200 < Game1.timeOfDay && Game1.timeOfDay < 1300) || (1800 < Game1.timeOfDay && Game1.timeOfDay < 2000)))
                         {
                             salePrice = (int)(salePrice * 0.8);
                             tip = (int)(tip * 2);
@@ -693,8 +757,8 @@ namespace FoodStore
                             //Generate chat box
                             if (Game1.IsMultiplayer)
                             {
-                                Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.sold", new { foodObjName = food.foodObject.Name, locationString = __instance.currentLocation.Name, saleString = salePrice }));
-                                MyMessage messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.sold", new { foodObjName = food.foodObject.Name, locationString = __instance.currentLocation.Name, saleString = salePrice }));
+                                Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.sold", new { foodObjName = itemName, locationString = __instance.currentLocation.Name, saleString = salePrice }));
+                                MyMessage messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.sold", new { foodObjName = itemName, locationString = __instance.currentLocation.Name, saleString = salePrice }));
                                 SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
 
                                 if (!Config.DisableChat)
@@ -715,7 +779,7 @@ namespace FoodStore
                             }
                             else
                             {
-                                Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.sold", new { foodObjName = food.foodObject.Name, locationString = __instance.currentLocation.Name, saleString = salePrice }));
+                                Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.sold", new { foodObjName = itemName, locationString = __instance.currentLocation.Name, saleString = salePrice }));
                                 if (!Config.DisableChat)
                                 {
                                     if (tip != 0)
@@ -796,14 +860,13 @@ namespace FoodStore
             foreach (var f in location.furniture)
             {
                 if (f.heldObject.Value != null 
-                    && categoryKeys.Contains(f.heldObject.Value.Category)
-                    //&& f.heldObject.Value.Edibility > 0 
+                    && (categoryKeys.Contains(f.heldObject.Value.Category)
+                        || (f.heldObject.Value is WeaponProxy && Config.EnableSaleWeapon))
                     )         // ***** Validate edible items *****
                 {
                     int xLocation = (f.boundingBox.X / 64) + (f.boundingBox.Width / 64 / 2);
                     int yLocation = (f.boundingBox.Y / 64) + (f.boundingBox.Height / 64 / 2);
                     var fLocation = new Vector2(xLocation, yLocation);
-
 
                     if (Vector2.Distance(fLocation, npc.getTileLocation()) < Config.MaxDistanceToFind)
                     {
@@ -842,7 +905,6 @@ namespace FoodStore
             int lastFoodTime = int.Parse(npc.modData["hapyke.FoodStore/LastFood"]);
             int minutesSinceLastFood = GetMinutes(Game1.timeOfDay) - GetMinutes(lastFoodTime);
 
-            // Check if either the time since the last food or the time since the last check is greater than the configured thresholds
             return minutesSinceLastFood > Config.MinutesToHungry;
         }
 
@@ -857,7 +919,6 @@ namespace FoodStore
             int lastSayTime = int.Parse(npc.modData["hapyke.FoodStore/LastSay"]);
             int minutesSinceLastFood = GetMinutes(Game1.timeOfDay) - GetMinutes(lastSayTime);
 
-            // Check if either the time since the last food or the time since the last check is greater than the configured thresholds
             return minutesSinceLastFood > time;
         }
 
@@ -871,7 +932,6 @@ namespace FoodStore
             int lastCheckTime = int.Parse(npc.modData["hapyke.FoodStore/LastCheck"]);
             int minutesSinceLastCheck = GetMinutes(Game1.timeOfDay) - GetMinutes(lastCheckTime);
 
-            // Check if either the time since the last food or the time since the last check is greater than the configured thresholds
             return minutesSinceLastCheck > 20;
         }
 
@@ -1075,7 +1135,14 @@ namespace FoodStore
                 }
             }
 
-            if (Game1.timeOfDay == 630 && Game1.player.currentLocation.Name == "Farm")
+            if (Game1.timeOfDay == 630 && Game1.player.currentLocation.Name == "Farm" && !Config.DisableKidAsk
+                && !(Game1.player.isRidingHorse()
+                    || Game1.currentLocation == null
+                    || Game1.eventUp
+                    || Game1.isFestival()
+                    || Game1.IsFading()
+                    || Game1.menuUp)
+                )
             {
                 TodaySelectedKid.Clear();
                 double visitChance = 0.5; // Default value
@@ -1133,5 +1200,110 @@ namespace FoodStore
         internal static List<string> FurnitureList { get; private set; } = new();
         internal static List<string> Animals { get; private set; } = new();
         internal static Dictionary<int, string> Crops { get; private set; } = new();
+
+
+        private static T XmlDeserialize<T>(string toDeserialize)
+        {
+            XmlSerializer xmlSerializer = new XmlSerializer(typeof(T));
+            using (StringReader textReader = new StringReader(toDeserialize))
+            {
+                return (T)xmlSerializer.Deserialize(textReader);
+            }
+        }
+
+        private static string XmlSerialize<T>(T toSerialize)
+        {
+            XmlSerializer xmlSerializer = new XmlSerializer(toSerialize.GetType());
+            using (StringWriter textWriter = new StringWriter())
+            {
+                xmlSerializer.Serialize(textWriter, toSerialize);
+                return textWriter.ToString();
+            }
+        }
+
+        private void makePlaceholderObjects()
+        {
+            foreach (GameLocation location in Game1.locations)
+            {
+                foreach (Furniture furniture in location.furniture)
+                {
+                    if (furniture.heldObject.Value is WeaponProxy weaponProxy)
+                    {
+                        StardewValley.Object placeholder = new StardewValley.Object(furniture.heldObject.Value.TileLocation, 0);
+                        placeholder.Name = $"WeaponProxy:{XmlSerialize(weaponProxy.Weapon)}";
+                        furniture.heldObject.Set(placeholder);
+                    }
+                }
+            }
+
+            foreach (Building building in Game1.getFarm().buildings)
+            {
+                if (building.indoors.Value != null && building.indoors.Value.furniture != null)
+                {
+                    foreach (Furniture furniture in building.indoors.Value.furniture)
+                    {
+                        if (furniture.heldObject.Value is WeaponProxy weaponProxy)
+                        {
+                            StardewValley.Object placeholder = new StardewValley.Object(furniture.heldObject.Value.TileLocation, 0);
+                            placeholder.Name = $"WeaponProxy:{XmlSerialize(weaponProxy.Weapon)}";
+                            furniture.heldObject.Set(placeholder);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void restoreMeleeWeapon(Furniture furniture, string xmlString)
+        {
+            MeleeWeapon weapon = XmlDeserialize<MeleeWeapon>(xmlString);
+            furniture.heldObject.Set(new WeaponProxy(weapon));
+        }
+
+        private void restorePlaceholderObjects()
+        {
+            foreach (GameLocation location in Game1.locations)
+            {
+                foreach (Furniture furniture in location.furniture)
+                {
+                    if (furniture.heldObject.Value != null && furniture.heldObject.Value.Name.Contains("Proxy:"))
+                    {
+                        string xmlString = furniture.heldObject.Value.Name;
+                        if (xmlString.StartsWith("WeaponProxy:"))
+                        {
+                            try
+                            {
+                                restoreMeleeWeapon(furniture, xmlString.Substring("WeaponProxy:".Length));
+                            }
+                            catch { }
+                        }
+                    }
+                }
+            }
+
+            foreach (Building building in Game1.getFarm().buildings)
+            {
+                try
+                {
+                    if (building.indoors != null && building.indoors.Value != null && building.indoors.Value.furniture != null)
+                    {
+                        foreach (Furniture furniture in building.indoors.Value.furniture)
+                        {
+                            if (furniture.heldObject.Value != null && furniture.heldObject.Value.Name.Contains("Proxy:"))
+                            {
+                                string xmlString = furniture.heldObject.Value.Name;
+                                if (xmlString.StartsWith("WeaponProxy:"))
+                                {
+                                    try
+                                    {
+                                        restoreMeleeWeapon(furniture, xmlString.Substring("WeaponProxy:".Length));
+                                    }
+                                    catch { }
+                                }
+                            }
+                        }
+                    }
+                } catch { }
+            }
+        }
     }
 }

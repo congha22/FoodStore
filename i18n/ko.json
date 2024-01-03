@@ -592,5 +592,9 @@
   "foodstore.general.child.rude.neutral.4": "우훗, 너 내가 게임하고 있잖아 안 보이니? 재미있는 걸 가지고 오지 않는다면 나를 귀찮게 하지 마세요.",
   "foodstore.general.child.rude.neutral.5": "봐봐, 난 대화에 기분이 안 좋아. 너가 재미 없으면, 이번에는 아니야.",
   "foodstore.general.child.rude.neutral.6": "왜 아직 여기 있니? 멋진 이야기나 장난감을 가져오지 않는다면 꺼져.",
-  "foodstore.general.child.rude.neutral.7": "음, 진지하게? 재미있는 것 없이 여기 있다면, 난 관심 없어."
+  "foodstore.general.child.rude.neutral.7": "음, 진지하게? 재미있는 것 없이 여기 있다면, 난 관심 없어.",
+  "foodstore.weaponText": "대단한 것",
+  "foodstore.config.dialogue":  "대화 설정"   ,
+  "foodstore.config.disablekidask": "아이들이 놀아달라고 요청하는 것을 비활성화하세요",
+  "foodstore.config.enablesaleweapon": "무기 판매 활성화"
 }
