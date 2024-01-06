@@ -961,22 +961,22 @@ namespace MarketTown
                         {
                             if (mannequin.Hat.Value != null)
                             {
-                                salePrice = rand.Next(700, 1500);
+                                salePrice += rand.Next(700, 1500);
                                 mannequin.Hat.Value = null;
                             }
                             if (mannequin.Shirt.Value != null)
                             {
-                                salePrice = rand.Next(900, 1800);
+                                salePrice += rand.Next(900, 1800);
                                 mannequin.Shirt.Value = null;
                             }
                             if (mannequin.Pants.Value != null)
                             {
-                                salePrice = rand.Next(1000, 2000);
+                                salePrice += rand.Next(1000, 2000);
                                 mannequin.Pants.Value = null;
                             }
                             if (mannequin.Boots.Value != null)
                             {
-                                salePrice =  (int)(mannequin.Boots.Value.salePrice() * 3.5);
+                                salePrice +=  (int)(mannequin.Boots.Value.salePrice() * 3.5);
                                 mannequin.Boots.Value = null;
                             }
                         }
