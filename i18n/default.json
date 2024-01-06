@@ -701,5 +701,22 @@
   "foodstore.weaponText":                             "Great one",
   "foodstore.config.dialogue":                        "Dialogue setting",
   "foodstore.config.disablekidask":                   "Disable kids ask to play",
-  "foodstore.config.enablesaleweapon":                "Enable selling weapon?"
+  "foodstore.config.enablesaleweapon":                "Enable selling weapon?",
+
+  "mannequin.desc":                                   "Put clothing, hats, or boots on it.",
+  "mannequin.name.plain-male":                        "Normal Mannequin",
+  "mannequin.name.plain-female":                      "Normal Womannequin",
+  "mannequin.name.magic-male":                        "Magic Mannequin",
+  "mannequin.name.magic-female":                      "Magic Womannequin",
+
+  "foodstore.soldclothes":                            "   Sold outfit at {{locationString}} for {{saleString}}G",
+
+  "foodstore.soldclothesText.0":                      "This might look good on me",
+  "foodstore.soldclothesText.1":                      "I wonder if this color suits my style",
+  "foodstore.soldclothesText.2":                      "Time for a wardrobe upgrade with this piece",
+  "foodstore.soldclothesText.3":                      "I can't resist adding this to my collection",
+  "foodstore.soldclothesText.4":                      "Perfect choice for the upcoming occasion",
+  "foodstore.soldclothesText.5":                      "Trying something new for a change",
+  "foodstore.soldclothesText.6":                      "A classic piece that never goes out of style"
+
 }

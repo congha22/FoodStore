@@ -346,10 +346,12 @@ namespace MarketTown
                     if (villager != null && WantsToEat(villager) && Game1.random.NextDouble() < moveToFoodChance / 100f && __instance.furniture.Count > 0)
                     {
                         PlacedFoodData food = GetClosestFood(npc, __instance);
-                        if (food == null || ( !Config.AllowRemoveNonFood && food.foodObject.Edibility <= 0))
+                        if (food == null || (!Config.AllowRemoveNonFood && food.foodObject.Edibility <= 0 && (npc.currentLocation is Farm || npc.currentLocation is FarmHouse)))
                             return;
                         if (TryToEatFood(villager, food))
+                        {
                             return;
+                        }
 
                         Microsoft.Xna.Framework.Vector2 possibleLocation;
                         possibleLocation = food.foodTile;

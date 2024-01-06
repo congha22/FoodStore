@@ -596,5 +596,21 @@
   "foodstore.weaponText": "偉大な者",
   "foodstore.config.dialogue":     "ダイアログ設定",
   "foodstore.config.disablekidask": "子供が遊びたいと頼むのを無効にする",
-  "foodstore.config.enablesaleweapon": "武器の販売を可能にする"
+  "foodstore.config.enablesaleweapon": "武器の販売を可能にする",
+  "mannequin.desc": "洋服、帽子、またはブーツをかけることができます。",
+  "mannequin.name.plain-male": "通常のマネキン",
+  "mannequin.name.plain-female": "通常の女性用マネキン",
+  "mannequin.name.magic-male": "マジックマネキン",
+  "mannequin.name.magic-female": "マジック女性用マネキン",
+
+  "foodstore.soldclothes": "{{locationString}}で{{saleString}}Gで服を販売しました",
+
+  "foodstore.soldclothesText.0": "これは私に良く見えるかもしれません",
+  "foodstore.soldclothesText.1": "この色は私のスタイルに合うかどうか考えてみます",
+  "foodstore.soldclothesText.2": "このアイテムでワードローブをアップグレードする時間です",
+  "foodstore.soldclothesText.3": "これをコレクションに加えるのを我慢できません",
+  "foodstore.soldclothesText.4": "次の特別な場面にぴったりの選択",
+  "foodstore.soldclothesText.5": "変化を求めて新しいものを試してみる",
+  "foodstore.soldclothesText.6": "決して流行から外れないクラシックな一着"
+
 }

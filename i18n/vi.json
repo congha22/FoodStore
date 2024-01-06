@@ -596,5 +596,21 @@
   "foodstore.weaponText": "Rất tốt",
   "foodstore.config.dialogue":     "Cài đặt hội thoại",
   "foodstore.config.disablekidask": "Từ chối trẻ em hỏi",
-  "foodstore.config.enablesaleweapon": "Cho phép bán vũ khí"
+  "foodstore.config.enablesaleweapon": "Cho phép bán vũ khí",
+  "mannequin.desc": "Đặt quần áo, mũ hoặc giày dép lên nó.",
+  "mannequin.name.plain-male": "Bức tượng mẫu thông thường",
+  "mannequin.name.plain-female": "Bức tượng mẫu phụ nữ thông thường",
+  "mannequin.name.magic-male": "Bức tượng mẫu phép thuật",
+  "mannequin.name.magic-female": "Bức tượng mẫu phụ nữ phép thuật",
+
+  "foodstore.soldclothes": "Bán quần áo tại {{locationString}} với giá {{saleString}}G",
+
+  "foodstore.soldclothesText.0": "Có vẻ nó sẽ phù hợp với tôi",
+  "foodstore.soldclothesText.1": "Tôi tự hỏi liệu màu này có hợp với phong cách của tôi không",
+  "foodstore.soldclothesText.2": "Đã đến lúc nâng cấp tủ quần áo với mảnh này",
+  "foodstore.soldclothesText.3": "Tôi không thể cưỡng lại việc thêm nó vào bộ sưu tập của mình",
+  "foodstore.soldclothesText.4": "Lựa chọn hoàn hảo cho dịp sắp tới",
+  "foodstore.soldclothesText.5": "Thử một cái gì đó mới cho sự đổi đặc",
+  "foodstore.soldclothesText.6": "Một mảnh cổ điển không bao giờ lỗi mốt"
+
 }

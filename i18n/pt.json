@@ -596,5 +596,21 @@
   "foodstore.weaponText": "muito bom",
   "foodstore.config.dialogue":     "Configuração de diálogo",
   "foodstore.config.disablekidask": "Desative as crianças e peça para brincar",
-  "foodstore.config.enablesaleweapon": "permitir a venda de armas"
+  "foodstore.config.enablesaleweapon": "permitir a venda de armas",
+  "mannequin.desc": "Vista roupas, chapéus ou botas nele.",
+  "mannequin.name.plain-male": "Manequim Normal",
+  "mannequin.name.plain-female": "Manequim Normal Feminino",
+  "mannequin.name.magic-male": "Manequim Mágico",
+  "mannequin.name.magic-female": "Manequim Mágico Feminino",
+
+  "foodstore.soldclothes": "Vendeu roupas em {{locationString}} por {{saleString}}G",
+
+  "foodstore.soldclothesText.0": "Isso pode ficar bem em mim",
+  "foodstore.soldclothesText.1": "Me pergunto se essa cor combina com o meu estilo",
+  "foodstore.soldclothesText.2": "Hora de atualizar meu guarda-roupa com esta peça",
+  "foodstore.soldclothesText.3": "Não consigo resistir em adicionar isso à minha coleção",
+  "foodstore.soldclothesText.4": "Escolha perfeita para a próxima ocasião",
+  "foodstore.soldclothesText.5": "Experimentando algo novo para variar",
+  "foodstore.soldclothesText.6": "Uma peça clássica que nunca sai de moda"
+
 }

@@ -31,6 +31,10 @@ using static MarketTown.ModEntry;
 using static MarketTown.PlayerChat;
 using static System.Net.Mime.MediaTypeNames;
 using Object = StardewValley.Object;
+using SpaceShared;
+using SpaceShared.APIs;
+using MarketTown.Framework;
+using static StardewValley.Minigames.TargetGame;
 
 namespace MarketTown
 {
@@ -38,6 +42,8 @@ namespace MarketTown
 
     public partial class ModEntry : Mod
     {
+
+        public static ModEntry Instance;
 
         public static IMonitor SMonitor;
         public static IModHelper SHelper;
@@ -55,6 +61,11 @@ namespace MarketTown
 
 
 
+        //
+        // *************************** ENTRY ***************************
+        //
+
+
         /// <summary>The mod entry point, called after the mod is first loaded.</summary>
         /// <param name="helper">Provides simplified APIs for writing mods.</param>
         public override void Entry(IModHelper helper)
@@ -62,6 +73,7 @@ namespace MarketTown
             Config = Helper.ReadConfig<ModConfig>();
 
             context = this;
+            ModEntry.Instance = this;
 
             SMonitor = Monitor;
             SHelper = helper;
@@ -71,6 +83,13 @@ namespace MarketTown
             helper.Events.GameLoop.UpdateTicked += GameLoop_UpdateTicked;
             helper.Events.GameLoop.TimeChanged += this.OnTimeChange;
             helper.Events.GameLoop.DayEnding += GameLoop_DayEnding;
+
+            helper.Events.GameLoop.GameLaunched += this.OnGameLaunched;
+            helper.Events.Display.MenuChanged += this.OnMenuChanged;
+
+            helper.ConsoleCommands.Add("markettown", "display", this.HandleCommand);
+
+            helper.Events.Content.AssetRequested += this.OnAssetRequested;
 
             helper.Events.Multiplayer.ModMessageReceived += this.OnModMessageReceived;
 
@@ -111,6 +130,83 @@ namespace MarketTown
             helper.Events.GameLoop.Saving += (s, e) => makePlaceholderObjects();
             helper.Events.GameLoop.Saved += (s, e) => restorePlaceholderObjects();
             helper.Events.GameLoop.SaveLoaded += (s, e) => restorePlaceholderObjects();
+        }
+
+        //
+        // ***************************  END OF ENTRY ***************************
+        //
+
+        private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
+        {
+            var sc = this.Helper.ModRegistry.GetApi<ISpaceCoreApi>("spacechase0.SpaceCore");
+            sc.RegisterSerializerType(typeof(Mannequin));
+        }
+
+        private void OnAssetRequested(object sender, AssetRequestedEventArgs e)
+        {
+            if (e.NameWithoutLocale.IsEquivalentTo("Characters\\Farmer\\farmer_transparent"))
+                e.LoadFromModFile<Texture2D>("FrameworkClothes/assets/farmer_transparent.png", AssetLoadPriority.Exclusive);
+        }
+
+        private void HandleCommand(string cmd, string[] args)
+        {
+            if (!Context.IsPlayerFree)
+                return;
+
+            if (args.Length == 0)
+            {
+                return;
+            }
+
+            Item item = null;
+            if (args[0] == "display")
+            {
+                var mannType = MannequinType.Plain;
+                var mannGender = MannequinGender.Male;
+                if (args.Length >= 2)
+                {
+                    switch (args[1].ToLower())
+                    {
+                        case "male":
+                            mannGender = MannequinGender.Male;
+                            break;
+                        case "female":
+                            mannGender = MannequinGender.Female;
+                            break;
+                        default:
+                            return;
+                    }
+                }
+                item = new Mannequin(mannType, mannGender, Vector2.Zero);
+            }
+
+            if (item == null)
+            {
+                return;
+            }
+
+            if (args.Length >= 3)
+            {
+                item.Stack = int.Parse(args[2]);
+            }
+
+            Game1.player.addItemByMenuIfNecessary(item);
+        }
+
+        private void OnMenuChanged(object sender, MenuChangedEventArgs e)
+        {
+            if (e.NewMenu is ShopMenu shop)
+            {
+                if (shop.portraitPerson?.Name == "Robin")
+                {
+                    var mm = new Mannequin(MannequinType.Plain, MannequinGender.Male, Vector2.Zero);
+                    var mf = new Mannequin(MannequinType.Plain, MannequinGender.Female, Vector2.Zero);
+                    shop.forSale.Add(mm);
+                    shop.forSale.Add(mf);
+                    shop.itemPriceAndStock.Add(mm, new[] { 1000, int.MaxValue });
+                    shop.itemPriceAndStock.Add(mf, new[] { 1000, int.MaxValue });
+                }
+            }
         }
         private void GameLoop_UpdateTicked(object sender, UpdateTickedEventArgs e)
         {
@@ -557,7 +653,7 @@ namespace MarketTown
 
         private static bool TryToEatFood(NPC __instance, PlacedFoodData food)
         {
-            if (food != null && Vector2.Distance(food.foodTile, __instance.getTileLocation()) < Config.MaxDistanceToEat && !__instance.Name.EndsWith("_DA"))
+            if (food != null && food.furniture != null && Vector2.Distance(food.foodTile, __instance.getTileLocation()) < Config.MaxDistanceToEat && !__instance.Name.EndsWith("_DA"))
             {
                 if ((__instance.currentLocation is Farm || __instance.currentLocation is FarmHouse) && !Config.AllowRemoveNonFood && food.foodObject.Edibility <= 0)
                 {
@@ -828,8 +924,8 @@ namespace MarketTown
                             int randomNumber = random.Next(12);
                             salePrice = tip = 0;
 
-                            if (!Config.DisableChatAll && food.foodObject.Edibility > 0 ) __instance.showTextAboveHead(SHelper.Translation.Get("foodstore.visitoreat." + randomNumber));
-                            else if (!Config.DisableChatAll && food.foodObject.Edibility <= 0) __instance.showTextAboveHead(SHelper.Translation.Get("foodstore.visitorpickup." + randomNumber));
+                            if (!Config.DisableChatAll && food.foodObject.Edibility > 0 ) __instance.showTextAboveHead(SHelper.Translation.Get("foodstore.visitoreat." + randomNumber), default, default, 5000);
+                            else if (!Config.DisableChatAll && food.foodObject.Edibility <= 0) __instance.showTextAboveHead(SHelper.Translation.Get("foodstore.visitorpickup." + randomNumber), default, default, 5000);
                         }           //Food in farmhouse
 
                         Game1.player.Money += salePrice + tip;
@@ -848,6 +944,58 @@ namespace MarketTown
                     }
                 }
             }
+            else if (food != null && food.obj != null && Vector2.Distance(food.foodTile, __instance.getTileLocation()) < Config.MaxDistanceToEat && !__instance.Name.EndsWith("_DA"))
+            {
+                using (IEnumerator<Object> enumerator = __instance.currentLocation.Objects.Values.GetEnumerator())
+                {
+                    while (enumerator.MoveNext())
+                    {
+                        Object currentObject = enumerator.Current;
+                        Random rand = new Random();
+                        int salePrice = 0;
+
+                        if (enumerator.Current.boundingBox.Value != food.obj.boundingBox.Value)
+                            continue;
+
+                        if (currentObject is Mannequin mannequin)
+                        {
+                            if (mannequin.Hat.Value != null)
+                            {
+                                salePrice = rand.Next(700, 1500);
+                                mannequin.Hat.Value = null;
+                            }
+                            if (mannequin.Shirt.Value != null)
+                            {
+                                salePrice = rand.Next(900, 1800);
+                                mannequin.Shirt.Value = null;
+                            }
+                            if (mannequin.Pants.Value != null)
+                            {
+                                salePrice = rand.Next(1000, 2000);
+                                mannequin.Pants.Value = null;
+                            }
+                            if (mannequin.Boots.Value != null)
+                            {
+                                salePrice =  (int)(mannequin.Boots.Value.salePrice() * 3.5);
+                                mannequin.Boots.Value = null;
+                            }
+                        }
+                        Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.soldclothes", new {locationString = __instance.currentLocation.Name, saleString = salePrice }));
+                        MyMessage messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.soldclothes", new { locationString = __instance.currentLocation.Name, saleString = salePrice }));
+                        SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
+
+                        __instance.showTextAboveHead(SHelper.Translation.Get("foodstore.soldclothesText." + rand.Next(7).ToString()), default, default, 4500);
+
+                        Game1.player.Money += salePrice;
+                        __instance.modData["hapyke.FoodStore/LastFood"] = Game1.timeOfDay.ToString();
+                        __instance.modData["hapyke.FoodStore/LastFoodTaste"] = "-1";
+
+                        return true;
+
+                    }
+                }
+            }
+
             return false;
         }
 
@@ -857,9 +1005,35 @@ namespace MarketTown
 
             List<PlacedFoodData> foodList = new List<PlacedFoodData>();
 
+            foreach (var x in location.Objects)
+            {
+                foreach (var obj in x.Values)
+                {
+                    if (obj.name.Contains("nequin") && obj is Mannequin mannequin)
+                    {
+                        // Access the name property of the object
+                        string objectName = obj.name;
+
+                        bool hasHat = mannequin.Hat.Value != null;
+                        bool hasShirt = mannequin.Shirt.Value != null;
+                        bool hasPants = mannequin.Pants.Value != null;
+                        bool hasBoots = mannequin.Boots.Value != null;
+
+                        int xLocation = (obj.boundingBox.X / 64) + (obj.boundingBox.Width / 64 / 2);
+                        int yLocation = (obj.boundingBox.Y / 64) + (obj.boundingBox.Height / 64 / 2);
+                        var fLocation = new Vector2(xLocation, yLocation);
+
+                        if (Vector2.Distance(fLocation, npc.getTileLocation()) < Config.MaxDistanceToFind && (hasHat || hasPants || hasShirt || hasBoots))
+                        {
+                            foodList.Add(new PlacedFoodData( obj, fLocation, obj, -1));
+                        }
+                    }
+                }
+            }
+
             foreach (var f in location.furniture)
             {
-                if (f.heldObject.Value != null 
+                if (f.heldObject.Value != null
                     && (categoryKeys.Contains(f.heldObject.Value.Category)
                         || (f.heldObject.Value is WeaponProxy && Config.EnableSaleWeapon))
                     )         // ***** Validate edible items *****
