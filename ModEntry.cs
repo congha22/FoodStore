@@ -361,6 +361,29 @@ namespace MarketTown
 
         private void GameLoop_GameLaunched(object sender, StardewModdingAPI.Events.GameLaunchedEventArgs e)
         {
+            Texture2D originalTexture = ModEntry.Instance.Helper.ModContent.Load<Texture2D>("Assets/markettown.png");
+
+            int newWidth = (int)(originalTexture.Width / 1.35);
+            int newHeight = (int)(originalTexture.Height / 1.35);
+            Texture2D resizedTexture = new Texture2D(originalTexture.GraphicsDevice, newWidth, newHeight);
+
+            Color[] originalData = new Color[originalTexture.Width * originalTexture.Height];
+            originalTexture.GetData(originalData);
+            Color[] resizedData = new Color[newWidth * newHeight];
+
+            // Resize
+            for (int y = 0; y < newHeight; y++)
+            {
+                for (int x = 0; x < newWidth; x++)
+                {
+                    int originalX = (int)(x * 1.35);
+                    int originalY = (int)(y * 1.35);
+                    resizedData[x + y * newWidth] = originalData[originalX + originalY * originalTexture.Width];
+                }
+            }
+            resizedTexture.SetData(resizedData);
+            Rectangle displayArea = new Rectangle(0, 0, newWidth, newHeight);
+
             // get Generic Mod Config Menu's API (if it's installed)
             var configMenu = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
             if (configMenu is null)
@@ -373,6 +396,7 @@ namespace MarketTown
                 save: () => Helper.WriteConfig(Config)
             );
 
+            configMenu.AddImage(mod: ModManifest, texture: () => resizedTexture, texturePixelArea: null, scale: 1);
 
             configMenu.AddBoolOption(
             mod: ModManifest,
@@ -425,11 +449,26 @@ namespace MarketTown
                 setValue: delegate (string value) { try { Config.MaxDistanceToEat = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
             );
             configMenu.AddBoolOption(
-                    mod: ModManifest,
-                    name: () => SHelper.Translation.Get("foodstore.config.rushhour"),
-                    tooltip: () => SHelper.Translation.Get("foodstore.config.rushhourText"),
-                    getValue: () => Config.RushHour,
-                    setValue: value => Config.RushHour = value
+            mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.randompurchase"),
+                tooltip: () => SHelper.Translation.Get("foodstore.config.randompurchaseText"),
+                getValue: () => Config.RandomPurchase,
+                setValue: value => Config.RandomPurchase = value
+            );
+
+            configMenu.AddTextOption(
+                mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.signrange"),
+                tooltip: () => SHelper.Translation.Get("foodstore.config.signrangeText"),
+                getValue: () => "" + Config.SignRange,
+                setValue: delegate (string value) { try { Config.SignRange = int.Parse(value, CultureInfo.InvariantCulture); } catch { } }
+            );
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.rushhour"),
+                tooltip: () => SHelper.Translation.Get("foodstore.config.rushhourText"),
+                getValue: () => Config.RushHour,
+                setValue: value => Config.RushHour = value
                 );
 
             configMenu.AddBoolOption(
@@ -769,6 +808,25 @@ namespace MarketTown
                                 if (tip < 5) { tip = 5; }
 
                             }                          //neutral
+                            try
+                            {
+                                switch (food.foodObject.Quality)
+                                {
+                                    case 4:
+                                        salePrice = (int)(salePrice * 1.75);
+                                        break;
+                                    case 2:
+                                        salePrice = (int)(salePrice * 1.4);
+                                        break;
+                                    case 1:
+                                        salePrice = (int)(salePrice * 1.15);
+                                        break;
+                                    default:
+                                        salePrice = (int)(salePrice * 1);
+                                        break;
+                                }
+                            } catch { }
+
                         } // **** SALE and TIP block ****
                         else if (food.foodObject is WeaponProxy)
                         {
@@ -1023,7 +1081,12 @@ namespace MarketTown
                         int yLocation = (obj.boundingBox.Y / 64) + (obj.boundingBox.Height / 64 / 2);
                         var fLocation = new Vector2(xLocation, yLocation);
 
-                        if (Vector2.Distance(fLocation, npc.getTileLocation()) < Config.MaxDistanceToFind && (hasHat || hasPants || hasShirt || hasBoots))
+                        float signRange = Config.SignRange;
+                        bool hasSignInRange = x.Values.Any(otherObj => otherObj is Sign sign && Vector2.Distance(fLocation, sign.TileLocation) <= signRange);
+
+                        if (Config.SignRange == 0) hasSignInRange = true; 
+                        // Add to foodList only if there is no sign within the range
+                        if (hasSignInRange && Vector2.Distance(fLocation, npc.getTileLocation()) < Config.MaxDistanceToFind && (hasHat || hasPants || hasShirt || hasBoots))
                         {
                             foodList.Add(new PlacedFoodData( obj, fLocation, obj, -1));
                         }
@@ -1042,7 +1105,12 @@ namespace MarketTown
                     int yLocation = (f.boundingBox.Y / 64) + (f.boundingBox.Height / 64 / 2);
                     var fLocation = new Vector2(xLocation, yLocation);
 
-                    if (Vector2.Distance(fLocation, npc.getTileLocation()) < Config.MaxDistanceToFind)
+                    float signRange = Config.SignRange;
+                    bool hasSignInRange = location.Objects.Values.Any(obj => obj is Sign sign && Vector2.Distance(fLocation, sign.TileLocation) <= signRange);
+
+                    if (Config.SignRange == 0) hasSignInRange = true;
+                    // Add to foodList only if there is no sign within the range
+                    if (hasSignInRange&& Vector2.Distance(fLocation, npc.getTileLocation()) < Config.MaxDistanceToFind)
                     {
                         foodList.Add(new PlacedFoodData(f, fLocation, f.heldObject.Value, -1));
                     }
@@ -1066,7 +1134,16 @@ namespace MarketTown
                     return compare;
                 return Vector2.Distance(a.foodTile, npc.getTileLocation()).CompareTo(Vector2.Distance(b.foodTile, npc.getTileLocation()));
             });
-            return foodList[0];
+
+            if (!Config.RandomPurchase)         //Return the closest
+            { 
+                return foodList[0]; 
+            }
+            else                                //Return a random item
+            {
+                Random random = new Random();
+                return foodList[random.Next(foodList.Count)];
+            }
         }
 
         private static bool WantsToEat(NPC npc)
@@ -1171,13 +1248,13 @@ namespace MarketTown
                 }
             }
 
-            if (decorPoint > 85) return 0.5;
-            else if (decorPoint > 67) return 0.4;
-            else if (decorPoint > 52) return 0.3;
-            else if (decorPoint > 48) return 0.2;
-            else if (decorPoint > 30) return 0.1;
-            else if (decorPoint > 20) return 0.0;
-            else if (decorPoint > 15) return -0.1;
+            if (decorPoint > 70) return 0.5;
+            else if (decorPoint > 56) return 0.4;
+            else if (decorPoint > 42) return 0.3;
+            else if (decorPoint > 30) return 0.2;
+            else if (decorPoint > 20) return 0.1;
+            else if (decorPoint > 14) return 0.0;
+            else if (decorPoint > 9) return -0.1;
             else return -0.2;
 
         }

@@ -24,6 +24,13 @@ namespace MarketTown
         /// <remarks>Each mod can only be registered once, unless it's deleted via <see cref="Unregister"/> before calling this again.</remarks>
         void Register(IManifest mod, Action reset, Action save, bool titleScreenOnly = false);
 
+        /// <summary>Add an image at the current position in the form.</summary>
+        /// <param name="mod">The mod's manifest.</param>
+        /// <param name="texture">The image texture to display.</param>
+        /// <param name="texturePixelArea">The pixel area within the texture to display, or <c>null</c> to show the entire image.</param>
+        /// <param name="scale">The zoom factor to apply to the image.</param>
+        void AddImage(IManifest mod, Func<Texture2D> texture, Rectangle? texturePixelArea = null, int scale = Game1.pixelZoom);
+
         /// <summary>Add a section title at the current position in the form.</summary>
         /// <param name="mod">The mod's manifest.</param>
         /// <param name="text">The title text shown in the form.</param>

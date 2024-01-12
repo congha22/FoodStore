@@ -38,5 +38,7 @@ namespace MarketTown
 
         public bool DisableKidAsk { get; set; } = false;
         public bool EnableSaleWeapon { get; set; } = true;
+        public bool RandomPurchase { get; set; } = false;
+        public int SignRange { get; set; } = 0;
     }
 }

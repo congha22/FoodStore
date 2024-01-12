@@ -33,12 +33,6 @@ namespace MarketTown
             return Utility.isOnScreen(new Point(x, y), 0, farm);
         }
 
-        /* NOTE:
-         * There is a NPC barrier surrounding the door. Characters warped to that tile won't be able to move.
-         * For this reason, the NPC must be warped 2 tiles below the door.
-         * 
-         * This could be fixed by editing map properties- but it'd only be compatible with vanilla maps (and might have side effects). This is the best workaround currently.
-         */
         internal static void PlayerWarp(object sender, WarpedEventArgs e)
         {
             if (!e.Player.IsMainPlayer)
@@ -93,7 +87,7 @@ namespace MarketTown
                         visit.faceDirection(2);
 
                         door.X--;
-                        visit.controller = new PathFindController(visit, Game1.getFarm(), door, 2); //(this was made as test, but will stay commented-out just in case.) */
+                        visit.controller = new PathFindController(visit, Game1.getFarm(), door, 2);
                     }
                 }
                 catch { }

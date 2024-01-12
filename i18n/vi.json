@@ -611,6 +611,12 @@
   "foodstore.soldclothesText.3": "Tôi không thể cưỡng lại việc thêm nó vào bộ sưu tập của mình",
   "foodstore.soldclothesText.4": "Lựa chọn hoàn hảo cho dịp sắp tới",
   "foodstore.soldclothesText.5": "Thử một cái gì đó mới cho sự đổi đặc",
-  "foodstore.soldclothesText.6": "Một mảnh cổ điển không bao giờ lỗi mốt"
+  "foodstore.soldclothesText.6": "Một mảnh cổ điển không bao giờ lỗi mốt",
+  "foodstore.config.randompurchase": "NPC mua một mục ngẫu nhiên?",
+  "foodstore.config.randompurchaseText": "Mặc định, NPC sẽ di chuyển đến mục gần nhất. Đặt là True để họ mua một mục ngẫu nhiên trong phạm vi tìm kiếm.",
+
+  "foodstore.config.signrange": "Đánh dấu cửa hàng bằng biển hiệu?",
+  "foodstore.config.signrangeText": "Đặt là 0 để vô hiệu hóa. Điều này giới hạn NPC chỉ mua các mục hợp lệ trong khoảng cách từ Biển hiệu đã đặt. Các mục nằm ngoài phạm vi sẽ bị bỏ qua."
+
 
 }

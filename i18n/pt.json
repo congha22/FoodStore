@@ -269,7 +269,7 @@
   "foodstore.dishday.8": "Vamos dar um toque especial ao dia de hoje com um sabor de {{dishToday}}! É a especialidade.",
   "foodstore.dishday.9": "O assunto da cidade: {{dishToday}} é o prato imperdível de hoje!",
   "foodstore.config.chat": "Desativar mensagem não importante?",
-  "foodstore.thankyou": "[144] Obrigado por usar o Food Store! [144] Se está a gostar do mod, o seu apoio é muito importante. Mostre o seu amor votando e seguindo para futuras atualizações. O seu entusiasmo alimenta a nossa cozinha de criatividade!!! [43] #FoodStore",
+  "foodstore.thankyou": "[144] Mais uma atualização com o Market Town! [144] Está gostando do mod e ansioso por melhorias contínuas? Não se esqueça de seguir e endossar! Sua paixão impulsiona nosso barco para frente. [43] #MarketTown",
   "foodstore.visitoreat.0": "Obrigado!",
   "foodstore.visitoreat.1": "Oh comida!!!",
   "foodstore.visitoreat.2": "Delicioso delicioso!",
@@ -611,6 +611,12 @@
   "foodstore.soldclothesText.3": "Não consigo resistir em adicionar isso à minha coleção",
   "foodstore.soldclothesText.4": "Escolha perfeita para a próxima ocasião",
   "foodstore.soldclothesText.5": "Experimentando algo novo para variar",
-  "foodstore.soldclothesText.6": "Uma peça clássica que nunca sai de moda"
+  "foodstore.soldclothesText.6": "Uma peça clássica que nunca sai de moda",
+  "foodstore.config.randompurchase": "NPC compra item aleatório?",
+  "foodstore.config.randompurchaseText": "Por padrão, NPC se moverá para o item mais próximo. Defina como True para que comprem um item aleatório dentro da faixa de busca.",
+
+  "foodstore.config.signrange": "Marcar a loja com uma placa?",
+  "foodstore.config.signrangeText": "Defina como 0 para desativar. Isso limita NPCs a comprar apenas itens válidos dentro da distância de uma placa colocada. Itens fora do alcance serão ignorados."
+
 
 }

@@ -312,7 +312,7 @@
   
   "foodstore.config.chat":                            "Disable non-important message?",
   
-  "foodstore.thankyou":                               "[144] Thank you for using Market Town! [144] If you're enjoying the mod, your support means the world. Show some love by voting and following for future updates. Your enthusiasm fuels our kitchen of creativity!!! [43] #MarketTown",
+  "foodstore.thankyou":                               "[144] Another update with Market Town! [144] Enjoying the mod and eager for ongoing improvements? Don't forget to Follow and Endorse!!. Your passion propels our ship forward. [43] #MarketTown",
   
   "foodstore.visitoreat.0":                           "Thank you!",
   "foodstore.visitoreat.1":                           "Oh food!!!",
@@ -717,6 +717,12 @@
   "foodstore.soldclothesText.3":                      "I can't resist adding this to my collection",
   "foodstore.soldclothesText.4":                      "Perfect choice for the upcoming occasion",
   "foodstore.soldclothesText.5":                      "Trying something new for a change",
-  "foodstore.soldclothesText.6":                      "A classic piece that never goes out of style"
+  "foodstore.soldclothesText.6":                      "A classic piece that never goes out of style",
+
+  "foodstore.config.randompurchase":                  "NPC buy random item?",
+  "foodstore.config.randompurchaseText":              "By default NPC will move to closest item. Set to True for they to buy random item within search range.",
+
+  "foodstore.config.signrange":                       "Mark the store with a Sign?",
+  "foodstore.config.signrangeText":                   "Set to 0 to disable. This limit NPCs only buying valid items within distance from a placed Sign. Items out of range will be ignored"
 
 }

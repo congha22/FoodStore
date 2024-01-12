@@ -269,7 +269,7 @@
   "foodstore.dishday.8": "오늘 {{dishToday}} 맛있게 매콤하게 맛보자! 이건 스페셜이야.",
   "foodstore.dishday.9": "마을 이야기: 오늘의 필수 요리입니다!",
   "foodstore.config.chat": "중요하지 않은 메시지 비활성화하시겠습니까?",
-  "foodstore.thankyou": "[144] 식품 가게를 이용해 주셔서 감사합니다![144] 만약 모드를 즐기신다면, 여러분의 지원은 세상을 의미합니다. 향후 업데이트를 위해 투표하고 팔로우로 사랑을 보여주세요. 여러분의 열정이 창조성이 넘치는 주방을 바꾸는 원동력이 됩니다!!! [43] #MarketTown",
+  "foodstore.thankyou": "[144] 마켓 타운과 함께한 또 다른 업데이트! [144] 모드를 즐기시고 지속적인 향상을 기대하시나요? 팔로우와 인도스를 잊지 마세요! 여러분의 열정이 우리 선박을 전진시킵니다. [43] #MarketTown",
   "foodstore.visitoreat.0": "감사합니다!",
   "foodstore.visitoreat.1": "오 음식!!!",
   "foodstore.visitoreat.2": "맛있어 맛있어!",
@@ -611,6 +611,12 @@
   "foodstore.soldclothesText.3": "이걸 내 컬렉션에 넣지 않을 수 없어",
   "foodstore.soldclothesText.4": "다가오는 특별한 경우에 완벽한 선택",
   "foodstore.soldclothesText.5": "변화를 위해 새로운 것을 시도해보기",
-  "foodstore.soldclothesText.6": "시대에 영원히 묻지 않는 클래식한 조각"
+  "foodstore.soldclothesText.6": "시대에 영원히 묻지 않는 클래식한 조각",
+  "foodstore.config.randompurchase": "NPC가 무작위 아이템을 구매하시겠습니까?",
+  "foodstore.config.randompurchaseText": "기본적으로 NPC는 가장 가까운 아이템으로 이동합니다. True로 설정하면 검색 범위 내에서 무작위 아이템을 구매하도록 설정됩니다.",
+
+  "foodstore.config.signrange": "가게에 표지판을 표시하시겠습니까?",
+  "foodstore.config.signrangeText": "비활성화하려면 0으로 설정하십시오. 이로써 NPC는 배치된 표지판으로부터의 거리 내에서만 유효한 아이템을 구매하도록 제한됩니다. 범위를 벗어나는 아이템은 무시됩니다."
+
 
 }

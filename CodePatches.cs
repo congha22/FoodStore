@@ -100,6 +100,9 @@ namespace MarketTown
         }
         private static void NPC_performTenMinuteUpdate_Postfix(NPC __instance)
         {
+            if (!Config.EnableMod)
+                return;
+
             try             //Warp invited NPC to and away
             {
                 if (__instance.isVillager() && !Utility.isFestivalDay(Game1.dayOfMonth, Game1.currentSeason) && __instance.modData["hapyke.FoodStore/inviteDate"] == (Game1.stats.daysPlayed - 1).ToString())
@@ -155,7 +158,7 @@ namespace MarketTown
             //Get taste and decoration score, call to SaySomething for NPC to send bubble text
             if (Config.EnableMod && !Game1.eventUp && __instance.currentLocation is not null && __instance.isVillager() && !WantsToEat(__instance) 
                 && Microsoft.Xna.Framework.Vector2.Distance(__instance.getTileLocation(), Game1.player.getTileLocation()) < 30
-                && __instance.modData["hapyke.FoodStore/LastFoodTaste"] != "-1" && !Config.DisableChatAll)
+                && __instance.modData["hapyke.FoodStore/LastFoodTaste"] != "-1" && Config.EnableDecor && !Config.DisableChatAll)
             {
                 if (Game1.random.NextDouble() < 0.1)
                 {
@@ -263,9 +266,12 @@ namespace MarketTown
         }
         private static void FarmHouse_updateEvenIfFarmerIsntHere_Postfix(GameLocation __instance)
         {
+            if (!Config.EnableMod)
+                return;
+
             foreach (NPC npc in __instance.characters)
             {
-                double talkChance = 0.00003;
+                double talkChance = 0.000025;
                 Random randomSayChance = new Random();
 
                 //Send bubble about decoration, dish of the week
@@ -273,6 +279,7 @@ namespace MarketTown
                     && randomSayChance.NextDouble() < talkChance
                     && WantsToSay(npc, 360)
                     && Utility.isThereAFarmerWithinDistance(new Microsoft.Xna.Framework.Vector2(npc.getTileLocation().X, npc.getTileLocation().Y), 20, npc.currentLocation) != null
+                    && Config.EnableDecor
                     && !Config.DisableChatAll)
                 {
                     PlacedFoodData tempFood = GetClosestFood(npc, npc.currentLocation);
@@ -282,7 +289,7 @@ namespace MarketTown
 
                     Random random = new Random();
                     int randomIndex = random.Next(5);
-                    if (tempFood != null)
+                    if (tempFood != null)       //If have item for sale
                     {
                         var decorPointComment = GetDecorPoint(tempFood.foodTile, npc.currentLocation);
 
@@ -302,7 +309,7 @@ namespace MarketTown
                             continue;
                         }
                     }
-                    else if (tempFood == null)
+                    else if (tempFood == null && npc.currentLocation is FarmHouse)      //if in FarmHouse and have no item for sale
                     {
                         var decorPointComment = GetDecorPoint(npc.getTileLocation(), npc.currentLocation);
 
