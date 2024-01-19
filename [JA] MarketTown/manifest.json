@@ -1,0 +1,12 @@
+{
+  "Name": "MarketTown - Custom Items",
+  "Author": "d5a1lamdtd",
+  "Version": "4.0.0",
+  "Description": "Custom Items for Market Town",
+  "UniqueID": "d5a1lamdtd.MarketTown.Item",
+  "MinimumApiVersion": "3.15.0",
+  "UpdateKeys": ["Nexus:???"],
+  "ContentPackFor": {
+    "UniqueID": "spacechase0.JsonAssets"
+  }
+}

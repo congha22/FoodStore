@@ -616,7 +616,24 @@
   "foodstore.config.randompurchaseText": "Por defecto, los NPC se moverán al artículo más cercano. Establecer en Verdadero para que compren un artículo aleatorio dentro del rango de búsqueda.",
 
   "foodstore.config.signrange": "¿Marcar la tienda con un letrero?",
-  "foodstore.config.signrangeText": "Establecer en 0 para desactivar. Esto limita a los NPC a comprar solo artículos válidos dentro de la distancia desde un letrero colocado. Los artículos fuera del rango serán ignorados."
+  "foodstore.config.signrangeText": "Establecer en 0 para desactivar. Esto limita a los NPC a comprar solo artículos válidos dentro de la distancia desde un letrero colocado. Los artículos fuera del rango serán ignorados.",
+  
+"foodstore.config.doorentry": "NPC aparece cerca de la puerta",
+"foodstore.config.doorentryText": "Por defecto Verdadero: El visitante aparecerá cerca de la Puerta de Entrada. Establecer en Falso para que el NPC aparezca cerca de la ubicación del letrero de licencia",
+
+"foodstore.config.shedvisitchance": "Probabilidad de visita al almacén",
+"foodstore.config.shedvisitchanceText": "Por defecto 0.1. Probabilidad de nuevo visitante en el almacén cada 10 minutos. ¡Recomendado por debajo de 0.25!",
+
+"foodstore.config.maxshedcapacity": "Visitantes máximos en el almacén",
+"foodstore.config.maxshedcapacityText": "Por defecto 3. Capacidad máxima en un almacén. Un valor extremo puede causar un lag extremo. Muy recomendado mantener el número total de NPCs de TODOS los almacenes al mismo tiempo por debajo de 8",
+
+"foodstore.config.timestay": "¿Cuánto tiempo se queda el NPC?",
+"foodstore.config.timestayText": "Por defecto 100 (equivalente a 1 hora). Recomendado por debajo de 200",
+
+"foodstore.config.openhour": "Hora de apertura",
+"foodstore.config.closehour": "Hora de cierre",
+
+"foodstore.config.shed": "Configuración del Almacén"
 
 
 }

@@ -40,7 +40,7 @@ namespace MarketTown
                 return;
             }
 
-            var isFarm = e.NewLocation.IsFarm;
+            var isFarm = e.NewLocation.Name.StartsWith("Farm");
             var isFarmHouse = e.NewLocation.Name.StartsWith("FarmHouse");
 
             if (!isFarm && !isFarmHouse) //if its neither the farm nor the farmhouse
@@ -113,22 +113,21 @@ namespace MarketTown
         {
             var c = Game1.getCharacterFromName(who);
 
-            var gameLocation = Game1.getLocationFromName("FarmHouse");
-            var newspot = getRandomOpenPointInFarm(gameLocation, Game1.random);
+            var newspot = getRandomOpenPointInFarm(c.currentLocation, Game1.random);
 
             try
             {
                 c.PathToOnFarm(newspot);
-
             }
-            catch { }
+            catch
+            { }
         }
 
         internal static Point getRandomOpenPointInFarm(GameLocation location, Random r, int tries = 30, int maxDistance = 10)
         {
             foreach (NPC who in Utility.getAllCharacters())
             {
-                if (who.isVillager() && (who.currentLocation.Name == "Farm" || who.currentLocation.Name == "FarmHouse") && who.modData["hapyke.FoodStore/invited"] == "true")
+                if (who.isVillager() && (((who.currentLocation.Name == "Farm" || who.currentLocation.Name == "FarmHouse") && who.modData["hapyke.FoodStore/invited"] == "true") || who.currentLocation.Name.Contains("Shed")))
                 {
 
                     var map = location.map;

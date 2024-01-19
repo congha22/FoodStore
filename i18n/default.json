@@ -391,7 +391,7 @@
   "foodstore.willinvitevisit.5":                      "I'm interested! Let me know the details for the visit.",
   "foodstore.willinvitevisit.6":                      "Certainly, I'll visit! Just share the necessary details.",
   
-  "foodstore.config.invitetime":                      "Visitors",
+  "foodstore.config.invitetime":                      "House Visitors",
   
   "foodstore.config.invitecometime":                  "Time villager arrive.",
   
@@ -723,6 +723,25 @@
   "foodstore.config.randompurchaseText":              "By default NPC will move to closest item. Set to True for they to buy random item within search range.",
 
   "foodstore.config.signrange":                       "Mark the store with a Sign?",
-  "foodstore.config.signrangeText":                   "Set to 0 to disable. This limit NPCs only buying valid items within distance from a placed Sign. Items out of range will be ignored"
+  "foodstore.config.signrangeText":                   "Set to 0 to disable. This limit NPCs only buying valid items within distance from a placed Sign. Items out of range will be ignored. Not apply inside Shed",
+
+  "foodstore.config.doorentry":                       "NPC spawn near door",
+  "foodstore.config.doorentryText":                   "Default True: Visitor will spawn near Entry Door. Set to False for NPC to spawn near License Sign location",
+
+  "foodstore.config.shedvisitchance":                 "Chance for Shed visit",
+  "foodstore.config.shedvisitchanceText":             "Default 0.1. Chance for new visitor in Shed every 10 minutes. Recommened below 0.25!",
+
+  "foodstore.config.maxshedcapacity":                 "Maximum visitors in Shed",
+  "foodstore.config.maxshedcapacityText":             "Default 3. Max capacity in one Shed. Extreme value can cause extreme lag. Greatly recommended to keep total number of NPCs from ALL Shed at the same time below 8",
+
+  "foodstore.config.timestay":                        "How long NPC stay?",
+  "foodstore.config.timestayText":                    "Default 100 (equal 1 hour). Recommended below 200",
+
+  "foodstore.config.openhour":                        "Open hour",
+  "foodstore.config.closehour":                       "Close hour",
+    
+  "foodstore.config.shed":                            "Shed Setting"
+
+
 
 }

@@ -3,8 +3,10 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Netcode;
+using Newtonsoft.Json.Linq;
 using StardewModdingAPI;
 using StardewValley;
+using StardewValley.Buildings;
 using StardewValley.Characters;
 using StardewValley.GameData;
 using StardewValley.Locations;
@@ -17,6 +19,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Numerics;
+using System.Reflection;
 using System.Reflection.Metadata;
 using System.Security.AccessControl;
 using System.Xml.Linq;
@@ -42,6 +45,9 @@ namespace MarketTown
             if (!Config.EnableMod)
                 return;
 
+            __instance.modData["hapyke.FoodStore/timeVisitShed"] = "0";
+            __instance.modData["hapyke.FoodStore/shedEntry"] = "-1,-1";
+            __instance.modData["hapyke.FoodStore/gettingFood"] = "false";
             __instance.modData["hapyke.FoodStore/LastFood"] = "0";
             __instance.modData["hapyke.FoodStore/LastCheck"] = "0";
             __instance.modData["hapyke.FoodStore/LocationControl"] = ",";
@@ -102,6 +108,38 @@ namespace MarketTown
         {
             if (!Config.EnableMod)
                 return;
+            try
+            {
+                if (__instance.isVillager() && __instance.currentLocation.Name.Contains("Shed") && !bool.Parse(__instance.modData["hapyke.FoodStore/gettingFood"])
+                    && (Int32.Parse(__instance.modData["hapyke.FoodStore/timeVisitShed"]) <= (Game1.timeOfDay - Config.TimeStay) || Game1.timeOfDay > Config.CloseHour || Game1.timeOfDay >= 2500))
+                {
+                    __instance.Halt();
+                    __instance.modData["hapyke.FoodStore/timeVisitShed"] = "0";
+
+                    if (__instance.modData["hapyke.FoodStore/shedEntry"] != "-1,-1" && __instance.modData["hapyke.FoodStore/shedEntry"] != null)        // Walk to Remove
+                    {
+                        string[] coordinates = __instance.modData["hapyke.FoodStore/shedEntry"].Split(',');
+
+                        var shedEntryPoint = Point.Zero;
+                        if (coordinates.Length == 2 && int.TryParse(coordinates[0], out int x) && int.TryParse(coordinates[1], out int y))
+                        {
+                            shedEntryPoint = new Point(x, y);
+                        }
+
+                        __instance.temporaryController = new PathFindController(__instance, __instance.currentLocation, shedEntryPoint, 0, (character, location) => __instance.currentLocation.characters.Remove(__instance));
+                    }
+                    else
+                    {
+                        var where = __instance.currentLocation;
+                        where.characters.Remove(__instance);
+                    }
+
+                    if (Int32.Parse(__instance.modData["hapyke.FoodStore/timeVisitShed"]) <= (Game1.timeOfDay - Config.TimeStay * 1.5))                 // Force Remove
+                    {
+                        __instance.currentLocation.characters.Remove(__instance);
+                    }
+                }
+            } catch { }
 
             try             //Warp invited NPC to and away
             {
@@ -342,7 +380,6 @@ namespace MarketTown
                 string text = "";
                 if (npc.isVillager() && !npc.Name.EndsWith("_DA"))
                 {
-                    NPC villager = npc;
                     double moveToFoodChance = Config.MoveToFoodChance;
 
                     if (Config.RushHour && ((800 < Game1.timeOfDay && Game1.timeOfDay < 930) || (1200 < Game1.timeOfDay && Game1.timeOfDay < 1300) || (1800 < Game1.timeOfDay && Game1.timeOfDay < 2000)))
@@ -350,12 +387,17 @@ namespace MarketTown
                         moveToFoodChance = moveToFoodChance * 1.5;
                     }
 
-                    if (villager != null && WantsToEat(villager) && Game1.random.NextDouble() < moveToFoodChance / 100f && __instance.furniture.Count > 0)
+                    if (npc.currentLocation.Name.Contains("Shed"))
+                    {
+                        moveToFoodChance = moveToFoodChance * 2;
+                    }
+
+                    if (npc != null && WantsToEat(npc) && Game1.random.NextDouble() < moveToFoodChance / 100f && __instance.furniture.Count > 0)
                     {
                         PlacedFoodData food = GetClosestFood(npc, __instance);
                         if (food == null || (!Config.AllowRemoveNonFood && food.foodObject.Edibility <= 0 && (npc.currentLocation is Farm || npc.currentLocation is FarmHouse)))
                             return;
-                        if (TryToEatFood(villager, food))
+                        if (TryToEatFood(npc, food))
                         {
                             return;
                         }
@@ -398,14 +440,14 @@ namespace MarketTown
                             }
                             tries++;
                         }
-                        if (tries < 3 && TimeDelayCheck(villager))
+                        if (tries < 3 && TimeDelayCheck(npc))
                         {
                             //Send message
-                            if (villager.currentLocation.Name != "Farm" && villager.currentLocation.Name != "FarmHouse" && !Config.DisableChat && !Config.DisableChatAll)
+                            if (npc.currentLocation.Name != "Farm" && npc.currentLocation.Name != "FarmHouse" && !Config.DisableChat && !Config.DisableChatAll)
                             {
                                 Random random = new Random();
                                 int randomIndex = random.Next(15);
-                                text = SHelper.Translation.Get("foodstore.coming." + randomIndex.ToString(), new { vName = villager.Name });
+                                text = SHelper.Translation.Get("foodstore.coming." + randomIndex.ToString(), new { vName = npc.Name });
 
                                 Game1.chatBox.addInfoMessage(text);
                                 MyMessage messageToSend = new MyMessage(text);
@@ -415,9 +457,10 @@ namespace MarketTown
                             //Update LastCheck
                             npc.modData["hapyke.FoodStore/LastCheck"] = Game1.timeOfDay.ToString();
 
+                            npc.modData["hapyke.FoodStore/gettingFood"] = "true";
                             //Villager control
-                            villager.addedSpeed = 2;
-                            villager.temporaryController = new PathFindController(villager, __instance, new Point((int)possibleLocation.X, (int)possibleLocation.Y), facingDirection, (character, location) => villager.updateMovement(villager.currentLocation, Game1.currentGameTime));
+                            npc.addedSpeed = 2;
+                            npc.temporaryController = new PathFindController(npc, __instance, new Point((int)possibleLocation.X, (int)possibleLocation.Y), facingDirection, (character, location) => npc.updateMovement(npc.currentLocation, Game1.currentGameTime));
                         }
                     }
                 }

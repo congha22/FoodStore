@@ -616,7 +616,23 @@
   "foodstore.config.randompurchaseText": "Por padrão, NPC se moverá para o item mais próximo. Defina como True para que comprem um item aleatório dentro da faixa de busca.",
 
   "foodstore.config.signrange": "Marcar a loja com uma placa?",
-  "foodstore.config.signrangeText": "Defina como 0 para desativar. Isso limita NPCs a comprar apenas itens válidos dentro da distância de uma placa colocada. Itens fora do alcance serão ignorados."
+  "foodstore.config.signrangeText": "Defina como 0 para desativar. Isso limita NPCs a comprar apenas itens válidos dentro da distância de uma placa colocada. Itens fora do alcance serão ignorados.",
+  "foodstore.config.doorentry": "NPC aparece perto da porta",
+"foodstore.config.doorentryText": "Padrão True: O visitante aparecerá perto da porta de entrada. Defina como Falso para que o NPC apareça perto da localização da Placa de Licença",
+
+"foodstore.config.shedvisitchance": "Chance de visita ao galpão",
+"foodstore.config.shedvisitchanceText": "Padrão 0.1. Chance de novo visitante no galpão a cada 10 minutos. Recomendado abaixo de 0.25!",
+
+"foodstore.config.maxshedcapacity": "Visitantes máximos no galpão",
+"foodstore.config.maxshedcapacityText": "Padrão 3. Capacidade máxima em um galpão. Valor extremo pode causar lag extremo. Altamente recomendado manter o número total de NPCs de TODOS os galpões ao mesmo tempo abaixo de 8",
+
+"foodstore.config.timestay": "Quanto tempo o NPC fica?",
+"foodstore.config.timestayText": "Padrão 100 (equivalente a 1 hora). Recomendado abaixo de 200",
+
+"foodstore.config.openhour": "Hora de abertura",
+"foodstore.config.closehour": "Hora de fechamento",
+
+"foodstore.config.shed": "Configuração do Galpão"
 
 
 }

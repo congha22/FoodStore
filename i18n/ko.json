@@ -616,7 +616,24 @@
   "foodstore.config.randompurchaseText": "기본적으로 NPC는 가장 가까운 아이템으로 이동합니다. True로 설정하면 검색 범위 내에서 무작위 아이템을 구매하도록 설정됩니다.",
 
   "foodstore.config.signrange": "가게에 표지판을 표시하시겠습니까?",
-  "foodstore.config.signrangeText": "비활성화하려면 0으로 설정하십시오. 이로써 NPC는 배치된 표지판으로부터의 거리 내에서만 유효한 아이템을 구매하도록 제한됩니다. 범위를 벗어나는 아이템은 무시됩니다."
+  "foodstore.config.signrangeText": "비활성화하려면 0으로 설정하십시오. 이로써 NPC는 배치된 표지판으로부터의 거리 내에서만 유효한 아이템을 구매하도록 제한됩니다. 범위를 벗어나는 아이템은 무시됩니다.",
+  
+"foodstore.config.doorentry": "도어 근처 NPC 생성",
+"foodstore.config.doorentryText": "기본값 True: 방문자는 현관 문 근처에 생성됩니다. 라이선스 표지 위치 근처에 NPC를 생성하려면 False로 설정하십시오.",
+
+"foodstore.config.shedvisitchance": "창고 방문 확률",
+"foodstore.config.shedvisitchanceText": "기본값 0.1. 10분마다 창고에 새로운 방문자의 확률입니다. 0.25 아래로 권장됩니다!",
+
+"foodstore.config.maxshedcapacity": "창고 내 최대 방문자 수",
+"foodstore.config.maxshedcapacityText": "기본값 3. 하나의 창고에서의 최대 수용 인원입니다. 극단적인 값은 극단적인 랙을 초래할 수 있습니다. 동시에 모든 창고의 NPC 총 수를 8 미만으로 유지하는 것이 강력히 권장됩니다.",
+
+"foodstore.config.timestay": "NPC 체류 시간",
+"foodstore.config.timestayText": "기본값 100 (1시간과 동일). 200 미만으로 권장됩니다.",
+
+"foodstore.config.openhour": "오픈 시간",
+"foodstore.config.closehour": "닫는 시간",
+
+"foodstore.config.shed": "창고 설정"
 
 
 }

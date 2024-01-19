@@ -1,0 +1,12 @@
+{
+   "Name":"Market License",
+   "Price":10000,
+   "Description":"The Ferngill Republic requires this license for all shop owners. To register your Shed as a business, you must display this License on a Sign at all times.",
+   "Category": "Junk",
+   "IsColored":false,
+   "CanPurchase":true,
+   "PurchaseFrom":"DesertTrade",
+   "PurchasePrice":20000,
+   "PurchaseRequirements":null
+
+}

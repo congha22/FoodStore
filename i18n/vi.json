@@ -616,7 +616,24 @@
   "foodstore.config.randompurchaseText": "Mặc định, NPC sẽ di chuyển đến mục gần nhất. Đặt là True để họ mua một mục ngẫu nhiên trong phạm vi tìm kiếm.",
 
   "foodstore.config.signrange": "Đánh dấu cửa hàng bằng biển hiệu?",
-  "foodstore.config.signrangeText": "Đặt là 0 để vô hiệu hóa. Điều này giới hạn NPC chỉ mua các mục hợp lệ trong khoảng cách từ Biển hiệu đã đặt. Các mục nằm ngoài phạm vi sẽ bị bỏ qua."
+  "foodstore.config.signrangeText": "Đặt là 0 để vô hiệu hóa. Điều này giới hạn NPC chỉ mua các mục hợp lệ trong khoảng cách từ Biển hiệu đã đặt. Các mục nằm ngoài phạm vi sẽ bị bỏ qua.",
+  
+"foodstore.config.doorentry": "NPC xuất hiện gần cửa",
+"foodstore.config.doorentryText": "Mặc định là True: Khách thăm sẽ xuất hiện gần Cửa vào. Đặt là False để NPC xuất hiện gần vị trí Bảng giấy phép.",
+
+"foodstore.config.shedvisitchance": "Cơ hội thăm Kho",
+"foodstore.config.shedvisitchanceText": "Mặc định là 0.1. Cơ hội cho khách thăm mới trong Kho mỗi 10 phút. Khuyến nghị dưới 0.25!",
+
+"foodstore.config.maxshedcapacity": "Số lượng khách tối đa trong Kho",
+"foodstore.config.maxshedcapacityText": "Mặc định là 3. Sức chứa tối đa trong một Kho. Giá trị cực kỳ cao có thể gây lag cực kỳ. Nên giữ tổng số NPC từ TẤT CẢ Kho cùng một lúc dưới 8 là lời khuyên lớn.",
+
+"foodstore.config.timestay": "NPC ở lại bao lâu?",
+"foodstore.config.timestayText": "Mặc định là 100 (tương đương 1 giờ). Khuyến nghị dưới 200",
+
+"foodstore.config.openhour": "Giờ mở cửa",
+"foodstore.config.closehour": "Giờ đóng cửa",
+
+"foodstore.config.shed": "Cài đặt Kho"
 
 
 }

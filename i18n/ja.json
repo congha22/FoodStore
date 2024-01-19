@@ -616,7 +616,30 @@
   "foodstore.config.randompurchaseText": "デフォルトでは、NPCは最も近くのアイテムに移動します。Trueに設定すると、検索範囲内でランダムなアイテムを購入します。",
 
   "foodstore.config.signrange": "看板で店をマークしますか？",
-  "foodstore.config.signrangeText": "0に設定して無効にします。これにより、NPCは設置された看板からの距離内でのみ有効なアイテムを購入するように制限されます。範囲外のアイテムは無視されます。"
+  "foodstore.config.signrangeText": "0に設定して無効にします。これにより、NPCは設置された看板からの距離内でのみ有効なアイテムを購入するように制限されます。範囲外のアイテムは無視されます。",
+  "foodstore.config.doorentry": "ドア付近にNPCが生成されます",
+"foodstore.config.doorentryText": "デフォルトはTrue：訪問者は入り口の近くに生成されます。NPCをライセンスサインの場所の近くに生成するにはFalseに設定します",
+
+"foodstore.config.shedvisitchance": "倉庫訪問のチャンス",
+"foodstore.config.shedvisitchanceText": "デフォルトは0.1。10分ごとに倉庫に新しい訪問者が現れる確率。0.25未満がお勧めです！",
+
+"foodstore.config.maxshedcapacity": "倉庫の最大訪問者数",
+"foodstore.config.maxshedcapacityText": "デフォルトは3。1つの倉庫の最大収容人数。極端な値は極端なラグを引き起こす可能性があります。同時にすべての倉庫のNPCの総数を8未満に保つことが強く推奨されています",
+
+"foodstore.config.timestay": "NPCの滞在時間は？",
+"foodstore.config.timestayText": "デフォルトは100（1時間と同等）。200未満がお勧めです",
+
+"foodstore.config.openhour": "開店時間",
+"foodstore.config.closehour": "閉店時間",
+
+"foodstore.config.shed": "倉庫の設定"
+
+
+
+
+
+
+
 
 
 }

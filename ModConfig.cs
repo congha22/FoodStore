@@ -40,5 +40,13 @@ namespace MarketTown
         public bool EnableSaleWeapon { get; set; } = true;
         public bool RandomPurchase { get; set; } = false;
         public int SignRange { get; set; } = 0;
+
+
+        public bool DoorEntry { get; set; } = true;
+        public float ShedVisitChance { get; set;} = 0.1f;
+        public int MaxShedCapacity { get; set; } = 3;
+        public int TimeStay { get; set; } = 100;
+        public int OpenHour { get; set; } = 800;
+        public int CloseHour { get;set; } = 2200;
     }
 }
