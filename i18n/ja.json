@@ -616,8 +616,9 @@
   "foodstore.config.randompurchaseText": "デフォルトでは、NPCは最も近くのアイテムに移動します。Trueに設定すると、検索範囲内でランダムなアイテムを購入します。",
 
   "foodstore.config.signrange": "看板で店をマークしますか？",
-  "foodstore.config.signrangeText": "0に設定して無効にします。これにより、NPCは設置された看板からの距離内でのみ有効なアイテムを購入するように制限されます。範囲外のアイテムは無視されます。",
-  "foodstore.config.doorentry": "ドア付近にNPCが生成されます",
+"foodstore.config.signrangeText": "0に設定して無効にします。この制限により、設置された看板からの距離内でのみ有効なアイテムをNPCが購入できます。範囲外のアイテムは無視されます。倉庫内では適用されません。",
+
+"foodstore.config.doorentry": "ドア付近にNPCが生成されます",
 "foodstore.config.doorentryText": "デフォルトはTrue：訪問者は入り口の近くに生成されます。NPCをライセンスサインの場所の近くに生成するにはFalseに設定します",
 
 "foodstore.config.shedvisitchance": "倉庫訪問のチャンス",

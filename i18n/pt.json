@@ -616,8 +616,9 @@
   "foodstore.config.randompurchaseText": "Por padrão, NPC se moverá para o item mais próximo. Defina como True para que comprem um item aleatório dentro da faixa de busca.",
 
   "foodstore.config.signrange": "Marcar a loja com uma placa?",
-  "foodstore.config.signrangeText": "Defina como 0 para desativar. Isso limita NPCs a comprar apenas itens válidos dentro da distância de uma placa colocada. Itens fora do alcance serão ignorados.",
-  "foodstore.config.doorentry": "NPC aparece perto da porta",
+"foodstore.config.signrangeText": "Defina como 0 para desativar. Este limite permite que NPCs comprem apenas itens válidos dentro da distância de uma Placa colocada. Itens fora do alcance serão ignorados. Não se aplica dentro do Galpão.",
+
+"foodstore.config.doorentry": "NPC aparece perto da porta",
 "foodstore.config.doorentryText": "Padrão True: O visitante aparecerá perto da porta de entrada. Defina como Falso para que o NPC apareça perto da localização da Placa de Licença",
 
 "foodstore.config.shedvisitchance": "Chance de visita ao galpão",

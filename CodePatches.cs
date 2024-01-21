@@ -387,10 +387,13 @@ namespace MarketTown
                         moveToFoodChance = moveToFoodChance * 1.5;
                     }
 
-                    if (npc.currentLocation.Name.Contains("Shed"))
+                    try
                     {
-                        moveToFoodChance = moveToFoodChance * 2;
-                    }
+                        if (npc.currentLocation != null && npc.currentLocation.Name.Contains("Shed"))
+                        {
+                            moveToFoodChance = moveToFoodChance * 2;
+                        }
+                    } catch { }
 
                     if (npc != null && WantsToEat(npc) && Game1.random.NextDouble() < moveToFoodChance / 100f && __instance.furniture.Count > 0)
                     {

@@ -616,8 +616,8 @@
   "foodstore.config.randompurchaseText": "Por defecto, los NPC se moverán al artículo más cercano. Establecer en Verdadero para que compren un artículo aleatorio dentro del rango de búsqueda.",
 
   "foodstore.config.signrange": "¿Marcar la tienda con un letrero?",
-  "foodstore.config.signrangeText": "Establecer en 0 para desactivar. Esto limita a los NPC a comprar solo artículos válidos dentro de la distancia desde un letrero colocado. Los artículos fuera del rango serán ignorados.",
-  
+"foodstore.config.signrangeText": "Establecer en 0 para desactivar. Este límite permite que los NPC compren solo artículos válidos dentro de la distancia desde una Señal colocada. Se ignorarán los elementos fuera del alcance. No se aplica dentro del Almacén.",
+
 "foodstore.config.doorentry": "NPC aparece cerca de la puerta",
 "foodstore.config.doorentryText": "Por defecto Verdadero: El visitante aparecerá cerca de la Puerta de Entrada. Establecer en Falso para que el NPC aparezca cerca de la ubicación del letrero de licencia",
 

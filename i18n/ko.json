@@ -616,8 +616,9 @@
   "foodstore.config.randompurchaseText": "기본적으로 NPC는 가장 가까운 아이템으로 이동합니다. True로 설정하면 검색 범위 내에서 무작위 아이템을 구매하도록 설정됩니다.",
 
   "foodstore.config.signrange": "가게에 표지판을 표시하시겠습니까?",
-  "foodstore.config.signrangeText": "비활성화하려면 0으로 설정하십시오. 이로써 NPC는 배치된 표지판으로부터의 거리 내에서만 유효한 아이템을 구매하도록 제한됩니다. 범위를 벗어나는 아이템은 무시됩니다.",
-  
+
+"foodstore.config.signrangeText": "0으로 설정하여 비활성화합니다. 이 제한은 설치된 표지로부터의 거리 내에서만 유효한 아이템을 구매하도록 허용합니다. 범위를 벗어난 아이템은 무시됩니다. 창고 내에서는 적용되지 않습니다.",
+
 "foodstore.config.doorentry": "도어 근처 NPC 생성",
 "foodstore.config.doorentryText": "기본값 True: 방문자는 현관 문 근처에 생성됩니다. 라이선스 표지 위치 근처에 NPC를 생성하려면 False로 설정하십시오.",
 
