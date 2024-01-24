@@ -633,7 +633,15 @@
 "foodstore.config.openhour": "Hora de abertura",
 "foodstore.config.closehour": "Hora de fechamento",
 
-"foodstore.config.shed": "Configuração do Galpão"
+"foodstore.config.shed": "Configuração do Galpão",
+
+"foodstore.config.shedbuychance": "Chance de compra do visitante",
+"foodstore.config.shedbuychanceText": "Padrão 0.2. Chance do visitante comprar item dentro do depósito",
+
+"foodstore.config.shedminutetohungry": "Minutos para comprar",
+"foodstore.config.shedminutetohungryText": "Padrão 60. Limite de tempo entre cada compra",
+
+"foodstore.shedguestgreeting": "Olá"
 
 
 }

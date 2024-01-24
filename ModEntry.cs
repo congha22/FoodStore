@@ -240,9 +240,9 @@ namespace MarketTown
                 {
                     foreach (NPC __instance in Utility.getAllCharacters())
                     {
-                        if (__instance != null && __instance.isVillager() && friendshipData.TryGetValue(__instance.Name, out var friendship))
+                        if (__instance != null && __instance.isVillager() && (friendshipData.TryGetValue(__instance.Name, out var friendship) || __instance.Name.Contains("mt.guest")))
                         {
-                            if (friendshipData[__instance.Name].TalkedToToday)
+                            if ( ( !__instance.Name.Contains("mt.guest") && friendshipData[__instance.Name].TalkedToToday) || __instance.Name.Contains("mt.guest"))
                             {
                                 try
                                 {
@@ -303,7 +303,7 @@ namespace MarketTown
                                                 break;
                                         }
 
-                                        if (!Game1.player.friendshipData[__instance.Name].IsMarried())
+                                        if (__instance.Name.Contains("mt.guest") || !Game1.player.friendshipData[__instance.Name].IsMarried())
                                         {
                                             __instance.CurrentDialogue.Push(new Dialogue(SHelper.Translation.Get("foodstore.general." + npcAge + npcManner+ npcSocial + randomIndex.ToString()), __instance));
                                             __instance.modData["hapyke.FoodStore/TotalCustomerResponse"] = (Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) + 1).ToString();
@@ -320,7 +320,8 @@ namespace MarketTown
 
 
                                         if (__instance.modData["hapyke.FoodStore/finishedDailyChat"] == "true"
-                                            && Int32.Parse(__instance.modData["hapyke.FoodStore/chatDone"]) < Config.DialogueTime)
+                                            && Int32.Parse(__instance.modData["hapyke.FoodStore/chatDone"]) < Config.DialogueTime
+                                            && !__instance.Name.Contains("mt.guest"))
                                         {
                                             __instance.modData["hapyke.FoodStore/chatDone"] = (Int32.Parse(__instance.modData["hapyke.FoodStore/chatDone"]) + 1).ToString();
                                             var formattedQuestion = string.Format(SHelper.Translation.Get("foodstore.responselist.main"), __instance);
@@ -508,6 +509,20 @@ namespace MarketTown
                 tooltip: () => SHelper.Translation.Get("foodstore.config.doorentryText"),
                 getValue: () => Config.DoorEntry,
                 setValue: value => Config.DoorEntry = value
+            );
+            configMenu.AddTextOption(
+                mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.shedminutetohungry"),
+                tooltip: () => SHelper.Translation.Get("foodstore.config.shedminutetohungryText"),
+                getValue: () => "" + Config.ShedMinuteToHungry,
+                setValue: delegate (string value) { try { Config.ShedMinuteToHungry = Int32.Parse(value, CultureInfo.InvariantCulture); } catch { } }
+            );
+            configMenu.AddTextOption(
+                mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.shedbuychance"),
+                tooltip: () => SHelper.Translation.Get("foodstore.config.shedbuychanceText"),
+                getValue: () => "" + Config.ShedMoveToFoodChance,
+                setValue: delegate (string value) { try { Config.ShedMoveToFoodChance = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
             );
             configMenu.AddTextOption(
                 mod: ModManifest,
@@ -722,6 +737,14 @@ namespace MarketTown
                     __instance.modData["hapyke.FoodStore/finishedDailyChat"] = "false";
                     __instance.modData["hapyke.FoodStore/chatDone"] = "0";
                     __instance.modData["hapyke.FoodStore/timeVisitShed"] = "0";
+                    __instance.modData["hapyke.FoodStore/LastFood"] = "0";
+                    __instance.modData["hapyke.FoodStore/LastCheck"] = "0";
+                    __instance.modData["hapyke.FoodStore/LocationControl"] = ",";
+                    __instance.modData["hapyke.FoodStore/LastFoodTaste"] = "-1";
+                    __instance.modData["hapyke.FoodStore/LastFoodDecor"] = "-1";
+                    __instance.modData["hapyke.FoodStore/LastSay"] = "0";
+                    __instance.modData["hapyke.FoodStore/TotalCustomerResponse"] = "0";
+                    __instance.modData["hapyke.FoodStore/inviteTried"] = "false";
 
                     if ( !BlockedGlobalNPC.Contains(__instance.Name) && !BlockedGlobalNPC.Contains(__instance.displayName)) GlobalNPCList.Add(__instance.Name);
 
@@ -1247,6 +1270,10 @@ namespace MarketTown
 
             int lastFoodTime = int.Parse(npc.modData["hapyke.FoodStore/LastFood"]);
             int minutesSinceLastFood = GetMinutes(Game1.timeOfDay) - GetMinutes(lastFoodTime);
+            try
+            {
+                if (npc.currentLocation != null && npc.currentLocation.Name.Contains("Shed")) return minutesSinceLastFood > Config.ShedMinuteToHungry;
+            } catch { }
 
             return minutesSinceLastFood > Config.MinutesToHungry;
         }
@@ -1460,7 +1487,7 @@ namespace MarketTown
         {
             Random random = new Random();
 
-            if (Game1.timeOfDay % 20 == 0 && Game1.timeOfDay > Config.InviteComeTime)
+            if (Game1.timeOfDay > Config.InviteComeTime)
             {
                 foreach (NPC c in Utility.getAllCharacters())
                 {
@@ -1506,24 +1533,27 @@ namespace MarketTown
                         switch (friendshipLevel)
                         {
                             case int lv when lv < 2:
-                                addKid = 0.2;
+                                addKid = 0.1;
                                 break;
 
                             case int lv when lv >= 2 && lv < 4:
-                                addKid = 0.4;
+                                addKid = 0.25;
                                 break;
 
                             case int lv when lv >= 4 && lv < 6:
-                                addKid = 0.6;
+                                addKid = 0.4;
                                 break;
 
                             case int lv when lv >= 6:
-                                addKid = 0.8;
+                                addKid = 0.6;
                                 break;
                             default:
                                 break;
                         }
-                        if (random.NextDouble() < addKid && Game1.getCharacterFromName(kid).modData["hapyke.FoodStore/invited"] != "true") TodaySelectedKid.Add(kid, friendshipLevel);
+                        try
+                        {
+                            if (random.NextDouble() < addKid && Game1.getCharacterFromName(kid).modData["hapyke.FoodStore/invited"] != "true") TodaySelectedKid.Add(kid, friendshipLevel);
+                        } catch { }
                     }
                 }
                 if (random.NextDouble() < visitChance && TodaySelectedKid.Count != 0)

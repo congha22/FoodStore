@@ -1,4 +1,6 @@
 using StardewValley;
+using StardewValley.SDKs;
+using System;
 
 namespace MarketTown
 {
@@ -6,6 +8,60 @@ namespace MarketTown
     {
         internal static void SetVariables(NPC who)
         {
+            Random random = new Random();
+            int randomIndex = random.Next(1, 8);
+            string npcAge, npcManner, npcSocial;
+
+            int age = who.Age;
+            int manner = who.Manners;
+            int social = who.SocialAnxiety;
+
+            switch (age)
+            {
+                case 0:
+                    npcAge = "adult.";
+                    break;
+                case 1:
+                    npcAge = "teens.";
+                    break;
+                case 2:
+                    npcAge = "child.";
+                    break;
+                default:
+                    npcAge = "adult.";
+                    break;
+            }
+            switch (manner)
+            {
+                case 0:
+                    npcManner = "neutral.";
+                    break;
+                case 1:
+                    npcManner = "polite.";
+                    break;
+                case 2:
+                    npcManner = "rude.";
+                    break;
+                default:
+                    npcManner = "neutral.";
+                    break;
+            }
+            switch (social)
+            {
+                case 0:
+                    npcSocial = "outgoing.";
+                    break;
+                case 1:
+                    npcSocial = "shy.";
+                    break;
+                case 2:
+                    npcSocial = "neutral.";
+                    break;
+                default:
+                    npcSocial = "neutral";
+                    break;
+            }
+
             //general data
             who.CurrentDialogue = null;
             who.ignoreScheduleToday = true;
@@ -51,13 +107,28 @@ namespace MarketTown
             result.CurrentDialogue?.Clear();
             result.Schedule?.Clear();
             result.Dialogue?.Clear();
+            result.CurrentDialogue.Push(new Dialogue(ModEntry.SHelper.Translation.Get("foodstore.shedguestgreeting"), result));
             result.clearSchedule();
             result.Halt();
             result.goingToDoEndOfRouteAnimation.Value = false;
             result.Sprite = sprite;
             result.Sprite.CurrentAnimation = null;
+
+
             result.modData["hapyke.FoodStore/gettingFood"] = "false";
             result.modData["hapyke.FoodStore/shedEntry"] = "-1,-1";
+
+            result.modData["hapyke.FoodStore/timeVisitShed"] = Game1.timeOfDay.ToString();
+            result.modData["hapyke.FoodStore/LastFood"] = "0";
+            result.modData["hapyke.FoodStore/LastCheck"] = "0";
+            result.modData["hapyke.FoodStore/LocationControl"] = ",";
+            result.modData["hapyke.FoodStore/LastFoodTaste"] = "-1";
+            result.modData["hapyke.FoodStore/LastFoodDecor"] = "-1";
+            result.modData["hapyke.FoodStore/LastSay"] = "0";
+            result.modData["hapyke.FoodStore/TotalCustomerResponse"] = "0";
+            result.modData["hapyke.FoodStore/inviteTried"] = "false";
+            result.modData["hapyke.FoodStore/finishedDailyChat"] = "false";
+            result.modData["hapyke.FoodStore/chatDone"] = "0";
 
             return result;
         }

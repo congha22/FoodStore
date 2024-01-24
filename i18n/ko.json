@@ -634,7 +634,15 @@
 "foodstore.config.openhour": "오픈 시간",
 "foodstore.config.closehour": "닫는 시간",
 
-"foodstore.config.shed": "창고 설정"
+"foodstore.config.shed": "창고 설정",
+
+"foodstore.config.shedbuychance": "방문자 구매 기회",
+"foodstore.config.shedbuychanceText": "기본값 0.2. 창고 내 아이템 구매 확률",
+
+"foodstore.config.shedminutetohungry": "구매까지의 분",
+"foodstore.config.shedminutetohungryText": "기본값 60. 각 구매 사이의 시간 제한",
+
+"foodstore.shedguestgreeting": "안녕하세요"
 
 
 }

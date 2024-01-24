@@ -633,7 +633,15 @@
 "foodstore.config.openhour": "Hora de apertura",
 "foodstore.config.closehour": "Hora de cierre",
 
-"foodstore.config.shed": "Configuración del Almacén"
+"foodstore.config.shed": "Configuración del Almacén",
+
+"foodstore.config.shedbuychance": "Oportunidad de compra del visitante",
+"foodstore.config.shedbuychanceText": "Por defecto 0.2. Probabilidad de que el visitante compre un artículo dentro del cobertizo",
+
+"foodstore.config.shedminutetohungry": "Minutos para comprar",
+"foodstore.config.shedminutetohungryText": "Por defecto 60. Límite de tiempo entre cada compra",
+
+"foodstore.shedguestgreeting": "Hola"
 
 
 }

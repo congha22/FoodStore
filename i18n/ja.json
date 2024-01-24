@@ -633,7 +633,15 @@
 "foodstore.config.openhour": "開店時間",
 "foodstore.config.closehour": "閉店時間",
 
-"foodstore.config.shed": "倉庫の設定"
+"foodstore.config.shed": "倉庫の設定",
+
+"foodstore.config.shedbuychance": "訪問者の購入チャンス",
+"foodstore.config.shedbuychanceText": "デフォルトは0.2。訪問者が物置内のアイテムを購入するチャンス",
+
+"foodstore.config.shedminutetohungry": "購入までの分数",
+"foodstore.config.shedminutetohungryText": "デフォルトは60。各購入の間の制限時間",
+
+"foodstore.shedguestgreeting": "こんにちは"
 
 
 

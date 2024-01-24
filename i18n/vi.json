@@ -633,7 +633,15 @@
 "foodstore.config.openhour": "Giờ mở cửa",
 "foodstore.config.closehour": "Giờ đóng cửa",
 
-"foodstore.config.shed": "Cài đặt Kho"
+"foodstore.config.shed": "Cài đặt Kho",
+
+"foodstore.config.shedbuychance": "Cơ hội mua của khách",
+"foodstore.config.shedbuychanceText": "Mặc định là 0.2. Cơ hội khách mua sản phẩm trong nhà kho",
+
+"foodstore.config.shedminutetohungry": "Phút để mua",
+"foodstore.config.shedminutetohungryText": "Mặc định là 60. Thời gian giới hạn giữa mỗi lần mua",
+
+"foodstore.shedguestgreeting": "Xin chào"
 
 
 }

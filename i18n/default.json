@@ -740,7 +740,15 @@
   "foodstore.config.openhour":                        "Open hour",
   "foodstore.config.closehour":                       "Close hour",
     
-  "foodstore.config.shed":                            "Shed Setting"
+  "foodstore.config.shed":                            "Shed Setting",
+
+  "foodstore.config.shedbuychance":                   "Visitor purchase chance",
+  "foodstore.config.shedbuychanceText":               "Default 0.2. Chance Visitor will buy item inside Shed",
+
+  "foodstore.config.shedminutetohungry":              "Minute to buy",
+  "foodstore.config.shedminutetohungryText":          "Default 60. Time limit between each purchase",
+
+  "foodstore.shedguestgreeting":                      "Hello"
 
 
 

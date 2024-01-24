@@ -48,5 +48,9 @@ namespace MarketTown
         public int TimeStay { get; set; } = 100;
         public int OpenHour { get; set; } = 800;
         public int CloseHour { get;set; } = 2200;
+
+        public float ShedMoveToFoodChance { get; set; } = 0.2f;
+        public int ShedMinuteToHungry { get; set; } = 60;
+
     }
 }

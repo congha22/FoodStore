@@ -284,7 +284,7 @@ namespace MarketTown
             NpcMap.Clear();
             foreach (NPC npc in Game1.currentLocation.characters)
             {
-                if (npc.isVillager())
+                if (npc.isVillager() && !npc.Name.Contains("mt.guest"))
                 {
                     string displayName = npc.displayName;
                     if (NpcMap.ContainsKey(displayName))

@@ -114,9 +114,12 @@ namespace MarketTown
                     && (Int32.Parse(__instance.modData["hapyke.FoodStore/timeVisitShed"]) <= (Game1.timeOfDay - Config.TimeStay) || Game1.timeOfDay > Config.CloseHour || Game1.timeOfDay >= 2500))
                 {
                     __instance.Halt();
-                    __instance.modData["hapyke.FoodStore/timeVisitShed"] = "0";
 
-                    if (__instance.modData["hapyke.FoodStore/shedEntry"] != "-1,-1" && __instance.modData["hapyke.FoodStore/shedEntry"] != null)        // Walk to Remove
+                    if (Int32.Parse(__instance.modData["hapyke.FoodStore/timeVisitShed"]) <= (Game1.timeOfDay - Config.TimeStay * 2))                 // Force Remove
+                    {
+                        __instance.currentLocation.characters.Remove(__instance);
+                    }
+                    else if (__instance.modData["hapyke.FoodStore/shedEntry"] != "-1,-1" && __instance.modData["hapyke.FoodStore/shedEntry"] != null)        // Walk to Remove
                     {
                         string[] coordinates = __instance.modData["hapyke.FoodStore/shedEntry"].Split(',');
 
@@ -130,14 +133,10 @@ namespace MarketTown
                     }
                     else
                     {
-                        var where = __instance.currentLocation;
-                        where.characters.Remove(__instance);
-                    }
-
-                    if (Int32.Parse(__instance.modData["hapyke.FoodStore/timeVisitShed"]) <= (Game1.timeOfDay - Config.TimeStay * 1.5))                 // Force Remove
-                    {
                         __instance.currentLocation.characters.Remove(__instance);
                     }
+
+
                 }
             } catch { }
 
@@ -381,19 +380,19 @@ namespace MarketTown
                 if (npc.isVillager() && !npc.Name.EndsWith("_DA"))
                 {
                     double moveToFoodChance = Config.MoveToFoodChance;
+                    try
+                    {
+                        if (npc.currentLocation != null && npc.currentLocation.Name.Contains("Shed"))
+                        {
+                            moveToFoodChance = Config.ShedMoveToFoodChance;
+                        }
+                    }
+                    catch { }
 
                     if (Config.RushHour && ((800 < Game1.timeOfDay && Game1.timeOfDay < 930) || (1200 < Game1.timeOfDay && Game1.timeOfDay < 1300) || (1800 < Game1.timeOfDay && Game1.timeOfDay < 2000)))
                     {
                         moveToFoodChance = moveToFoodChance * 1.5;
                     }
-
-                    try
-                    {
-                        if (npc.currentLocation != null && npc.currentLocation.Name.Contains("Shed"))
-                        {
-                            moveToFoodChance = moveToFoodChance * 2;
-                        }
-                    } catch { }
 
                     if (npc != null && WantsToEat(npc) && Game1.random.NextDouble() < moveToFoodChance / 100f && __instance.furniture.Count > 0)
                     {
