@@ -126,7 +126,8 @@ namespace MarketTown
                 {
                     if (!Config.DisableChatAll) npc.showTextAboveHead(SHelper.Translation.Get("foodstore.help." + index), default, default, 7000);
                 }                       // Invite to visit
-                else if (askVisit && !bool.Parse(npc.modData["hapyke.FoodStore/inviteTried"]) && !bool.Parse(npc.modData["hapyke.FoodStore/invited"]))
+                else if (askVisit && npc.modData.ContainsKey("hapyke.FoodStore/inviteTried") && npc.modData.ContainsKey("hapyke.FoodStore/invited")
+                    && !bool.Parse(npc.modData["hapyke.FoodStore/inviteTried"]) && !bool.Parse(npc.modData["hapyke.FoodStore/invited"]))
                 {
                     Random rand = new Random();
                     int heartLevel = Game1.player.getFriendshipHeartLevelForNPC(npc.Name);
@@ -284,7 +285,7 @@ namespace MarketTown
             NpcMap.Clear();
             foreach (NPC npc in Game1.currentLocation.characters)
             {
-                if (npc.isVillager() && !npc.Name.Contains("mt.guest"))
+                if (npc.isVillager() && !npc.Name.Contains("MT.Guest"))
                 {
                     string displayName = npc.displayName;
                     if (NpcMap.ContainsKey(displayName))

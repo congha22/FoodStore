@@ -115,9 +115,10 @@ namespace MarketTown
                 {
                     __instance.Halt();
 
-                    if (Int32.Parse(__instance.modData["hapyke.FoodStore/timeVisitShed"]) <= (Game1.timeOfDay - Config.TimeStay * 2))                 // Force Remove
+
+                    if (Int32.Parse(__instance.modData["hapyke.FoodStore/timeVisitShed"]) <= (Game1.timeOfDay - Config.TimeStay * 2) || Game1.timeOfDay - 100 >= Config.CloseHour)                 // Force Remove
                     {
-                        __instance.currentLocation.characters.Remove(__instance);
+                        Game1.warpCharacter(__instance, __instance.DefaultMap, new Point((int)__instance.DefaultPosition.X / 64, (int)__instance.DefaultPosition.Y / 64));
                     }
                     else if (__instance.modData["hapyke.FoodStore/shedEntry"] != "-1,-1" && __instance.modData["hapyke.FoodStore/shedEntry"] != null)        // Walk to Remove
                     {
@@ -129,11 +130,12 @@ namespace MarketTown
                             shedEntryPoint = new Point(x, y);
                         }
 
-                        __instance.temporaryController = new PathFindController(__instance, __instance.currentLocation, shedEntryPoint, 0, (character, location) => __instance.currentLocation.characters.Remove(__instance));
+                        __instance.temporaryController = new PathFindController(__instance, __instance.currentLocation, shedEntryPoint, 0, 
+                            (character, location) => Game1.warpCharacter(__instance, __instance.DefaultMap, new Point((int)__instance.DefaultPosition.X / 64, (int)__instance.DefaultPosition.Y / 64)));
                     }
                     else
                     {
-                        __instance.currentLocation.characters.Remove(__instance);
+                        Game1.warpCharacter(__instance, __instance.DefaultMap, new Point((int)__instance.DefaultPosition.X / 64, (int)__instance.DefaultPosition.Y / 64));
                     }
 
 
@@ -151,6 +153,7 @@ namespace MarketTown
                         Game1.drawDialogue(__instance, SHelper.Translation.Get("foodstore.visitcome." + index));
                         Game1.globalFadeToBlack();
 
+                        __instance.Halt();
 
                         var door = Game1.getFarm().GetMainFarmHouseEntry();
                         door.X += 3 - index;
@@ -171,7 +174,8 @@ namespace MarketTown
                     {
                         Game1.drawDialogue(__instance, SHelper.Translation.Get("foodstore.visitleave." + index));
                         Game1.globalFadeToBlack();
-
+                        
+                        __instance.Halt();
                         __instance.modData["hapyke.FoodStore/invited"] = "false";
                         __instance.controller = null;
                         __instance.clearSchedule();

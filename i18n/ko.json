@@ -623,13 +623,13 @@
 "foodstore.config.doorentryText": "기본값 True: 방문자는 현관 문 근처에 생성됩니다. 라이선스 표지 위치 근처에 NPC를 생성하려면 False로 설정하십시오.",
 
 "foodstore.config.shedvisitchance": "창고 방문 확률",
-"foodstore.config.shedvisitchanceText": "기본값 0.1. 10분마다 창고에 새로운 방문자의 확률입니다. 0.25 아래로 권장됩니다!",
+"foodstore.config.shedvisitchanceText": "기본값 0.2. 10분마다 창고에 새로운 방문자의 확률입니다. 0.5 아래로 권장됩니다!",
 
 "foodstore.config.maxshedcapacity": "창고 내 최대 방문자 수",
-"foodstore.config.maxshedcapacityText": "기본값 3. 하나의 창고에서의 최대 수용 인원입니다. 극단적인 값은 극단적인 랙을 초래할 수 있습니다. 동시에 모든 창고의 NPC 총 수를 8 미만으로 유지하는 것이 강력히 권장됩니다.",
+"foodstore.config.maxshedcapacityText": "기본값 5. 하나의 창고에서의 최대 수용 인원입니다.",
 
 "foodstore.config.timestay": "NPC 체류 시간",
-"foodstore.config.timestayText": "기본값 100 (1시간과 동일). 200 미만으로 권장됩니다.",
+"foodstore.config.timestayText": "기본값 230 (2.5시간과 동일). 400 미만으로 권장됩니다.",
 
 "foodstore.config.openhour": "오픈 시간",
 "foodstore.config.closehour": "닫는 시간",
@@ -642,7 +642,10 @@
 "foodstore.config.shedminutetohungry": "구매까지의 분",
 "foodstore.config.shedminutetohungryText": "기본값 60. 각 구매 사이의 시간 제한",
 
-"foodstore.shedguestgreeting": "안녕하세요"
+"foodstore.shedguestgreeting": "안녕하세요",
+"foodstore.config.buswalk":                         "버스에서 NPC 걷기",
+"foodstore.config.buswalkText":                     "True로 설정하면 방문자가 버스에서 농장 쪽으로 걸어가기 시작합니다"
+
 
 
 }

@@ -1,0 +1,20 @@
+﻿{
+    "Changes": [
+      {
+        "Action": "EditData",
+        "Target": "Characters/Dialogue/Isaac",
+        "Entries": 
+        {
+
+"Mon": "{{i18n:Isaac.CharacterDialogue.001}}",
+"Tue": "{{i18n:Isaac.CharacterDialogue.002}}",
+"Wed": "{{i18n:Isaac.CharacterDialogue.003}}",
+"Sat": "{{i18n:Isaac.CharacterDialogue.004}}",
+
+//Self doubt can poison even the strongest of men.$0
+//An adventurer's resolve is put to the test out in the field...$3
+//Death is everyon's destiny. I will decide it for myself.$0
+},
+      },
+    ]
+}

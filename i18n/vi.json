@@ -622,13 +622,13 @@
 "foodstore.config.doorentryText": "Mặc định là True: Khách thăm sẽ xuất hiện gần Cửa vào. Đặt là False để NPC xuất hiện gần vị trí Bảng giấy phép.",
 
 "foodstore.config.shedvisitchance": "Cơ hội thăm Kho",
-"foodstore.config.shedvisitchanceText": "Mặc định là 0.1. Cơ hội cho khách thăm mới trong Kho mỗi 10 phút. Khuyến nghị dưới 0.25!",
+"foodstore.config.shedvisitchanceText": "Mặc định là 0.2. Cơ hội cho khách thăm mới trong Kho mỗi 10 phút. Khuyến nghị dưới 0.5!",
 
 "foodstore.config.maxshedcapacity": "Số lượng khách tối đa trong Kho",
-"foodstore.config.maxshedcapacityText": "Mặc định là 3. Sức chứa tối đa trong một Kho. Giá trị cực kỳ cao có thể gây lag cực kỳ. Nên giữ tổng số NPC từ TẤT CẢ Kho cùng một lúc dưới 8 là lời khuyên lớn.",
+"foodstore.config.maxshedcapacityText": "Mặc định là 5. Sức chứa tối đa trong một Kho.",
 
 "foodstore.config.timestay": "NPC ở lại bao lâu?",
-"foodstore.config.timestayText": "Mặc định là 100 (tương đương 1 giờ). Khuyến nghị dưới 200",
+"foodstore.config.timestayText": "Mặc định là 230 (tương đương 2.5 giờ). Khuyến nghị dưới 400",
 
 "foodstore.config.openhour": "Giờ mở cửa",
 "foodstore.config.closehour": "Giờ đóng cửa",
@@ -641,7 +641,10 @@
 "foodstore.config.shedminutetohungry": "Phút để mua",
 "foodstore.config.shedminutetohungryText": "Mặc định là 60. Thời gian giới hạn giữa mỗi lần mua",
 
-"foodstore.shedguestgreeting": "Xin chào"
+"foodstore.shedguestgreeting": "Xin chào",
+"foodstore.config.buswalk":                         "NPC đi bộ từ Xe Bus",
+"foodstore.config.buswalkText":                     "Khi đặt là Đúng, khách thăm sẽ bắt đầu đi bộ từ Xe Bus về phía Nông trại của bạn"
+
 
 
 }

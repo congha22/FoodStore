@@ -729,13 +729,13 @@
   "foodstore.config.doorentryText":                   "Default True: Visitor will spawn near Entry Door. Set to False for NPC to spawn near License Sign location",
 
   "foodstore.config.shedvisitchance":                 "Chance for Shed visit",
-  "foodstore.config.shedvisitchanceText":             "Default 0.1. Chance for new visitor in Shed every 10 minutes. Recommened below 0.25!",
+  "foodstore.config.shedvisitchanceText":             "Default 0.2. Chance for new visitor in Shed every 10 minutes. Recommened below 0.5!",
 
   "foodstore.config.maxshedcapacity":                 "Maximum visitors in Shed",
-  "foodstore.config.maxshedcapacityText":             "Default 3. Max capacity in one Shed. Extreme value can cause extreme lag. Greatly recommended to keep total number of NPCs from ALL Shed at the same time below 8",
+  "foodstore.config.maxshedcapacityText":             "Default 5. Max capacity in one Shed.",
 
   "foodstore.config.timestay":                        "How long NPC stay?",
-  "foodstore.config.timestayText":                    "Default 100 (equal 1 hour). Recommended below 200",
+  "foodstore.config.timestayText":                    "Default 230 (equal 2.5 hour). Recommended below 400 (3 hours)",
 
   "foodstore.config.openhour":                        "Open hour",
   "foodstore.config.closehour":                       "Close hour",
@@ -746,9 +746,12 @@
   "foodstore.config.shedbuychanceText":               "Default 0.2. Chance Visitor will buy item inside Shed",
 
   "foodstore.config.shedminutetohungry":              "Minute to buy",
-  "foodstore.config.shedminutetohungryText":          "Default 60. Time limit between each purchase",
+  "foodstore.config.shedminutetohungryText":          "Default 90. Time limit between each purchase",
 
-  "foodstore.shedguestgreeting":                      "Hello"
+  "foodstore.shedguestgreeting":                      "Hello",
+
+  "foodstore.config.buswalk":                         "NPC walk from Bus",
+  "foodstore.config.buswalkText":                     "When set to True, visitors will start walking out of the Bus toward you Farm"
 
 
 

@@ -622,13 +622,13 @@
 "foodstore.config.doorentryText": "デフォルトはTrue：訪問者は入り口の近くに生成されます。NPCをライセンスサインの場所の近くに生成するにはFalseに設定します",
 
 "foodstore.config.shedvisitchance": "倉庫訪問のチャンス",
-"foodstore.config.shedvisitchanceText": "デフォルトは0.1。10分ごとに倉庫に新しい訪問者が現れる確率。0.25未満がお勧めです！",
+"foodstore.config.shedvisitchanceText": "デフォルトは0.25。10分ごとに倉庫に新しい訪問者が現れる確率。0.5未満がお勧めです！",
 
 "foodstore.config.maxshedcapacity": "倉庫の最大訪問者数",
-"foodstore.config.maxshedcapacityText": "デフォルトは3。1つの倉庫の最大収容人数。極端な値は極端なラグを引き起こす可能性があります。同時にすべての倉庫のNPCの総数を8未満に保つことが強く推奨されています",
+"foodstore.config.maxshedcapacityText": "デフォルトは5。1つの倉庫の最大収容人数。",
 
 "foodstore.config.timestay": "NPCの滞在時間は？",
-"foodstore.config.timestayText": "デフォルトは100（1時間と同等）。200未満がお勧めです",
+"foodstore.config.timestayText": "デフォルトは230（2.5時間と同等）。400未満がお勧めです",
 
 "foodstore.config.openhour": "開店時間",
 "foodstore.config.closehour": "閉店時間",
@@ -641,7 +641,10 @@
 "foodstore.config.shedminutetohungry": "購入までの分数",
 "foodstore.config.shedminutetohungryText": "デフォルトは60。各購入の間の制限時間",
 
-"foodstore.shedguestgreeting": "こんにちは"
+"foodstore.shedguestgreeting": "こんにちは",
+"foodstore.config.buswalk":                         "NPCがバスから歩く",
+"foodstore.config.buswalkText":                     "Trueに設定すると、訪問者はバスから歩いてあなたのファームに向かいます"
+
 
 
 

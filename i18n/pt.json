@@ -622,13 +622,13 @@
 "foodstore.config.doorentryText": "Padrão True: O visitante aparecerá perto da porta de entrada. Defina como Falso para que o NPC apareça perto da localização da Placa de Licença",
 
 "foodstore.config.shedvisitchance": "Chance de visita ao galpão",
-"foodstore.config.shedvisitchanceText": "Padrão 0.1. Chance de novo visitante no galpão a cada 10 minutos. Recomendado abaixo de 0.25!",
+"foodstore.config.shedvisitchanceText": "Padrão 0.2. Chance de novo visitante no galpão a cada 10 minutos. Recomendado abaixo de 0.5!",
 
 "foodstore.config.maxshedcapacity": "Visitantes máximos no galpão",
-"foodstore.config.maxshedcapacityText": "Padrão 3. Capacidade máxima em um galpão. Valor extremo pode causar lag extremo. Altamente recomendado manter o número total de NPCs de TODOS os galpões ao mesmo tempo abaixo de 8",
+"foodstore.config.maxshedcapacityText": "Padrão 5. Capacidade máxima em um galpão.",
 
 "foodstore.config.timestay": "Quanto tempo o NPC fica?",
-"foodstore.config.timestayText": "Padrão 100 (equivalente a 1 hora). Recomendado abaixo de 200",
+"foodstore.config.timestayText": "Padrão 230 (equivalente a 2.5 hora). Recomendado abaixo de 400",
 
 "foodstore.config.openhour": "Hora de abertura",
 "foodstore.config.closehour": "Hora de fechamento",
@@ -641,7 +641,10 @@
 "foodstore.config.shedminutetohungry": "Minutos para comprar",
 "foodstore.config.shedminutetohungryText": "Padrão 60. Limite de tempo entre cada compra",
 
-"foodstore.shedguestgreeting": "Olá"
+"foodstore.shedguestgreeting": "Olá",
+"foodstore.config.buswalk":                         "NPC caminha do ônibus",
+"foodstore.config.buswalkText":                     "Quando definido como True, os visitantes começarão a caminhar do ônibus em direção à sua fazenda"
+
 
 
 }
