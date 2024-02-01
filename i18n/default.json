@@ -751,8 +751,24 @@
   "foodstore.shedguestgreeting":                      "Hello",
 
   "foodstore.config.buswalk":                         "NPC walk from Bus",
-  "foodstore.config.buswalkText":                     "When set to True, visitors will start walking out of the Bus toward you Farm"
+  "foodstore.config.buswalkText":                     "When set to True, visitors will start walking out of the Bus toward you Farm",
 
+  "foodstore.config.modkey":                          "Show Dish name key",
+  "foodstore.config.orderchance":                     "Chance for new order / s",
+  "foodstore.config.lovedishchance":                  "Chance of loved dish",
+  "foodstore.config.pricemultiplier":                 "Price multiplier",
+  "foodstore.config.maxordernight":                   "Max order per NPC per day",
 
+  "loved-order-reaction-1":                           "Thank you, this looks delicious!",
+  "loved-order-reaction-2":                           "Thank you!",
+  "loved-order-reaction-3":                           "Exactly what I wanted, thank you!",
+
+  "liked-order-reaction-1":                           "Thanks, this looks good!",
+  "liked-order-reaction-2":                           "Thanks!",
+  "liked-order-reaction-3":                           "Just what I ordered, thanks!",
+
+  "neutral-order-reaction-1":                         "Oh, OK!",
+  "neutral-order-reaction-2":                         "Alright",
+  "neutral-order-reaction-3":                         "Cool!"
 
 }

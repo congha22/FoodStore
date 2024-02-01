@@ -35,6 +35,10 @@ using SpaceShared;
 using SpaceShared.APIs;
 using MarketTown.Framework;
 using static StardewValley.Minigames.TargetGame;
+using StardewModdingAPI.Utilities;
+using xTile.ObjectModel;
+using System.Text.RegularExpressions;
+using xTile;
 
 namespace MarketTown
 {
@@ -50,6 +54,16 @@ namespace MarketTown
         public static ModConfig Config;
 
         public static ModEntry context;
+
+        public static string orderKey = "aedenthorn.Restauranteer/order";
+        public static string fridgeKey = "aedenthorn.Restauranteer/fridge";
+        public static Texture2D emoteSprite;
+        public static Vector2 fridgeHideTile = new Vector2(-42000, -42000);
+        public static PerScreen<Dictionary<string, int>> npcOrderNumbers = new PerScreen<Dictionary<string, int>>();
+        public static Dictionary<string, NetRef<Chest>> fridgeDict = new();
+
+        private Harmony harmony;
+
 
         internal static List<Response> ResponseList { get; private set; } = new();
         internal static List<Response> KidResponseList { get; private set; } = new();
@@ -77,6 +91,9 @@ namespace MarketTown
         /// <param name="helper">Provides simplified APIs for writing mods.</param>
         public override void Entry(IModHelper helper)
         {
+
+            npcOrderNumbers.Value = new Dictionary<string, int>();
+
             Config = Helper.ReadConfig<ModConfig>();
 
             context = this;
@@ -90,6 +107,9 @@ namespace MarketTown
             helper.Events.GameLoop.UpdateTicked += GameLoop_UpdateTicked;
             helper.Events.GameLoop.TimeChanged += this.OnTimeChange;
             helper.Events.GameLoop.DayEnding += GameLoop_DayEnding;
+            Helper.Events.GameLoop.DayStarted += GameLoop_DayStarted;
+
+            Helper.Events.GameLoop.OneSecondUpdateTicked += GameLoop_OneSecondUpdateTicked;
 
             helper.Events.GameLoop.GameLaunched += this.OnGameLaunched;
             helper.Events.Display.MenuChanged += this.OnMenuChanged;
@@ -137,11 +157,28 @@ namespace MarketTown
             helper.Events.GameLoop.Saving += (s, e) => makePlaceholderObjects();
             helper.Events.GameLoop.Saved += (s, e) => restorePlaceholderObjects();
             helper.Events.GameLoop.SaveLoaded += (s, e) => restorePlaceholderObjects();
+
+            harmony.PatchAll();
         }
 
         //
         // ***************************  END OF ENTRY ***************************
         //
+
+        private void GameLoop_DayStarted(object sender, StardewModdingAPI.Events.DayStartedEventArgs e)
+        {
+            fridgeDict.Clear();
+            npcOrderNumbers.Value.Clear();
+            emoteSprite = SHelper.ModContent.Load<Texture2D>(Path.Combine("Assets", "emote.png"));
+        }
+
+        private void GameLoop_OneSecondUpdateTicked(object sender, StardewModdingAPI.Events.OneSecondUpdateTickedEventArgs e)
+        {
+            if (Config.EnableMod && Context.IsPlayerFree && Config.RestaurantLocations.Contains(Game1.player.currentLocation.Name))
+            {
+                UpdateOrders();
+            }
+        }
 
         private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
         {
@@ -579,6 +616,37 @@ namespace MarketTown
                 setValue: delegate (string value) { try { Config.CloseHour = Int32.Parse(value, CultureInfo.InvariantCulture); } catch { } }
             );
 
+
+            configMenu.AddKeybind(
+                mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.modkey"),
+                getValue: () => Config.ModKey,
+                setValue: value => Config.ModKey = value
+            );
+            configMenu.AddTextOption(
+                mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.orderchance"),
+                getValue: () => "" + Config.OrderChance,
+                setValue: delegate (string value) { try { Config.OrderChance = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
+            );
+            configMenu.AddTextOption(
+                mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.lovedishchance"),
+                getValue: () => "" + Config.LovedDishChance,
+                setValue: delegate (string value) { try { Config.LovedDishChance = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
+            );
+            configMenu.AddTextOption(
+                mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.pricemultiplier"),
+                getValue: () => "" + Config.PriceMarkup,
+                setValue: delegate (string value) { try { Config.PriceMarkup = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
+            );
+            configMenu.AddTextOption(
+                mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.maxordernight"),
+                getValue: () => "" + Config.MaxNPCOrdersPerNight,
+                setValue: delegate (string value) { try { Config.MaxNPCOrdersPerNight = Int32.Parse(value, CultureInfo.InvariantCulture); } catch { } }
+            );
 
             //Dialogue setting
             configMenu.AddPage(mod: ModManifest, "dialogue", () => SHelper.Translation.Get("foodstore.config.dialogue"));
@@ -1669,7 +1737,7 @@ namespace MarketTown
                                     {
                                         Vector2 randomClearTile = clearTiles[Game1.random.Next(clearTiles.Count)];
 
-                                        if (Game1.player.currentLocation.Name == "BusStop" && Config.BusWalk)
+                                        if (Game1.player.currentLocation.Name == "BusStop" && Config.BusWalk && Game1.MasterPlayer.mailReceived.Contains("ccVault"))
                                         {
                                             Game1.warpCharacter(visit, "BusStop", new Point(13, 11));
                                             visit.isCharging = true;
@@ -1683,7 +1751,7 @@ namespace MarketTown
                                     }
                                     else
                                     {
-                                        if (Game1.player.currentLocation.Name == "BusStop" && Config.BusWalk)
+                                        if (Game1.player.currentLocation.Name == "BusStop" && Config.BusWalk && Game1.MasterPlayer.mailReceived.Contains("ccVault"))
                                         {
                                             Game1.warpCharacter(visit, "BusStop", new Point(13, 11));
                                             visit.isCharging = true;
@@ -1713,7 +1781,7 @@ namespace MarketTown
                                     {
                                         Vector2 randomClearTile = clearTiles[Game1.random.Next(clearTiles.Count)];
 
-                                        if (Game1.player.currentLocation.Name == "BusStop" && Config.BusWalk)
+                                        if (Game1.player.currentLocation.Name == "BusStop" && Config.BusWalk && Game1.MasterPlayer.mailReceived.Contains("ccVault"))
                                         {
                                             Game1.warpCharacter(visit, "BusStop", new Point(13, 11));
                                             visit.isCharging = true;
@@ -1727,7 +1795,7 @@ namespace MarketTown
                                     else
                                     {
 
-                                        if (Game1.player.currentLocation.Name == "BusStop" && Config.BusWalk)
+                                        if (Game1.player.currentLocation.Name == "BusStop" && Config.BusWalk && Game1.MasterPlayer.mailReceived.Contains("ccVault"))
                                         {
                                             Game1.warpCharacter(visit, "BusStop", new Point(13, 11));
                                             visit.isCharging = true;
@@ -1758,7 +1826,7 @@ namespace MarketTown
                                     {
                                         Vector2 randomClearTile = clearTiles[Game1.random.Next(clearTiles.Count)];
 
-                                        if (Game1.player.currentLocation.Name == "BusStop" && Config.BusWalk)
+                                        if (Game1.player.currentLocation.Name == "BusStop" && Config.BusWalk && Game1.MasterPlayer.mailReceived.Contains("ccVault"))
                                         {
                                             Game1.warpCharacter(visit, "BusStop", new Point(13, 11));
                                             visit.isCharging = true;
@@ -1772,7 +1840,7 @@ namespace MarketTown
                                     }
                                     else
                                     {
-                                        if (Game1.player.currentLocation.Name == "BusStop" && Config.BusWalk)
+                                        if (Game1.player.currentLocation.Name == "BusStop" && Config.BusWalk && Game1.MasterPlayer.mailReceived.Contains("ccVault"))
                                         {
                                             Game1.warpCharacter(visit, "BusStop", new Point(13, 11));
                                             visit.isCharging = true;

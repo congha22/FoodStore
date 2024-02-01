@@ -1,4 +1,5 @@
 ﻿using StardewModdingAPI;
+using System.Collections.Generic;
 
 namespace MarketTown
 {
@@ -54,5 +55,15 @@ namespace MarketTown
 
 
         public bool BusWalk { get; set; } = true;
+
+        public SButton ModKey { get; set; } = SButton.LeftAlt;
+        public int MaxNPCOrdersPerNight { get; set; } = 3;
+        public float PriceMarkup { get; set; } = 1f;
+        public float OrderChance { get; set; } = 0.01f;
+        public float LovedDishChance { get; set; } = 0.7f;
+        public List<string> RestaurantLocations { get; set; } = new List<string>()
+        {
+            "Shed"
+        };
     }
 }
