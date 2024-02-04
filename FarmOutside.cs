@@ -43,9 +43,13 @@ namespace MarketTown
             {
                 foreach (NPC who in Game1.getLocationFromName("BusStop").characters)
                 {
-                    if (who.Name.Contains("MT.Guest_"))
+                    if (who.Name.Contains("MT.Guest_") && who.getTileLocation() != who.DefaultPosition / 64)
                     {
-                        Game1.warpCharacter(who, who.DefaultMap, new Point((int)who.DefaultPosition.X / 64, (int)who.DefaultPosition.Y / 64));
+                        who.Halt();
+                        who.temporaryController = null;
+                        who.controller = null;
+                        who.clearSchedule();
+                        Game1.warpCharacter(who, who.DefaultMap, who.DefaultPosition / 64);
                     }
                 }
             }
@@ -112,36 +116,30 @@ namespace MarketTown
             }
         }
 
-        internal static void WalkAroundFarm(string who)
+        internal static void WalkAround(string who)
         {
             var c = Game1.getCharacterFromName(who);
-
-            var gameLocation = Game1.getFarm();
-            var newspot = getRandomOpenPointInFarm(gameLocation, Game1.random);
-
-            try
-            {
-                c.PathToOnFarm(newspot);
-
-            }
-            catch { }
-        }
-
-        internal static void WalkAroundHouse(string who)
-        {
-            var c = Game1.getCharacterFromName(who);
+            if (c == null) return;
 
             var newspot = getRandomOpenPointInFarm(c.currentLocation, Game1.random);
 
             try
             {
-                c.PathToOnFarm(newspot);
+                c.controller = null;
+                c.isCharging = true;
+
+                c.controller = new PathFindController(
+                    c,
+                    c.currentLocation,
+                    newspot,
+                    Game1.random.Next(0, 4)
+                    );
             }
-            catch
-            { }
+            catch { }
         }
 
-        internal static Point getRandomOpenPointInFarm(GameLocation location, Random r, int tries = 30, int maxDistance = 10)
+
+        internal static Point getRandomOpenPointInFarm(GameLocation location, Random r, int tries = 7, int maxDistance = 10)
         {
             foreach (NPC who in Utility.getAllCharacters())
             {
@@ -156,7 +154,7 @@ namespace MarketTown
                     for (int i = 0; i < tries; i++)
                     {
                         //we get random position using width and height of map
-                        zero = new Point(r.Next(map.Layers[0].LayerWidth), r.Next(map.Layers[0].LayerHeight));
+                        zero = new Point(r.Next(1, map.Layers[0].LayerWidth - 1), r.Next(1, map.Layers[0].LayerHeight - 1));
 
                         bool isFloorValid = location.isTileOnMap(zero.ToVector2()) && location.isTilePassable(new xTile.Dimensions.Location(zero.X, zero.Y), Game1.viewport) && !location.isWaterTile(zero.X, zero.Y);
                         bool IsBehindTree = location.isBehindTree(zero.ToVector2());

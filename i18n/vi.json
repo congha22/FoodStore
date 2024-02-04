@@ -643,7 +643,28 @@
 
 "foodstore.shedguestgreeting": "Xin chào",
 "foodstore.config.buswalk":                         "NPC đi bộ từ Xe Bus",
-"foodstore.config.buswalkText":                     "Khi đặt là Đúng, khách thăm sẽ bắt đầu đi bộ từ Xe Bus về phía Nông trại của bạn"
+"foodstore.config.buswalkText":                     "Khi đặt là Đúng, khách thăm sẽ bắt đầu đi bộ từ Xe Bus về phía Nông trại của bạn",
+
+"foodstore.config.modkey":                          "Hiển thị khóa tên món ăn",
+"foodstore.config.orderchance":                     "Cơ hội đơn đặt hàng mới / giây",
+"foodstore.config.lovedishchance":                  "Cơ hội món ăn yêu thích",
+"foodstore.config.pricemultiplier":                 "Hệ số giá",
+"foodstore.config.maxordernight":                   "Số đơn hàng tối đa cho mỗi NPC mỗi ngày",
+
+"foodstore.config.kidaskchance":                    "Cơ hội hàng ngày cho trẻ em yêu cầu chơi",
+
+"loved-order-reaction-1":                           "Cảm ơn, món này trông ngon quá!",
+"loved-order-reaction-2":                           "Cảm ơn!",
+"loved-order-reaction-3":                           "Đúng như tôi muốn, cảm ơn!",
+
+"liked-order-reaction-1":                           "Cảm ơn, món này trông ngon!",
+"liked-order-reaction-2":                           "Cảm ơn!",
+"liked-order-reaction-3":                           "Đúng như tôi đặt, cảm ơn!",
+
+"neutral-order-reaction-1":                         "Ồ, vậy à!",
+"neutral-order-reaction-2":                         "Được rồi",
+"neutral-order-reaction-3":                         "Hay đấy!"
+
 
 
 

@@ -759,6 +759,8 @@
   "foodstore.config.pricemultiplier":                 "Price multiplier",
   "foodstore.config.maxordernight":                   "Max order per NPC per day",
 
+  "foodstore.config.kidaskchance":                    "Daily chance kid ask to play",
+
   "loved-order-reaction-1":                           "Thank you, this looks delicious!",
   "loved-order-reaction-2":                           "Thank you!",
   "loved-order-reaction-3":                           "Exactly what I wanted, thank you!",

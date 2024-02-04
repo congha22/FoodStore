@@ -18,7 +18,6 @@ namespace MarketTown
         {
             foreach (var c in Game1.player.currentLocation.characters)
             {
-
                 if (c.isVillager())
                 {
                     CheckOrder(c, Game1.player.currentLocation);
@@ -43,7 +42,6 @@ namespace MarketTown
                 return;
             if (rand.NextDouble() < Config.OrderChance)
             {
-                //Game1.chatBox.addInfoMessage(Config.OrderChance.ToString());
                 StartOrder(npc, location);
             }
         }
@@ -73,6 +71,7 @@ namespace MarketTown
                     loves.Add(int.Parse(str));
                 }
             }
+
             List<int> likes = new();
             foreach (var str in Game1.NPCGiftTastes["Universal_Like"].Split(' '))
             {
@@ -97,7 +96,7 @@ namespace MarketTown
                     neutral.Add(int.Parse(str));
                 }
             }
-            foreach (var str in Game1.NPCGiftTastes[npc.Name].Split('/')[3].Split(' '))
+            foreach (var str in Game1.NPCGiftTastes[npc.Name].Split('/')[9].Split(' '))
             {
                 if (int.TryParse(str, out int i) && Game1.objectInformation.TryGetValue(i, out string data) && CraftingRecipe.cookingRecipes.ContainsKey(data.Split('/')[0]))
                 {
@@ -106,28 +105,32 @@ namespace MarketTown
             }
             Random rand = new Random();
 
-            if (!loves.Any() && !likes.Any())
-                return;
             string loved = "neutral";
-            int dish;
-            if (loves.Any() && (!likes.Any() || (rand.NextDouble() < Config.LovedDishChance)))
+            int dish = 216;
+
+            if (!loves.Any() && !likes.Any() && !neutral.Any())
+                return;
+            try
             {
-                loved = "love";
-                dish = loves[Game1.random.Next(loves.Count)];
-            }
-            else
-            {
-                if (rand.NextDouble() < 0.7)
+                if (!likes.Any() && !neutral.Any() && loved.Any() || loved.Any() && rand.NextDouble() < Config.LovedDishChance)
                 {
-                    loved = "like";
-                    dish = likes[Game1.random.Next(likes.Count)];
+                    loved = "love";
+                    dish = loves[rand.Next(loves.Count)];
                 }
                 else
                 {
-                    loved = "neutral";
-                    dish = neutral[Game1.random.Next(neutral.Count)];
+                    if (rand.NextDouble() < 0.0 && likes.Any())
+                    {
+                        loved = "like";
+                        dish = likes[rand.Next(likes.Count)];
+                    }
+                    else if (neutral.Any())
+                    {
+                        loved = "neutral";
+                        dish = neutral[rand.Next(neutral.Count)];
+                    }
                 }
-            }
+            } catch { }
             var name = Game1.objectInformation[dish].Split('/')[0];
             int price = 0;
             int.TryParse(Game1.objectInformation[dish].Split('/')[1], out price);

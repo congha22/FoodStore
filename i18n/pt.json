@@ -643,7 +643,28 @@
 
 "foodstore.shedguestgreeting": "Olá",
 "foodstore.config.buswalk":                         "NPC caminha do ônibus",
-"foodstore.config.buswalkText":                     "Quando definido como True, os visitantes começarão a caminhar do ônibus em direção à sua fazenda"
+"foodstore.config.buswalkText":                     "Quando definido como True, os visitantes começarão a caminhar do ônibus em direção à sua fazenda",
+
+"foodstore.config.modkey":                          "Mostrar chave do nome do prato",
+"foodstore.config.orderchance":                     "Chance de novo pedido / s",
+"foodstore.config.lovedishchance":                  "Chance de prato favorito",
+"foodstore.config.pricemultiplier":                 "Multiplicador de preço",
+"foodstore.config.maxordernight":                   "Máximo de pedidos por NPC por dia",
+
+"foodstore.config.kidaskchance":                    "Chance diária de criança pedir para brincar",
+
+"loved-order-reaction-1":                           "Obrigado, isso parece delicioso!",
+"loved-order-reaction-2":                           "Obrigado!",
+"loved-order-reaction-3":                           "Exatamente o que eu queria, obrigado!",
+
+"liked-order-reaction-1":                           "Obrigado, isso parece bom!",
+"liked-order-reaction-2":                           "Obrigado!",
+"liked-order-reaction-3":                           "Exatamente o que pedi, obrigado!",
+
+"neutral-order-reaction-1":                         "Ah, OK!",
+"neutral-order-reaction-2":                         "Tudo bem",
+"neutral-order-reaction-3":                         "Legal!"
+
 
 
 

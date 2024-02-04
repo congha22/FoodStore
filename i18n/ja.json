@@ -643,7 +643,28 @@
 
 "foodstore.shedguestgreeting": "こんにちは",
 "foodstore.config.buswalk":                         "NPCがバスから歩く",
-"foodstore.config.buswalkText":                     "Trueに設定すると、訪問者はバスから歩いてあなたのファームに向かいます"
+"foodstore.config.buswalkText":                     "Trueに設定すると、訪問者はバスから歩いてあなたのファームに向かいます",
+
+"foodstore.config.modkey":                          "料理名キーを表示",
+"foodstore.config.orderchance":                     "新しい注文の確率 / 秒",
+"foodstore.config.lovedishchance":                  "好きな料理の確率",
+"foodstore.config.pricemultiplier":                 "価格の倍率",
+"foodstore.config.maxordernight":                   "1日あたりのNPCごとの最大注文数",
+
+"foodstore.config.kidaskchance":                    "子供が遊びに誘う日次の確率",
+
+"loved-order-reaction-1":                           "ありがとう、これは美味しそうです！",
+"loved-order-reaction-2":                           "ありがとう！",
+"loved-order-reaction-3":                           "これが欲しかった、ありがとう！",
+
+"liked-order-reaction-1":                           "ありがとう、これは良さそうです！",
+"liked-order-reaction-2":                           "ありがとう！",
+"liked-order-reaction-3":                           "注文した通り、ありがとう！",
+
+"neutral-order-reaction-1":                         "ああ、わかった！",
+"neutral-order-reaction-2":                         "わかった",
+"neutral-order-reaction-3":                         "いいね！"
+
 
 
 

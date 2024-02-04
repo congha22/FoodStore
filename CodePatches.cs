@@ -123,7 +123,7 @@ namespace MarketTown
 
                     if (Int32.Parse(__instance.modData["hapyke.FoodStore/timeVisitShed"]) <= (Game1.timeOfDay - Config.TimeStay * 2) || Game1.timeOfDay - 100 >= Config.CloseHour)                 // Force Remove
                     {
-                        Game1.warpCharacter(__instance, __instance.DefaultMap, new Point((int)__instance.DefaultPosition.X / 64, (int)__instance.DefaultPosition.Y / 64));
+                        Game1.warpCharacter(__instance, __instance.DefaultMap, __instance.DefaultPosition / 64);
                     }
                     else if (__instance.modData["hapyke.FoodStore/shedEntry"] != "-1,-1" && __instance.modData["hapyke.FoodStore/shedEntry"] != null)        // Walk to Remove
                     {
@@ -136,14 +136,9 @@ namespace MarketTown
                         }
 
                         __instance.temporaryController = new PathFindController(__instance, __instance.currentLocation, shedEntryPoint, 0, 
-                            (character, location) => Game1.warpCharacter(__instance, __instance.DefaultMap, new Point((int)__instance.DefaultPosition.X / 64, (int)__instance.DefaultPosition.Y / 64)));
+                            (character, location) => Game1.warpCharacter(__instance, __instance.DefaultMap, __instance.DefaultPosition / 64));
                     }
-                    else
-                    {
-                        Game1.warpCharacter(__instance, __instance.DefaultMap, new Point((int)__instance.DefaultPosition.X / 64, (int)__instance.DefaultPosition.Y / 64));
-                    }
-
-
+                    else Game1.warpCharacter(__instance, __instance.DefaultMap, __instance.DefaultPosition / 64);
                 }
             } catch { }
 
@@ -185,7 +180,7 @@ namespace MarketTown
                         __instance.controller = null;
                         __instance.clearSchedule();
                         __instance.ignoreScheduleToday = true;
-                        Game1.warpCharacter(__instance, __instance.DefaultMap, new Point((int)__instance.DefaultPosition.X / 64, (int)__instance.DefaultPosition.Y / 64));
+                        Game1.warpCharacter(__instance, __instance.DefaultMap, __instance.DefaultPosition / 64);
                     }
                 }
             }
@@ -296,13 +291,16 @@ namespace MarketTown
             if (!Config.EnableMod || Game1.eventUp || __instance.currentLocation is null || !__instance.isVillager() || !WantsToEat(__instance))
                 return;
 
-            if (__instance.getTileLocation().X >= (__instance.currentLocation.Map.DisplayWidth / 64) + 20 ||
-                __instance.getTileLocation().Y >= (__instance.currentLocation.Map.DisplayHeight / 64) + 20 ||
-                __instance.getTileLocation().X <= -20 ||
-                (__instance.getTileLocation().Y <= -20 &&
-                !__instance.IsReturningToEndPoint())
+            if (__instance.getTileLocation().X >= __instance.currentLocation.Map.Layers[0].LayerWidth - 1
+                || __instance.getTileLocation().Y >= __instance.currentLocation.Map.Layers[0].LayerHeight - 1
+                || __instance.getTileLocation().X <= 1
+                || __instance.getTileLocation().Y <= 1
+                && !__instance.IsReturningToEndPoint()
+                && __instance.getTileLocation() != __instance.DefaultPosition / 64
                 )
             {
+                __instance.isCharging = true;
+                __instance.addedSpeed = 1;
                 __instance.returnToEndPoint();
                 __instance.MovePosition(Game1.currentGameTime, Game1.viewport, __instance.currentLocation);
             }
@@ -478,8 +476,7 @@ namespace MarketTown
             }
         }
 
-
-        // /////////////////////////////////////
+        // NPC order part 
 
         [HarmonyPatch(typeof(NPC), nameof(NPC.draw))]
         public class NPC_draw_Patch
@@ -562,7 +559,6 @@ namespace MarketTown
                 OrderData orderData = JsonConvert.DeserializeObject<OrderData>(data);
                 if (who.ActiveObject?.ParentSheetIndex == orderData.dish)
                 {
-                    SMonitor.Log($"Fulfilling {__instance.Name}'s order of {orderData.dishName}");
                     if (!npcOrderNumbers.Value.ContainsKey(__instance.Name))
                     {
                         npcOrderNumbers.Value[__instance.Name] = 1;
@@ -572,59 +568,23 @@ namespace MarketTown
                         npcOrderNumbers.Value[__instance.Name]++;
                     }
                     List<string> possibleReactions = new();
-                    int count = 0;
-                    string prefix = "RestauranteerMod-";
-                    var dict = SHelper.GameContent.Load<Dictionary<string, string>>($"Characters/Dialogue/{__instance.Name}");
                     if (orderData.loved == "love")
                     {
-                        if (dict is not null && dict.TryGetValue($"{prefix}Loved-{++count}", out string r))
-                        {
-                            possibleReactions.Add(r);
-                            while (dict.TryGetValue($"{prefix}Loved-{++count}", out r))
-                            {
-                                possibleReactions.Add(r);
-                            }
-                        }
-                        else
-                        {
-                            possibleReactions.Add(SHelper.Translation.Get("loved-order-reaction-1"));
-                            possibleReactions.Add(SHelper.Translation.Get("loved-order-reaction-2"));
-                            possibleReactions.Add(SHelper.Translation.Get("loved-order-reaction-3"));
-                        }
+                        possibleReactions.Add(SHelper.Translation.Get("loved-order-reaction-1"));
+                        possibleReactions.Add(SHelper.Translation.Get("loved-order-reaction-2"));
+                        possibleReactions.Add(SHelper.Translation.Get("loved-order-reaction-3"));
                     }
                     else if (orderData.loved == "like")
                     {
-                        if (dict is not null && dict.TryGetValue($"{prefix}Liked-{++count}", out string r))
-                        {
-                            possibleReactions.Add(r);
-                            while (dict.TryGetValue($"{prefix}Liked-{++count}", out r))
-                            {
-                                possibleReactions.Add(r);
-                            }
-                        }
-                        else
-                        {
-                            possibleReactions.Add(SHelper.Translation.Get("liked-order-reaction-1"));
-                            possibleReactions.Add(SHelper.Translation.Get("liked-order-reaction-2"));
-                            possibleReactions.Add(SHelper.Translation.Get("liked-order-reaction-3"));
-                        }
+                        possibleReactions.Add(SHelper.Translation.Get("liked-order-reaction-1"));
+                        possibleReactions.Add(SHelper.Translation.Get("liked-order-reaction-2"));
+                        possibleReactions.Add(SHelper.Translation.Get("liked-order-reaction-3"));
                     }
                     else
                     {
-                        if (dict is not null && dict.TryGetValue($"{prefix}Neutral-{++count}", out string r))
-                        {
-                            possibleReactions.Add(r);
-                            while (dict.TryGetValue($"{prefix}Neutral-{++count}", out r))
-                            {
-                                possibleReactions.Add(r);
-                            }
-                        }
-                        else
-                        {
-                            possibleReactions.Add(SHelper.Translation.Get("neutral-order-reaction-1"));
-                            possibleReactions.Add(SHelper.Translation.Get("neutral-order-reaction-2"));
-                            possibleReactions.Add(SHelper.Translation.Get("neutral-order-reaction-3"));
-                        }
+                        possibleReactions.Add(SHelper.Translation.Get("neutral-order-reaction-1"));
+                        possibleReactions.Add(SHelper.Translation.Get("neutral-order-reaction-2"));
+                        possibleReactions.Add(SHelper.Translation.Get("neutral-order-reaction-3"));
                     }
                     string reaction = possibleReactions[Game1.random.Next(possibleReactions.Count)];
 
@@ -647,8 +607,7 @@ namespace MarketTown
                     if (Config.PriceMarkup > 0)
                     {
                         int price = (int)Math.Round(who.ActiveObject.Price * Config.PriceMarkup);
-                        who.Money += price;
-                        SMonitor.Log($"Received {price} coins for order");
+                        Game1.player.Money += price;
                     }
 
                     who.reduceActiveItemByOne();
@@ -661,6 +620,5 @@ namespace MarketTown
                 return true;
             }
         }
-
     }
 }

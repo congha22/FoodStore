@@ -644,7 +644,28 @@
 
 "foodstore.shedguestgreeting": "안녕하세요",
 "foodstore.config.buswalk":                         "버스에서 NPC 걷기",
-"foodstore.config.buswalkText":                     "True로 설정하면 방문자가 버스에서 농장 쪽으로 걸어가기 시작합니다"
+"foodstore.config.buswalkText":                     "True로 설정하면 방문자가 버스에서 농장 쪽으로 걸어가기 시작합니다",
+
+"foodstore.config.modkey":                          "요리 이름 키 표시",
+"foodstore.config.orderchance":                     "초당 새로운 주문 확률",
+"foodstore.config.lovedishchance":                  "좋아하는 요리 확률",
+"foodstore.config.pricemultiplier":                 "가격 배수",
+"foodstore.config.maxordernight":                   "하루당 NPC 당 최대 주문 횟수",
+
+"foodstore.config.kidaskchance":                    "아이가 놀이를 제안하는 매일 확률",
+
+"loved-order-reaction-1":                           "고마워, 이거 맛있어 보여!",
+"loved-order-reaction-2":                           "고마워!",
+"loved-order-reaction-3":                           "바로 원하던 거, 고마워!",
+
+"liked-order-reaction-1":                           "고마워, 이거 좋아 보여!",
+"liked-order-reaction-2":                           "고마워!",
+"liked-order-reaction-3":                           "주문한 대로, 고마워!",
+
+"neutral-order-reaction-1":                         "오, 알겠어!",
+"neutral-order-reaction-2":                         "좋아",
+"neutral-order-reaction-3":                         "좋아!"
+
 
 
 
