@@ -12,7 +12,7 @@
 "Dependencies": [
     {
       "UniqueID": "SuperAardvark.AntiSocial",
-      "IsRequired": true
+      "IsRequired": false
     }
 ]
 }

@@ -59,14 +59,14 @@ namespace MarketTown
             List<int> loves = new();
             foreach (var str in Game1.NPCGiftTastes["Universal_Love"].Split(' '))
             {
-                if (int.TryParse(str, out int i) && Game1.objectInformation.TryGetValue(i, out string data) && CraftingRecipe.cookingRecipes.ContainsKey(data.Split('/')[0]))
+                if (Game1.objectData.ContainsKey(str) && CraftingRecipe.cookingRecipes.ContainsKey(Game1.objectData[str].Name))
                 {
                     loves.Add(int.Parse(str));
                 }
             }
             foreach (var str in Game1.NPCGiftTastes[npc.Name].Split('/')[1].Split(' '))
             {
-                if (int.TryParse(str, out int i) && Game1.objectInformation.TryGetValue(i, out string data) && CraftingRecipe.cookingRecipes.ContainsKey(data.Split('/')[0]))
+                if (Game1.objectData.ContainsKey(str) && CraftingRecipe.cookingRecipes.ContainsKey(Game1.objectData[str].Name))
                 {
                     loves.Add(int.Parse(str));
                 }
@@ -75,14 +75,14 @@ namespace MarketTown
             List<int> likes = new();
             foreach (var str in Game1.NPCGiftTastes["Universal_Like"].Split(' '))
             {
-                if (int.TryParse(str, out int i) && Game1.objectInformation.TryGetValue(i, out string data) && CraftingRecipe.cookingRecipes.ContainsKey(data.Split('/')[0]))
+                if (Game1.objectData.ContainsKey(str) && CraftingRecipe.cookingRecipes.ContainsKey(Game1.objectData[str].Name))
                 {
                     likes.Add(int.Parse(str));
                 }
             }
             foreach (var str in Game1.NPCGiftTastes[npc.Name].Split('/')[3].Split(' '))
             {
-                if (int.TryParse(str, out int i) && Game1.objectInformation.TryGetValue(i, out string data) && CraftingRecipe.cookingRecipes.ContainsKey(data.Split('/')[0]))
+                if (Game1.objectData.ContainsKey(str) && CraftingRecipe.cookingRecipes.ContainsKey(Game1.objectData[str].Name))
                 {
                     likes.Add(int.Parse(str));
                 }
@@ -91,14 +91,14 @@ namespace MarketTown
             List<int> neutral = new();
             foreach (var str in Game1.NPCGiftTastes["Universal_Neutral"].Split(' '))
             {
-                if (int.TryParse(str, out int i) && Game1.objectInformation.TryGetValue(i, out string data) && CraftingRecipe.cookingRecipes.ContainsKey(data.Split('/')[0]))
+                if (Game1.objectData.ContainsKey(str) && CraftingRecipe.cookingRecipes.ContainsKey(Game1.objectData[str].Name))
                 {
                     neutral.Add(int.Parse(str));
                 }
             }
             foreach (var str in Game1.NPCGiftTastes[npc.Name].Split('/')[9].Split(' '))
             {
-                if (int.TryParse(str, out int i) && Game1.objectInformation.TryGetValue(i, out string data) && CraftingRecipe.cookingRecipes.ContainsKey(data.Split('/')[0]))
+                if (Game1.objectData.ContainsKey(str) && CraftingRecipe.cookingRecipes.ContainsKey(Game1.objectData[str].Name))
                 {
                     neutral.Add(int.Parse(str));
                 }
@@ -131,9 +131,9 @@ namespace MarketTown
                     }
                 }
             } catch { }
-            var name = Game1.objectInformation[dish].Split('/')[0];
+            var name = Game1.objectData[dish.ToString()].Name;
             int price = 0;
-            int.TryParse(Game1.objectInformation[dish].Split('/')[1], out price);
+            price = (int)(Game1.objectData[dish.ToString()].Price);
 
 
             npc.modData[orderKey] = JsonConvert.SerializeObject(new OrderData(dish, name, price, loved));

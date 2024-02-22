@@ -144,7 +144,7 @@ namespace MarketTown
                         {
                             if (!Config.DisableChatAll) npc.showTextAboveHead(SHelper.Translation.Get("foodstore.willinvitevisit." + inviteIndex), default, default, 5000);
                             npc.modData["hapyke.FoodStore/invited"] = "true";
-                            npc.modData["hapyke.FoodStore/inviteDate"] = Game1.stats.daysPlayed.ToString();
+                            npc.modData["hapyke.FoodStore/inviteDate"] = Game1.stats.DaysPlayed.ToString();
                         }
                         else
                             if (!Config.DisableChatAll) npc.showTextAboveHead(SHelper.Translation.Get("foodstore.cannotinvitevisit." + inviteIndex), default, default, 5000);
@@ -156,7 +156,7 @@ namespace MarketTown
                         {
                             if (!Config.DisableChatAll) npc.showTextAboveHead(SHelper.Translation.Get("foodstore.willinvitevisit." + inviteIndex), default, default, 5000);
                             npc.modData["hapyke.FoodStore/invited"] = "true";
-                            npc.modData["hapyke.FoodStore/inviteDate"] = Game1.stats.daysPlayed.ToString();
+                            npc.modData["hapyke.FoodStore/inviteDate"] = Game1.stats.DaysPlayed.ToString();
                         }
                         else
                             if (!Config.DisableChatAll) npc.showTextAboveHead(SHelper.Translation.Get("foodstore.cannotinvitevisit." + inviteIndex), default, default, 5000);
@@ -292,9 +292,9 @@ namespace MarketTown
                     {
                         NPC newNPC = npc;
                         NPC oldNPC = NpcMap[displayName];
-                        Microsoft.Xna.Framework.Vector2 val = Microsoft.Xna.Framework.Vector2.Subtract(Game1.player.getTileLocation(), oldNPC.getTileLocation());
+                        Microsoft.Xna.Framework.Vector2 val = Microsoft.Xna.Framework.Vector2.Subtract(Game1.player.Tile, oldNPC.Tile);
                         float oldDistance = ((Microsoft.Xna.Framework.Vector2)val).Length();
-                        val = Microsoft.Xna.Framework.Vector2.Subtract(Game1.player.getTileLocation(), newNPC.getTileLocation());
+                        val = Microsoft.Xna.Framework.Vector2.Subtract(Game1.player.Tile, newNPC.Tile);
                         float newDistance = ((Microsoft.Xna.Framework.Vector2)val).Length();
                         if (oldDistance < newDistance)
                         {
@@ -317,7 +317,7 @@ namespace MarketTown
             float bestDistance = 6;
             foreach (KeyValuePair<string, NPC> pair in NpcMap)
             {
-                Microsoft.Xna.Framework.Vector2 val = Microsoft.Xna.Framework.Vector2.Subtract(Game1.player.getTileLocation(), pair.Value.getTileLocation());
+                Microsoft.Xna.Framework.Vector2 val = Microsoft.Xna.Framework.Vector2.Subtract(Game1.player.Tile, pair.Value.Tile);
                 float distance = ((Microsoft.Xna.Framework.Vector2)val).Length();
                 if (distance <= bestDistance)
                 {
@@ -347,10 +347,11 @@ namespace MarketTown
     internal class EntryQuestion : DialogueBox
     {
         private readonly List<Action> ResponseActions;
-        internal EntryQuestion(string dialogue, List<Response> responses, List<Action> Actions) : base(dialogue, responses)
+        internal EntryQuestion(string dialogue, List<Response> responses, List<Action> actions) : base(dialogue, responses.ToArray())
         {
-            ResponseActions = Actions;
+            ResponseActions = actions;
         }
+
         public override void receiveLeftClick(int x, int y, bool playSound = true)
         {
             int responseIndex = selectedResponse;

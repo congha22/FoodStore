@@ -64,7 +64,8 @@ namespace MarketTown
         public float LovedDishChance { get; set; } = 0.7f;
         public List<string> RestaurantLocations { get; set; } = new List<string>()
         {
-            "Shed"
+            "Shed",
+            "Big Shed"
         };
     }
 }

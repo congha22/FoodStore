@@ -40,7 +40,7 @@ namespace MarketTown.Framework
         public override string DisplayName
         {
             get => this.name;
-            set { }
+            //set { }
         }
 
 
@@ -54,10 +54,9 @@ namespace MarketTown.Framework
             this.MannType.Value = type;
             this.MannGender.Value = gender;
             this.name = this.loadDisplayName();
-            this.DisplayName = this.loadDisplayName();
             this.bigCraftable.Value = true;
             this.Type = "Crafting"; // Makes performObjectDropInAction work for non-objects
-
+            this.ItemId = "MT.Object." + gender.ToString();
             this.TileLocation = placement;
             this.boundingBox.Value = new Rectangle((int)placement.X * 64, (int)placement.Y * 64, 64, 64);
         }
@@ -75,14 +74,14 @@ namespace MarketTown.Framework
                 && m.MannGender.Value == this.MannGender.Value;
         }
 
-        public override Item getOne()
+        protected override Item GetOneNew()
         {
             var ret = new Mannequin(this.MannType.Value, this.MannGender.Value, Vector2.Zero);
             ret.Hat.Value = (Hat)this.Hat.Value?.getOne();
             ret.Shirt.Value = (Clothing)this.Shirt.Value?.getOne();
             ret.Pants.Value = (Clothing)this.Pants.Value?.getOne();
             ret.Boots.Value = (Boots)this.Boots.Value?.getOne();
-            ret._GetOneFrom(this);
+            ret.GetOneCopyFrom(this);
             return ret;
         }
 
@@ -100,7 +99,7 @@ namespace MarketTown.Framework
             return true;
         }
 
-        public override bool performToolAction(Tool t, GameLocation location)
+        public override bool performToolAction(Tool t)
         {
             if (t == null)
                 return false;
@@ -111,37 +110,37 @@ namespace MarketTown.Framework
                 {
                     if (this.Hat.Value != null)
                     {
-                        this.DropItem(location, this.Hat.Value);
+                        this.DropItem(Game1.player.currentLocation, this.Hat.Value);
                         this.Hat.Value = null;
                     }
                     else if (this.Shirt.Value != null)
                     {
-                        this.DropItem(location, this.Shirt.Value);
+                        this.DropItem(Game1.player.currentLocation, this.Shirt.Value);
                         this.Shirt.Value = null;
                     }
                     else if (this.Pants.Value != null)
                     {
-                        this.DropItem(location, this.Pants.Value);
+                        this.DropItem(Game1.player.currentLocation, this.Pants.Value);
                         this.Pants.Value = null;
                     }
                     else if (this.Boots.Value != null)
                     {
-                        this.DropItem(location, this.Boots.Value);
+                        this.DropItem(Game1.player.currentLocation, this.Boots.Value);
                         this.Boots.Value = null;
                     }
-                    location.playSound("hammer");
+                    Game1.player.currentLocation.playSound("hammer");
                     this.shakeTimer = 100;
                     return false;
                 }
-                location.objects.Remove(this.TileLocation);
-                this.DropItem(location, new Mannequin(this.MannType.Value, this.MannGender.Value, Vector2.Zero));
+                Game1.player.currentLocation.objects.Remove(this.TileLocation);
+                this.DropItem(Game1.player.currentLocation, new Mannequin(this.MannType.Value, this.MannGender.Value, Vector2.Zero));
                 return false;
             }
 
             return false;
         }
 
-        public override void performRemoveAction(Vector2 tileLocation, GameLocation location)
+        public override void performRemoveAction()
         {
             if (this.Hat.Value != null || this.Shirt.Value != null || this.Pants.Value != null || this.Boots.Value != null)
             {
@@ -185,7 +184,7 @@ namespace MarketTown.Framework
             return false;
         }
 
-        public override bool performObjectDropInAction(Item dropInItem, bool probe, Farmer who)
+        public override bool performObjectDropInAction(Item dropInItem, bool probe, Farmer who, bool returnFalseIfItemConsumed)
         {
             if (probe && (dropInItem is StardewValley.Objects.Hat or Clothing or StardewValley.Objects.Boots))
                 return true;
@@ -201,13 +200,13 @@ namespace MarketTown.Framework
                 case Clothing clothing:
                     switch (clothing.clothesType.Value)
                     {
-                        case (int)Clothing.ClothesType.SHIRT:
+                        case Clothing.ClothesType.SHIRT:
                             if (this.Shirt.Value != null)
                                 this.DropItem(who.currentLocation, this.Shirt.Value);
                             this.Shirt.Value = clothing;
                             return true;
 
-                        case (int)Clothing.ClothesType.PANTS:
+                        case Clothing.ClothesType.PANTS:
                             if (this.Pants.Value != null)
                                 this.DropItem(who.currentLocation, this.Pants.Value);
                             this.Pants.Value = clothing;
@@ -232,7 +231,7 @@ namespace MarketTown.Framework
         {
             var tex = this.GetMainTexture();
 
-            spriteBatch.Draw(tex, objectPosition, null, Color.White, 0, Vector2.Zero, 4f, SpriteEffects.None, Math.Max(0f, (f.getStandingY() + 3) / 10000f));
+            spriteBatch.Draw(tex, objectPosition, null, Color.White, 0, Vector2.Zero, 4f, SpriteEffects.None, Math.Max(0f, (f.StandingPixel.Y + 3) / 10000f));
         }
 
         public override void drawInMenu(SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, StackDrawType drawStackNumber, Color color, bool drawShadow)
@@ -288,7 +287,15 @@ namespace MarketTown.Framework
         protected override void initNetFields()
         {
             base.initNetFields();
-            this.NetFields.AddFields(this.MannType, this.MannGender, this.Facing, this.Hat, this.Shirt, this.Pants, this.Boots);
+
+            this.NetFields
+                      .AddField(this.MannType)
+                      .AddField(this.MannGender)
+                      .AddField(this.Facing)
+                      .AddField(this.Hat)
+                      .AddField(this.Shirt)
+                      .AddField(this.Pants)
+                      .AddField(this.Boots);
 
             this.MannType.fieldChangeEvent += this.OnNetFieldChanged;
             this.Facing.fieldChangeEvent += this.OnNetFieldChanged;
@@ -332,20 +339,20 @@ namespace MarketTown.Framework
                 // shirt
                 farmer.shirtItem.Value = this.Shirt.Value;
                 if (this.Shirt.Value != null)
-                    farmer.shirt.Value = this.MannGender.Value == MannequinGender.Male ? this.Shirt.Value.indexInTileSheetMale.Value : this.Shirt.Value.indexInTileSheetFemale.Value;
+                    farmer.shirt.Value = this.MannGender.Value == MannequinGender.Male ? this.Shirt.Value.indexInTileSheet.Value.ToString() : this.Shirt.Value.indexInTileSheet.Value.ToString();
 
                 // paints
                 farmer.pantsItem.Value = this.Pants.Value;
                 if (this.Pants.Value != null)
                 {
-                    farmer.pants.Value = this.MannGender.Value == MannequinGender.Male ? this.Pants.Value.indexInTileSheetMale.Value : this.Pants.Value.indexInTileSheetFemale.Value;
+                    farmer.pants.Value = this.MannGender.Value == MannequinGender.Male ? this.Pants.Value.indexInTileSheet.Value.ToString() : this.Pants.Value.indexInTileSheet.Value.ToString();
                     farmer.pantsColor.Value = this.Pants.Value.clothesColor.Value;
                 }
 
                 // boots
                 farmer.boots.Value = this.Boots.Value;
                 if (this.Boots.Value != null)
-                    farmer.changeShoeColor(this.Boots.Value.indexInColorSheet.Value);
+                    farmer.changeShoeColor(this.Boots.Value.indexInColorSheet.Value.ToString());
 
                 return farmer;
             }
@@ -402,11 +409,11 @@ namespace MarketTown.Framework
             switch (item)
             {
                 case Boots boots:
-                    boots.onUnequip();
+                    boots.onUnequip(player);
                     break;
 
                 case Ring ring:
-                    ring.onUnequip(player, player.currentLocation);
+                    ring.onUnequip(player);
                     break;
             }
         }
@@ -421,11 +428,11 @@ namespace MarketTown.Framework
             switch (item)
             {
                 case Boots boots:
-                    boots.onEquip();
+                    boots.onEquip(player);
                     break;
 
                 case Ring ring:
-                    ring.onEquip(player, player.currentLocation);
+                    ring.onEquip(player);
                     break;
             }
         }

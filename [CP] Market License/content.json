@@ -1,0 +1,79 @@
+{
+    "Format": "1.30.0",
+    "Changes": [
+        // add item
+        {
+            "Action": "EditData",
+            "Target": "Data/Objects",
+            "Entries": {
+                "MT.Objects.MarketLicense": {
+                    "Name": "Market License",
+                    "Displayname": "Market License",
+                    "Description": "The Ferngill Republic requires this license for all shop owners. To register your Shed as a business, you must display this License on a Sign at all times.",
+                    "Type": "Basic",
+                    "Price": 7500,
+
+                    "Texture": "{{InternalAssetKey: assets/MarketLicense.png}}",
+                    "SpriteIndex": 0
+                      },
+                "MT.Objects.RestaurantLicense": {
+                    "Name": "Restaurant License",
+                    "Displayname": "Restaurant License",
+                    "Description": "The Ferngill Republic issues this License to Restaurant owner to operate food service. To register your Shed as a Restaurant, the License must be displayed on a Sign.",
+                    "Type": "Basic",
+                    "Price": 4000,
+
+                    "Texture": "{{InternalAssetKey: assets/RestaurantLicense.png}}",
+                    "SpriteIndex": 0
+                      }
+            }
+        },
+
+
+
+        {
+            "Action": "EditData",
+            "Target": "Data/Shops",
+            "TargetField": [ "DesertTrade", "Items" ],
+            "Entries": {
+                "MT.Objects.MarketLicense": {
+                    "Id": "MT.Objects.MarketLicense",
+                    "ItemId": "(O)MT.Objects.MarketLicense",
+                    "Price": 15000,
+                    "TradeItemId": 336,
+                    "TradeItemAmount": 5,
+                    "Condition": "PLAYER_FARMING_LEVEL current 4, PLAYER_FORAGING_LEVEL current 4, PLAYER_FISHING_LEVEL current 4, PLAYER_MINING_LEVEL current 4, PLAYER_STAT current ItemsCooked 25"
+
+                }
+            }
+        },
+        {
+            "Action": "EditData",
+            "Target": "Data/Shops",
+            "TargetField": [ "Festival_StardewValleyFair_StarTokens", "Items" ],
+            "Entries": {
+                "MT.Objects.MarketLicense": {
+                    "Id": "MT.Objects.MarketLicense",
+                    "ItemId": "(O)MT.Objects.MarketLicense",
+                    "Price": 3000,
+                    "Condition": "PLAYER_FARMING_LEVEL current 5, PLAYER_FORAGING_LEVEL current 5, PLAYER_FISHING_LEVEL current 5, PLAYER_MINING_LEVEL current 5"
+                }
+            }
+        },
+        {
+            "Action": "EditData",
+            "Target": "Data/Shops",
+            "TargetField": [ "Saloon", "Items" ],
+            "Entries": {
+                "MT.Objects.RestaurantLicense": {
+                    "Id": "MT.Objects.RestaurantLicense",
+                    "ItemId": "(O)MT.Objects.RestaurantLicense",
+                    "Price": 8000,
+                    "TradeItemId": 336,
+                    "TradeItemAmount": 2,
+                    "Condition": "PLAYER_FARMING_LEVEL current 2, PLAYER_FORAGING_LEVEL current 2, PLAYER_STAT current ItemsCooked 10"
+                }
+            }
+        }
+    ]
+}

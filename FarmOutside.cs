@@ -5,6 +5,7 @@ using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Network;
+using StardewValley.Pathfinding;
 using StardewValley.TerrainFeatures;
 using System;
 using System.Linq;
@@ -43,12 +44,12 @@ namespace MarketTown
             {
                 foreach (NPC who in Game1.getLocationFromName("BusStop").characters)
                 {
-                    if (who.Name.Contains("MT.Guest_") && who.getTileLocation() != who.DefaultPosition / 64)
+                    if (who.Name.Contains("MT.Guest_") && who.Tile != who.DefaultPosition / 64)
                     {
                         who.Halt();
                         who.temporaryController = null;
                         who.controller = null;
-                        who.clearSchedule();
+                        who.ClearSchedule();
                         Game1.warpCharacter(who, who.DefaultMap, who.DefaultPosition / 64);
                     }
                 }
@@ -161,7 +162,8 @@ namespace MarketTown
                         Warp WarpOrDoor = location.isCollidingWithWarpOrDoor(new Rectangle(zero, new Point(1, 1)));
 
                         //check that location is clear + not water tile + not behind tree + not a warp
-                        CanGetHere = location.isTileLocationTotallyClearAndPlaceable(zero.X, zero.Y) && isFloorValid && !IsBehindTree && WarpOrDoor == null;
+                        CanGetHere = !location.IsTileBlockedBy(new Vector2(zero.X, zero.Y)) && location.CanItemBePlacedHere(new Vector2(zero.X, zero.Y)) 
+                            && isFloorValid && !IsBehindTree && WarpOrDoor == null;
 
                         //if the new point is too far away
                         Point difference = new(Math.Abs(zero.X - (int)who.Position.X), Math.Abs(zero.Y - (int)who.Position.Y));

@@ -40,6 +40,7 @@ using xTile.ObjectModel;
 using System.Text.RegularExpressions;
 using xTile;
 using xTile.Dimensions;
+using StardewValley.Pathfinding;
 
 namespace MarketTown
 {
@@ -69,9 +70,6 @@ namespace MarketTown
 
         internal static List<string> GlobalKidList = new List<string>();
 
-        internal static List<string> BlockedGlobalNPC = new List<string> { "Bouncer", "ClothesTherapyCharacters", "Gourmand", "Governor", "Gunther", "Henchman", "IslandParrot", "Junimo", "KrobusRaven", "Marlon", "Mariner", "Qi", 
-            "MrQi", "Mr Qi", "MisterQi", "Mister Qi", "Mister", "robot", "SeaMonsterKrobus", "RelicSpirit", "Kiwi", "Torts", "Axel", "Dewey", "Brooklyn", "Chloe", "Jace", "Gil", "Zoey"};
-
         internal static List<string> GlobalNPCList = new List<string>();
 
         internal static List<string> CurrentShopper = new List<string>();
@@ -92,7 +90,6 @@ namespace MarketTown
         /// <param name="helper">Provides simplified APIs for writing mods.</param>
         public override void Entry(IModHelper helper)
         {
-
             npcOrderNumbers.Value = new Dictionary<string, int>();
 
             Config = Helper.ReadConfig<ModConfig>();
@@ -137,27 +134,27 @@ namespace MarketTown
                postfix: new HarmonyMethod(typeof(ModEntry), nameof(FarmHouse_updateEvenIfFarmerIsntHere_Postfix))
             );
 
-            // Patch furniture's pick up, drop item, and render functionality to support weapons.
-            harmony.Patch(original: AccessTools.Method(typeof(StardewValley.Objects.Furniture), nameof(StardewValley.Objects.Furniture.clicked)),
-                          prefix: new HarmonyMethod(typeof(FurniturePatches), nameof(FurniturePatches.clicked_Prefix)));
-            harmony.Patch(original: AccessTools.Method(typeof(StardewValley.Objects.Furniture), nameof(StardewValley.Objects.Furniture.performObjectDropInAction)),
-                          postfix: new HarmonyMethod(typeof(FurniturePatches), nameof(FurniturePatches.performObjectDropInAction_Postfix)));
-            harmony.Patch(original: AccessTools.Method(typeof(StardewValley.Objects.Furniture), nameof(StardewValley.Objects.Furniture.draw),
-                          new Type[] { typeof(SpriteBatch), typeof(int), typeof(int), typeof(float) }),
-                          prefix: new HarmonyMethod(typeof(FurniturePatches), nameof(FurniturePatches.draw_Prefix)));
+            //harmony.Patch(original: AccessTools.Method(typeof(StardewValley.Objects.Furniture), nameof(StardewValley.Objects.Furniture.clicked)),
+            //              prefix: new HarmonyMethod(typeof(FurniturePatches), nameof(FurniturePatches.clicked_Prefix)));
+            //harmony.Patch(original: AccessTools.Method(typeof(StardewValley.Objects.Furniture), nameof(StardewValley.Objects.Furniture.performObjectDropInAction)),
+            //              postfix: new HarmonyMethod(typeof(FurniturePatches), nameof(FurniturePatches.performObjectDropInAction_Postfix)));
 
-            // Pass the game's action button functionality to allow weapons to be dropped onto furniture.
-            harmony.Patch(original: AccessTools.Method(typeof(StardewValley.Game1), nameof(StardewValley.Game1.pressActionButton)),
-                          prefix: new HarmonyMethod(typeof(Game1Patches), nameof(Game1Patches.pressActionButton_Prefix)));
+            ////bug draw behind chair
+            //harmony.Patch(original: AccessTools.Method(typeof(StardewValley.Objects.Furniture), nameof(StardewValley.Objects.Furniture.draw),
+            //              new Type[] { typeof(SpriteBatch), typeof(int), typeof(int), typeof(float) }),
+            //              prefix: new HarmonyMethod(typeof(FurniturePatches), nameof(FurniturePatches.draw_Prefix)));
 
-            // Patch the game location's "check action" to allow weapons to be dropped onto tables.
-            harmony.Patch(original: AccessTools.Method(typeof(StardewValley.GameLocation), nameof(StardewValley.GameLocation.checkAction)),
-                          prefix: new HarmonyMethod(typeof(GameLocationPatches), nameof(GameLocationPatches.checkAction_Prefix)));
+            //harmony.Patch(original: AccessTools.Method(typeof(StardewValley.Game1), nameof(StardewValley.Game1.pressActionButton)),
+            //              prefix: new HarmonyMethod(typeof(Game1Patches), nameof(Game1Patches.pressActionButton_Prefix)));
 
-            // Save handlers to prevent custom objects from being saved to file.
-            helper.Events.GameLoop.Saving += (s, e) => makePlaceholderObjects();
-            helper.Events.GameLoop.Saved += (s, e) => restorePlaceholderObjects();
-            helper.Events.GameLoop.SaveLoaded += (s, e) => restorePlaceholderObjects();
+            ////bug open door
+            //harmony.Patch(original: AccessTools.Method(typeof(StardewValley.GameLocation), nameof(StardewValley.GameLocation.checkAction)),
+            //              prefix: new HarmonyMethod(typeof(GameLocationPatches), nameof(GameLocationPatches.checkAction_Prefix)));
+
+            //// Save handlers to prevent custom objects from being saved to file.
+            //helper.Events.GameLoop.Saving += (s, e) => makePlaceholderObjects();
+            //helper.Events.GameLoop.Saved += (s, e) => restorePlaceholderObjects();
+            //helper.Events.GameLoop.SaveLoaded += (s, e) => restorePlaceholderObjects();
 
             harmony.PatchAll();
         }
@@ -186,7 +183,7 @@ namespace MarketTown
                     || Game1.eventUp
                     || Game1.isFestival()
                     || Game1.IsFading()
-                    || Game1.menuUp))
+                    || Game1.activeClickableMenu != null))
             {
 
                 Farmer farmerInstance = Game1.player;
@@ -199,17 +196,17 @@ namespace MarketTown
 
                         // ******* Check NPC valid tile *******
 
-                        if (__instance != null && __instance.isVillager() && __instance.currentLocation != null && __instance.getTileLocation() != __instance.DefaultPosition / 64
+                        if (__instance != null && __instance.isVillager() && __instance.currentLocation != null && __instance.Tile != __instance.DefaultPosition / 64
                             && __instance.Sprite.CurrentFrame >= 0 && __instance.Sprite.CurrentFrame <= 15
                             && !ChairPositions.Any(chairPosition => chairPosition.locationName == __instance.currentLocation.Name &&
-                                        chairPosition.x == (int)__instance.getTileLocation().X &&
-                                        chairPosition.y == (int)__instance.getTileLocation().Y)
+                                        chairPosition.x == (int)__instance.Tile.X &&
+                                        chairPosition.y == (int)__instance.Tile.Y)
                             )
                         {
-                            Point zero = new Point((int)__instance.getTileLocation().X, (int)__instance.getTileLocation().Y);
+                            Point zero = new Point((int)__instance.Tile.X, (int)__instance.Tile.Y);
                             var location = __instance.currentLocation;
 
-                            bool isValid = location.isTileOnMap(__instance.getTileLocation()) && !location.isWaterTile(zero.X, zero.Y)
+                            bool isValid = location.isTileOnMap(__instance.Tile) && !location.isWaterTile(zero.X, zero.Y)
                                 && location.isTilePassable(new Location(zero.X, zero.Y), Game1.viewport);
 
 
@@ -290,14 +287,14 @@ namespace MarketTown
 
                                         if (__instance.Name.Contains("MT.Guest_") || !Game1.player.friendshipData[__instance.Name].IsMarried())
                                         {
-                                            __instance.CurrentDialogue.Push(new Dialogue(SHelper.Translation.Get("foodstore.general." + npcAge + npcManner + npcSocial + randomIndex.ToString()), __instance));
+                                            __instance.CurrentDialogue.Push(new Dialogue(__instance, SHelper.Translation.Get("foodstore.general." + npcAge + npcManner + npcSocial + randomIndex.ToString())));
                                             __instance.modData["hapyke.FoodStore/TotalCustomerResponse"] = (Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) + 1).ToString();
                                         }
                                         else
                                         {
                                             if (Game1.timeOfDay == 900 || Game1.timeOfDay == 1200 || Game1.timeOfDay == 1500 || Game1.timeOfDay == 1800 || Game1.timeOfDay == 2100 || Game1.timeOfDay == 2400)
                                             {
-                                                __instance.CurrentDialogue.Push(new Dialogue(SHelper.Translation.Get("foodstore.general." + npcAge + npcManner + npcSocial + randomIndex.ToString()), __instance));
+                                                __instance.CurrentDialogue.Push(new Dialogue(__instance, SHelper.Translation.Get("foodstore.general." + npcAge + npcManner + npcSocial + randomIndex.ToString())));
                                                 __instance.modData["hapyke.FoodStore/TotalCustomerResponse"] = (Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) + 1).ToString();
                                             }
                                         }
@@ -391,6 +388,8 @@ namespace MarketTown
 
         private void OnMenuChanged(object sender, MenuChangedEventArgs e)
         {
+            if (!Game1.hasLoadedGame) return;
+
             foreach (var x in Utility.getAllCharacters())
             {
                 if (x.Name.Contains("MT.Guest_"))
@@ -399,20 +398,20 @@ namespace MarketTown
                 }
             }
 
-
             if (e.NewMenu is ShopMenu shop)
             {
-                if (shop.portraitPerson?.Name == "Robin")
+                if (shop.ShopId == "Carpenter")
                 {
                     var mm = new Mannequin(MannequinType.Plain, MannequinGender.Male, Vector2.Zero);
                     var mf = new Mannequin(MannequinType.Plain, MannequinGender.Female, Vector2.Zero);
                     shop.forSale.Add(mm);
                     shop.forSale.Add(mf);
-                    shop.itemPriceAndStock.Add(mm, new[] { 1000, int.MaxValue });
-                    shop.itemPriceAndStock.Add(mf, new[] { 1000, int.MaxValue });
+                    shop.itemPriceAndStock.Add(mm, new ItemStockInformation(1000, int.MaxValue));
+                    shop.itemPriceAndStock.Add(mf, new ItemStockInformation(1000, int.MaxValue));
                 }
             }
         }
+
         private void GameLoop_UpdateTicked(object sender, UpdateTickedEventArgs e)
         {
             if (e.IsMultipleOf(6))
@@ -496,12 +495,6 @@ namespace MarketTown
                 getValue: () => Config.AllowRemoveNonFood,
                 setValue: value => Config.AllowRemoveNonFood = value
             );
-            configMenu.AddBoolOption(
-            mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.enablesaleweapon"),
-                getValue: () => Config.EnableSaleWeapon,
-                setValue: value => Config.EnableSaleWeapon = value
-            );
 
             configMenu.AddNumberOption(
                 mod: ModManifest,
@@ -510,12 +503,16 @@ namespace MarketTown
                 getValue: () => Config.MinutesToHungry,
                 setValue: value => Config.MinutesToHungry = value
             );
-            configMenu.AddTextOption(
+
+            configMenu.AddNumberOption(
                 mod: ModManifest,
                 name: () => SHelper.Translation.Get("foodstore.config.movetofoodchange"),
                 tooltip: () => SHelper.Translation.Get("foodstore.config.movetofoodchangeText"),
-                getValue: () => "" + Config.MoveToFoodChance,
-                setValue: delegate (string value) { try { Config.MoveToFoodChance = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
+                getValue: () => Config.MoveToFoodChance,
+                setValue: value => Config.MoveToFoodChance = value,
+                min: 0.0f,
+                max: 0.33f,
+                interval: 0.0025f
             );
 
             configMenu.AddTextOption(
@@ -532,8 +529,9 @@ namespace MarketTown
                 getValue: () => "" + Config.MaxDistanceToEat,
                 setValue: delegate (string value) { try { Config.MaxDistanceToEat = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
             );
+
             configMenu.AddBoolOption(
-            mod: ModManifest,
+                mod: ModManifest,
                 name: () => SHelper.Translation.Get("foodstore.config.randompurchase"),
                 tooltip: () => SHelper.Translation.Get("foodstore.config.randompurchaseText"),
                 getValue: () => Config.RandomPurchase,
@@ -578,6 +576,34 @@ namespace MarketTown
 
             // Shed setting
             configMenu.AddPage(mod: ModManifest, "shed", () => SHelper.Translation.Get("foodstore.config.shed"));
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.shedvisitchance"),
+                tooltip: () => SHelper.Translation.Get("foodstore.config.shedvisitchanceText"),
+                getValue: () => Config.ShedVisitChance,
+                setValue: value => Config.ShedVisitChance = value,
+                min: 0.0f,
+                max: 1.0f,
+                interval: 0.01f
+            );
+
+            configMenu.AddTextOption(
+                mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.maxshedcapacity"),
+                tooltip: () => SHelper.Translation.Get("foodstore.config.maxshedcapacityText"),
+                getValue: () => "" + Config.MaxShedCapacity,
+                setValue: delegate (string value) { try { Config.MaxShedCapacity = Int32.Parse(value, CultureInfo.InvariantCulture); } catch { } }
+            );
+
+            configMenu.AddTextOption(
+                mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.timestay"),
+                tooltip: () => SHelper.Translation.Get("foodstore.config.timestayText"),
+                getValue: () => "" + Config.TimeStay,
+                setValue: delegate (string value) { try { Config.TimeStay = Int32.Parse(value, CultureInfo.InvariantCulture); } catch { } }
+            );
+
             configMenu.AddBoolOption(
                 mod: ModManifest,
                 name: () => SHelper.Translation.Get("foodstore.config.doorentry"),
@@ -592,6 +618,7 @@ namespace MarketTown
                 getValue: () => Config.BusWalk,
                 setValue: value => Config.BusWalk = value
             );
+
             configMenu.AddTextOption(
                 mod: ModManifest,
                 name: () => SHelper.Translation.Get("foodstore.config.shedminutetohungry"),
@@ -599,47 +626,42 @@ namespace MarketTown
                 getValue: () => "" + Config.ShedMinuteToHungry,
                 setValue: delegate (string value) { try { Config.ShedMinuteToHungry = Int32.Parse(value, CultureInfo.InvariantCulture); } catch { } }
             );
-            configMenu.AddTextOption(
+
+            configMenu.AddNumberOption(
                 mod: ModManifest,
                 name: () => SHelper.Translation.Get("foodstore.config.shedbuychance"),
                 tooltip: () => SHelper.Translation.Get("foodstore.config.shedbuychanceText"),
-                getValue: () => "" + Config.ShedMoveToFoodChance,
-                setValue: delegate (string value) { try { Config.ShedMoveToFoodChance = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
-            );
-            configMenu.AddTextOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.shedvisitchance"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.shedvisitchanceText"),
-                getValue: () => "" + Config.ShedVisitChance,
-                setValue: delegate (string value) { try { Config.ShedVisitChance = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
-            );
-            configMenu.AddTextOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.maxshedcapacity"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.maxshedcapacityText"),
-                getValue: () => "" + Config.MaxShedCapacity,
-                setValue: delegate (string value) { try { Config.MaxShedCapacity = Int32.Parse(value, CultureInfo.InvariantCulture); } catch { } }
-            );
-            configMenu.AddTextOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.timestay"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.timestayText"),
-                getValue: () => "" + Config.TimeStay,
-                setValue: delegate (string value) { try { Config.TimeStay = Int32.Parse(value, CultureInfo.InvariantCulture); } catch { } }
-            );
-            configMenu.AddTextOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.openhour"),
-                getValue: () => "" + Config.OpenHour,
-                setValue: delegate (string value) { try { Config.OpenHour = Int32.Parse(value, CultureInfo.InvariantCulture); } catch { } }
-            );
-            configMenu.AddTextOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.closehour"),
-                getValue: () => "" + Config.CloseHour,
-                setValue: delegate (string value) { try { Config.CloseHour = Int32.Parse(value, CultureInfo.InvariantCulture); } catch { } }
+                getValue: () => Config.ShedMoveToFoodChance,
+                setValue: value => Config.ShedMoveToFoodChance = value,
+                min: 0.0f,
+                max: 1.0f,
+                interval: 0.01f
             );
 
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.openhour"),
+                getValue: () => Config.OpenHour,
+                setValue: value => Config.OpenHour = (int)value,
+                min: 600,
+                max: 2400f,
+                interval: 10f
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.closehour"),
+                getValue: () => Config.CloseHour,
+                setValue: value => Config.CloseHour = (int)value,
+                min: 600,
+                max: 2400f,
+                interval: 10f
+            );
+
+            configMenu.AddSectionTitle(
+                mod: ModManifest,
+                text: () => SHelper.Translation.Get("foodstore.config.shedvisitor")
+            );
 
             configMenu.AddKeybind(
                 mod: ModManifest,
@@ -647,17 +669,25 @@ namespace MarketTown
                 getValue: () => Config.ModKey,
                 setValue: value => Config.ModKey = value
             );
-            configMenu.AddTextOption(
+
+            configMenu.AddNumberOption(
                 mod: ModManifest,
                 name: () => SHelper.Translation.Get("foodstore.config.orderchance"),
-                getValue: () => "" + Config.OrderChance,
-                setValue: delegate (string value) { try { Config.OrderChance = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
+                getValue: () => Config.OrderChance,
+                setValue: value => Config.OrderChance = value,
+                min: 0.0f,
+                max: 1.0f,
+                interval: 0.01f
             );
-            configMenu.AddTextOption(
+
+            configMenu.AddNumberOption(
                 mod: ModManifest,
                 name: () => SHelper.Translation.Get("foodstore.config.lovedishchance"),
-                getValue: () => "" + Config.LovedDishChance,
-                setValue: delegate (string value) { try { Config.LovedDishChance = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
+                getValue: () => Config.LovedDishChance,
+                setValue: value => Config.LovedDishChance = value,
+                min: 0.0f,
+                max: 1.0f,
+                interval: 0.01f
             );
             configMenu.AddTextOption(
                 mod: ModManifest,
@@ -716,19 +746,26 @@ namespace MarketTown
                 getValue: () => Config.EnableVisitInside,
                 setValue: value => Config.EnableVisitInside = value
             );
-            configMenu.AddTextOption(
+
+            configMenu.AddNumberOption(
                 mod: ModManifest,
                 name: () => SHelper.Translation.Get("foodstore.config.invitecometime"),
-                getValue: () => "" + Config.InviteComeTime,
-                setValue: delegate (string value) { try { Config.InviteComeTime = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
-            );
-            configMenu.AddTextOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.inviteleavetime"),
-                getValue: () => "" + Config.InviteLeaveTime,
-                setValue: delegate (string value) { try { Config.InviteLeaveTime = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
+                getValue: () => Config.InviteComeTime,
+                setValue: value => Config.InviteComeTime = (int)value,
+                min: 600,
+                max: 2400f,
+                interval: 10f
             );
 
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.inviteleavetime"),
+                getValue: () => Config.InviteLeaveTime,
+                setValue: value => Config.InviteLeaveTime = (int)value,
+                min: 600,
+                max: 2400f,
+                interval: 10f
+            );
             //sell multiplier
 
             configMenu.AddPage(mod: ModManifest, "salePrice", () => SHelper.Translation.Get("foodstore.config.saleprice"));
@@ -865,14 +902,13 @@ namespace MarketTown
                     __instance.modData["hapyke.FoodStore/TotalCustomerResponse"] = "0";
                     __instance.modData["hapyke.FoodStore/inviteTried"] = "false";
 
-                    if (!BlockedGlobalNPC.Contains(__instance.Name) && !BlockedGlobalNPC.Contains(__instance.displayName)
-                        && __instance.Name.Contains("MT.Guest_"))
+                    if (__instance.Name.Contains("MT.Guest_"))
                     {
                         GlobalNPCList.Add(__instance.Name);
                     }
 
 
-                    if (__instance.Age == 2)
+                    if (__instance.Age == 2 && !__instance.Name.Contains("MT.Guest_"))
                     {
                         GlobalKidList.Add(__instance.Name);
                     }
@@ -902,7 +938,7 @@ namespace MarketTown
                 foreach (NPC __instance in Utility.getAllCharacters())
                 {
                     if ( (__instance.isVillager() && __instance.modData.ContainsKey("hapyke.FoodStore/invited") && __instance.modData.ContainsKey("hapyke.FoodStore/inviteDate")
-                        && __instance.modData["hapyke.FoodStore/invited"] == "true" && Int32.Parse(__instance.modData["hapyke.FoodStore/inviteDate"]) <= (Game1.stats.daysPlayed - 1))
+                        && __instance.modData["hapyke.FoodStore/invited"] == "true" && Int32.Parse(__instance.modData["hapyke.FoodStore/inviteDate"]) <= (Game1.stats.DaysPlayed - 1))
                         || (__instance.isVillager() && (!__instance.modData.ContainsKey("hapyke.FoodStore/invited")) || !__instance.modData.ContainsKey("hapyke.FoodStore/inviteDate")) )
                     {
                         __instance.modData["hapyke.FoodStore/invited"] = "false";
@@ -920,24 +956,13 @@ namespace MarketTown
             // Wipe visitors
             try
             {
-                foreach (Building building in Game1.getFarm().buildings)
+                foreach (var name in GlobalNPCList)
                 {
-                    if (building.nameOfIndoors.Contains("Shed") || building.nameOfIndoors.Contains("BusStop"))
-                    {
-                        List<NPC> npcsToRemove = new List<NPC>();
-                        foreach (NPC npc in Game1.getLocationFromName(building.nameOfIndoors).characters)
-                        {
-                            if (npc.isVillager())
-                            {
-                                npcsToRemove.Add(npc);
-                            }
-                        }
-
-                        foreach (NPC npcToRemove in npcsToRemove)
-                        {
-                            Game1.warpCharacter(npcToRemove, npcToRemove.DefaultMap, npcToRemove.DefaultPosition / 64);
-                        }
-                    }
+                    NPC npc = Game1.getCharacterFromName(name);
+                    npc.Halt();
+                    npc.temporaryController = null;
+                    npc.controller = null;
+                    Game1.warpCharacter(npc, npc.DefaultMap, npc.DefaultPosition / 64);
                 }
             }
             catch { }
@@ -947,7 +972,7 @@ namespace MarketTown
         {
             try
             {
-                if (food != null && __instance.isVillager() && food.furniture != null && Vector2.Distance(food.foodTile, __instance.getTileLocation()) < Config.MaxDistanceToEat && !__instance.Name.EndsWith("_DA") && bool.Parse(__instance.modData["hapyke.FoodStore/gettingFood"]))
+                if (food != null && __instance.isVillager() && food.furniture != null && Vector2.Distance(food.foodTile, __instance.Tile) < Config.MaxDistanceToEat && !__instance.Name.EndsWith("_DA") && bool.Parse(__instance.modData["hapyke.FoodStore/gettingFood"]))
                 {
                     if ((__instance.currentLocation is Farm || __instance.currentLocation is FarmHouse) && !Config.AllowRemoveNonFood && food.foodObject.Edibility <= 0)
                     {
@@ -960,7 +985,7 @@ namespace MarketTown
                             int taste = 8;
                             try
                             {
-                                if (food.foodObject is not WeaponProxy || food.foodObject is not null) taste = __instance.getGiftTasteForThisItem(food.foodObject);
+                                //if (food.foodObject is not WeaponProxy || food.foodObject is not null) taste = __instance.getGiftTasteForThisItem(food.foodObject);
                                 if (__instance.Name == "Gus" && (taste == 0 || taste == 2)) taste = 8;
                             }
                             catch { }
@@ -1083,18 +1108,18 @@ namespace MarketTown
                                 } catch { }
 
                             } // **** SALE and TIP block ****
-                            else if (food.foodObject is WeaponProxy)
-                            {
+                            //else if (food.foodObject is WeaponProxy)
+                            //{
 
-                                WeaponProxy weaponProxy = (WeaponProxy)food.foodObject;
-                                string weaponName = weaponProxy.WeaponName;
-                                int weaponSalePrice = weaponProxy.SalePrice;
+                            //    WeaponProxy weaponProxy = (WeaponProxy)food.foodObject;
+                            //    string weaponName = weaponProxy.WeaponName;
+                            //    int weaponSalePrice = weaponProxy.SalePrice;
 
-                                itemName = weaponName;
-                                reply = SHelper.Translation.Get("foodstore.weaponText");
-                                salePrice = (int)(weaponSalePrice * 1.5);
-                                tip = 0;
-                            }
+                            //    itemName = weaponName;
+                            //    reply = SHelper.Translation.Get("foodstore.weaponText");
+                            //    salePrice = (int)(weaponSalePrice * 1.5);
+                            //    tip = 0;
+                            //}
                             else    // Non-food case
                             {
                                 itemName = food.foodObject.Name;
@@ -1258,7 +1283,7 @@ namespace MarketTown
                         }
                     }
                 }
-                else if (food != null && __instance.isVillager() && food.obj != null && Vector2.Distance(food.foodTile, __instance.getTileLocation()) < Config.MaxDistanceToEat && !__instance.Name.EndsWith("_DA") && bool.Parse(__instance.modData["hapyke.FoodStore/gettingFood"]))
+                else if (food != null && __instance.isVillager() && food.obj != null && Vector2.Distance(food.foodTile, __instance.Tile) < Config.MaxDistanceToEat && !__instance.Name.EndsWith("_DA") && bool.Parse(__instance.modData["hapyke.FoodStore/gettingFood"]))
                 {
                     using (IEnumerator<Object> enumerator = __instance.currentLocation.Objects.Values.GetEnumerator())
                     {
@@ -1352,7 +1377,7 @@ namespace MarketTown
                             || (location.Name.Contains("Shed") && foundSign != null && foundSign.displayItem != null && foundSign.displayItem.Value.Name == "Market License")) hasSignInRange = true;
 
                         // Add to foodList only if there is no sign within the range
-                        if (hasSignInRange && Vector2.Distance(fLocation, npc.getTileLocation()) < Config.MaxDistanceToFind && (hasHat || hasPants || hasShirt || hasBoots))
+                        if (hasSignInRange && Vector2.Distance(fLocation, npc.Tile) < Config.MaxDistanceToFind && (hasHat || hasPants || hasShirt || hasBoots))
                         {
                             foodList.Add(new PlacedFoodData( obj, fLocation, obj, -1));
                         }
@@ -1364,8 +1389,8 @@ namespace MarketTown
             {
                 if (f.heldObject.Value != null
                     && (categoryKeys.Contains(f.heldObject.Value.Category)
-                        || (f.heldObject.Value is WeaponProxy && Config.EnableSaleWeapon))
-                    )         // ***** Validate category items *****
+                        // || (f.heldObject.Value is WeaponProxy && Config.EnableSaleWeapon))
+                    ))         // ***** Validate category items *****
                 {
                     int xLocation = (f.boundingBox.X / 64) + (f.boundingBox.Width / 64 / 2);
                     int yLocation = (f.boundingBox.Y / 64) + (f.boundingBox.Height / 64 / 2);
@@ -1385,7 +1410,7 @@ namespace MarketTown
                         && foundSign.displayItem != null && foundSign.displayItem.Value.Name == "Restaurant License")) hasSignInRange = true;
 
                     // Add to foodList only if there is no sign within the range
-                    if (hasSignInRange&& Vector2.Distance(fLocation, npc.getTileLocation()) < Config.MaxDistanceToFind)
+                    if (hasSignInRange&& Vector2.Distance(fLocation, npc.Tile) < Config.MaxDistanceToFind)
                     {
                         foodList.Add(new PlacedFoodData(f, fLocation, f.heldObject.Value, -1));
                     }
@@ -1407,7 +1432,7 @@ namespace MarketTown
                 var compare = b.value.CompareTo(a.value);
                 if (compare != 0)
                     return compare;
-                return Vector2.Distance(a.foodTile, npc.getTileLocation()).CompareTo(Vector2.Distance(b.foodTile, npc.getTileLocation()));
+                return Vector2.Distance(a.foodTile, npc.Tile).CompareTo(Vector2.Distance(b.foodTile, npc.Tile));
             });
 
             if (!Config.RandomPurchase)         //Return the closest
@@ -1548,14 +1573,13 @@ namespace MarketTown
 
             foreach (NPC newCharacter in thisLocation.characters)
             {
-                if (Utility.isThereAFarmerOrCharacterWithinDistance(new Vector2(thisCharacter.getTileLocation().X, thisCharacter.getTileLocation().Y), 13, thisCharacter.currentLocation) != null
+                if (Utility.isThereAFarmerOrCharacterWithinDistance(new Vector2(thisCharacter.Tile.X, thisCharacter.Tile.Y), 13, thisCharacter.currentLocation) != null
                     && localNpcCount > 0.2) localNpcCount -= 0.0175;
-
             }
 
             foreach (NPC newCharacter in thisLocation.characters)
             {
-                if (Vector2.Distance(newCharacter.getTileLocation(), thisCharacter.getTileLocation()) <= (float)15 && newCharacter.Name != thisCharacter.Name && !Config.DisableChatAll)
+                if (Vector2.Distance(newCharacter.Tile, thisCharacter.Tile) <= (float)15 && newCharacter.Name != thisCharacter.Name && !Config.DisableChatAll)
                 {
                     Random random = new Random();
                     int randomIndex = random.Next(5);
@@ -1576,38 +1600,38 @@ namespace MarketTown
                     //do the work
                     if (getChance < chanceToVisit && lastTasteRate > 0.3 && lastDecorRate > 0)          //Will visit, positive Food, positive Decor
                     {
-                        thisCharacter.showTextAboveHead(tasteString + ". " + decorString, -1, 2, 8000);
+                        thisCharacter.showTextAboveHead(tasteString + ". " + decorString, default, 2, 8000);
                         if (rand.NextDouble() > localNpcCount) continue;
 
                         if (newCharacter.modData["hapyke.FoodStore/LastFood"] == null) newCharacter.modData["hapyke.FoodStore/LastFood"] = "0";
                         newCharacter.modData["hapyke.FoodStore/LastFood"] = (Int32.Parse(newCharacter.modData["hapyke.FoodStore/LastFood"]) - Config.MinutesToHungry + 30).ToString();
-                        newCharacter.showTextAboveHead(SHelper.Translation.Get("foodstore.willVisit." + randomIndex2), -1, 2, 7000);
+                        newCharacter.showTextAboveHead(SHelper.Translation.Get("foodstore.willVisit." + randomIndex2), default, 2, 7000);
                     }
                     else if (getChance < chanceToVisit)                                                 //Will visit, normal or negative Food , Decor
                     {
-                        thisCharacter.showTextAboveHead(tasteString + ". " + decorString, -1, 2, 8000);
+                        thisCharacter.showTextAboveHead(tasteString + ". " + decorString, default, 2, 8000);
                         if (rand.NextDouble() > localNpcCount) continue;
 
                         if (newCharacter.modData["hapyke.FoodStore/LastFood"] == null) newCharacter.modData["hapyke.FoodStore/LastFood"] = "0";
                         if (Config.MinutesToHungry >= 60)
                             newCharacter.modData["hapyke.FoodStore/LastFood"] = (Int32.Parse(newCharacter.modData["hapyke.FoodStore/LastFood"]) - (Config.MinutesToHungry / 2)).ToString();
-                        newCharacter.showTextAboveHead(SHelper.Translation.Get("foodstore.mayVisit." + randomIndex2), -1, 2, 7000);
+                        newCharacter.showTextAboveHead(SHelper.Translation.Get("foodstore.mayVisit." + randomIndex2), default, 2, 7000);
                     }
                     else if (getChance >= chanceToVisit && lastTasteRate < 0.3 && lastDecorRate < 0)     //No visit, negative Food, negative Decor
                     {
-                        thisCharacter.showTextAboveHead(tasteString + ". " + decorString, -1, 2, 8000);
+                        thisCharacter.showTextAboveHead(tasteString + ". " + decorString, default, 2, 8000);
                         if (rand.NextDouble() > localNpcCount) continue;
 
                         if (newCharacter.modData["hapyke.FoodStore/LastFood"] == null) newCharacter.modData["hapyke.FoodStore/LastFood"] = "2600";
                         newCharacter.modData["hapyke.FoodStore/LastFood"] = "2600";
-                        newCharacter.showTextAboveHead(SHelper.Translation.Get("foodstore.noVisit." + randomIndex2), -1, 2, 7000);
+                        newCharacter.showTextAboveHead(SHelper.Translation.Get("foodstore.noVisit." + randomIndex2), default, 2, 7000);
                     }
                     else if (getChance >= chanceToVisit)                                                 //No visit, normal or positive Food, Decor
                     {
-                        thisCharacter.showTextAboveHead(tasteString + ". " + decorString, -1, 2, 8000);
+                        thisCharacter.showTextAboveHead(tasteString + ". " + decorString, default, 2, 8000);
                         if (rand.NextDouble() > localNpcCount) continue;
 
-                        newCharacter.showTextAboveHead(SHelper.Translation.Get("foodstore.mayVisit." + randomIndex2), -1, 2, 7000);
+                        newCharacter.showTextAboveHead(SHelper.Translation.Get("foodstore.mayVisit." + randomIndex2), default, 2, 7000);
                     }
                     else { }    //Handle
                 }
@@ -1619,15 +1643,14 @@ namespace MarketTown
 
             List<string> resultList = new List<string>();
 
-            foreach (var obj in Game1.objectInformation)
+            foreach (var obj in Game1.objectData)
             {
                 var key = obj.Key;
                 var value = obj.Value;
-                string[] splitStrings = value.Split('/');
 
-                if (splitStrings.Length >= 3 && splitStrings[2] != "-300" && splitStrings[3] == "Cooking -7")
+                if (value.Category == -7)
                 {
-                    resultList.Add(splitStrings[0]);
+                    resultList.Add(value.Name);
                 }
             }
 
@@ -1653,12 +1676,12 @@ namespace MarketTown
                 {
                     try
                     {
-                        if (c.isVillager() && c.currentLocation!= null && c.currentLocation.Name == "Farm" && c.modData["hapyke.FoodStore/invited"] == "true" && c.modData["hapyke.FoodStore/inviteDate"] == (Game1.stats.daysPlayed - 1).ToString())
+                        if (c.isVillager() && c.currentLocation!= null && c.currentLocation.Name == "Farm" && c.modData["hapyke.FoodStore/invited"] == "true" && c.modData["hapyke.FoodStore/inviteDate"] == (Game1.stats.DaysPlayed - 1).ToString())
                         {
                             FarmOutside.WalkAround(c.Name);
                         }
 
-                        if (c.isVillager() && c.currentLocation != null && c.currentLocation.Name == "FarmHouse" && c.modData["hapyke.FoodStore/invited"] == "true" && c.modData["hapyke.FoodStore/inviteDate"] == (Game1.stats.daysPlayed - 1).ToString())
+                        if (c.isVillager() && c.currentLocation != null && c.currentLocation.Name == "FarmHouse" && c.modData["hapyke.FoodStore/invited"] == "true" && c.modData["hapyke.FoodStore/inviteDate"] == (Game1.stats.DaysPlayed - 1).ToString())
                         {
                             FarmOutside.WalkAround(c.Name);
                         }
@@ -1678,7 +1701,7 @@ namespace MarketTown
                     || Game1.eventUp
                     || Game1.isFestival()
                     || Game1.IsFading()
-                    || Game1.menuUp)
+                    || Game1.activeClickableMenu != null)
                 )
             {
                 TodaySelectedKid.Clear();
@@ -1728,7 +1751,7 @@ namespace MarketTown
                     Game1.activeClickableMenu = entryQuestion;
 
                     ActionList.Add(() => KidJoin(TodaySelectedKid));
-                    ActionList.Add(() => Game1.drawDialogue(Game1.getCharacterFromName(randomKey), SHelper.Translation.Get("foodstore.kidresponselist.boring")));
+                    ActionList.Add(() => Game1.DrawDialogue(new Dialogue(Game1.getCharacterFromName(randomKey), "key", SHelper.Translation.Get("foodstore.kidresponselist.boring"))));
 
                 }
             }
@@ -1739,9 +1762,9 @@ namespace MarketTown
             {
                 foreach (Building building in Game1.getFarm().buildings)
                 {
-                    if (building.nameOfIndoors.Contains("Shed") && CountShedVisitor(Game1.getLocationFromName(building.nameOfIndoors)) < Config.MaxShedCapacity)
+                    if (building != null && building.GetIndoorsName() != null && building.GetIndoorsName().Contains("Shed") && CountShedVisitor(Game1.getLocationFromName(building.GetIndoorsName())) < Config.MaxShedCapacity)
                     {
-                        foreach (var obj in Game1.getLocationFromName(building.nameOfIndoors).Objects.Values)
+                        foreach (var obj in Game1.getLocationFromName(building.GetIndoorsName()).Objects.Values)
                         {
                             if (obj is Sign sign && sign.displayItem.Value != null && (sign.displayItem.Value.Name == "Market License" || sign.displayItem.Value.Name == "Restaurant License"))
                             {
@@ -1781,18 +1804,18 @@ namespace MarketTown
                                 if (blockedNPC) return;
 
 
-                                visit.modData["hapyke.FoodStore/initLocation"] = visit.getTileX().ToString() + "," + visit.getTileY().ToString() ;
+                                visit.modData["hapyke.FoodStore/initLocation"] = visit.Tile.X.ToString() + "," + visit.Tile.Y.ToString() ;
                                 visit.modData["hapyke.FoodStore/initMap"] = visit.currentLocation.Name;
 
                                 List<Vector2> clearTiles = new List<Vector2>();
-                                if (Config.DoorEntry && building.getNameOfNextUpgrade() == "Big Shed")          // Alow warp at door and Shed lv0
+                                if (Config.DoorEntry && building.buildingType == "Shed")          // Alow warp at door and Shed lv0
                                 {
                                     for (int x = -1; x <= 1; x++)
                                     {
                                         for (int y = -1; y <= 1; y++)
                                         {
                                             Vector2 checkLocation = new Vector2(6f, 11f) + new Vector2(x, y);
-                                            if (Game1.currentLocation.isTileLocationTotallyClearAndPlaceable(checkLocation)) clearTiles.Add(checkLocation);
+                                            if (!Game1.currentLocation.IsTileBlockedBy(checkLocation)) clearTiles.Add(checkLocation);
                                         }
                                     }
 
@@ -1806,9 +1829,9 @@ namespace MarketTown
                                             visit.isCharging = true;
                                             visit.addedSpeed = 1;
                                             visit.temporaryController = new PathFindController(visit, visit.currentLocation, new Point(1, 24), 3,
-                                            (character, location) => Game1.warpCharacter(visit, building.nameOfIndoors, randomClearTile));
+                                            (character, location) => Game1.warpCharacter(visit, building.GetIndoorsName(), randomClearTile));
                                         }
-                                        else Game1.warpCharacter(visit, building.nameOfIndoors, randomClearTile);
+                                        else Game1.warpCharacter(visit, building.GetIndoorsName(), randomClearTile);
 
                                         visit.modData["hapyke.FoodStore/shedEntry"] = $"{randomClearTile.X},{randomClearTile.Y}";
                                     }
@@ -1820,9 +1843,9 @@ namespace MarketTown
                                             visit.isCharging = true;
                                             visit.addedSpeed = 1;
                                             visit.temporaryController = new PathFindController(visit, visit.currentLocation, new Point(1, 24), 3,
-                                            (character, location) => Game1.warpCharacter(visit, building.nameOfIndoors, new Vector2(6f, 11f)));
+                                            (character, location) => Game1.warpCharacter(visit, building.GetIndoorsName(), new Vector2(6f, 11f)));
                                         }
-                                        else Game1.warpCharacter(visit, building.nameOfIndoors, new Vector2(6f, 11f));
+                                        else Game1.warpCharacter(visit, building.GetIndoorsName(), new Vector2(6f, 11f));
 
                                         visit.modData["hapyke.FoodStore/shedEntry"] = "6,11";
                                     }
@@ -1836,7 +1859,8 @@ namespace MarketTown
                                         for (int y = -1; y <= 1; y++)
                                         {
                                             Vector2 checkLocation = new Vector2(9f, 14) + new Vector2(x, y);
-                                            if (Game1.currentLocation.isTileLocationTotallyClearAndPlaceable(checkLocation)) clearTiles.Add(checkLocation);
+                                            if (!Game1.currentLocation.IsTileBlockedBy(checkLocation)) clearTiles.Add(checkLocation);
+
                                         }
                                     }
 
@@ -1850,23 +1874,22 @@ namespace MarketTown
                                             visit.isCharging = true;
                                             visit.addedSpeed = 1;
                                             visit.temporaryController = new PathFindController(visit, visit.currentLocation, new Point(1, 24), 3,
-                                            (character, location) => Game1.warpCharacter(visit, building.nameOfIndoors, randomClearTile));
+                                            (character, location) => Game1.warpCharacter(visit, building.GetIndoorsName(), randomClearTile));
                                         }
-                                        else Game1.warpCharacter(visit, building.nameOfIndoors, randomClearTile);
+                                        else Game1.warpCharacter(visit, building.GetIndoorsName(), randomClearTile);
                                         visit.modData["hapyke.FoodStore/shedEntry"] = $"{randomClearTile.X},{randomClearTile.Y}";
                                     }
                                     else
                                     {
-
                                         if (Game1.player.currentLocation.Name == "BusStop" && Config.BusWalk && Game1.MasterPlayer.mailReceived.Contains("ccVault"))
                                         {
                                             Game1.warpCharacter(visit, "BusStop", new Point(13, 11));
                                             visit.isCharging = true;
                                             visit.addedSpeed = 1;
                                             visit.temporaryController = new PathFindController(visit, visit.currentLocation, new Point(1, 24), 3,
-                                            (character, location) => Game1.warpCharacter(visit, building.nameOfIndoors, new Vector2(9f, 14)));
+                                            (character, location) => Game1.warpCharacter(visit, building.GetIndoorsName(), new Vector2(9f, 14)));
                                         }
-                                        else Game1.warpCharacter(visit, building.nameOfIndoors, new Vector2(9f, 14));
+                                        else Game1.warpCharacter(visit, building.GetIndoorsName(), new Vector2(9f, 14));
 
 
                                         visit.modData["hapyke.FoodStore/shedEntry"] = "9,14";
@@ -1881,7 +1904,7 @@ namespace MarketTown
                                         for (int y = -1; y <= 1; y++)
                                         {
                                             Vector2 checkLocation = new Vector2(obj.TileLocation.X, obj.TileLocation.Y) + new Vector2(x, y);
-                                            if (Game1.currentLocation.isTileLocationTotallyClearAndPlaceable(checkLocation)) clearTiles.Add(checkLocation);
+                                            if (!Game1.currentLocation.IsTileBlockedBy(checkLocation)) clearTiles.Add(checkLocation);
                                         }
                                     }
 
@@ -1895,9 +1918,9 @@ namespace MarketTown
                                             visit.isCharging = true;
                                             visit.addedSpeed = 1;
                                             visit.temporaryController = new PathFindController(visit, visit.currentLocation, new Point(1, 24), 3,
-                                            (character, location) => Game1.warpCharacter(visit, building.nameOfIndoors, randomClearTile));
+                                            (character, location) => Game1.warpCharacter(visit, building.GetIndoorsName(), randomClearTile));
                                         }
-                                        else Game1.warpCharacter(visit, building.nameOfIndoors, randomClearTile);
+                                        else Game1.warpCharacter(visit, building.GetIndoorsName(), randomClearTile);
 
                                         visit.modData["hapyke.FoodStore/shedEntry"] = $"{randomClearTile.X},{randomClearTile.Y}";
                                     }
@@ -1909,9 +1932,9 @@ namespace MarketTown
                                             visit.isCharging = true;
                                             visit.addedSpeed = 1;
                                             visit.temporaryController = new PathFindController(visit, visit.currentLocation, new Point(1, 24), 3,
-                                            (character, location) => Game1.warpCharacter(visit, building.nameOfIndoors, new Vector2(obj.TileLocation.X, obj.TileLocation.Y)));
+                                            (character, location) => Game1.warpCharacter(visit, building.GetIndoorsName(), new Vector2(obj.TileLocation.X, obj.TileLocation.Y)));
                                         }
-                                        else Game1.warpCharacter(visit, building.nameOfIndoors, new Vector2(obj.TileLocation.X, obj.TileLocation.Y));
+                                        else Game1.warpCharacter(visit, building.GetIndoorsName(), new Vector2(obj.TileLocation.X, obj.TileLocation.Y));
 
 
                                         visit.modData["hapyke.FoodStore/shedEntry"] = (obj.TileLocation.X).ToString() + "," + (obj.TileLocation.Y).ToString();
@@ -1937,7 +1960,7 @@ namespace MarketTown
                 
                 if (c.currentLocation.Name.Contains("BusStop")                      // Count NPC walking at BusStop
                     && c.temporaryController != null
-                    && c.getTileLocation() != c.DefaultPosition / 64) count += 1;
+                    && c.Tile != c.DefaultPosition / 64) count += 1;
 
             }
             return count;
@@ -1948,7 +1971,8 @@ namespace MarketTown
         internal static List<string> Animals { get; private set; } = new();
         internal static Dictionary<int, string> Crops { get; private set; } = new();
 
-
+        // unused for weapon
+        /*
         private static T XmlDeserialize<T>(string toDeserialize)
         {
             XmlSerializer xmlSerializer = new XmlSerializer(typeof(T));
@@ -1976,7 +2000,7 @@ namespace MarketTown
                 {
                     if (furniture.heldObject.Value is WeaponProxy weaponProxy)
                     {
-                        StardewValley.Object placeholder = new StardewValley.Object(furniture.heldObject.Value.TileLocation, 0);
+                        StardewValley.Object placeholder = new StardewValley.Object(furniture.heldObject.Value.TileLocation, "(O)0");
                         placeholder.Name = $"WeaponProxy:{XmlSerialize(weaponProxy.Weapon)}";
                         furniture.heldObject.Set(placeholder);
                     }
@@ -1991,7 +2015,7 @@ namespace MarketTown
                     {
                         if (furniture.heldObject.Value is WeaponProxy weaponProxy)
                         {
-                            StardewValley.Object placeholder = new StardewValley.Object(furniture.heldObject.Value.TileLocation, 0);
+                            StardewValley.Object placeholder = new StardewValley.Object(furniture.heldObject.Value.TileLocation, "(O)0");
                             placeholder.Name = $"WeaponProxy:{XmlSerialize(weaponProxy.Weapon)}";
                             furniture.heldObject.Set(placeholder);
                         }
@@ -2052,5 +2076,6 @@ namespace MarketTown
                 } catch { }
             }
         }
+        */
     }
 }

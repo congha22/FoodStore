@@ -2,56 +2,6 @@
 "Format": "1.29.4",
   "Changes": [
     {
-      "Action": "EditData",
-      "Target": "Data/AntiSocialNPCs",
-      "Entries": {
-        "MT.Guest_Aguar":     true,
-        "MT.Guest_Alissa":    true,
-        "MT.Guest_Bert":      true,
-        "MT.Guest_Corine":    true,
-        "MT.Guest_Ezekiel":   true,
-        "MT.Guest_Flor":      true,
-        "MT.Guest_Freddie":   true,
-        "MT.Guest_Ian":       true,
-        "MT.Guest_Jeric":     true,
-        "MT.Guest_Keahi":     true,
-        "MT.Guest_Kenneth":   true,
-        "MT.Guest_Kiwi":      true,
-        "MT.Guest_Lenny":     true,
-        "MT.Guest_Lola":      true,
-        "MT.Guest_Maddie":    true,
-        "MT.Guest_Olga":      true,
-        "MT.Guest_Philip":    true,
-        "MT.Guest_Pika":      true,
-        "MT.Guest_Richard":   true,
-        "MT.Guest_Shiro":     true,
-        "MT.Guest_Trinnie":   true,
-        "MT.Guest_Ysabelle":  true,
-        "MT.Guest_Yuuma":     true,
-        "MT.Guest_Ariah":     true,
-        "MT.Guest_Maive":     true,
-        "MT.Guest_Louie":     true,
-        "MT.Guest_Irene":     true,
-        "MT.Guest_Sonny":     true,
-        "MT.Guest_Paula":     true,
-        "MT.Guest_Carmen":    true,
-        "MT.Guest_Blair":     true,
-        "MT.Guest_Lorenzo":   true,
-        "MT.Guest_Shanice":   true,
-        "MT.Guest_Anton":     true,
-        "MT.Guest_Kiarra":    true,
-        "MT.Guest_Sean":      true,
-        "MT.Guest_Faye":      true,
-        "MT.Guest_Malaya":    true,
-        "MT.Guest_Kimpoi":    true,
-        "MT.Guest_Naomi":     true,
-        "MT.Guest_Torts":     true,
-        "MT.Guest_June":      true
-      }
-    },
-
-
-    {
         "Action": "Load",
         "Target": "Characters/MT.Guest_Acorn,Characters/MT.Guest_Aguar,Characters/MT.Guest_Alissa,Characters/MT.Guest_Althea,Characters/MT.Guest_Anton,Characters/MT.Guest_Ariah,Characters/MT.Guest_Belinda,Characters/MT.Guest_Bert,Characters/MT.Guest_Blair,Characters/MT.Guest_Bliss,Characters/MT.Guest_Bryle,Characters/MT.Guest_Carmen,Characters/MT.Guest_Corine,Characters/MT.Guest_Daia,Characters/MT.Guest_Ezekiel,Characters/MT.Guest_Faye,Characters/MT.Guest_Flor,Characters/MT.Guest_Freddie,Characters/MT.Guest_Helen,Characters/MT.Guest_Ian,Characters/MT.Guest_Irene,Characters/MT.Guest_Jeric,Characters/MT.Guest_Jio,Characters/MT.Guest_June,Characters/MT.Guest_Keahi,Characters/MT.Guest_Kenneth,Characters/MT.Guest_Kiarra,Characters/MT.Guest_Kimpoi,Characters/MT.Guest_Kiwi,Characters/MT.Guest_Lenny,Characters/MT.Guest_Lola,Characters/MT.Guest_Lorenzo,Characters/MT.Guest_Lorraine,Characters/MT.Guest_Louie,Characters/MT.Guest_Maddie,Characters/MT.Guest_Maive,Characters/MT.Guest_Malaya,Characters/MT.Guest_Nadaline,Characters/MT.Guest_Naomi,Characters/MT.Guest_Olga,Characters/MT.Guest_Paula,Characters/MT.Guest_Philip,Characters/MT.Guest_Pika,Characters/MT.Guest_Pipo,Characters/MT.Guest_Raeriyala,Characters/MT.Guest_Richard,Characters/MT.Guest_Sari,Characters/MT.Guest_Sean,Characters/MT.Guest_Shanice,Characters/MT.Guest_Shiro,Characters/MT.Guest_Sonny,Characters/MT.Guest_Trinnie,Characters/MT.Guest_Undreya,Characters/MT.Guest_Ysabelle,Characters/MT.Guest_Yuuma,Characters/MT.Guest_Zachary,Characters/MT.Guest_Zayne",
         "FromFile": "assets/{{Target}}.png"
@@ -71,68 +21,1490 @@
 
     {
         "Action": "EditData",
-        "Target": "Data/NPCDispositions",
+        "Target": "Data/Characters",
         "Entries": {
-          "MT.Guest_Richard": "adult/neutral/neutral/neutral/male/non-datable/null/Town/fall 3/null/BusStop 7777 7777/Richard",
-			    "MT.Guest_Ysabelle": "adult/rude/outgoing/positive/female/non-datable/null/Town/spring 11//BusStop 7777 7777/Ysabelle",
-			    "MT.Guest_Flor": "adult/neutral/shy/negative/female/non-datable/null/Town/summer 14//BusStop 7777 7777/Flor",
-			    "MT.Guest_Philip": "adult/polite/outgoing/positive/male/non-datable/null/Town/spring 17//BusStop 7777 7777/Philip",
-			    "MT.Guest_Ian": "adult/polite/shy/positive/male/non-datable/null/Town/fall 14//BusStop 7777 7777/Ian",
-			    "MT.Guest_Sean": "adult/polite/outgoing/positive/male/non-datable/null/Town/spring 22//BusStop 7777 7777/Sean",
-			    "MT.Guest_Kenneth": "adult/neutral/neutral/neutral/male/non-datable/null/Town/summer 18//BusStop 7777 7777/Kenneth",
-			    "MT.Guest_Paula": "adult/polite/neutral/negative/female/non-datable/Anton/Town/fall 27//BusStop 7777 7777/Paula",
-			    "MT.Guest_Lenny": "adult/polite/outgoing/positive/female/non-datable/null/Town/summer 16//BusStop 7777 7777/Lenny",
-			    "MT.Guest_Maddie": "adult/rude/neutral/neutral/female/non-datable/null/Town/fall 23//BusStop 7777 7777/Maddie",
-			    "MT.Guest_Corine": "adult/polite/outgoing/positive/female/non-datable/null/Town/fall 26//BusStop 7777 7777/Corine",
-			    "MT.Guest_Ezekiel": "adult/rude/outgoing/positive/male/non-datable/null/Town/spring 12//BusStop 7777 7777/Ezekiel",
-			    "MT.Guest_Lorenzo": "adult/polite/neutral/positive/male/non-datable/null/Town/fall 1//BusStop 7777 7777/Lorenzo",
-			    "MT.Guest_Anton": "adult/polite/neutral/neutral/male/non-datable/Paula/Town/spring 9//BusStop 7777 7777/Anton",
-			    "MT.Guest_Kiarra": "adult/polite/outgoing/negative/female/non-datable/null/Town/summer 13//BusStop 7777 7777/Kiarra",
-			    "MT.Guest_Shanice": "adult/polite/neutral/neutral/female/non-datable/null/Town/winter 26//BusStop 7777 7777/Shanice",
-			    "MT.Guest_Jeric": "adult/polite/neutral/neutral/male/non-datable/null/Town/winter 2//BusStop 7777 7777/Jeric",
-			    "MT.Guest_Bryle": "adult/polite/outgoing/neutral/male/non-datable/Faye/Other/summer 1//BusStop 7777 7777/Bryle",
-			    "MT.Guest_Naomi": "adult/neutral/neutral/neutral/female/non-datable/null/Other/spring 18//BusStop 7777 7777/Naomi",
-			    "MT.Guest_Shiro": "adult/rude/shy/negative/male/non-datable/null/Town/winter 28//BusStop 7777 7777/Shiro",
-			    "MT.Guest_Yuuma": "child/neutral/neutral/neutral/male/non-datable/null/Town/fall 4//BusStop 7777 7777/Yuuma",
-			    "MT.Guest_Faye": "adult/polite/outgoing/positive/female/non-datable/Bryle/Town/summer 12//BusStop 7777 7777/Faye",
-			    "MT.Guest_Pika": "adult/polite/outgoing/neutral/male/non-datable/null/Town/winter 21//BusStop 7777 7777/Pika",
-			    "MT.Guest_Keahi": "child/polite/outgoing/positive/male/non-datable/null/Town/winter 11//BusStop 7777 7777/Keahi",
-			    "MT.Guest_Carmen": "adult/neutral/outgoing/positive/female/non-datable/null/Town/fall 21//BusStop 7777 7777/Carmen",
-			    "MT.Guest_Blair": "teen/polite/outgoing/positive/female/non-datable/null/Town/winter 5//BusStop 7777 7777/Blair",
-			    "MT.Guest_Freddie": "adult/polite/outgoing/positive/male/non-datable/null/Town/winter 18//BusStop 7777 7777/Freddie",
-			    "MT.Guest_Lola": "adult/polite/neutral/neutral/female/non-datable/null/Town/summer 2//BusStop 7777 7777/Lola",
-			    "MT.Guest_Maive": "adult/rude/neutral/negative/female/non-datable/null/Town/spring 14//BusStop 7777 7777/Maive",
-			    "MT.Guest_Zayne": "adult/polite/outgoing/positive/male/non-datable/Irene/Other/fall 2//BusStop 7777 7777/Zayne",
-			    "MT.Guest_Ariah": "teen/polite/neutral/positive/female/non-datable/null/Town/fall 4//BusStop 7777 7777/Ariah",
-			    "MT.Guest_Louie": "child/rude/outgoing/positive/male/non-datable/null/Town/winter 16//BusStop 7777 7777/Louie",
-			    "MT.Guest_Sonny": "adult/polite/neutral/neutral/male/non-datable/null/Town/spring 28//BusStop 7777 7777/Sonny",
-			    "MT.Guest_Irene": "adult/polite/neutral/positive/female/non-datable/Zayne/Town/winter 27//BusStop 7777 7777/Irene",
-			    "MT.Guest_Althea": "adult/rude/neutral/neutral/female/non-datable/null/Other/null//BusStop 7777 7777/Althea",
-			    "MT.Guest_Lorraine": "adult/polite/neutral/neutral/female/non-datable/null/Other/null//BusStop 7777 7777/Lorraine",
-			    "MT.Guest_Nadaline": "child/polite/neutral/neutral/female/non-datable/null/Other/null//BusStop 7777 7777/Nadaline",
-			    "MT.Guest_Zachary": "adult/polite/neutral/neutral/male/non-datable/null/Other/null//BusStop 7777 7777/Zachary",
-			    "MT.Guest_Aguar": "adult/rude/neutral/negative/male/non-datable/null/Town/summer 25//BusStop 7777 7777/Aguar",
-			    "MT.Guest_Alissa": "teen/polite/shy/neutral/female/non-datable/null/Town/spring 5//BusStop 7777 7777/Alissa",
-			    "MT.Guest_Malaya": "adult/polite/outgoing/positive/female/non-datable/null/Other/summer 27//BusStop 7777 7777/Malaya",
-			    "MT.Guest_Kimpoi": "adult/polite/shy/positive/male/non-datable/null/Other/fall 5//BusStop 7777 7777/Kimpoi",
-			    "MT.Guest_Trinnie": "child/polite/outgoing/negative/female/non-datable/null/Town/spring 16//BusStop 7777 7777/Trinnie",
-			    "MT.Guest_Olga": "adult/polite/neutral/positive/female/non-datable/null/Town/summer 9//BusStop 7777 7777/Olga",
-			    "MT.Guest_Bert": "adult/neutral/neutral/neutral/male/non-datable/null/Town/spring 28//BusStop 7777 7777/Bert",
-			    "MT.Guest_Belinda": "adult/neutral/outgoing/positive/female/non-datable/null/Other/null//BusStop 7777 7777/Belinda",
-			    "MT.Guest_Raeriyala": "adult/polite/outgoing/positive/female/non-datable/null/Other/null//BusStop 7777 7777/Raeriyala",
-			    "MT.Guest_Undreya": "child/neutral/neutral/neutral/female/non-datable/null/Other/null//BusStop 7777 7777/Undreya",
-			    "MT.Guest_Sari": "adult/polite/outgoing/positive/female/non-datable/null/Other/null//BusStop 7777 7777/Sari",
-			    "MT.Guest_Pipo": "child/polite/outgoing/positive/male/non-datable/null/Other/null//BusStop 7777 7777/Pipo",
-			    "MT.Guest_Acorn": "child/polite/outgoing/positive/male/non-datable/null/Other/null//BusStop 7777 7777/Acorn",
-			    "MT.Guest_Helen": "adult/neutral/neutral/neutral/female/non-datable/null/Other/null//BusStop 7777 7777/Helen",
-			    "MT.Guest_Daia": "adult/neutral/outgoing/positive/female/non-datable/null/Other/null//BusStop 7777 7777/Daia",
-			    "MT.Guest_Jio": "adult/neutral/neutral/neutral/male/non-datable/null/Other/null//BusStop 7777 7777/Jio",
-			    "MT.Guest_Bliss": "child/rude/neutral/negative/female/non-datable/null/Other/null//BusStop 7777 7777/Bliss",
-			    "MT.Guest_Kiwi": "child/rude/outgoing/negative/female/non-datable/null/Other/null//BusStop 7777 7777/Kiwi",
-			    "MT.Guest_TreehouseGirl": "child/polite/neutral/neutral/female/non-datable/null/Other/null//BusStop 7777 7777/???",
-			    "MT.Guest_RelicSpirit": "child/polite/neutral/neutral/male/non-datable/null/Other/null//BusStop 7777 7777/???",
-			    "MT.Guest_Torts": "child/neutral/neutral/neutral/male/non-datable/null/Other/spring 1//BusStop 7777 7777/Torts",
-			    "MT.Guest_June": "adult/neutral/neutral/neutral/male/non-datable/null/Town/fall 12/ PregnancyRole make/BusStop 7777 7777/June"
+          "MT.Guest_Richard": {
+       "DisplayName": "MT.Guest_Richard",
+        "Gender": "male",
+        "Age": "adult",
+        "Manner": "neutral",
+        "SocialAnxiety": "neutral",
+        "Optimism": "neutral",
+        "BirthSeason": "Fall",
+        "BirthDay": "3",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Ysabelle": {
+       "DisplayName": "MT.Guest_Ysabelle",
+        "Gender": "female",
+        "Age": "adult",
+        "Manner": "rude",
+        "SocialAnxiety": "outgoing",
+        "Optimism": "positive",
+        "BirthSeason": "Spring",
+        "BirthDay": "11",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Flor": {
+       "DisplayName": "MT.Guest_Flor",
+        "Gender": "female",
+        "Age": "adult",
+        "Manner": "neutral",
+        "SocialAnxiety": "shy",
+        "Optimism": "negative",
+        "BirthSeason": "Summer",
+        "BirthDay": "14",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Philip": {
+       "DisplayName": "MT.Guest_Philip",
+        "Gender": "male",
+        "Age": "adult",
+        "Manner": "polite",
+        "SocialAnxiety": "outgoing",
+        "Optimism": "positive",
+        "BirthSeason": "Spring",
+        "BirthDay": "17",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Ian": {
+       "DisplayName": "MT.Guest_Ian",
+        "Gender": "male",
+        "Age": "adult",
+        "Manner": "polite",
+        "SocialAnxiety": "shy",
+        "Optimism": "positive",
+        "BirthSeason": "Fall",
+        "BirthDay": "14",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Sean": {
+       "DisplayName": "MT.Guest_Sean",
+        "Gender": "male",
+        "Age": "adult",
+        "Manner": "polite",
+        "SocialAnxiety": "outgoing",
+        "Optimism": "positive",
+        "BirthSeason": "Spring",
+        "BirthDay": "22",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Kenneth": {
+       "DisplayName": "MT.Guest_Kenneth",
+        "Gender": "male",
+        "Age": "adult",
+        "Manner": "neutral",
+        "SocialAnxiety": "neutral",
+        "Optimism": "neutral",
+        "BirthSeason": "Summer",
+        "BirthDay": "18",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Paula": {
+       "DisplayName": "MT.Guest_Paula",
+        "Gender": "female",
+        "Age": "adult",
+        "Manner": "polite",
+        "SocialAnxiety": "neutral",
+        "Optimism": "negative",
+        "BirthSeason": "Fall",
+        "BirthDay": "27",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Lenny": {
+       "DisplayName": "MT.Guest_Lenny",
+        "Gender": "female",
+        "Age": "adult",
+        "Manner": "polite",
+        "SocialAnxiety": "outgoing",
+        "Optimism": "positive",
+        "BirthSeason": "Summer",
+        "BirthDay": "16",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Maddie": {
+       "DisplayName": "MT.Guest_Maddie",
+        "Gender": "female",
+        "Age": "adult",
+        "Manner": "rude",
+        "SocialAnxiety": "neutral",
+        "Optimism": "neutral",
+        "BirthSeason": "Fall",
+        "BirthDay": "23",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Corine": {
+       "DisplayName": "MT.Guest_Corine",
+        "Gender": "female",
+        "Age": "adult",
+        "Manner": "polite",
+        "SocialAnxiety": "outgoing",
+        "Optimism": "positive",
+        "BirthSeason": "Fall",
+        "BirthDay": "26",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Ezekiel": {
+       "DisplayName": "MT.Guest_Ezekiel",
+        "Gender": "male",
+        "Age": "adult",
+        "Manner": "rude",
+        "SocialAnxiety": "outgoing",
+        "Optimism": "positive",
+        "BirthSeason": "Spring",
+        "BirthDay": "12",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Lorenzo": {
+      "DisplayName": "MT.Guest_Lorenzo",
+        "Gender": "male",
+        "Age": "adult",
+        "Manner": "polite",
+        "SocialAnxiety": "neutral",
+        "Optimism": "positive",
+        "BirthSeason": "Fall",
+        "BirthDay": "1",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Anton": {
+       "DisplayName": "MT.Guest_Anton",
+        "Gender": "male",
+        "Age": "adult",
+        "Manner": "polite",
+        "SocialAnxiety": "neutral",
+        "Optimism": "neutral",
+        "BirthSeason": "Spring",
+        "BirthDay": "9",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Kiarra": {
+       "DisplayName": "MT.Guest_Kiarra",
+        "Gender": "female",
+        "Age": "adult",
+        "Manner": "polite",
+        "SocialAnxiety": "outgoing",
+        "Optimism": "negative",
+        "BirthSeason": "Summer",
+        "BirthDay": "13",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Shanice": {
+       "DisplayName": "MT.Guest_Shanice",
+        "Gender": "female",
+        "Age": "adult",
+        "Manner": "polite",
+        "SocialAnxiety": "neutral",
+        "Optimism": "neutral",
+        "BirthSeason": "Winter",
+        "BirthDay": "26",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Jeric": {
+       "DisplayName": "MT.Guest_Jeric",
+        "Gender": "male",
+        "Age": "adult",
+        "Manner": "polite",
+        "SocialAnxiety": "neutral",
+        "Optimism": "neutral",
+        "BirthSeason": "Winter",
+        "BirthDay": "2",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Bryle": {
+       "DisplayName": "MT.Guest_Bryle",
+        "Gender": "male",
+        "Age": "adult",
+        "Manner": "polite",
+        "SocialAnxiety": "outgoing",
+        "Optimism": "neutral",
+        "BirthSeason": "Summer",
+        "BirthDay": "1",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Naomi": {
+       "DisplayName": "MT.Guest_Naomi",
+        "Gender": "female",
+        "Age": "adult",
+        "Manner": "neutral",
+        "SocialAnxiety": "neutral",
+        "Optimism": "neutral",
+        "BirthSeason": "Spring",
+        "BirthDay": "18",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Shiro": {
+       "DisplayName": "MT.Guest_Shiro",
+        "Gender": "male",
+        "Age": "adult",
+        "Manner": "rude",
+        "SocialAnxiety": "shy",
+        "Optimism": "negative",
+        "BirthSeason": "Winter",
+        "BirthDay": "28",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Yuuma": {
+       "DisplayName": "MT.Guest_Yuuma",
+        "Gender": "male",
+        "Age": "child",
+        "Manner": "neutral",
+        "SocialAnxiety": "neutral",
+        "Optimism": "neutral",
+        "BirthSeason": "Fall",
+        "BirthDay": "4",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Faye": {
+       "DisplayName": "MT.Guest_Faye",
+        "Gender": "female",
+        "Age": "adult",
+        "Manner": "polite",
+        "SocialAnxiety": "outgoing",
+        "Optimism": "positive",
+        "BirthSeason": "Summer",
+        "BirthDay": "12",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Pika": {
+       "DisplayName": "MT.Guest_Pika",
+        "Gender": "male",
+        "Age": "adult",
+        "Manner": "polite",
+        "SocialAnxiety": "outgoing",
+        "Optimism": "neutral",
+        "BirthSeason": "Winter",
+        "BirthDay": "21",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Keahi": {
+       "DisplayName": "MT.Guest_Keahi",
+        "Gender": "male",
+        "Age": "child",
+        "Manner": "polite",
+        "SocialAnxiety": "outgoing",
+        "Optimism": "positive",
+        "BirthSeason": "Winter",
+        "BirthDay": "11",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Carmen": {
+       "DisplayName": "MT.Guest_Carmen",
+        "Gender": "female",
+        "Age": "adult",
+        "Manner": "neutral",
+        "SocialAnxiety": "outgoing",
+        "Optimism": "positive",
+        "BirthSeason": "Fall",
+        "BirthDay": "21",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Blair": {
+       "DisplayName": "MT.Guest_Blair",
+        "Gender": "female",
+        "Age": "teen",
+        "Manner": "polite",
+        "SocialAnxiety": "outgoing",
+        "Optimism": "positive",
+        "BirthSeason": "Winter",
+        "BirthDay": "5",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Freddie": {
+       "DisplayName": "MT.Guest_Freddie",
+        "Gender": "male",
+        "Age": "adult",
+        "Manner": "polite",
+        "SocialAnxiety": "outgoing",
+        "Optimism": "positive",
+        "BirthSeason": "Winter",
+        "BirthDay": "18",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Lola": {
+       "DisplayName": "MT.Guest_Lola",
+        "Gender": "female",
+        "Age": "adult",
+        "Manner": "polite",
+        "SocialAnxiety": "neutral",
+        "Optimism": "neutral",
+        "BirthSeason": "Summer",
+        "BirthDay": "2",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Maive": {
+       "DisplayName": "MT.Guest_Maive",
+        "Gender": "female",
+        "Age": "adult",
+        "Manner": "rude",
+        "SocialAnxiety": "neutral",
+        "Optimism": "negative",
+        "BirthSeason": "Spring",
+        "BirthDay": "14",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Zayne": {
+       "DisplayName": "MT.Guest_Zayne",
+        "Gender": "male",
+        "Age": "adult",
+        "Manner": "polite",
+        "SocialAnxiety": "outgoing",
+        "Optimism": "positive",
+        "BirthSeason": "Fall",
+        "BirthDay": "2",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Ariah": {
+       "DisplayName": "MT.Guest_Ariah",
+        "Gender": "female",
+        "Age": "teen",
+        "Manner": "polite",
+        "SocialAnxiety": "neutral",
+        "Optimism": "positive",
+        "BirthSeason": "Fall",
+        "BirthDay": "4",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Louie": {
+       "DisplayName": "MT.Guest_Louie",
+        "Gender": "male",
+        "Age": "child",
+        "Manner": "rude",
+        "SocialAnxiety": "outgoing",
+        "Optimism": "positive",
+        "BirthSeason": "Winter",
+        "BirthDay": "16",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Sonny": {
+       "DisplayName": "MT.Guest_Sonny",
+        "Gender": "male",
+        "Age": "adult",
+        "Manner": "polite",
+        "SocialAnxiety": "neutral",
+        "Optimism": "neutral",
+        "BirthSeason": "Spring",
+        "BirthDay": "28",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Irene": {
+       "DisplayName": "MT.Guest_Irene",
+        "Gender": "female",
+        "Age": "adult",
+        "Manner": "polite",
+        "SocialAnxiety": "neutral",
+        "Optimism": "positive",
+        "BirthSeason": "Winter",
+        "BirthDay": "27",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Althea": {
+       "DisplayName": "MT.Guest_Althea",
+        "Gender": "female",
+        "Age": "adult",
+        "Manner": "rude",
+        "SocialAnxiety": "neutral",
+        "Optimism": "neutral",
+        "BirthSeason": "Winter",
+        "BirthDay": "29",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Lorraine": {
+       "DisplayName": "MT.Guest_Lorraine",
+        "Gender": "female",
+        "Age": "adult",
+        "Manner": "polite",
+        "SocialAnxiety": "neutral",
+        "Optimism": "neutral",
+        "BirthSeason": "Winter",
+        "BirthDay": "29",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Nadaline": {
+       "DisplayName": "MT.Guest_Nadaline",
+        "Gender": "female",
+        "Age": "child",
+        "Manner": "polite",
+        "SocialAnxiety": "neutral",
+        "Optimism": "neutral",
+        "BirthSeason": "Winter",
+        "BirthDay": "29",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Zachary": {
+       "DisplayName": "MT.Guest_Zachary",
+        "Gender": "male",
+        "Age": "adult",
+        "Manner": "polite",
+        "SocialAnxiety": "neutral",
+        "Optimism": "neutral",
+        "BirthSeason": "Winter",
+        "BirthDay": "29",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Aguar": {
+       "DisplayName": "MT.Guest_Aguar",
+        "Gender": "male",
+        "Age": "adult",
+        "Manner": "rude",
+        "SocialAnxiety": "neutral",
+        "Optimism": "negative",
+        "BirthSeason": "Summer",
+        "BirthDay": "25",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Alissa": {
+       "DisplayName": "MT.Guest_Alissa",
+        "Gender": "female",
+        "Age": "teen",
+        "Manner": "polite",
+        "SocialAnxiety": "shy",
+        "Optimism": "neutral",
+        "BirthSeason": "Spring",
+        "BirthDay": "5",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Malaya": {
+       "DisplayName": "MT.Guest_Malaya",
+        "Gender": "female",
+        "Age": "adult",
+        "Manner": "polite",
+        "SocialAnxiety": "outgoing",
+        "Optimism": "positive",
+        "BirthSeason": "Summer",
+        "BirthDay": "27",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Kimpoi": {
+       "DisplayName": "MT.Guest_Kimpoi",
+        "Gender": "male",
+        "Age": "adult",
+        "Manner": "polite",
+        "SocialAnxiety": "shy",
+        "Optimism": "positive",
+        "BirthSeason": "Fall",
+        "BirthDay": "5",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Trinnie": {
+       "DisplayName": "MT.Guest_Trinnie",
+        "Gender": "female",
+        "Age": "child",
+        "Manner": "polite",
+        "SocialAnxiety": "outgoing",
+        "Optimism": "negative",
+        "BirthSeason": "Spring",
+        "BirthDay": "16",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Olga": {
+       "DisplayName": "MT.Guest_Olga",
+        "Gender": "female",
+        "Age": "adult",
+        "Manner": "polite",
+        "SocialAnxiety": "neutral",
+        "Optimism": "positive",
+        "BirthSeason": "Summer",
+        "BirthDay": "9",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Bert": {
+       "DisplayName": "MT.Guest_Bert",
+        "Gender": "male",
+        "Age": "adult",
+        "Manner": "neutral",
+        "SocialAnxiety": "neutral",
+        "Optimism": "neutral",
+        "BirthSeason": "Spring",
+        "BirthDay": "28",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Belinda": {
+       "DisplayName": "MT.Guest_Belinda",
+        "Gender": "female",
+        "Age": "adult",
+        "Manner": "neutral",
+        "SocialAnxiety": "outgoing",
+        "Optimism": "positive",
+        "BirthSeason": "Winter",
+        "BirthDay": "29",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Raeriyala": {
+       "DisplayName": "MT.Guest_Raeriyala",
+        "Gender": "female",
+        "Age": "adult",
+        "Manner": "polite",
+        "SocialAnxiety": "outgoing",
+        "Optimism": "positive",
+        "BirthSeason": "Winter",
+        "BirthDay": "29",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Undreya": {
+       "DisplayName": "MT.Guest_Undreya",
+        "Gender": "female",
+        "Age": "child",
+        "Manner": "neutral",
+        "SocialAnxiety": "neutral",
+        "Optimism": "neutral",
+        "BirthSeason": "Winter",
+        "BirthDay": "29",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Sari": {
+       "DisplayName": "MT.Guest_Sari",
+        "Gender": "female",
+        "Age": "adult",
+        "Manner": "polite",
+        "SocialAnxiety": "outgoing",
+        "Optimism": "positive",
+        "BirthSeason": "Winter",
+        "BirthDay": "29",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Pipo": {
+       "DisplayName": "MT.Guest_Pipo",
+        "Gender": "male",
+        "Age": "child",
+        "Manner": "polite",
+        "SocialAnxiety": "outgoing",
+        "Optimism": "positive",
+        "BirthSeason": "Winter",
+        "BirthDay": "29",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Acorn": {
+       "DisplayName": "MT.Guest_Acorn",
+        "Gender": "male",
+        "Age": "child",
+        "Manner": "polite",
+        "SocialAnxiety": "outgoing",
+        "Optimism": "positive",
+        "BirthSeason": "Winter",
+        "BirthDay": "29",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Helen": {
+       "DisplayName": "MT.Guest_Helen",
+        "Gender": "female",
+        "Age": "adult",
+        "Manner": "neutral",
+        "SocialAnxiety": "neutral",
+        "Optimism": "neutral",
+        "BirthSeason": "Winter",
+        "BirthDay": "29",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Daia": {
+       "DisplayName": "MT.Guest_Daia",
+        "Gender": "female",
+        "Age": "adult",
+        "Manner": "neutral",
+        "SocialAnxiety": "outgoing",
+        "Optimism": "positive",
+        "BirthSeason": "Winter",
+        "BirthDay": "29",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Jio": {
+       "DisplayName": "MT.Guest_Jio",
+        "Gender": "male",
+        "Age": "adult",
+        "Manner": "neutral",
+        "SocialAnxiety": "neutral",
+        "Optimism": "neutral",
+        "BirthSeason": "Winter",
+        "BirthDay": "29",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Bliss": {
+       "DisplayName": "MT.Guest_Bliss",
+        "Gender": "female",
+        "Age": "child",
+        "Manner": "rude",
+        "SocialAnxiety": "neutral",
+        "Optimism": "negative",
+        "BirthSeason": "Winter",
+        "BirthDay": "29",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_Kiwi": {
+       "DisplayName": "MT.Guest_Kiwi",
+        "Gender": "female",
+        "Age": "child",
+        "Manner": "rude",
+        "SocialAnxiety": "outgoing",
+        "Optimism": "negative",
+        "BirthSeason": "Winter",
+        "BirthDay": "29",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    },
+    "MT.Guest_June": {
+       "DisplayName": "MT.Guest_June",
+        "Gender": "male",
+        "Age": "adult",
+        "Manner": "neutral",
+        "SocialAnxiety": "neutral",
+        "Optimism": "neutral",
+        "BirthSeason": "Fall",
+        "BirthDay": "12",
+        "HomeRegion": "Other",
+        "CanVisitIsland": null,
+        "Calendar": "HiddenAlways",
+        "SocialTab": "HiddenAlways",
+        "PerfectionScore": false,
+        "EndSlideShow": "Hidden",
+        "Home": [
+            {
+                "Id": "Default",
+                "Location": "BusStop",
+                "Tile": {
+                    "X": "7777",
+                    "Y": "7777"
+                }
+            }
+        ]
+    }
         }
     },
 
