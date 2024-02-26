@@ -38,11 +38,20 @@
 		<None Update="[CP] CloneNPC_RSV\**\*">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+		<None Update="[MFM] MarketTown\**\*">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 		<None Update="[] MarketTown\**\*">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
-
+	<ItemGroup>
+		<Reference Include="MailFrameworkMod">
+			<SpecificVersion>False</SpecificVersion>
+			<HintPath>$(GamePath)\Mods\MailFrameworkMod\MailFrameworkMod.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.1.1" />

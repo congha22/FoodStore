@@ -42,7 +42,7 @@
                     "Price": 15000,
                     "TradeItemId": 336,
                     "TradeItemAmount": 5,
-                    "Condition": "PLAYER_FARMING_LEVEL current 4, PLAYER_FORAGING_LEVEL current 4, PLAYER_FISHING_LEVEL current 4, PLAYER_MINING_LEVEL current 4, PLAYER_STAT current ItemsCooked 25"
+                    "Condition": "PLAYER_HAS_MAIL any MT.MarketTownLicense received"
 
                 }
             }
@@ -56,7 +56,7 @@
                     "Id": "MT.Objects.MarketLicense",
                     "ItemId": "(O)MT.Objects.MarketLicense",
                     "Price": 3000,
-                    "Condition": "PLAYER_FARMING_LEVEL current 5, PLAYER_FORAGING_LEVEL current 5, PLAYER_FISHING_LEVEL current 5, PLAYER_MINING_LEVEL current 5"
+                    "Condition": "PLAYER_HAS_MAIL any MT.MarketTownLicense received"
                 }
             }
         },
@@ -71,7 +71,7 @@
                     "Price": 8000,
                     "TradeItemId": 336,
                     "TradeItemAmount": 2,
-                    "Condition": "PLAYER_FARMING_LEVEL current 2, PLAYER_FORAGING_LEVEL current 2, PLAYER_STAT current ItemsCooked 10"
+                    "Condition": "PLAYER_HAS_MAIL any MT.RestaurantLicense received"
                 }
             }
         }

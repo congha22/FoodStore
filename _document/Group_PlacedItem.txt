@@ -16,9 +16,9 @@
 -16: Resouce building ( battery, grass)
 -15: Resource metal
 -12: Mineral
--8: Crating
--7: Cooking
--6: Milk
--5: Egg
--4: Fish
--2: Gem (Aquamine, Earth cyrstal)
+-8:	 Crating
+-7:	 Cooking
+-6:	 Milk
+-5:	 Egg
+-4:	 Fish
+-2:	 Gem (Aquamine, Earth cyrstal)

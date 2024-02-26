@@ -773,6 +773,7 @@
   "neutral-order-reaction-2":                         "Alright",
   "neutral-order-reaction-3":                         "Cool!",
 
-  "foodstore.config.shedvisitor":                     "  Visitors Special Request"
+  "foodstore.config.shedvisitor":                     "  Visitors Special Request",
+  "foodstore.mailtotal":                              "Total Market earning: {{totalEarning}}G^^  Earning yesterday: {{sellMoney}}G^^"
 
 }

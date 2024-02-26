@@ -41,6 +41,8 @@ using System.Text.RegularExpressions;
 using xTile;
 using xTile.Dimensions;
 using StardewValley.Pathfinding;
+using MailFrameworkMod;
+using StardewValley.GameData.Tools;
 
 namespace MarketTown
 {
@@ -80,7 +82,24 @@ namespace MarketTown
         internal static List<(string locationName, int x, int y)> ChairPositions { get; private set; } = new List<(string, int, int)>();
 
 
-
+        internal static MailData mailData = new MailData();
+        public static string TodaySell = "";
+        public static int TodayMoney = 0;
+        public static int TodayForageSold = 0;
+        public static int TodayFlowerSold = 0;
+        public static int TodayFruitSold = 0;
+        public static int TodayVegetableSold = 0;
+        public static int TodaySeedSold = 0;
+        public static int TodayMonsterLootSold = 0;
+        public static int TodaySyrupSold = 0;
+        public static int TodayArtisanGoodSold = 0;
+        public static int TodayAnimalProductSold = 0;
+        public static int TodayResourceMetalSold = 0;
+        public static int TodayMineralSold = 0;
+        public static int TodayCraftingSold = 0;
+        public static int TodayCookingSold = 0;
+        public static int TodayFishSold = 0;
+        public static int TodayGemSold = 0;
         //
         // *************************** ENTRY ***************************
         //
@@ -165,6 +184,24 @@ namespace MarketTown
 
         private void GameLoop_DayStarted(object sender, StardewModdingAPI.Events.DayStartedEventArgs e)
         {
+            TodaySell = ""; 
+            TodayMoney = 0;
+            TodayForageSold = 0;
+            TodayFlowerSold = 0;
+            TodayFruitSold = 0;
+            TodayVegetableSold = 0;
+            TodaySeedSold = 0;
+            TodayMonsterLootSold = 0;
+            TodaySyrupSold = 0;
+            TodayArtisanGoodSold = 0;
+            TodayAnimalProductSold = 0;
+            TodayResourceMetalSold = 0;
+            TodayMineralSold = 0;
+            TodayCraftingSold = 0;
+            TodayCookingSold = 0;
+            TodayFishSold = 0;
+            TodayGemSold = 0;
+
             fridgeDict.Clear();
             npcOrderNumbers.Value.Clear();
             emoteSprite = SHelper.ModContent.Load<Texture2D>(Path.Combine("Assets", "emote.png"));
@@ -350,7 +387,6 @@ namespace MarketTown
             {
                 return;
             }
-
             Item item = null;
             if (args[0] == "display")
             {
@@ -856,6 +892,9 @@ namespace MarketTown
         {
             if (!Config.EnableMod)
                 return;
+
+            new MailLoader(SHelper);
+
             if (ResponseList?.Count is not 4)
             {
                 ResponseList.Add(new Response("Talk", SHelper.Translation.Get("foodstore.responselist.talk")));
@@ -932,6 +971,150 @@ namespace MarketTown
 
         private void GameLoop_DayEnding(object sender, DayEndingEventArgs e)
         {
+            try
+            {
+                var mailHistory = MailRepository.FindLetter("MT.SellLogMail");
+                var weeklyHistory = MailRepository.FindLetter("MT.WeeklyLogMail");
+
+                if (mailHistory != null) MailRepository.RemoveLetter(mailHistory);
+                if (weeklyHistory != null) MailRepository.RemoveLetter(weeklyHistory);
+
+            }
+            catch { }
+
+            int totalMoney = 0;
+
+            int weeklyForageSold = 0;
+            int weeklyFlowerSold = 0;
+            int weeklyFruitSold = 0;
+            int weeklyVegetableSold = 0;
+            int weeklySeedSold = 0;
+            int weeklyMonsterLootSold = 0;
+            int weeklySyrupSold = 0;
+            int weeklyArtisanGoodSold = 0;
+            int weeklyAnimalProductSold = 0;
+            int weeklyResourceMetalSold = 0;
+            int weeklyMineralSold = 0;
+            int weeklyCraftingSold = 0;
+            int weeklyCookingSold = 0;
+            int weeklyFishSold = 0;
+            int weeklyGemSold = 0;
+
+            int totalForageSold  = 0;
+            int totalFlowerSold  = 0;
+            int totalFruitSold  = 0;
+            int totalVegetableSold  = 0;
+            int totalSeedSold  = 0;
+            int totalMonsterLootSold  = 0;
+            int totalSyrupSold  = 0;
+            int totalArtisanGoodSold  = 0;
+            int totalAnimalProductSold  = 0;
+            int totalResourceMetalSold  = 0;
+            int totalMineralSold  = 0;
+            int totalCraftingSold  = 0;
+            int totalCookingSold  = 0;
+            int totalFishSold  = 0;
+            int totalGemSold  = 0;
+
+            var model = this.Helper.Data.ReadSaveData<MailData>("MT.MailLog");
+            if (model != null)
+            {
+                totalMoney = model.TotalEarning;
+
+                weeklyForageSold = model.ForageSold;
+                weeklyFlowerSold = model.FlowerSold;
+                weeklyFruitSold = model.FruitSold;
+                weeklyVegetableSold = model.VegetableSold;
+                weeklySeedSold = model.SeedSold;
+                weeklyMonsterLootSold = model.MonsterLootSold;
+                weeklySyrupSold = model.SyrupSold;
+                weeklyArtisanGoodSold = model.ArtisanGoodSold;
+                weeklyAnimalProductSold = model.AnimalProductSold;
+                weeklyResourceMetalSold = model.ResourceMetalSold;
+                weeklyMineralSold = model.MineralSold;
+                weeklyCraftingSold = model.CraftingSold;
+                weeklyCookingSold = model.CookingSold;
+                weeklyFishSold = model.FishSold;
+                weeklyGemSold = model.GemSold;
+
+                totalForageSold = model.TotalForageSold;
+                totalFlowerSold = model.TotalFlowerSold;
+                totalFruitSold = model.TotalFruitSold;
+                totalVegetableSold = model.TotalVegetableSold;
+                totalSeedSold = model.TotalSeedSold;
+                totalMonsterLootSold = model.TotalMonsterLootSold;
+                totalSyrupSold = model.TotalSyrupSold;
+                totalArtisanGoodSold = model.TotalArtisanGoodSold;
+                totalAnimalProductSold = model.TotalAnimalProductSold;
+                totalResourceMetalSold = model.TotalResourceMetalSold;
+                totalMineralSold = model.TotalMineralSold;
+                totalCraftingSold = model.TotalCraftingSold;
+                totalCookingSold = model.TotalCookingSold;
+                totalFishSold = model.TotalFishSold;
+                totalGemSold = model.TotalGemSold;
+
+                if (Game1.dayOfMonth == 1 || Game1.dayOfMonth == 8 || Game1.dayOfMonth == 15 || Game1.dayOfMonth == 22)
+                {
+                    weeklyForageSold = 0;
+                    weeklyFlowerSold = 0;
+                    weeklyFruitSold = 0;
+                    weeklyVegetableSold = 0;
+                    weeklySeedSold = 0;
+                    weeklyMonsterLootSold = 0;
+                    weeklySyrupSold = 0;
+                    weeklyArtisanGoodSold = 0;
+                    weeklyAnimalProductSold = 0;
+                    weeklyResourceMetalSold = 0;
+                    weeklyMineralSold = 0;
+                    weeklyCraftingSold = 0;
+                    weeklyCookingSold = 0;
+                    weeklyFishSold = 0;
+                    weeklyGemSold = 0;
+                }
+            }
+
+
+            MailData dataToSave = new MailData
+            {
+                TotalEarning = totalMoney + TodayMoney,
+                SellMoney = TodayMoney,
+                SellList = TodaySell,
+
+                ForageSold = TodayForageSold+                        + weeklyForageSold ,    
+                FlowerSold = TodayFlowerSold+                        + weeklyFlowerSold,
+                FruitSold = TodayFruitSold+                          + weeklyFruitSold ,
+                VegetableSold = TodayVegetableSold+                  + weeklyVegetableSold,
+                SeedSold = TodaySeedSold+                            + weeklySeedSold ,
+                MonsterLootSold = TodayMonsterLootSold+              + weeklyMonsterLootSold ,
+                SyrupSold = TodaySyrupSold+                          + weeklySyrupSold ,
+                ArtisanGoodSold = TodayArtisanGoodSold+              + weeklyArtisanGoodSold ,
+                AnimalProductSold = TodayAnimalProductSold+          + weeklyAnimalProductSold,
+                ResourceMetalSold = TodayResourceMetalSold+          + weeklyResourceMetalSold ,
+                MineralSold = TodayMineralSold+                      + weeklyMineralSold,
+                CraftingSold = TodayCraftingSold+                    + weeklyCraftingSold ,
+                CookingSold = TodayCookingSold+                      + weeklyCookingSold,
+                FishSold = TodayFishSold+                            + weeklyFishSold ,
+                GemSold = TodayGemSold+                              + weeklyGemSold,
+
+                TotalForageSold = TodayForageSold +                  totalForageSold,
+                TotalFlowerSold = TodayFlowerSold +                  totalFlowerSold,
+                TotalFruitSold = TodayFruitSold +                    totalFruitSold,
+                TotalVegetableSold = TodayVegetableSold +            totalVegetableSold,
+                TotalSeedSold = TodaySeedSold +                      totalSeedSold,
+                TotalMonsterLootSold = TodayMonsterLootSold +        totalMonsterLootSold,
+                TotalSyrupSold = TodaySyrupSold +                    totalSyrupSold,
+                TotalArtisanGoodSold = TodayArtisanGoodSold +        totalArtisanGoodSold,
+                TotalAnimalProductSold = TodayAnimalProductSold +    totalAnimalProductSold,
+                TotalResourceMetalSold = TodayResourceMetalSold +    totalResourceMetalSold ,
+                TotalMineralSold = TodayMineralSold +                totalMineralSold,
+                TotalCraftingSold = TodayCraftingSold +              totalCraftingSold,
+                TotalCookingSold = TodayCookingSold +                totalCookingSold,
+                TotalFishSold = TodayFishSold +                      totalFishSold,
+                TotalGemSold = TodayGemSold +                        totalGemSold
+            };
+            this.Helper.Data.WriteSaveData("MT.MailLog", dataToSave);
+            new MailLoader(SHelper);
+
             // Wipe invitation
             try
             {
@@ -1265,6 +1448,13 @@ namespace MarketTown
                                 if (!Config.DisableChatAll && food.foodObject.Edibility > 0) __instance.showTextAboveHead(SHelper.Translation.Get("foodstore.visitoreat." + randomNumber), default, default, 5000);
                                 else if (!Config.DisableChatAll && food.foodObject.Edibility <= 0) __instance.showTextAboveHead(SHelper.Translation.Get("foodstore.visitorpickup." + randomNumber), default, default, 5000);
                             }           //Food in farmhouse
+
+
+
+                            TodaySell += SHelper.Translation.Get("foodstore.sold", new { foodObjName = itemName, locationString = __instance.currentLocation.Name, saleString = salePrice }) + "^";
+                            TodayMoney += salePrice + tip;
+
+                            UpdateCount(food.foodObject.Category);
 
                             Game1.player.Money += salePrice + tip;
                             __instance.modData["hapyke.FoodStore/LastFood"] = Game1.timeOfDay.ToString();
@@ -1966,6 +2156,32 @@ namespace MarketTown
             return count;
         }
 
+        public static void UpdateCount(int category)
+        {
+            Dictionary<int, Action> categoryActions = new Dictionary<int, Action>
+            {
+                {-81, () => { TodayForageSold ++; } },
+                {-80, () => { TodayFlowerSold ++; } },
+                {-79, () => { TodayFruitSold ++; } },
+                {-75, () => { TodayVegetableSold ++; } },
+                {-74, () => { TodaySeedSold ++; } },
+                {-28, () => { TodayMonsterLootSold ++; } },
+                {-27, () => { TodaySyrupSold ++; } },
+                {-26, () => { TodayArtisanGoodSold ++; } },
+                {-18, () => { TodayAnimalProductSold ++; } },
+                {-15, () => { TodayResourceMetalSold ++; } },
+                {-12, () => { TodayMineralSold ++; } },
+                {-8,  () => { TodayCraftingSold ++; } },
+                {-7,  () => { TodayCookingSold ++; } },
+                {-4,  () => { TodayFishSold ++; } },
+                {-2,  () => { TodayGemSold ++; } }
+            };
+
+            if (categoryActions.ContainsKey(category))
+            {
+                categoryActions[category].Invoke();
+            }
+        }
         public static bool IsOutside { get; internal set; }
         internal static List<string> FurnitureList { get; private set; } = new();
         internal static List<string> Animals { get; private set; } = new();
