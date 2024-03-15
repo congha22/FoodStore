@@ -64,6 +64,9 @@ namespace MarketTown
         public static PerScreen<Dictionary<string, int>> npcOrderNumbers = new PerScreen<Dictionary<string, int>>();
         public static Dictionary<string, NetRef<Chest>> fridgeDict = new();
 
+        public static List<BuildingObjectPair> validBuildingObjectPairs = new List<BuildingObjectPair>();
+        public static Dictionary<NPC, int> listNPCTodayPurchaseTime = new Dictionary<NPC, int>();
+
         private Harmony harmony;
 
         internal static List<Response> ResponseList { get; private set; } = new();
@@ -202,9 +205,38 @@ namespace MarketTown
             TodayFishSold = 0;
             TodayGemSold = 0;
 
+            listNPCTodayPurchaseTime.Clear();
+
+            foreach (Building building in Game1.getFarm().buildings)
+            {
+                if ( building != null && building.GetIndoorsName() != null && building.GetIndoorsName().Contains("Shed"))
+                {
+                    foreach (var obj in Game1.getLocationFromName(building.GetIndoorsName()).Objects.Values)
+                    {
+                        if (obj is Sign sign && sign.displayItem.Value != null && (sign.displayItem.Value.Name == "Market License" || sign.displayItem.Value.Name == "Restaurant License"))
+                        {
+                            validBuildingObjectPairs.Add(new BuildingObjectPair(building, obj));
+                            break;
+                        }
+                    }
+                }
+            }
+
             fridgeDict.Clear();
             npcOrderNumbers.Value.Clear();
             emoteSprite = SHelper.ModContent.Load<Texture2D>(Path.Combine("Assets", "emote.png"));
+        }
+
+        public class BuildingObjectPair
+        {
+            public Building Building { get; set; }
+            public Object Object { get; set; }
+
+            public BuildingObjectPair(Building building, Object obj)
+            {
+                Building = building;
+                Object = obj;
+            }
         }
 
         private void GameLoop_OneSecondUpdateTicked(object sender, StardewModdingAPI.Events.OneSecondUpdateTickedEventArgs e)
@@ -222,7 +254,6 @@ namespace MarketTown
                     || Game1.IsFading()
                     || Game1.activeClickableMenu != null))
             {
-
                 Farmer farmerInstance = Game1.player;
                 NetStringDictionary<Friendship, NetRef<Friendship>> friendshipData = farmerInstance.friendshipData;
 
@@ -232,137 +263,131 @@ namespace MarketTown
                     {
 
                         // ******* Check NPC valid tile *******
-
-                        if (__instance != null && __instance.isVillager() && __instance.currentLocation != null && __instance.Tile != __instance.DefaultPosition / 64
-                            && __instance.Sprite.CurrentFrame >= 0 && __instance.Sprite.CurrentFrame <= 15
-                            && !ChairPositions.Any(chairPosition => chairPosition.locationName == __instance.currentLocation.Name &&
-                                        chairPosition.x == (int)__instance.Tile.X &&
-                                        chairPosition.y == (int)__instance.Tile.Y)
-                            )
+                        if (__instance != null && __instance.isVillager())
                         {
-                            Point zero = new Point((int)__instance.Tile.X, (int)__instance.Tile.Y);
-                            var location = __instance.currentLocation;
-
-                            bool isValid = location.isTileOnMap(__instance.Tile) && !location.isWaterTile(zero.X, zero.Y)
-                                && location.isTilePassable(new Location(zero.X, zero.Y), Game1.viewport);
-
-
-                            if (!isValid)
+                            if (Config.NPCCheckTimer != 0 && e.IsMultipleOf(60 * (uint)Config.NPCCheckTimer) 
+                                && __instance.currentLocation != null && __instance.currentLocation is not BusStop
+                                && __instance.Tile != __instance.DefaultPosition / 64
+                                && __instance.Sprite.CurrentFrame >= 0 && __instance.Sprite.CurrentFrame <= 15
+                                && !ChairPositions.Any(chairPosition => chairPosition.locationName == __instance.currentLocation.Name &&
+                                            chairPosition.x == (int)__instance.Tile.X &&
+                                            chairPosition.y == (int)__instance.Tile.Y)
+                                )
                             {
-                                __instance.isCharging = true;
-                                __instance.addedSpeed = 1;
-                                __instance.returnToEndPoint();
-                                __instance.MovePosition(Game1.currentGameTime, Game1.viewport, __instance.currentLocation);
-                            }
-                        }
+                                Point zero = new Point((int)__instance.Tile.X, (int)__instance.Tile.Y);
+                                var location = __instance.currentLocation;
 
-                        // ******* end of check *******
+                                bool isValid = location.isTileOnMap(__instance.Tile) && !location.isWaterTile(zero.X, zero.Y)
+                                    && location.isTilePassable(new Location(zero.X, zero.Y), Game1.viewport);
 
 
-                        if (__instance != null && __instance.isVillager() && (friendshipData.TryGetValue(__instance.Name, out var friendship) || __instance.Name.Contains("MT.Guest_")))
-                        {
-                            if ((!__instance.Name.Contains("MT.Guest_") && friendshipData[__instance.Name].TalkedToToday) || __instance.Name.Contains("MT.Guest_"))
-                            {
-                                try
+                                if (!isValid)
                                 {
-                                    if (__instance.CurrentDialogue.Count == 0 && __instance.Name != "Krobus" && __instance.Name != "Dwarf")
+                                    if (__instance.Name.Contains("MT.")) Game1.chatBox.addInfoMessage("HERER" + __instance.Name);
+                                    __instance.isCharging = true;
+                                    __instance.addedSpeed = 1;
+                                    __instance.returnToEndPoint();
+                                    __instance.MovePosition(Game1.currentGameTime, Game1.viewport, __instance.currentLocation);
+                                }
+                            }
+
+                            // ******* end of check *******
+
+
+                            if ((friendshipData.TryGetValue(__instance.Name, out var friendship) || __instance.Name.Contains("MT.Guest_")))
+                            {
+                                if ((!__instance.Name.Contains("MT.Guest_") && friendshipData[__instance.Name].TalkedToToday) || __instance.Name.Contains("MT.Guest_"))
+                                {
+                                    try
                                     {
-                                        Random random = new Random();
-                                        int randomIndex = random.Next(1, 8);
+                                        if (__instance.CurrentDialogue.Count == 0 && __instance.Name != "Krobus" && __instance.Name != "Dwarf")
+                                        {
+                                            Random random = new Random();
+                                            int randomIndex = random.Next(1, 8);
 
-                                        string npcAge, npcManner, npcSocial;
+                                            string npcAge, npcManner, npcSocial;
 
-                                        int age = __instance.Age;
-                                        int manner = __instance.Manners;
-                                        int social = __instance.SocialAnxiety;
+                                            int age = __instance.Age;
+                                            int manner = __instance.Manners;
+                                            int social = __instance.SocialAnxiety;
 
-                                        switch (age)
-                                        {
-                                            case 0:
-                                                npcAge = "adult.";
-                                                break;
-                                            case 1:
-                                                npcAge = "teens.";
-                                                break;
-                                            case 2:
-                                                npcAge = "child.";
-                                                break;
-                                            default:
-                                                npcAge = "adult.";
-                                                break;
-                                        }
-                                        switch (manner)
-                                        {
-                                            case 0:
-                                                npcManner = "neutral.";
-                                                break;
-                                            case 1:
-                                                npcManner = "polite.";
-                                                break;
-                                            case 2:
-                                                npcManner = "rude.";
-                                                break;
-                                            default:
-                                                npcManner = "neutral.";
-                                                break;
-                                        }
-                                        switch (social)
-                                        {
-                                            case 0:
-                                                npcSocial = "outgoing.";
-                                                break;
-                                            case 1:
-                                                npcSocial = "shy.";
-                                                break;
-                                            case 2:
-                                                npcSocial = "neutral.";
-                                                break;
-                                            default:
-                                                npcSocial = "neutral";
-                                                break;
-                                        }
-
-                                        if (__instance.Name.Contains("MT.Guest_") || !Game1.player.friendshipData[__instance.Name].IsMarried())
-                                        {
-                                            __instance.CurrentDialogue.Push(new Dialogue(__instance, SHelper.Translation.Get("foodstore.general." + npcAge + npcManner + npcSocial + randomIndex.ToString())));
-                                            __instance.modData["hapyke.FoodStore/TotalCustomerResponse"] = (Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) + 1).ToString();
-                                        }
-                                        else
-                                        {
-                                            if (Game1.timeOfDay == 900 || Game1.timeOfDay == 1200 || Game1.timeOfDay == 1500 || Game1.timeOfDay == 1800 || Game1.timeOfDay == 2100 || Game1.timeOfDay == 2400)
+                                            switch (age)
                                             {
-                                                __instance.CurrentDialogue.Push(new Dialogue(__instance, SHelper.Translation.Get("foodstore.general." + npcAge + npcManner + npcSocial + randomIndex.ToString())));
+                                                case 0:
+                                                    npcAge = "adult.";
+                                                    break;
+                                                case 1:
+                                                    npcAge = "teens.";
+                                                    break;
+                                                case 2:
+                                                    npcAge = "child.";
+                                                    break;
+                                                default:
+                                                    npcAge = "adult.";
+                                                    break;
+                                            }
+                                            switch (manner)
+                                            {
+                                                case 0:
+                                                    npcManner = "neutral.";
+                                                    break;
+                                                case 1:
+                                                    npcManner = "polite.";
+                                                    break;
+                                                case 2:
+                                                    npcManner = "rude.";
+                                                    break;
+                                                default:
+                                                    npcManner = "neutral.";
+                                                    break;
+                                            }
+                                            switch (social)
+                                            {
+                                                case 0:
+                                                    npcSocial = "outgoing.";
+                                                    break;
+                                                case 1:
+                                                    npcSocial = "shy.";
+                                                    break;
+                                                case 2:
+                                                    npcSocial = "neutral.";
+                                                    break;
+                                                default:
+                                                    npcSocial = "neutral";
+                                                    break;
+                                            }
+                                            if (!Game1.player.friendshipData[__instance.Name].IsMarried())
+                                            {
+                                                __instance.CurrentDialogue.Push(new Dialogue(__instance, "key", SHelper.Translation.Get("foodstore.general." + npcAge + npcManner + npcSocial + randomIndex.ToString())));
                                                 __instance.modData["hapyke.FoodStore/TotalCustomerResponse"] = (Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) + 1).ToString();
                                             }
+
+
+                                            if (__instance.modData["hapyke.FoodStore/finishedDailyChat"] == "true"
+                                                && Int32.Parse(__instance.modData["hapyke.FoodStore/chatDone"]) < Config.DialogueTime
+                                                && !__instance.Name.Contains("MT.Guest_"))
+                                            {
+                                                __instance.modData["hapyke.FoodStore/chatDone"] = (Int32.Parse(__instance.modData["hapyke.FoodStore/chatDone"]) + 1).ToString();
+                                                var formattedQuestion = string.Format(SHelper.Translation.Get("foodstore.responselist.main"), __instance);
+                                                var entryQuestion = new EntryQuestion(formattedQuestion, ResponseList, ActionList);
+                                                Game1.activeClickableMenu = entryQuestion;
+
+                                                var pc = new PlayerChat();
+                                                ActionList.Add(() => pc.OnPlayerSend(__instance, "hi"));
+                                                ActionList.Add(() => pc.OnPlayerSend(__instance, "invite"));
+                                                ActionList.Add(() => pc.OnPlayerSend(__instance, "last dish"));
+                                                ActionList.Add(() => pc.OnPlayerSend(__instance, "special today"));
+                                            }
+                                            __instance.modData["hapyke.FoodStore/finishedDailyChat"] = "true";
                                         }
-
-
-
-                                        if (__instance.modData["hapyke.FoodStore/finishedDailyChat"] == "true"
-                                            && Int32.Parse(__instance.modData["hapyke.FoodStore/chatDone"]) < Config.DialogueTime
-                                            && !__instance.Name.Contains("MT.Guest_"))
-                                        {
-                                            __instance.modData["hapyke.FoodStore/chatDone"] = (Int32.Parse(__instance.modData["hapyke.FoodStore/chatDone"]) + 1).ToString();
-                                            var formattedQuestion = string.Format(SHelper.Translation.Get("foodstore.responselist.main"), __instance);
-                                            var entryQuestion = new EntryQuestion(formattedQuestion, ResponseList, ActionList);
-                                            Game1.activeClickableMenu = entryQuestion;
-
-                                            var pc = new PlayerChat();
-                                            ActionList.Add(() => pc.OnPlayerSend(__instance, "hi"));
-                                            ActionList.Add(() => pc.OnPlayerSend(__instance, "invite"));
-                                            ActionList.Add(() => pc.OnPlayerSend(__instance, "last dish"));
-                                            ActionList.Add(() => pc.OnPlayerSend(__instance, "special today"));
-                                        }
-                                        __instance.modData["hapyke.FoodStore/finishedDailyChat"] = "true";
                                     }
+                                    catch { }
                                 }
-                                catch { }
                             }
                         }
                     }
                 }
                 catch (NullReferenceException) { }
-
             }
         }
 
@@ -572,6 +597,17 @@ namespace MarketTown
                 tooltip: () => SHelper.Translation.Get("foodstore.config.randompurchaseText"),
                 getValue: () => Config.RandomPurchase,
                 setValue: value => Config.RandomPurchase = value
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => "NPC path check interval",
+                tooltip: () => "Default 1. If you have a lot of NPC mod and see lag, increase this number. Set to 0 to disable (best performance). Interval in second each time the game check if NPC walked into invalid tile location",
+                getValue: () => Config.NPCCheckTimer,
+                setValue: value => Config.NPCCheckTimer = (int)value,
+                min: 0,
+                max: 7,
+                interval: 1
             );
 
             configMenu.AddTextOption(
@@ -940,6 +976,7 @@ namespace MarketTown
                     __instance.modData["hapyke.FoodStore/LastSay"] = "0";
                     __instance.modData["hapyke.FoodStore/TotalCustomerResponse"] = "0";
                     __instance.modData["hapyke.FoodStore/inviteTried"] = "false";
+                    __instance.modData["hapyke.FoodStore/walkingBlock"] = "false";
 
                     if (__instance.Name.Contains("MT.Guest_"))
                     {
@@ -1142,10 +1179,13 @@ namespace MarketTown
                 foreach (var name in GlobalNPCList)
                 {
                     NPC npc = Game1.getCharacterFromName(name);
-                    npc.Halt();
-                    npc.temporaryController = null;
-                    npc.controller = null;
-                    Game1.warpCharacter(npc, npc.DefaultMap, npc.DefaultPosition / 64);
+                    if (npc != null)
+                    {
+                        npc.Halt();
+                        npc.temporaryController = null;
+                        npc.controller = null;
+                        Game1.warpCharacter(npc, npc.DefaultMap, npc.DefaultPosition / 64);
+                    }
                 }
             }
             catch { }
@@ -1347,7 +1387,7 @@ namespace MarketTown
                             {
                                 if (__instance.modData["hapyke.FoodStore/TotalCustomerResponse"] != null)
                                 {
-                                    double totalInteract = Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) / 150;
+                                    double totalInteract = Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) / 100;
                                     if (totalInteract > 0.25) totalInteract = 0.25;
                                     salePrice = (int)(salePrice * (1 + totalInteract));
                                 }
@@ -1950,209 +1990,207 @@ namespace MarketTown
 
             if (random.NextDouble() < Config.ShedVisitChance && Game1.timeOfDay <= Config.CloseHour && Game1.timeOfDay >= Config.OpenHour)
             {
-                foreach (Building building in Game1.getFarm().buildings)
+                foreach (var pair in validBuildingObjectPairs)
                 {
-                    if (building != null && building.GetIndoorsName() != null && building.GetIndoorsName().Contains("Shed") && CountShedVisitor(Game1.getLocationFromName(building.GetIndoorsName())) < Config.MaxShedCapacity)
+                    Building building = pair.Building;
+                    Object obj = pair.Object;
+
+                    if (GlobalNPCList.Count == 0 || building == null || obj == null || CountShedVisitor(Game1.getLocationFromName(building.GetIndoorsName())) >= Config.MaxShedCapacity) return;
+
+                    string randomNPCName = GlobalNPCList[new Random().Next(0, GlobalNPCList.Count)];
+
+                    string[] parts = randomNPCName.Split('_');
+                    string realName = "";
+                    if (parts.Length >= 2)
                     {
-                        foreach (var obj in Game1.getLocationFromName(building.GetIndoorsName()).Objects.Values)
+                        realName = parts[1];
+                    }
+
+                    var visit = Game1.getCharacterFromName(randomNPCName);
+
+                    bool blockedNPC = false;
+                    try
+                    {
+                        if (Game1.getCharacterFromName(realName) != null)
                         {
-                            if (obj is Sign sign && sign.displayItem.Value != null && (sign.displayItem.Value.Name == "Market License" || sign.displayItem.Value.Name == "Restaurant License"))
+                            blockedNPC = Game1.getCharacterFromName(realName).currentLocation.IsFarm
+                                || Game1.player.friendshipData[realName].IsMarried()
+                                || Game1.player.friendshipData[realName].IsRoommate();
+                        }
+
+                    }
+                    catch { }
+
+                    try
+                    {
+                        blockedNPC = visit == null
+                            || Game1.getCharacterFromName(randomNPCName).currentLocation.Name.Contains("Shed")
+                            || (Int32.Parse(Game1.getCharacterFromName(randomNPCName).modData["hapyke.FoodStore/timeVisitShed"])
+                                    >= (Game1.timeOfDay - Config.TimeStay * 3) && (Game1.timeOfDay >= 600 + Config.TimeStay * 3));
+                    } catch { }
+
+                    if (blockedNPC) return;
+
+
+                    visit.modData["hapyke.FoodStore/initLocation"] = visit.Tile.X.ToString() + "," + visit.Tile.Y.ToString() ;
+                    visit.modData["hapyke.FoodStore/initMap"] = visit.currentLocation.Name;
+
+                    List<Vector2> clearTiles = new List<Vector2>();
+                    if (Config.DoorEntry && building.buildingType == "Shed")          // Alow warp at door and Shed lv0
+                    {
+                        for (int x = -1; x <= 1; x++)
+                        {
+                            for (int y = -1; y <= 1; y++)
                             {
-                                if (GlobalNPCList.Count == 0) return;
-                                string randomNPCName = GlobalNPCList[new Random().Next(0, GlobalNPCList.Count)];
-
-                                string[] parts = randomNPCName.Split('_');
-                                string realName = "";
-                                if (parts.Length >= 2)
-                                {
-                                    realName = parts[1];
-                                }
-
-                                var visit = Game1.getCharacterFromName(randomNPCName);
-
-                                bool blockedNPC = false;
-                                try
-                                {
-                                    if (Game1.getCharacterFromName(realName) != null)
-                                    {
-                                        blockedNPC = Game1.getCharacterFromName(realName).currentLocation.IsFarm
-                                            || Game1.player.friendshipData[realName].IsMarried()
-                                            || Game1.player.friendshipData[realName].IsRoommate();
-                                    }
-
-                                }
-                                catch { }
-
-                                try
-                                {
-                                    blockedNPC = visit == null
-                                        || Game1.getCharacterFromName(randomNPCName).currentLocation.Name.Contains("Shed")
-                                        || (Int32.Parse(Game1.getCharacterFromName(randomNPCName).modData["hapyke.FoodStore/timeVisitShed"])
-                                                >= (Game1.timeOfDay - Config.TimeStay * 3) && (Game1.timeOfDay >= 600 + Config.TimeStay * 3));
-                                } catch { }
-
-                                if (blockedNPC) return;
-
-
-                                visit.modData["hapyke.FoodStore/initLocation"] = visit.Tile.X.ToString() + "," + visit.Tile.Y.ToString() ;
-                                visit.modData["hapyke.FoodStore/initMap"] = visit.currentLocation.Name;
-
-                                List<Vector2> clearTiles = new List<Vector2>();
-                                if (Config.DoorEntry && building.buildingType == "Shed")          // Alow warp at door and Shed lv0
-                                {
-                                    for (int x = -1; x <= 1; x++)
-                                    {
-                                        for (int y = -1; y <= 1; y++)
-                                        {
-                                            Vector2 checkLocation = new Vector2(6f, 11f) + new Vector2(x, y);
-                                            if (!Game1.currentLocation.IsTileBlockedBy(checkLocation)) clearTiles.Add(checkLocation);
-                                        }
-                                    }
-
-                                    if (clearTiles.Count > 0)
-                                    {
-                                        Vector2 randomClearTile = clearTiles[Game1.random.Next(clearTiles.Count)];
-
-                                        if (Game1.player.currentLocation.Name == "BusStop" && Config.BusWalk && Game1.MasterPlayer.mailReceived.Contains("ccVault"))
-                                        {
-                                            Game1.warpCharacter(visit, "BusStop", new Point(13, 11));
-                                            visit.isCharging = true;
-                                            visit.addedSpeed = 1;
-                                            visit.temporaryController = new PathFindController(visit, visit.currentLocation, new Point(1, 24), 3,
-                                            (character, location) => Game1.warpCharacter(visit, building.GetIndoorsName(), randomClearTile));
-                                        }
-                                        else Game1.warpCharacter(visit, building.GetIndoorsName(), randomClearTile);
-
-                                        visit.modData["hapyke.FoodStore/shedEntry"] = $"{randomClearTile.X},{randomClearTile.Y}";
-                                    }
-                                    else
-                                    {
-                                        if (Game1.player.currentLocation.Name == "BusStop" && Config.BusWalk && Game1.MasterPlayer.mailReceived.Contains("ccVault"))
-                                        {
-                                            Game1.warpCharacter(visit, "BusStop", new Point(13, 11));
-                                            visit.isCharging = true;
-                                            visit.addedSpeed = 1;
-                                            visit.temporaryController = new PathFindController(visit, visit.currentLocation, new Point(1, 24), 3,
-                                            (character, location) => Game1.warpCharacter(visit, building.GetIndoorsName(), new Vector2(6f, 11f)));
-                                        }
-                                        else Game1.warpCharacter(visit, building.GetIndoorsName(), new Vector2(6f, 11f));
-
-                                        visit.modData["hapyke.FoodStore/shedEntry"] = "6,11";
-                                    }
-                                    clearTiles.Clear();
-                                }
-
-                                else if (Config.DoorEntry)                                                          // Alow warp at door and shed lv1
-                                {
-                                    for (int x = -1; x <= 1; x++)
-                                    {
-                                        for (int y = -1; y <= 1; y++)
-                                        {
-                                            Vector2 checkLocation = new Vector2(9f, 14) + new Vector2(x, y);
-                                            if (!Game1.currentLocation.IsTileBlockedBy(checkLocation)) clearTiles.Add(checkLocation);
-
-                                        }
-                                    }
-
-                                    if (clearTiles.Count > 0)
-                                    {
-                                        Vector2 randomClearTile = clearTiles[Game1.random.Next(clearTiles.Count)];
-
-                                        if (Game1.player.currentLocation.Name == "BusStop" && Config.BusWalk && Game1.MasterPlayer.mailReceived.Contains("ccVault"))
-                                        {
-                                            Game1.warpCharacter(visit, "BusStop", new Point(13, 11));
-                                            visit.isCharging = true;
-                                            visit.addedSpeed = 1;
-                                            visit.temporaryController = new PathFindController(visit, visit.currentLocation, new Point(1, 24), 3,
-                                            (character, location) => Game1.warpCharacter(visit, building.GetIndoorsName(), randomClearTile));
-                                        }
-                                        else Game1.warpCharacter(visit, building.GetIndoorsName(), randomClearTile);
-                                        visit.modData["hapyke.FoodStore/shedEntry"] = $"{randomClearTile.X},{randomClearTile.Y}";
-                                    }
-                                    else
-                                    {
-                                        if (Game1.player.currentLocation.Name == "BusStop" && Config.BusWalk && Game1.MasterPlayer.mailReceived.Contains("ccVault"))
-                                        {
-                                            Game1.warpCharacter(visit, "BusStop", new Point(13, 11));
-                                            visit.isCharging = true;
-                                            visit.addedSpeed = 1;
-                                            visit.temporaryController = new PathFindController(visit, visit.currentLocation, new Point(1, 24), 3,
-                                            (character, location) => Game1.warpCharacter(visit, building.GetIndoorsName(), new Vector2(9f, 14)));
-                                        }
-                                        else Game1.warpCharacter(visit, building.GetIndoorsName(), new Vector2(9f, 14));
-
-
-                                        visit.modData["hapyke.FoodStore/shedEntry"] = "9,14";
-                                    }
-                                    clearTiles.Clear();
-                                }
-
-                                else                                                                                // Warp at Sign
-                                {
-                                    for (int x = -1; x <= 1; x++)
-                                    {
-                                        for (int y = -1; y <= 1; y++)
-                                        {
-                                            Vector2 checkLocation = new Vector2(obj.TileLocation.X, obj.TileLocation.Y) + new Vector2(x, y);
-                                            if (!Game1.currentLocation.IsTileBlockedBy(checkLocation)) clearTiles.Add(checkLocation);
-                                        }
-                                    }
-
-                                    if (clearTiles.Count > 0)
-                                    {
-                                        Vector2 randomClearTile = clearTiles[Game1.random.Next(clearTiles.Count)];
-
-                                        if (Game1.player.currentLocation.Name == "BusStop" && Config.BusWalk && Game1.MasterPlayer.mailReceived.Contains("ccVault"))
-                                        {
-                                            Game1.warpCharacter(visit, "BusStop", new Point(13, 11));
-                                            visit.isCharging = true;
-                                            visit.addedSpeed = 1;
-                                            visit.temporaryController = new PathFindController(visit, visit.currentLocation, new Point(1, 24), 3,
-                                            (character, location) => Game1.warpCharacter(visit, building.GetIndoorsName(), randomClearTile));
-                                        }
-                                        else Game1.warpCharacter(visit, building.GetIndoorsName(), randomClearTile);
-
-                                        visit.modData["hapyke.FoodStore/shedEntry"] = $"{randomClearTile.X},{randomClearTile.Y}";
-                                    }
-                                    else
-                                    {
-                                        if (Game1.player.currentLocation.Name == "BusStop" && Config.BusWalk && Game1.MasterPlayer.mailReceived.Contains("ccVault"))
-                                        {
-                                            Game1.warpCharacter(visit, "BusStop", new Point(13, 11));
-                                            visit.isCharging = true;
-                                            visit.addedSpeed = 1;
-                                            visit.temporaryController = new PathFindController(visit, visit.currentLocation, new Point(1, 24), 3,
-                                            (character, location) => Game1.warpCharacter(visit, building.GetIndoorsName(), new Vector2(obj.TileLocation.X, obj.TileLocation.Y)));
-                                        }
-                                        else Game1.warpCharacter(visit, building.GetIndoorsName(), new Vector2(obj.TileLocation.X, obj.TileLocation.Y));
-
-
-                                        visit.modData["hapyke.FoodStore/shedEntry"] = (obj.TileLocation.X).ToString() + "," + (obj.TileLocation.Y).ToString();
-                                    }
-                                    clearTiles.Clear();
-                                }
-
-                                visit.modData["hapyke.FoodStore/timeVisitShed"] = Game1.timeOfDay.ToString();
+                                Vector2 checkLocation = new Vector2(6f, 11f) + new Vector2(x, y);
+                                if (!Game1.currentLocation.IsTileBlockedBy(checkLocation)) clearTiles.Add(checkLocation);
                             }
                         }
+
+                        if (clearTiles.Count > 0)
+                        {
+                            Vector2 randomClearTile = clearTiles[Game1.random.Next(clearTiles.Count)];
+
+                            if (Game1.player.currentLocation.Name == "BusStop" && Config.BusWalk && Game1.MasterPlayer.mailReceived.Contains("ccVault"))
+                            {
+                                Game1.warpCharacter(visit, "BusStop", new Point(13, 11));
+                                visit.isCharging = true;
+                                visit.addedSpeed = 1;
+                                visit.temporaryController = new PathFindController(visit, visit.currentLocation, new Point(1, 24), 3,
+                                (character, location) => Game1.warpCharacter(visit, building.GetIndoorsName(), randomClearTile));
+                            }
+                            else Game1.warpCharacter(visit, building.GetIndoorsName(), randomClearTile);
+
+                            visit.modData["hapyke.FoodStore/shedEntry"] = $"{randomClearTile.X},{randomClearTile.Y}";
+                        }
+                        else
+                        {
+                            if (Game1.player.currentLocation.Name == "BusStop" && Config.BusWalk && Game1.MasterPlayer.mailReceived.Contains("ccVault"))
+                            {
+                                Game1.warpCharacter(visit, "BusStop", new Point(13, 11));
+                                visit.isCharging = true;
+                                visit.addedSpeed = 1;
+                                visit.temporaryController = new PathFindController(visit, visit.currentLocation, new Point(1, 24), 3,
+                                (character, location) => Game1.warpCharacter(visit, building.GetIndoorsName(), new Vector2(6f, 11f)));
+                            }
+                            else Game1.warpCharacter(visit, building.GetIndoorsName(), new Vector2(6f, 11f));
+
+                            visit.modData["hapyke.FoodStore/shedEntry"] = "6,11";
+                        }
+                        clearTiles.Clear();
                     }
+
+                    else if (Config.DoorEntry)                                                          // Alow warp at door and shed lv1
+                    {
+                        for (int x = -1; x <= 1; x++)
+                        {
+                            for (int y = -1; y <= 1; y++)
+                            {
+                                Vector2 checkLocation = new Vector2(9f, 14) + new Vector2(x, y);
+                                if (!Game1.currentLocation.IsTileBlockedBy(checkLocation)) clearTiles.Add(checkLocation);
+
+                            }
+                        }
+
+                        if (clearTiles.Count > 0)
+                        {
+                            Vector2 randomClearTile = clearTiles[Game1.random.Next(clearTiles.Count)];
+
+                            if (Game1.player.currentLocation.Name == "BusStop" && Config.BusWalk && Game1.MasterPlayer.mailReceived.Contains("ccVault"))
+                            {
+                                Game1.warpCharacter(visit, "BusStop", new Point(13, 11));
+                                visit.isCharging = true;
+                                visit.addedSpeed = 1;
+                                visit.temporaryController = new PathFindController(visit, visit.currentLocation, new Point(1, 24), 3,
+                                (character, location) => Game1.warpCharacter(visit, building.GetIndoorsName(), randomClearTile));
+                            }
+                            else Game1.warpCharacter(visit, building.GetIndoorsName(), randomClearTile);
+                            visit.modData["hapyke.FoodStore/shedEntry"] = $"{randomClearTile.X},{randomClearTile.Y}";
+                        }
+                        else
+                        {
+                            if (Game1.player.currentLocation.Name == "BusStop" && Config.BusWalk && Game1.MasterPlayer.mailReceived.Contains("ccVault"))
+                            {
+                                Game1.warpCharacter(visit, "BusStop", new Point(13, 11));
+                                visit.isCharging = true;
+                                visit.addedSpeed = 1;
+                                visit.temporaryController = new PathFindController(visit, visit.currentLocation, new Point(1, 24), 3,
+                                (character, location) => Game1.warpCharacter(visit, building.GetIndoorsName(), new Vector2(9f, 14)));
+                            }
+                            else Game1.warpCharacter(visit, building.GetIndoorsName(), new Vector2(9f, 14));
+
+
+                            visit.modData["hapyke.FoodStore/shedEntry"] = "9,14";
+                        }
+                        clearTiles.Clear();
+                    }
+
+                    else                                                                                // Warp at Sign
+                    {
+                        for (int x = -1; x <= 1; x++)
+                        {
+                            for (int y = -1; y <= 1; y++)
+                            {
+                                Vector2 checkLocation = new Vector2(obj.TileLocation.X, obj.TileLocation.Y) + new Vector2(x, y);
+                                if (!Game1.currentLocation.IsTileBlockedBy(checkLocation)) clearTiles.Add(checkLocation);
+                            }
+                        }
+
+                        if (clearTiles.Count > 0)
+                        {
+                            Vector2 randomClearTile = clearTiles[Game1.random.Next(clearTiles.Count)];
+
+                            if (Game1.player.currentLocation.Name == "BusStop" && Config.BusWalk && Game1.MasterPlayer.mailReceived.Contains("ccVault"))
+                            {
+                                Game1.warpCharacter(visit, "BusStop", new Point(13, 11));
+                                visit.isCharging = true;
+                                visit.addedSpeed = 1;
+                                visit.temporaryController = new PathFindController(visit, visit.currentLocation, new Point(1, 24), 3,
+                                (character, location) => Game1.warpCharacter(visit, building.GetIndoorsName(), randomClearTile));
+                            }
+                            else Game1.warpCharacter(visit, building.GetIndoorsName(), randomClearTile);
+
+                            visit.modData["hapyke.FoodStore/shedEntry"] = $"{randomClearTile.X},{randomClearTile.Y}";
+                        }
+                        else
+                        {
+                            if (Game1.player.currentLocation.Name == "BusStop" && Config.BusWalk && Game1.MasterPlayer.mailReceived.Contains("ccVault"))
+                            {
+                                Game1.warpCharacter(visit, "BusStop", new Point(13, 11));
+                                visit.isCharging = true;
+                                visit.addedSpeed = 1;
+                                visit.temporaryController = new PathFindController(visit, visit.currentLocation, new Point(1, 24), 3,
+                                (character, location) => Game1.warpCharacter(visit, building.GetIndoorsName(), new Vector2(obj.TileLocation.X, obj.TileLocation.Y)));
+                            }
+                            else Game1.warpCharacter(visit, building.GetIndoorsName(), new Vector2(obj.TileLocation.X, obj.TileLocation.Y));
+
+
+                            visit.modData["hapyke.FoodStore/shedEntry"] = (obj.TileLocation.X).ToString() + "," + (obj.TileLocation.Y).ToString();
+                        }
+                        clearTiles.Clear();
+                    }
+
+                    visit.modData["hapyke.FoodStore/timeVisitShed"] = Game1.timeOfDay.ToString();
                 }
             }   // ****** end of shed visitor ******
         }
         public static int CountShedVisitor( GameLocation environment)
         {
+            if (environment == null) return 99999;
+
             int count = 0;
 
             foreach (var validName in GlobalNPCList)
             {
                 NPC c = Game1.getCharacterFromName(validName);
-                if (c.currentLocation.Name == environment.Name) count += 1;         // Count NPC in Shed
+                if (c != null && c.currentLocation.Name == environment.Name) count += 1;         // Count NPC in Shed
                 
-                if (c.currentLocation.Name.Contains("BusStop")                      // Count NPC walking at BusStop
+                if (c != null && c.currentLocation.Name.Contains("BusStop")                      // Count NPC walking at BusStop
                     && c.temporaryController != null
                     && c.Tile != c.DefaultPosition / 64) count += 1;
 
             }
+
             return count;
         }
 

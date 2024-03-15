@@ -34,7 +34,7 @@ namespace MarketTown
         public float InviteComeTime { get; set; } = 1000;
         public float InviteLeaveTime { get; set; } = 2000;
         public bool EnableVisitInside { get; set; } = true;
-        public int DialogueTime { get; set; } = 2;
+        public int DialogueTime { get; set; } = 1;
         public bool AllowRemoveNonFood { get; set; } = false;
 
         public bool DisableKidAsk { get; set; } = false;
@@ -67,5 +67,6 @@ namespace MarketTown
             "Shed",
             "Big Shed"
         };
+        public int NPCCheckTimer { get; set; } = 1;
     }
 }

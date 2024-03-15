@@ -64,6 +64,7 @@ namespace MarketTown
             __instance.modData["hapyke.FoodStore/inviteTried"] = "false";
             __instance.modData["hapyke.FoodStore/finishedDailyChat"] = "false";
             __instance.modData["hapyke.FoodStore/chatDone"] = "0";
+            __instance.modData["hapyke.FoodStore/walkingBlock"] = "false";
 
             if (__instance.Name == "Lewis")
             {
@@ -76,10 +77,11 @@ namespace MarketTown
 
                     if (!Config.DisableChatAll)
                     {
+                        MyMessage messageToSend = new MyMessage("");
                         //Send thanks
-                        Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.thankyou"));
-                        MyMessage messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.thankyou"));
-                        SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
+                        //Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.thankyou"));
+                        //messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.thankyou"));
+                        //SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
 
                         // ******** Send mod Note ********
                         //string modNote = SHelper.Translation.Get("foodstore.note");
@@ -289,10 +291,23 @@ namespace MarketTown
 
 
             //Fix position, do eating food
-            if (!Config.EnableMod || Game1.eventUp || __instance.currentLocation is null || !__instance.isVillager() || !WantsToEat(__instance))
+            if (!Config.EnableMod || Game1.eventUp || __instance is null || __instance.currentLocation is null || !__instance.isVillager() || !WantsToEat(__instance))
                 return;
 
-            if (__instance.Tile.X >= __instance.currentLocation.Map.Layers[0].LayerWidth - 1
+            if (listNPCTodayPurchaseTime.TryGetValue(__instance, out int purchaseTime))
+            {
+                if (Game1.timeOfDay - 400 > purchaseTime)
+                {
+                    try
+                    {
+                        listNPCTodayPurchaseTime.Remove(__instance);
+                        __instance.modData["hapyke.FoodStore/walkingBlock"] = "false";
+                    } catch { }
+                }
+            }
+
+            if (listNPCTodayPurchaseTime.ContainsKey(__instance)  
+                && __instance.Tile.X >= __instance.currentLocation.Map.Layers[0].LayerWidth - 1
                 || __instance.Tile.Y >= __instance.currentLocation.Map.Layers[0].LayerHeight - 1
                 || __instance.Tile.X <= 1
                 || __instance.Tile.Y <= 1
@@ -384,7 +399,7 @@ namespace MarketTown
 
                 //Control NPC walking to the food
                 string text = "";
-                if (npc.isVillager() && !npc.Name.EndsWith("_DA"))
+                if (npc.isVillager() && !npc.Name.EndsWith("_DA") && !npc.Name.StartsWith("RNPC"))
                 {
                     double moveToFoodChance = Config.MoveToFoodChance;
                     try
@@ -401,77 +416,90 @@ namespace MarketTown
                         moveToFoodChance = moveToFoodChance * 1.5;
                     }
 
-                    if (npc != null && WantsToEat(npc) && Game1.random.NextDouble() < moveToFoodChance / 100f && __instance.furniture.Count > 0)
+                    try
                     {
-                        PlacedFoodData food = GetClosestFood(npc, __instance);
-                        if (food == null || (!Config.AllowRemoveNonFood && food.foodObject.Edibility <= 0 && (npc.currentLocation is Farm || npc.currentLocation is FarmHouse)))
-                            return;
-                        if (TryToEatFood(npc, food))
+                        if (npc != null && WantsToEat(npc) && Game1.random.NextDouble() < moveToFoodChance / 100f && npc.modData["hapyke.FoodStore/walkingBlock"] == "false")
                         {
-                            return;
+                            PlacedFoodData food = GetClosestFood(npc, __instance);
+                            if (food == null || (!Config.AllowRemoveNonFood && food.foodObject.Edibility <= 0 && (npc.currentLocation is Farm || npc.currentLocation is FarmHouse)))
+                                return;
+                            if (TryToEatFood(npc, food))
+                            {
+                                return;
+                            }
+
+                            Microsoft.Xna.Framework.Vector2 possibleLocation;
+                            possibleLocation = food.foodTile;
+                            int tries = 0;
+                            int facingDirection = -3;
+
+
+                            while (tries < 3)
+                            {
+                                int xMove = Game1.random.Next(-1, 2);
+                                int yMove = Game1.random.Next(-1, 2);
+
+                                possibleLocation.X += xMove;
+                                if (xMove == 0)
+                                {
+                                    possibleLocation.Y += yMove;
+                                }
+                                if (xMove == -1)
+                                {
+                                    facingDirection = 1;
+                                }
+                                else if (xMove == 1)
+                                {
+                                    facingDirection = 3;
+                                }
+                                else if (yMove == -1)
+                                {
+                                    facingDirection = 2;
+                                }
+                                else if (yMove == 1)
+                                {
+                                    facingDirection = 0;
+                                }
+                                if (!__instance.IsTileBlockedBy(possibleLocation))
+                                {
+                                    break;
+                                }
+                                tries++;
+                            }
+                            if (tries < 3 && TimeDelayCheck(npc))
+                            {
+                                //Send message
+                                if (npc.currentLocation.Name != "Farm" && npc.currentLocation.Name != "FarmHouse" && !Config.DisableChat && !Config.DisableChatAll)
+                                {
+                                    Random random = new Random();
+                                    int randomIndex = random.Next(15);
+                                    text = SHelper.Translation.Get("foodstore.coming." + randomIndex.ToString(), new { vName = npc.Name });
+
+                                    Game1.chatBox.addInfoMessage(text);
+                                    MyMessage messageToSend = new MyMessage(text);
+                                    SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
+
+                                }
+                                //Update LastCheck
+                                if (listNPCTodayPurchaseTime.ContainsKey(npc)) listNPCTodayPurchaseTime[npc] = Game1.timeOfDay;
+                                else listNPCTodayPurchaseTime.Add(npc, Game1.timeOfDay);
+
+                                npc.modData["hapyke.FoodStore/LastCheck"] = Game1.timeOfDay.ToString();
+                                npc.modData["hapyke.FoodStore/walkingBlock"] = "true";
+                                npc.modData["hapyke.FoodStore/gettingFood"] = "true";
+
+                                //Villager control
+                                npc.addedSpeed = 1;
+                                npc.temporaryController = new PathFindController(npc, __instance, new Point((int)possibleLocation.X, (int)possibleLocation.Y), facingDirection,
+                                    (character, location) =>
+                                    {
+                                        npc.modData["hapyke.FoodStore/walkingBlock"] = "false";
+                                        npc.addedSpeed = 0;
+                                        npc.updateMovement(npc.currentLocation, Game1.currentGameTime);
+                                    });
+                            }
                         }
-
-                        Microsoft.Xna.Framework.Vector2 possibleLocation;
-                        possibleLocation = food.foodTile;
-                        int tries = 0;
-                        int facingDirection = -3;
-
-
-                        while (tries < 3)
-                        {
-                            int xMove = Game1.random.Next(-1, 2);
-                            int yMove = Game1.random.Next(-1, 2);
-
-                            possibleLocation.X += xMove;
-                            if (xMove == 0)
-                            {
-                                possibleLocation.Y += yMove;
-                            }
-                            if (xMove == -1)
-                            {
-                                facingDirection = 1;
-                            }
-                            else if (xMove == 1)
-                            {
-                                facingDirection = 3;
-                            }
-                            else if (yMove == -1)
-                            {
-                                facingDirection = 2;
-                            }
-                            else if (yMove == 1)
-                            {
-                                facingDirection = 0;
-                            }
-                            if (!__instance.IsTileBlockedBy(possibleLocation))
-                            {
-                                break;
-                            }
-                            tries++;
-                        }
-                        if (tries < 3 && TimeDelayCheck(npc))
-                        {
-                            //Send message
-                            if (npc.currentLocation.Name != "Farm" && npc.currentLocation.Name != "FarmHouse" && !Config.DisableChat && !Config.DisableChatAll)
-                            {
-                                Random random = new Random();
-                                int randomIndex = random.Next(15);
-                                text = SHelper.Translation.Get("foodstore.coming." + randomIndex.ToString(), new { vName = npc.Name });
-
-                                Game1.chatBox.addInfoMessage(text);
-                                MyMessage messageToSend = new MyMessage(text);
-                                SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
-
-                            }
-                            //Update LastCheck
-                            npc.modData["hapyke.FoodStore/LastCheck"] = Game1.timeOfDay.ToString();
-
-                            npc.modData["hapyke.FoodStore/gettingFood"] = "true";
-                            //Villager control
-                            npc.addedSpeed = 2;
-                            npc.temporaryController = new PathFindController(npc, __instance, new Point((int)possibleLocation.X, (int)possibleLocation.Y), facingDirection, (character, location) => npc.updateMovement(npc.currentLocation, Game1.currentGameTime));
-                        }
-                    }
+                    } catch { }
                 }
             }
         }
