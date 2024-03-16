@@ -43,6 +43,7 @@ using xTile.Dimensions;
 using StardewValley.Pathfinding;
 using MailFrameworkMod;
 using StardewValley.GameData.Tools;
+using StardewValley.GameData.Buildings;
 
 namespace MarketTown
 {
@@ -209,13 +210,14 @@ namespace MarketTown
 
             foreach (Building building in Game1.getFarm().buildings)
             {
-                if ( building != null && building.GetIndoorsName() != null && building.GetIndoorsName().Contains("Shed"))
+                if ( building != null && building.GetIndoorsName() != null)
                 {
                     foreach (var obj in Game1.getLocationFromName(building.GetIndoorsName()).Objects.Values)
                     {
                         if (obj is Sign sign && sign.displayItem.Value != null && (sign.displayItem.Value.Name == "Market License" || sign.displayItem.Value.Name == "Restaurant License"))
                         {
                             validBuildingObjectPairs.Add(new BuildingObjectPair(building, obj));
+                            if ( !Config.RestaurantLocations.Contains(Game1.getLocationFromName(building.GetIndoorsName()).Name)) Config.RestaurantLocations.Add(Game1.getLocationFromName(building.GetIndoorsName()).Name);
                             break;
                         }
                     }
@@ -283,7 +285,6 @@ namespace MarketTown
 
                                 if (!isValid)
                                 {
-                                    if (__instance.Name.Contains("MT.")) Game1.chatBox.addInfoMessage("HERER" + __instance.Name);
                                     __instance.isCharging = true;
                                     __instance.addedSpeed = 1;
                                     __instance.returnToEndPoint();
@@ -1603,8 +1604,14 @@ namespace MarketTown
                                         .OfType<Sign>()
                                         .FirstOrDefault(sign => sign.displayItem.Value != null);
 
-                        if ((Config.SignRange == 0 && !location.Name.Contains("Shed")) 
-                            || (location.Name.Contains("Shed") && foundSign != null && foundSign.displayItem != null && foundSign.displayItem.Value.Name == "Market License")) hasSignInRange = true;
+                        var tempCheck = false;
+                        foreach (var building in Game1.getFarm().buildings)
+                        {
+                            if (building != null && building.GetIndoorsName() != null && building.GetIndoorsName().Contains(location.Name)) tempCheck = true;
+                        }
+
+                        if ((Config.SignRange == 0 && !tempCheck) 
+                            || (tempCheck && foundSign != null && foundSign.displayItem != null && foundSign.displayItem.Value.Name == "Market License")) hasSignInRange = true;
 
                         // Add to foodList only if there is no sign within the range
                         if (hasSignInRange && Vector2.Distance(fLocation, npc.Tile) < Config.MaxDistanceToFind && (hasHat || hasPants || hasShirt || hasBoots))
@@ -1632,12 +1639,17 @@ namespace MarketTown
                     Sign foundSign = location.Objects.Values
                                     .OfType<Sign>()
                                     .FirstOrDefault(sign => sign.displayItem.Value != null);
+                    var tempCheck = false;
+                    foreach ( var building in Game1.getFarm().buildings)
+                    {
+                        if (building != null && building.GetIndoorsName() != null && building.GetIndoorsName().Contains(location.Name)) tempCheck = true;
+                    }
 
-                    if ((Config.SignRange == 0 && !location.Name.Contains("Shed"))
-                        || (location.Name.Contains("Shed") && foundSign != null
-                        && foundSign.displayItem != null && foundSign.displayItem.Value.Name == "Market License")
-                        || (location.Name.Contains("Shed") && foundSign != null && f.heldObject.Value.Category == -7
-                        && foundSign.displayItem != null && foundSign.displayItem.Value.Name == "Restaurant License")) hasSignInRange = true;
+                    if ( (Config.SignRange == 0 && !tempCheck)
+                          || (tempCheck && foundSign != null && foundSign.displayItem != null && foundSign.displayItem.Value.Name == "Market License")
+                          || (tempCheck && foundSign != null && f.heldObject.Value.Category == -7 && foundSign.displayItem != null && foundSign.displayItem.Value.Name == "Restaurant License")
+                            
+                        ) hasSignInRange = true;
 
                     // Add to foodList only if there is no sign within the range
                     if (hasSignInRange&& Vector2.Distance(fLocation, npc.Tile) < Config.MaxDistanceToFind)
@@ -1687,7 +1699,11 @@ namespace MarketTown
             int minutesSinceLastFood = GetMinutes(Game1.timeOfDay) - GetMinutes(lastFoodTime);
             try
             {
-                if (npc.currentLocation != null && npc.currentLocation.Name.Contains("Shed")) return minutesSinceLastFood > Config.ShedMinuteToHungry;
+                foreach (var building in Game1.getFarm().buildings)
+                {
+                    if (npc.currentLocation != null && building.GetIndoorsName().Contains(npc.currentLocation.Name)) return minutesSinceLastFood > Config.ShedMinuteToHungry;
+                    break;
+                }
             } catch { }
 
             return minutesSinceLastFood > Config.MinutesToHungry;
@@ -1906,17 +1922,17 @@ namespace MarketTown
                 {
                     try
                     {
-                        if (c.isVillager() && c.currentLocation!= null && c.currentLocation.Name == "Farm" && c.modData["hapyke.FoodStore/invited"] == "true" && c.modData["hapyke.FoodStore/inviteDate"] == (Game1.stats.DaysPlayed - 1).ToString())
+                        if (c.IsVillager && c.currentLocation!= null && c.currentLocation.Name == "Farm" && c.modData["hapyke.FoodStore/invited"] == "true" && c.modData["hapyke.FoodStore/inviteDate"] == (Game1.stats.DaysPlayed - 1).ToString())
                         {
                             FarmOutside.WalkAround(c.Name);
                         }
 
-                        if (c.isVillager() && c.currentLocation != null && c.currentLocation.Name == "FarmHouse" && c.modData["hapyke.FoodStore/invited"] == "true" && c.modData["hapyke.FoodStore/inviteDate"] == (Game1.stats.DaysPlayed - 1).ToString())
+                        if (c.IsVillager && c.currentLocation != null && c.currentLocation.Name == "FarmHouse" && c.modData["hapyke.FoodStore/invited"] == "true" && c.modData["hapyke.FoodStore/inviteDate"] == (Game1.stats.DaysPlayed - 1).ToString())
                         {
                             FarmOutside.WalkAround(c.Name);
                         }
 
-                        if (c.isVillager() && c.currentLocation != null && c.currentLocation.Name.Contains("Shed"))
+                        if (c.IsVillager && c.currentLocation != null && c.Name.Contains("MT.Guest_") && !c.currentLocation.Name.Contains("BusStop"))
                         {
                             FarmOutside.WalkAround(c.Name);
                         }
@@ -1994,8 +2010,19 @@ namespace MarketTown
                 {
                     Building building = pair.Building;
                     Object obj = pair.Object;
+                    Vector2 doorTile = new(0f, 0f);
 
                     if (GlobalNPCList.Count == 0 || building == null || obj == null || CountShedVisitor(Game1.getLocationFromName(building.GetIndoorsName())) >= Config.MaxShedCapacity) return;
+
+                    if (building != null && building.GetIndoorsName() != null)
+                    {
+                        var warps = Game1.getLocationFromName(building.GetIndoorsName()).warps;
+                        foreach (var warp in warps)
+                        {
+                            if (warp.TargetName == "Farm") doorTile = new(warp.X, warp.Y - 3);
+                            break;
+                        }
+                    }
 
                     string randomNPCName = GlobalNPCList[new Random().Next(0, GlobalNPCList.Count)];
 
@@ -2036,13 +2063,13 @@ namespace MarketTown
                     visit.modData["hapyke.FoodStore/initMap"] = visit.currentLocation.Name;
 
                     List<Vector2> clearTiles = new List<Vector2>();
-                    if (Config.DoorEntry && building.buildingType == "Shed")          // Alow warp at door and Shed lv0
+                    if (Config.DoorEntry)          // Alow warp at door
                     {
                         for (int x = -1; x <= 1; x++)
                         {
                             for (int y = -1; y <= 1; y++)
                             {
-                                Vector2 checkLocation = new Vector2(6f, 11f) + new Vector2(x, y);
+                                Vector2 checkLocation = doorTile + new Vector2(x, y);
                                 if (!Game1.currentLocation.IsTileBlockedBy(checkLocation)) clearTiles.Add(checkLocation);
                             }
                         }
@@ -2071,56 +2098,11 @@ namespace MarketTown
                                 visit.isCharging = true;
                                 visit.addedSpeed = 1;
                                 visit.temporaryController = new PathFindController(visit, visit.currentLocation, new Point(1, 24), 3,
-                                (character, location) => Game1.warpCharacter(visit, building.GetIndoorsName(), new Vector2(6f, 11f)));
+                                (character, location) => Game1.warpCharacter(visit, building.GetIndoorsName(), doorTile));
                             }
-                            else Game1.warpCharacter(visit, building.GetIndoorsName(), new Vector2(6f, 11f));
+                            else Game1.warpCharacter(visit, building.GetIndoorsName(), doorTile);
 
-                            visit.modData["hapyke.FoodStore/shedEntry"] = "6,11";
-                        }
-                        clearTiles.Clear();
-                    }
-
-                    else if (Config.DoorEntry)                                                          // Alow warp at door and shed lv1
-                    {
-                        for (int x = -1; x <= 1; x++)
-                        {
-                            for (int y = -1; y <= 1; y++)
-                            {
-                                Vector2 checkLocation = new Vector2(9f, 14) + new Vector2(x, y);
-                                if (!Game1.currentLocation.IsTileBlockedBy(checkLocation)) clearTiles.Add(checkLocation);
-
-                            }
-                        }
-
-                        if (clearTiles.Count > 0)
-                        {
-                            Vector2 randomClearTile = clearTiles[Game1.random.Next(clearTiles.Count)];
-
-                            if (Game1.player.currentLocation.Name == "BusStop" && Config.BusWalk && Game1.MasterPlayer.mailReceived.Contains("ccVault"))
-                            {
-                                Game1.warpCharacter(visit, "BusStop", new Point(13, 11));
-                                visit.isCharging = true;
-                                visit.addedSpeed = 1;
-                                visit.temporaryController = new PathFindController(visit, visit.currentLocation, new Point(1, 24), 3,
-                                (character, location) => Game1.warpCharacter(visit, building.GetIndoorsName(), randomClearTile));
-                            }
-                            else Game1.warpCharacter(visit, building.GetIndoorsName(), randomClearTile);
-                            visit.modData["hapyke.FoodStore/shedEntry"] = $"{randomClearTile.X},{randomClearTile.Y}";
-                        }
-                        else
-                        {
-                            if (Game1.player.currentLocation.Name == "BusStop" && Config.BusWalk && Game1.MasterPlayer.mailReceived.Contains("ccVault"))
-                            {
-                                Game1.warpCharacter(visit, "BusStop", new Point(13, 11));
-                                visit.isCharging = true;
-                                visit.addedSpeed = 1;
-                                visit.temporaryController = new PathFindController(visit, visit.currentLocation, new Point(1, 24), 3,
-                                (character, location) => Game1.warpCharacter(visit, building.GetIndoorsName(), new Vector2(9f, 14)));
-                            }
-                            else Game1.warpCharacter(visit, building.GetIndoorsName(), new Vector2(9f, 14));
-
-
-                            visit.modData["hapyke.FoodStore/shedEntry"] = "9,14";
+                            visit.modData["hapyke.FoodStore/shedEntry"] = doorTile.X.ToString() + doorTile.Y.ToString();
                         }
                         clearTiles.Clear();
                     }

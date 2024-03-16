@@ -726,7 +726,7 @@
   "foodstore.config.signrangeText":                   "Set to 0 to disable. This limit NPCs only buying valid items within distance from a placed Sign. Items out of range will be ignored. Not apply inside Shed",
 
   "foodstore.config.doorentry":                       "NPC spawn near door",
-  "foodstore.config.doorentryText":                   "Default True: Visitor will spawn near Entry Door. Set to False for NPC to spawn near License Sign location",
+  "foodstore.config.doorentryText":                   "Default False: Visitor will spawn near License Sign. Set to True for NPC to spawn near door (work on vanilla Shed only)",
 
   "foodstore.config.shedvisitchance":                 "Chance for Shed visit",
   "foodstore.config.shedvisitchanceText":             "Default 0.2. Chance for new visitor in Shed every 10 minutes. Recommened below 0.5!",

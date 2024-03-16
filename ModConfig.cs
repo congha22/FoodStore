@@ -43,7 +43,7 @@ namespace MarketTown
         public int SignRange { get; set; } = 0;
 
 
-        public bool DoorEntry { get; set; } = true;
+        public bool DoorEntry { get; set; } = false;
         public float ShedVisitChance { get; set;} = 0.2f;
         public int MaxShedCapacity { get; set; } = 5;
         public int TimeStay { get; set; } = 230;

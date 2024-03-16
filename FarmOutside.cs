@@ -22,7 +22,7 @@ namespace MarketTown
             var farm = Game1.getLocationFromName("Farm");
             foreach (NPC who in Utility.getAllCharacters())
             {
-                if (who.isVillager() && who.currentLocation.Name == "Farm" 
+                if (who.IsVillager && who.currentLocation.Name == "Farm" 
                     && who.modData.ContainsKey("hapyke.FoodStore/invited") && who.modData["hapyke.FoodStore/invited"] == "true")
                 {
                     x = (int)(who.Position.X / 64);
@@ -98,7 +98,7 @@ namespace MarketTown
             {
                 try
                 {
-                    if (visit.isVillager() && (visit.currentLocation.Name == "Farm" || visit.currentLocation.Name == "FarmHouse") 
+                    if (visit.IsVillager && (visit.currentLocation.Name == "Farm" || visit.currentLocation.Name == "FarmHouse") 
                         && visit.modData.ContainsKey("hapyke.FoodStore/invited") && visit.modData["hapyke.FoodStore/invited"] == "true" 
                         && Game1.timeOfDay > ModEntry.Config.InviteComeTime)
                     {
@@ -144,7 +144,7 @@ namespace MarketTown
         {
             foreach (NPC who in Utility.getAllCharacters())
             {
-                if (who.isVillager() && (((who.currentLocation.Name == "Farm" || who.currentLocation.Name == "FarmHouse") && who.modData["hapyke.FoodStore/invited"] == "true") || who.currentLocation.Name.Contains("Shed")))
+                if (who.IsVillager && (((who.currentLocation.Name == "Farm" || who.currentLocation.Name == "FarmHouse") && who.modData["hapyke.FoodStore/invited"] == "true") || (who.Name.Contains("MT.Guest_") && !who.currentLocation.Name.Contains("BusStop")) ))
                 {
 
                     var map = location.map;

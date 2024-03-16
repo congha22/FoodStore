@@ -118,7 +118,7 @@ namespace MarketTown
                 return;
             try
             {
-                if (__instance.isVillager() && __instance.currentLocation.Name.Contains("Shed") && !bool.Parse(__instance.modData["hapyke.FoodStore/gettingFood"])
+                if (__instance.IsVillager && __instance.Name.Contains("MT.Guest_") && !__instance.currentLocation.Name.Contains("BusStop") && !bool.Parse(__instance.modData["hapyke.FoodStore/gettingFood"])
                     && (Int32.Parse(__instance.modData["hapyke.FoodStore/timeVisitShed"]) <= (Game1.timeOfDay - Config.TimeStay) || Game1.timeOfDay > Config.CloseHour || Game1.timeOfDay >= 2500))
                 {
                     __instance.Halt();
@@ -404,9 +404,12 @@ namespace MarketTown
                     double moveToFoodChance = Config.MoveToFoodChance;
                     try
                     {
-                        if (npc.currentLocation != null && npc.currentLocation.Name.Contains("Shed"))
+                        foreach (var building in Game1.getFarm().buildings)
                         {
-                            moveToFoodChance = Config.ShedMoveToFoodChance;
+                            if (npc.currentLocation != null && building.GetIndoorsName() != null && building.GetIndoorsName().Contains(npc.currentLocation.Name))
+                            {
+                                moveToFoodChance = Config.ShedMoveToFoodChance;
+                            }
                         }
                     }
                     catch { }
