@@ -113,7 +113,7 @@ namespace MarketTown
 
 
             // Handle text message
-            if (npc.isVillager() && (askHelp || askHelpIndex || askFood || askVisit || askTaste))
+            if (npc.IsVillager && (askHelp || askHelpIndex || askFood || askVisit || askTaste))
             {
                 if (askHelp)       // Show main help option
                 {
@@ -126,7 +126,7 @@ namespace MarketTown
                 {
                     if (!Config.DisableChatAll) npc.showTextAboveHead(SHelper.Translation.Get("foodstore.help." + index), default, default, 7000);
                 }                       // Invite to visit
-                else if (askVisit && npc.modData.ContainsKey("hapyke.FoodStore/inviteTried") && npc.modData.ContainsKey("hapyke.FoodStore/invited")
+                else if (askVisit && !npc.Name.Contains("MT.Guest_") && npc.modData.ContainsKey("hapyke.FoodStore/inviteTried") && npc.modData.ContainsKey("hapyke.FoodStore/invited")
                     && !bool.Parse(npc.modData["hapyke.FoodStore/inviteTried"]) && !bool.Parse(npc.modData["hapyke.FoodStore/invited"]))
                 {
                     Random rand = new Random();
@@ -285,7 +285,7 @@ namespace MarketTown
             NpcMap.Clear();
             foreach (NPC npc in Game1.currentLocation.characters)
             {
-                if (npc.isVillager() && !npc.Name.Contains("MT.Guest"))
+                if (npc.IsVillager)
                 {
                     string displayName = npc.displayName;
                     if (NpcMap.ContainsKey(displayName))

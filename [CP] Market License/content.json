@@ -9,7 +9,7 @@
                 "MT.Objects.MarketLicense": {
                     "Name": "Market License",
                     "Displayname": "Market License",
-                    "Description": "The Ferngill Republic requires this license for all shop owners. To register your Shed as a business, you must display this License on a Sign at all times.",
+                    "Description": "The Ferngill Republic requires this license for all shop owners. To register your Building as a business, you must display this License on a Sign at all times. Any change made will take effect the next day.",
                     "Type": "Basic",
                     "Price": 7500,
 
@@ -19,7 +19,7 @@
                 "MT.Objects.RestaurantLicense": {
                     "Name": "Restaurant License",
                     "Displayname": "Restaurant License",
-                    "Description": "The Ferngill Republic issues this License to Restaurant owner to operate food service. To register your Shed as a Restaurant, the License must be displayed on a Sign.",
+                    "Description": "The Ferngill Republic issues this License to Restaurant owner to operate food service. To register your Building as a Restaurant, the License must be displayed on a Sign. Any change made will take effect the next day.",
                     "Type": "Basic",
                     "Price": 4000,
 

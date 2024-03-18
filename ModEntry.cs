@@ -88,6 +88,7 @@ namespace MarketTown
 
         internal static MailData mailData = new MailData();
         public static string TodaySell = "";
+        public static int TodayCustomerInteraction = 0;
         public static int TodayMoney = 0;
         public static int TodayForageSold = 0;
         public static int TodayFlowerSold = 0;
@@ -190,6 +191,7 @@ namespace MarketTown
         {
             TodaySell = ""; 
             TodayMoney = 0;
+            TodayCustomerInteraction = 0;
             TodayForageSold = 0;
             TodayFlowerSold = 0;
             TodayFruitSold = 0;
@@ -265,7 +267,7 @@ namespace MarketTown
                     {
 
                         // ******* Check NPC valid tile *******
-                        if (__instance != null && __instance.isVillager())
+                        if (__instance != null && __instance.IsVillager)
                         {
                             if (Config.NPCCheckTimer != 0 && e.IsMultipleOf(60 * (uint)Config.NPCCheckTimer) 
                                 && __instance.currentLocation != null && __instance.currentLocation is not BusStop
@@ -295,9 +297,9 @@ namespace MarketTown
                             // ******* end of check *******
 
 
-                            if ((friendshipData.TryGetValue(__instance.Name, out var friendship) || __instance.Name.Contains("MT.Guest_")))
+                            if (friendshipData.TryGetValue(__instance.Name, out var friendship) || __instance.Name.Contains("MT.Guest_"))
                             {
-                                if ((!__instance.Name.Contains("MT.Guest_") && friendshipData[__instance.Name].TalkedToToday) || __instance.Name.Contains("MT.Guest_"))
+                                if ( ( !__instance.Name.Contains("MT.Guest_") && friendshipData[__instance.Name].TalkedToToday ) || __instance.Name.Contains("MT.Guest_"))
                                 {
                                     try
                                     {
@@ -361,25 +363,25 @@ namespace MarketTown
                                             {
                                                 __instance.CurrentDialogue.Push(new Dialogue(__instance, "key", SHelper.Translation.Get("foodstore.general." + npcAge + npcManner + npcSocial + randomIndex.ToString())));
                                                 __instance.modData["hapyke.FoodStore/TotalCustomerResponse"] = (Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) + 1).ToString();
+
+
+                                                if (__instance.modData["hapyke.FoodStore/finishedDailyChat"] == "true"
+                                                    && Int32.Parse(__instance.modData["hapyke.FoodStore/chatDone"]) < Config.DialogueTime
+                                                    && !__instance.Name.Contains("MT.Guest_"))
+                                                {
+                                                    __instance.modData["hapyke.FoodStore/chatDone"] = (Int32.Parse(__instance.modData["hapyke.FoodStore/chatDone"]) + 1).ToString();
+                                                    var formattedQuestion = string.Format(SHelper.Translation.Get("foodstore.responselist.main"), __instance);
+                                                    var entryQuestion = new EntryQuestion(formattedQuestion, ResponseList, ActionList);
+                                                    Game1.activeClickableMenu = entryQuestion;
+
+                                                    var pc = new PlayerChat();
+                                                    ActionList.Add(() => pc.OnPlayerSend(__instance, "hi"));
+                                                    ActionList.Add(() => pc.OnPlayerSend(__instance, "invite"));
+                                                    ActionList.Add(() => pc.OnPlayerSend(__instance, "last dish"));
+                                                    ActionList.Add(() => pc.OnPlayerSend(__instance, "special today"));
+                                                }
+                                                __instance.modData["hapyke.FoodStore/finishedDailyChat"] = "true";
                                             }
-
-
-                                            if (__instance.modData["hapyke.FoodStore/finishedDailyChat"] == "true"
-                                                && Int32.Parse(__instance.modData["hapyke.FoodStore/chatDone"]) < Config.DialogueTime
-                                                && !__instance.Name.Contains("MT.Guest_"))
-                                            {
-                                                __instance.modData["hapyke.FoodStore/chatDone"] = (Int32.Parse(__instance.modData["hapyke.FoodStore/chatDone"]) + 1).ToString();
-                                                var formattedQuestion = string.Format(SHelper.Translation.Get("foodstore.responselist.main"), __instance);
-                                                var entryQuestion = new EntryQuestion(formattedQuestion, ResponseList, ActionList);
-                                                Game1.activeClickableMenu = entryQuestion;
-
-                                                var pc = new PlayerChat();
-                                                ActionList.Add(() => pc.OnPlayerSend(__instance, "hi"));
-                                                ActionList.Add(() => pc.OnPlayerSend(__instance, "invite"));
-                                                ActionList.Add(() => pc.OnPlayerSend(__instance, "last dish"));
-                                                ActionList.Add(() => pc.OnPlayerSend(__instance, "special today"));
-                                            }
-                                            __instance.modData["hapyke.FoodStore/finishedDailyChat"] = "true";
                                         }
                                     }
                                     catch { }
@@ -956,11 +958,12 @@ namespace MarketTown
             GlobalKidList.Clear();
             GlobalNPCList.Clear();
             ShoppersToRemove.Clear();
+            ChairPositions.Clear();
 
             //Assign visit value
             foreach (NPC __instance in Utility.getAllCharacters())
             {
-                if (__instance is not null && __instance.isVillager())
+                if (__instance is not null && __instance.IsVillager)
                 {
                     __instance.modData["hapyke.FoodStore/shedEntry"] = "-1,-1";
                     __instance.modData["hapyke.FoodStore/gettingFood"] = "false";
@@ -992,7 +995,6 @@ namespace MarketTown
                 }
             }
 
-            ChairPositions.Clear();
             foreach (GameLocation location in Game1.locations)
             {
                 foreach (MapSeat chair in location.mapSeats)
@@ -1009,6 +1011,34 @@ namespace MarketTown
 
         private void GameLoop_DayEnding(object sender, DayEndingEventArgs e)
         {
+            // Wipe invitation
+            try
+            {
+                foreach (NPC __instance in Utility.getAllCharacters())
+                {
+
+                    TodayCustomerInteraction += Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]);
+                    if ( (__instance.IsVillager && __instance.modData.ContainsKey("hapyke.FoodStore/invited") && __instance.modData.ContainsKey("hapyke.FoodStore/inviteDate")
+                        && __instance.modData["hapyke.FoodStore/invited"] == "true" && Int32.Parse(__instance.modData["hapyke.FoodStore/inviteDate"]) <= (Game1.stats.DaysPlayed - 1))
+                        || (__instance.IsVillager && (!__instance.modData.ContainsKey("hapyke.FoodStore/invited")) || !__instance.modData.ContainsKey("hapyke.FoodStore/inviteDate")) )
+                    {
+                        __instance.modData["hapyke.FoodStore/invited"] = "false";
+                        __instance.modData["hapyke.FoodStore/inviteDate"] = "-99";
+                    }
+
+                    if (__instance.Name.Contains("MT.Guest_"))
+                    {
+                        Game1.player.friendshipData.Remove(__instance.Name);
+
+                        __instance.Halt();
+                        __instance.temporaryController = null;
+                        __instance.controller = null;
+                        Game1.warpCharacter(__instance, __instance.DefaultMap, __instance.DefaultPosition / 64);
+                    }
+                }
+            }
+            catch { }
+
             try
             {
                 var mailHistory = MailRepository.FindLetter("MT.SellLogMail");
@@ -1038,21 +1068,21 @@ namespace MarketTown
             int weeklyFishSold = 0;
             int weeklyGemSold = 0;
 
-            int totalForageSold  = 0;
-            int totalFlowerSold  = 0;
-            int totalFruitSold  = 0;
-            int totalVegetableSold  = 0;
-            int totalSeedSold  = 0;
-            int totalMonsterLootSold  = 0;
-            int totalSyrupSold  = 0;
-            int totalArtisanGoodSold  = 0;
-            int totalAnimalProductSold  = 0;
-            int totalResourceMetalSold  = 0;
-            int totalMineralSold  = 0;
-            int totalCraftingSold  = 0;
-            int totalCookingSold  = 0;
-            int totalFishSold  = 0;
-            int totalGemSold  = 0;
+            int totalForageSold = 0;
+            int totalFlowerSold = 0;
+            int totalFruitSold = 0;
+            int totalVegetableSold = 0;
+            int totalSeedSold = 0;
+            int totalMonsterLootSold = 0;
+            int totalSyrupSold = 0;
+            int totalArtisanGoodSold = 0;
+            int totalAnimalProductSold = 0;
+            int totalResourceMetalSold = 0;
+            int totalMineralSold = 0;
+            int totalCraftingSold = 0;
+            int totalCookingSold = 0;
+            int totalFishSold = 0;
+            int totalGemSold = 0;
 
             var model = this.Helper.Data.ReadSaveData<MailData>("MT.MailLog");
             if (model != null)
@@ -1118,85 +1148,50 @@ namespace MarketTown
                 SellMoney = TodayMoney,
                 SellList = TodaySell,
 
-                ForageSold = TodayForageSold+                        + weeklyForageSold ,    
-                FlowerSold = TodayFlowerSold+                        + weeklyFlowerSold,
-                FruitSold = TodayFruitSold+                          + weeklyFruitSold ,
-                VegetableSold = TodayVegetableSold+                  + weeklyVegetableSold,
-                SeedSold = TodaySeedSold+                            + weeklySeedSold ,
-                MonsterLootSold = TodayMonsterLootSold+              + weeklyMonsterLootSold ,
-                SyrupSold = TodaySyrupSold+                          + weeklySyrupSold ,
-                ArtisanGoodSold = TodayArtisanGoodSold+              + weeklyArtisanGoodSold ,
-                AnimalProductSold = TodayAnimalProductSold+          + weeklyAnimalProductSold,
-                ResourceMetalSold = TodayResourceMetalSold+          + weeklyResourceMetalSold ,
-                MineralSold = TodayMineralSold+                      + weeklyMineralSold,
-                CraftingSold = TodayCraftingSold+                    + weeklyCraftingSold ,
-                CookingSold = TodayCookingSold+                      + weeklyCookingSold,
-                FishSold = TodayFishSold+                            + weeklyFishSold ,
-                GemSold = TodayGemSold+                              + weeklyGemSold,
+                TodayCustomerInteraction = TodayCustomerInteraction,
 
-                TotalForageSold = TodayForageSold +                  totalForageSold,
-                TotalFlowerSold = TodayFlowerSold +                  totalFlowerSold,
-                TotalFruitSold = TodayFruitSold +                    totalFruitSold,
-                TotalVegetableSold = TodayVegetableSold +            totalVegetableSold,
-                TotalSeedSold = TodaySeedSold +                      totalSeedSold,
-                TotalMonsterLootSold = TodayMonsterLootSold +        totalMonsterLootSold,
-                TotalSyrupSold = TodaySyrupSold +                    totalSyrupSold,
-                TotalArtisanGoodSold = TodayArtisanGoodSold +        totalArtisanGoodSold,
-                TotalAnimalProductSold = TodayAnimalProductSold +    totalAnimalProductSold,
-                TotalResourceMetalSold = TodayResourceMetalSold +    totalResourceMetalSold ,
-                TotalMineralSold = TodayMineralSold +                totalMineralSold,
-                TotalCraftingSold = TodayCraftingSold +              totalCraftingSold,
-                TotalCookingSold = TodayCookingSold +                totalCookingSold,
-                TotalFishSold = TodayFishSold +                      totalFishSold,
-                TotalGemSold = TodayGemSold +                        totalGemSold
+                ForageSold = TodayForageSold + +weeklyForageSold,
+                FlowerSold = TodayFlowerSold + +weeklyFlowerSold,
+                FruitSold = TodayFruitSold + +weeklyFruitSold,
+                VegetableSold = TodayVegetableSold + +weeklyVegetableSold,
+                SeedSold = TodaySeedSold + +weeklySeedSold,
+                MonsterLootSold = TodayMonsterLootSold + +weeklyMonsterLootSold,
+                SyrupSold = TodaySyrupSold + +weeklySyrupSold,
+                ArtisanGoodSold = TodayArtisanGoodSold + +weeklyArtisanGoodSold,
+                AnimalProductSold = TodayAnimalProductSold + +weeklyAnimalProductSold,
+                ResourceMetalSold = TodayResourceMetalSold + +weeklyResourceMetalSold,
+                MineralSold = TodayMineralSold + +weeklyMineralSold,
+                CraftingSold = TodayCraftingSold + +weeklyCraftingSold,
+                CookingSold = TodayCookingSold + +weeklyCookingSold,
+                FishSold = TodayFishSold + +weeklyFishSold,
+                GemSold = TodayGemSold + +weeklyGemSold,
+
+                TotalForageSold = TodayForageSold + totalForageSold,
+                TotalFlowerSold = TodayFlowerSold + totalFlowerSold,
+                TotalFruitSold = TodayFruitSold + totalFruitSold,
+                TotalVegetableSold = TodayVegetableSold + totalVegetableSold,
+                TotalSeedSold = TodaySeedSold + totalSeedSold,
+                TotalMonsterLootSold = TodayMonsterLootSold + totalMonsterLootSold,
+                TotalSyrupSold = TodaySyrupSold + totalSyrupSold,
+                TotalArtisanGoodSold = TodayArtisanGoodSold + totalArtisanGoodSold,
+                TotalAnimalProductSold = TodayAnimalProductSold + totalAnimalProductSold,
+                TotalResourceMetalSold = TodayResourceMetalSold + totalResourceMetalSold,
+                TotalMineralSold = TodayMineralSold + totalMineralSold,
+                TotalCraftingSold = TodayCraftingSold + totalCraftingSold,
+                TotalCookingSold = TodayCookingSold + totalCookingSold,
+                TotalFishSold = TodayFishSold + totalFishSold,
+                TotalGemSold = TodayGemSold + totalGemSold
             };
             this.Helper.Data.WriteSaveData("MT.MailLog", dataToSave);
             new MailLoader(SHelper);
 
-            // Wipe invitation
-            try
-            {
-                foreach (NPC __instance in Utility.getAllCharacters())
-                {
-                    if ( (__instance.isVillager() && __instance.modData.ContainsKey("hapyke.FoodStore/invited") && __instance.modData.ContainsKey("hapyke.FoodStore/inviteDate")
-                        && __instance.modData["hapyke.FoodStore/invited"] == "true" && Int32.Parse(__instance.modData["hapyke.FoodStore/inviteDate"]) <= (Game1.stats.DaysPlayed - 1))
-                        || (__instance.isVillager() && (!__instance.modData.ContainsKey("hapyke.FoodStore/invited")) || !__instance.modData.ContainsKey("hapyke.FoodStore/inviteDate")) )
-                    {
-                        __instance.modData["hapyke.FoodStore/invited"] = "false";
-                        __instance.modData["hapyke.FoodStore/inviteDate"] = "-99";
-                    }
-
-                    if (__instance.Name.Contains("MT.Guest_"))
-                    {
-                        Game1.player.friendshipData.Remove(__instance.Name);
-                    }
-                }
-            }
-            catch { }
-
-            // Wipe visitors
-            try
-            {
-                foreach (var name in GlobalNPCList)
-                {
-                    NPC npc = Game1.getCharacterFromName(name);
-                    if (npc != null)
-                    {
-                        npc.Halt();
-                        npc.temporaryController = null;
-                        npc.controller = null;
-                        Game1.warpCharacter(npc, npc.DefaultMap, npc.DefaultPosition / 64);
-                    }
-                }
-            }
-            catch { }
         }
 
         private static bool TryToEatFood(NPC __instance, PlacedFoodData food)
         {
             try
             {
-                if (food != null && __instance.isVillager() && food.furniture != null && Vector2.Distance(food.foodTile, __instance.Tile) < Config.MaxDistanceToEat && !__instance.Name.EndsWith("_DA") && bool.Parse(__instance.modData["hapyke.FoodStore/gettingFood"]))
+                if (food != null && __instance.IsVillager && food.furniture != null && Vector2.Distance(food.foodTile, __instance.Tile) < Config.MaxDistanceToEat && !__instance.Name.EndsWith("_DA") && bool.Parse(__instance.modData["hapyke.FoodStore/gettingFood"]))
                 {
                     if ((__instance.currentLocation is Farm || __instance.currentLocation is FarmHouse) && !Config.AllowRemoveNonFood && food.foodObject.Edibility <= 0)
                     {
@@ -1377,7 +1372,7 @@ namespace MarketTown
                             if (food.foodObject.Name == DishPrefer.dishWeek) { salePrice = (int)(salePrice * 1.1); }
 
                             //Config Rush hours Price
-                            if (Config.RushHour && tip != 0 && ((800 < Game1.timeOfDay && Game1.timeOfDay < 930) || (1200 < Game1.timeOfDay && Game1.timeOfDay < 1300) || (1800 < Game1.timeOfDay && Game1.timeOfDay < 2000)))
+                            if (Config.RushHour && tip != 0 && ((800 < Game1.timeOfDay && Game1.timeOfDay < 930) || (1200 < Game1.timeOfDay && Game1.timeOfDay < 1330) || (1800 < Game1.timeOfDay && Game1.timeOfDay < 2000)))
                             {
                                 salePrice = (int)(salePrice * 0.8);
                                 tip = (int)(tip * 2);
@@ -1388,8 +1383,8 @@ namespace MarketTown
                             {
                                 if (__instance.modData["hapyke.FoodStore/TotalCustomerResponse"] != null)
                                 {
-                                    double totalInteract = Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) / 100;
-                                    if (totalInteract > 0.25) totalInteract = 0.25;
+                                    double totalInteract = Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) / 10;
+                                    if (totalInteract > 0.3) totalInteract = 0.3;
                                     salePrice = (int)(salePrice * (1 + totalInteract));
                                 }
                             }
@@ -1477,7 +1472,6 @@ namespace MarketTown
                                                 __instance.doEmote(20);
                                                 break;
                                         }
-                                        if (owner.Name == "HaPyke" || owner.Name == "d5a1lamdtd") points = (int)(points * 2);
                                         owner.friendshipData[__instance.Name].Points += (int)points;
                                     }
                                 }
@@ -1514,7 +1508,7 @@ namespace MarketTown
                         }
                     }
                 }
-                else if (food != null && __instance.isVillager() && food.obj != null && Vector2.Distance(food.foodTile, __instance.Tile) < Config.MaxDistanceToEat && !__instance.Name.EndsWith("_DA") && bool.Parse(__instance.modData["hapyke.FoodStore/gettingFood"]))
+                else if (food != null && __instance.IsVillager && food.obj != null && Vector2.Distance(food.foodTile, __instance.Tile) < Config.MaxDistanceToEat && !__instance.Name.EndsWith("_DA") && bool.Parse(__instance.modData["hapyke.FoodStore/gettingFood"]))
                 {
                     using (IEnumerator<Object> enumerator = __instance.currentLocation.Objects.Values.GetEnumerator())
                     {
@@ -1798,13 +1792,13 @@ namespace MarketTown
                 }
             }
 
-            if (decorPoint > 70) return 0.5;
-            else if (decorPoint > 56) return 0.4;
-            else if (decorPoint > 42) return 0.3;
-            else if (decorPoint > 30) return 0.2;
-            else if (decorPoint > 20) return 0.1;
-            else if (decorPoint > 14) return 0.0;
-            else if (decorPoint > 9) return -0.1;
+            if (decorPoint > 58) return 0.5;
+            else if (decorPoint > 46) return 0.4;
+            else if (decorPoint > 36) return 0.3;
+            else if (decorPoint > 27) return 0.2;
+            else if (decorPoint > 19) return 0.1;
+            else if (decorPoint > 13) return 0.0;
+            else if (decorPoint > 8) return -0.1;
             else return -0.2;
 
         }
@@ -1954,7 +1948,7 @@ namespace MarketTown
 
                 foreach (string kid in GlobalKidList)
                 {
-                    if (random.NextDouble() < 0.75)
+                    if (random.NextDouble() < 0.5)
                     {
                         int friendshipLevel = Game1.player.getFriendshipHeartLevelForNPC(kid);
                         double addKid = 0;

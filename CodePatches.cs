@@ -147,7 +147,7 @@ namespace MarketTown
 
             try             //Warp invited NPC to and away
             {
-                if (__instance.isVillager() && !Utility.isFestivalDay() && __instance.modData["hapyke.FoodStore/inviteDate"] == (Game1.stats.DaysPlayed - 1).ToString())
+                if (__instance.IsVillager && !Utility.isFestivalDay() && __instance.modData["hapyke.FoodStore/inviteDate"] == (Game1.stats.DaysPlayed - 1).ToString())
                 {
                     Random rand = new Random();
                     int index = rand.Next(7);
@@ -200,7 +200,7 @@ namespace MarketTown
             }
 
             //Get taste and decoration score, call to SaySomething for NPC to send bubble text
-            if (Config.EnableMod && !Game1.eventUp && __instance.currentLocation is not null && __instance.isVillager() && !WantsToEat(__instance) 
+            if (Config.EnableMod && !Game1.eventUp && __instance.currentLocation is not null && __instance.IsVillager && !WantsToEat(__instance) 
                 && Microsoft.Xna.Framework.Vector2.Distance(__instance.Tile, Game1.player.Tile) < 30
                 && __instance.modData["hapyke.FoodStore/LastFoodTaste"] != "-1" && Config.EnableDecor && !Config.DisableChatAll)
             {
@@ -291,7 +291,7 @@ namespace MarketTown
 
 
             //Fix position, do eating food
-            if (!Config.EnableMod || Game1.eventUp || __instance is null || __instance.currentLocation is null || !__instance.isVillager() || !WantsToEat(__instance))
+            if (!Config.EnableMod || Game1.eventUp || __instance is null || __instance.currentLocation is null || !__instance.IsVillager || !WantsToEat(__instance))
                 return;
 
             if (listNPCTodayPurchaseTime.TryGetValue(__instance, out int purchaseTime))
@@ -334,7 +334,7 @@ namespace MarketTown
                 Random randomSayChance = new Random();
 
                 //Send bubble about decoration, dish of the week
-                if (npc.isVillager()
+                if (npc.IsVillager
                     && randomSayChance.NextDouble() < talkChance
                     && WantsToSay(npc, 360)
                     && Utility.isThereAFarmerWithinDistance(new Microsoft.Xna.Framework.Vector2(npc.Tile.X, npc.Tile.Y), 20, npc.currentLocation) != null
@@ -399,17 +399,14 @@ namespace MarketTown
 
                 //Control NPC walking to the food
                 string text = "";
-                if (npc.isVillager() && !npc.Name.EndsWith("_DA") && !npc.Name.StartsWith("RNPC"))
+                if (npc.IsVillager && !npc.Name.EndsWith("_DA") && !npc.Name.StartsWith("RNPC"))
                 {
                     double moveToFoodChance = Config.MoveToFoodChance;
                     try
                     {
-                        foreach (var building in Game1.getFarm().buildings)
+                        if (npc.Name != null && npc.Name.Contains("MT.Guest_"))
                         {
-                            if (npc.currentLocation != null && building.GetIndoorsName() != null && building.GetIndoorsName().Contains(npc.currentLocation.Name))
-                            {
-                                moveToFoodChance = Config.ShedMoveToFoodChance;
-                            }
+                            moveToFoodChance = Config.ShedMoveToFoodChance;
                         }
                     }
                     catch { }

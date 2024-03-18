@@ -18,7 +18,7 @@ namespace MarketTown
         {
             foreach (var c in Game1.player.currentLocation.characters)
             {
-                if (c.isVillager())
+                if (c.IsVillager)
                 {
                     CheckOrder(c, Game1.player.currentLocation);
                 }

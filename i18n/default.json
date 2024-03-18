@@ -4,7 +4,7 @@
   "foodstore.hidden.0":                               "And weekly tip: Villager more likely to promote when ate loved food, and more criticise when are hated food.",
   "foodstore.hidden.1":                               "And weekly tip: The lower sale price can be 32% of the base price, while the highest is 520%.",
   "foodstore.hidden.2":                               "And weekly tip: Well-decorated store boost your sell price",
-  "foodstore.hidden.3":                               "And weekly tip: You can only get information about dish of the week from villager chat.",
+  "foodstore.hidden.3":                               "And weekly tip: You can only get information about Dish of the Week from villager chat.",
   "foodstore.hidden.4":                               "And weekly tip: Gus only rate your dish as neutral dish at the best. He graciously paid the full price without expressing his dissatisfaction and he chose to keep his opinion about the taste to himself.",
   "foodstore.hidden.5":                               "And weekly tip: Not every visitor may find the food appealing; some quickly turn away, perhaps perceiving it as less enticing and not up to their standards.",
   "foodstore.hidden.6":                               "And weekly tip: There is no tip for a hated dish because it is hated!!!",
@@ -15,7 +15,7 @@
   
   "foodstore.help.0":                                 "Interact with villager by stand close to them, and type in your message. Some special question required to have the keyword in the message!!",
   "foodstore.help.1":                                 "To invite villager come over tomorrow, send a message contains keyword: 'invite'.",
-  "foodstore.help.2":                                 "Ask villager about dish of the day. The message must contains at least a keyword. For example 'special today' or 'recommend today'.",
+  "foodstore.help.2":                                 "Ask villager about Dish of the Day. The message must contains at least a keyword. For example 'special today' or 'recommend today'.",
   "foodstore.help.3":                                 "Ask villager how do they feel about their last dish by include keyword 'last dish' or 'dish taste'.",
   "foodstore.help.4":                                 "To set up your first store, simply place donw a table at a busy location, and then put a dish on it!!!",
   
@@ -413,7 +413,7 @@
   "foodstore.config.enablevisitinside":               "Enable visitor inside Farm House?",
   
   "foodstore.config.dialoguetime":                    "Daily dialogue box time each NPC?",
-  "foodstore.config.dialoguetimeText":                "Default 2. This number limit how many time the invite box appear for each NPC daily. You still can talk and invite NPC using chatbox when passed the limit",
+  "foodstore.config.dialoguetimeText":                "Default 1. This number limit how many time the invite box appear for each NPC daily. You still can talk and invite NPC using chatbox when passed the limit",
   
   "foodstore.kidask":                                 "{{kidName}}: Pwease, can I play on your farm today? Pretty pwease with sprinkles on top!!",
   "foodstore.groupkidask":                            "Heyyy, can we all pretty-pretty-please play on your super-duper farm today? Cross my heart, we won't even touch the flowers!",
@@ -723,16 +723,16 @@
   "foodstore.config.randompurchaseText":              "By default NPC will move to closest item. Set to True for they to buy random item within search range.",
 
   "foodstore.config.signrange":                       "Mark the store with a Sign?",
-  "foodstore.config.signrangeText":                   "Set to 0 to disable. This limit NPCs only buying valid items within distance from a placed Sign. Items out of range will be ignored. Not apply inside Shed",
+  "foodstore.config.signrangeText":                   "Set to 0 to disable. This limit NPCs only buying valid items within distance from a placed Sign. Items out of range will be ignored. Not apply inside Building",
 
   "foodstore.config.doorentry":                       "NPC spawn near door",
-  "foodstore.config.doorentryText":                   "Default False: Visitor will spawn near License Sign. Set to True for NPC to spawn near door (work on vanilla Shed only)",
+  "foodstore.config.doorentryText":                   "Default True: Visitor will spawn near door. Set to False for NPC to spawn near License Sign. Only apply for business Building",
 
-  "foodstore.config.shedvisitchance":                 "Chance for Shed visit",
-  "foodstore.config.shedvisitchanceText":             "Default 0.2. Chance for new visitor in Shed every 10 minutes. Recommened below 0.5!",
+  "foodstore.config.shedvisitchance":                 "Chance for new visitor",
+  "foodstore.config.shedvisitchanceText":             "Default 0.2. Chance for new visitor in Building every 10 minutes. Recommened below 0.5!",
 
-  "foodstore.config.maxshedcapacity":                 "Maximum visitors in Shed",
-  "foodstore.config.maxshedcapacityText":             "Default 5. Max capacity in one Shed.",
+  "foodstore.config.maxshedcapacity":                 "Maximum visitors in Building",
+  "foodstore.config.maxshedcapacityText":             "Default 5. Max capacity in one Building.",
 
   "foodstore.config.timestay":                        "How long NPC stay?",
   "foodstore.config.timestayText":                    "Default 230 (equal 2.5 hour). Recommended below 400 (4 hours)",
@@ -740,10 +740,10 @@
   "foodstore.config.openhour":                        "Open hour",
   "foodstore.config.closehour":                       "Close hour",
     
-  "foodstore.config.shed":                            "Shed Setting",
+  "foodstore.config.shed":                            "Building Store Setting",
 
   "foodstore.config.shedbuychance":                   "Visitor purchase chance",
-  "foodstore.config.shedbuychanceText":               "Default 0.2. Chance Visitor will buy item inside Shed",
+  "foodstore.config.shedbuychanceText":               "Default 0.2. Chance Visitor will buy item inside Building",
 
   "foodstore.config.shedminutetohungry":              "Minute to buy",
   "foodstore.config.shedminutetohungryText":          "Default 90. Time limit between each purchase",
@@ -753,7 +753,7 @@
   "foodstore.config.buswalk":                         "NPC walk from Bus",
   "foodstore.config.buswalkText":                     "When set to True, visitors will start walking out of the Bus toward you Farm",
 
-  "foodstore.config.modkey":                          "Show Dish name key",
+  "foodstore.config.modkey":                          "Key to show name of the Dish",
   "foodstore.config.orderchance":                     "Chance for new order / s",
   "foodstore.config.lovedishchance":                  "Chance of loved dish",
   "foodstore.config.pricemultiplier":                 "Price multiplier",
@@ -762,7 +762,7 @@
   "foodstore.config.kidaskchance":                    "Daily chance kid ask to play",
 
   "loved-order-reaction-1":                           "Thank you, this looks delicious!",
-  "loved-order-reaction-2":                           "Thank you!",
+  "loved-order-reaction-2":                           "Thank you so much!",
   "loved-order-reaction-3":                           "Exactly what I wanted, thank you!",
 
   "liked-order-reaction-1":                           "Thanks, this looks good!",
@@ -774,6 +774,43 @@
   "neutral-order-reaction-3":                         "Cool!",
 
   "foodstore.config.shedvisitor":                     "  Visitors Special Request",
-  "foodstore.mailtotal":                              "Total Market earning: {{totalEarning}}G^^  Earning yesterday: {{sellMoney}}G^^"
+  "foodstore.mailtotal":                              "Total Market earning: {{totalEarning}}G^  Yesterday earning: {{sellMoney}}G^  Yesterday customer interaction:{{todayCustomerInteraction}}.^^",
+
+  "foodstore.letter.mtwelcome":                       "  Welcome to Market Town. Here you can set up your own store and sell goods to villagers!!!^^   Let's start by choosing a good place for your store, then place down a table and start selling any item you prefer.^^   If you want to turn Building into a restaurant, a convenience store, or any kind you want, you need to obtain either a Restaurant License from Saloon, or a Market Town License from Desert Trader.^^ -Requirement for Restaurant License: Total earning more than 10000, and has sold at least 20 Cooking.^^ -Requirement for Market Town License: Total earning more than 30000, and has sold at least 30 of each Forage, Vegetable, Artisan Good, Animal Product, Cooking, Fish, and Mineral.^^     -HaPyke^^   Thank you for using Market Town!!!^  This Mod is highly configurable to fit the gameplay of most players. Please review the details in Config before reporting any issues.^^   Found any bugs? Please report it to Mod page together with SMAPI log, or contact me via Discord: hapyke",
+  "foodstore.letter.mtrestaurantlicense":             "Dear @.^^As you have meet the requirement to hold a Restaurant License, you can drop by the Saloon whenever you are free to purchase the license.^Restaurant License allowing you to operate any of your Farm Building as a restaurant.^^I will drop by for some meal sometime^-Gus",
+  "foodstore.letter.mtmarkettownlicense":             "Dear @.^^You are doing great with your business. Now you can obtain a Market Town License from Desert Trader.^Market Town License let you to sell anything you want!^^-Lewis",
+
+  "foodstore.weeklylog":                              "Weekly Log:^^",
+  "foodstore.forage":                                 "   Total Forage Sold: {{TotalForageSold}}^",
+  "foodstore.flower":                                 "   Total Flower Sold: {{TotalFlowerSold}}^",
+  "foodstore.fruit":                                  "   Total Fruit Sold: {{TotalFruitSold}}^",
+  "foodstore.vegetable":                              "   Total Vegetable Sold: {{TotalVegetableSold}}^",
+  "foodstore.seed":                                   "   Total Seed Sold: {{TotalSeedSold}}^",
+  "foodstore.monsterloot":                            "   Total Monster Loot Sold: {{TotalMonsterLootSold}}^",
+  "foodstore.syrup":                                  "   Total Syrup Sold: {{TotalSyrupSold}}^",
+  "foodstore.artisangood":                            "   Total Artisan Good Sold: {{TotalArtisanGoodSold}}^",
+  "foodstore.animalproduct":                          "   Total Animal Product Sold: {{TotalAnimalProductSold}}^",
+  "foodstore.resourcemetal":                          "   Total Resource Metal Sold: {{TotalResourceMetalSold}}^",
+  "foodstore.mineral":                                "   Total Mineral Sold: {{TotalMineralSold}}^",
+  "foodstore.crafting":                               "   Total Crafting Sold: {{TotalCraftingSold}}^",
+  "foodstore.cooking":                                "   Total Cooking Sold: {{TotalCookingSold}}^",
+  "foodstore.fish":                                   "   Total Fish Sold: {{TotalFishSold}}^",
+  "foodstore.gem":                                    "   Total Gem Sold: {{TotalGemSold}}^",
+
+  "foodstore.lastweek.forage":                        "   Last week Forage Sold: {{LastweekForageSold}}^",
+  "foodstore.lastweek.flower":                        "   Last week Flower Sold: {{LastweekFlowerSold}}^",
+  "foodstore.lastweek.fruit":                         "   Last week Fruit Sold: {{LastweekFruitSold}}^",
+  "foodstore.lastweek.vegetable":                     "   Last week Vegetable Sold: {{LastweekVegetableSold}}^",
+  "foodstore.lastweek.seed":                          "   Last week Seed Sold: {{LastweekSeedSold}}^",
+  "foodstore.lastweek.monsterloot":                   "   Last week Monster Loot Sold: {{LastweekMonsterLootSold}}^",
+  "foodstore.lastweek.syrup":                         "   Last week Syrup Sold: {{LastweekSyrupSold}}^",
+  "foodstore.lastweek.artisangood":                   "   Last week Artisan Good Sold: {{LastweekArtisanGoodSold}}^",
+  "foodstore.lastweek.animalproduct":                 "   Last week Animal Product Sold: {{LastweekAnimalProductSold}}^",
+  "foodstore.lastweek.resourcemetal":                 "   Last week Resource Metal Sold: {{LastweekResourceMetalSold}}^",
+  "foodstore.lastweek.mineral":                       "   Last week Mineral Sold: {{LastweekMineralSold}}^",
+  "foodstore.lastweek.crafting":                      "   Last week Crafting Sold: {{LastweekCraftingSold}}^",
+  "foodstore.lastweek.cooking":                       "   Last week Cooking Sold: {{LastweekCookingSold}}^",
+  "foodstore.lastweek.fish":                          "   Last week Fish Sold: {{LastweekFishSold}}^",
+  "foodstore.lastweek.gem":                           "   Last week Gem Sold: {{LastweekGemSold}}^"
 
 }

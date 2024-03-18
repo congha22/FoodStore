@@ -1,7 +1,7 @@
 ﻿{
   "Name": "Market Town",
   "Author": "d5a1lamdtd",
-  "Version": "5.0.0-alpha",
+  "Version": "5.0.0",
   "Description": "MarketTown",
   "UniqueID": "d5a1lamdtd.MarketTown",
   "EntryDll": "MarketTown.dll",
@@ -15,6 +15,14 @@
     {  
       "UniqueID": "Pathoschild.ContentPatcher",
       "IsRequired": true
+    },
+    { 
+      "UniqueID": "DIGUS.MailFrameworkMod", 
+      "IsRequired": true
+    },
+    { 
+      "UniqueID": "MadaraUchiha.NonDestructiveNPCs", 
+      "IsRequired": true 
     }
   ]
 }

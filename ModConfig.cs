@@ -43,7 +43,7 @@ namespace MarketTown
         public int SignRange { get; set; } = 0;
 
 
-        public bool DoorEntry { get; set; } = false;
+        public bool DoorEntry { get; set; } = true;
         public float ShedVisitChance { get; set;} = 0.2f;
         public int MaxShedCapacity { get; set; } = 5;
         public int TimeStay { get; set; } = 230;
@@ -51,16 +51,16 @@ namespace MarketTown
         public int CloseHour { get;set; } = 2200;
 
         public float ShedMoveToFoodChance { get; set; } = 0.2f;
-        public int ShedMinuteToHungry { get; set; } = 60;
+        public int ShedMinuteToHungry { get; set; } = 90;
 
-        public float KidAskChance { get; set; } = 0.3f;
+        public float KidAskChance { get; set; } = 0.2f;
 
         public bool BusWalk { get; set; } = true;
 
         public SButton ModKey { get; set; } = SButton.LeftAlt;
         public int MaxNPCOrdersPerNight { get; set; } = 3;
         public float PriceMarkup { get; set; } = 3f;
-        public float OrderChance { get; set; } = 0.01f;
+        public float OrderChance { get; set; } = 0.02f;
         public float LovedDishChance { get; set; } = 0.7f;
         public List<string> RestaurantLocations { get; set; } = new List<string>()
         {

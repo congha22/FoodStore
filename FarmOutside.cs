@@ -140,7 +140,7 @@ namespace MarketTown
         }
 
 
-        internal static Point getRandomOpenPointInFarm(GameLocation location, Random r, int tries = 7, int maxDistance = 10)
+        internal static Point getRandomOpenPointInFarm(GameLocation location, Random r, int tries = 5, int maxDistance = 15)
         {
             foreach (NPC who in Utility.getAllCharacters())
             {
