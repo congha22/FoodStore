@@ -12,7 +12,7 @@ using SObject = StardewValley.Object;
 namespace MarketTown.Framework
 {
     [XmlType("Mods_spacechase0_Mannequin")]
-    public class Mannequin : SObject // must be public for the XML serializer
+    public class MtMannequin : SObject // must be public for the XML serializer
     {
         /*********
         ** Fields
@@ -47,9 +47,9 @@ namespace MarketTown.Framework
         /*********
         ** Public methods
         *********/
-        public Mannequin() { }
+        public MtMannequin() { }
 
-        public Mannequin(MannequinType type, MannequinGender gender, Vector2 placement)
+        public MtMannequin(MannequinType type, MannequinGender gender, Vector2 placement)
         {
             this.MannType.Value = type;
             this.MannGender.Value = gender;
@@ -69,14 +69,14 @@ namespace MarketTown.Framework
         public override bool canStackWith(ISalable other)
         {
             return
-                other is Mannequin m
+                other is MtMannequin m
                 && m.MannType.Value == this.MannType.Value
                 && m.MannGender.Value == this.MannGender.Value;
         }
 
         protected override Item GetOneNew()
         {
-            var ret = new Mannequin(this.MannType.Value, this.MannGender.Value, Vector2.Zero);
+            var ret = new MtMannequin(this.MannType.Value, this.MannGender.Value, Vector2.Zero);
             ret.Hat.Value = (Hat)this.Hat.Value?.getOne();
             ret.Shirt.Value = (Clothing)this.Shirt.Value?.getOne();
             ret.Pants.Value = (Clothing)this.Pants.Value?.getOne();
@@ -93,7 +93,7 @@ namespace MarketTown.Framework
         public override bool placementAction(GameLocation location, int x, int y, Farmer who = null)
         {
             Vector2 placementTile = new Vector2(x / Game1.tileSize, y / Game1.tileSize);
-            var m = new Mannequin(this.MannType.Value, this.MannGender.Value, placementTile);
+            var m = new MtMannequin(this.MannType.Value, this.MannGender.Value, placementTile);
             location.Objects.Add(placementTile, m);
             location.playSound("woodyStep");
             return true;
@@ -133,7 +133,7 @@ namespace MarketTown.Framework
                     return false;
                 }
                 Game1.player.currentLocation.objects.Remove(this.TileLocation);
-                this.DropItem(Game1.player.currentLocation, new Mannequin(this.MannType.Value, this.MannGender.Value, Vector2.Zero));
+                this.DropItem(Game1.player.currentLocation, new MtMannequin(this.MannType.Value, this.MannGender.Value, Vector2.Zero));
                 return false;
             }
 
@@ -365,9 +365,9 @@ namespace MarketTown.Framework
         {
             return this.MannGender.Value switch
             {
-                MannequinGender.Male => Mannequin.TexM,
-                MannequinGender.Female => Mannequin.TexF,
-                _ => Mannequin.Tex
+                MannequinGender.Male => MtMannequin.TexM,
+                MannequinGender.Female => MtMannequin.TexF,
+                _ => MtMannequin.Tex
             };
         }
 

@@ -653,6 +653,7 @@
   "foodstore.letter.mtrestaurantlicense": "Caro @.^^Como você cumpriu os requisitos para obter uma Licença de Restaurante, você pode passar pelo Saloon sempre que estiver livre para comprar a licença.^A Licença de Restaurante permite que você opere qualquer um dos seus Prédios da Fazenda como um restaurante.^^Eu passarei para fazer uma refeição algum tempo^-Gus",
   "foodstore.letter.mtmarkettownlicense": "Caro @.^^Você está indo muito bem com o seu negócio. Agora você pode obter uma Licença da Cidade Mercantil do Desert Trader.^A Licença da Cidade Mercantil permite que você venda o que quiser!^^-Lewis",
   "foodstore.weeklylog": "Registro Semanal:",
+  "foodstore.weeklytotallog": "Ganhos totais do mercado: {{totalEarning}}G^",
   "foodstore.forage": "Total de Forragem Vendida: {{TotalForageSold}}",
   "foodstore.flower": "Total de Flores Vendidas: {{TotalFlowerSold}}",
   "foodstore.fruit": "Total de Frutas Vendidas: {{TotalFruitSold}}",

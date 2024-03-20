@@ -5,7 +5,7 @@
   "Description": "MarketTown",
   "UniqueID": "d5a1lamdtd.MarketTown",
   "EntryDll": "MarketTown.dll",
-  "MinimumApiVersion": "3.15.0",
+  "MinimumApiVersion": "4.0.0",
   "UpdateKeys": [ "Nexus:19309" ],
   "Dependencies":[
     {

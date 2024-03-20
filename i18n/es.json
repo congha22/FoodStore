@@ -653,6 +653,7 @@
   "foodstore.letter.mtrestaurantlicense": "Querido @. ^^ Como has cumplido con los requisitos para obtener una Licencia de Restaurante, puedes pasar por el Salón cuando estés libre para comprar la licencia. La Licencia de Restaurante te permitirá operar cualquier edificio de tu Granja como restaurante. ^^ Pasaré por allí para comer algún día. -Gus",
   "foodstore.letter.mtmarkettownlicense": "Querido @.^^Estás haciendo un gran trabajo con tu negocio. Ahora puedes obtener una Licencia de Pueblo de Mercado de Desert Trader.^¡La Licencia de Pueblo de Mercado te permite vender todo lo que quieras!^^-Lewis",
   "foodstore.weeklylog": "Registro Semanal:",
+  "foodstore.weeklytotallog": "Ganancias totales del mercado: {{totalEarning}}G^",
   "foodstore.forage": "Total de forraje vendido: {{TotalForageSold}}",
   "foodstore.flower": "Total de flores vendidas: {{TotalFlowerSold}}",
   "foodstore.fruit": "Total de frutas vendidas: {{TotalFruitSold}}^",

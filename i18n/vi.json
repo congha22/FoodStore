@@ -653,6 +653,7 @@
 "foodstore.letter.mtrestaurantlicense": "Chào @.^^Bạn đã đáp ứng được yêu cầu để sở hữu Giấy phép Nhà hàng, bạn có thể ghé qua nhà hàng bất cứ khi nào bạn rảnh để mua giấy phép.^Giấy phép Nhà hàng cho phép bạn vận hành bất kỳ tòa nhà Nông trại nào của bạn như một nhà hàng.^^Tôi sẽ ghé qua ăn một bữa trong tương lai^-Gus",
   "foodstore.letter.mtmarkettownlicense": "Chào @.^^Bạn đang làm tốt với công việc kinh doanh của mình. Bây giờ bạn có thể nhận được Giấy phép Thị trấn thị trường từ Người bán lưu động sa mạc. ^Gói Giấy phép Thị trấn thị trường cho phép bạn bán bất cứ thứ gì bạn muốn!^^-Lewis",
   "foodstore.weeklylog": "Nhật ký hàng tuần: ^^",
+  "foodstore.weeklytotallog": "Thu nhập tổng cộng từ thị trường: {{totalEarning}}G^",
   "foodstore.forage": "Tổng số Thức ăn để bán: {{TotalForageSold}}",
   "foodstore.flower": "Tổng số hoa đã bán: {{TotalFlowerSold}}",
   "foodstore.fruit": "Tổng số trái cây đã bán: {{TotalFruitSold}} ",

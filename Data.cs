@@ -152,7 +152,7 @@ namespace MarketTown;
         public string GetCategoryCountsString(MailData model, IModHelper modHelper)
         {
             StringBuilder stringBuilder = new StringBuilder();
-
+            stringBuilder.Append(modHelper.Translation.Get("foodstore.weeklytotallog", new { totalEarning = model.TotalEarning }));
             stringBuilder.Append(modHelper.Translation.Get("foodstore.weeklylog"));
 
             stringBuilder.Append(modHelper.Translation.Get("foodstore.forage", new { TotalForageSold = model.TotalForageSold }));
@@ -172,7 +172,7 @@ namespace MarketTown;
             stringBuilder.Append(modHelper.Translation.Get("foodstore.gem", new { TotalGemSold = model.TotalGemSold }));
 
 
-        stringBuilder.Append($"------------------------------------------^");
+            stringBuilder.Append($"------------------------------------------^");
 
             stringBuilder.Append(modHelper.Translation.Get("foodstore.lastweek.forage", new { LastweekForageSold = model.ForageSold }));
             stringBuilder.Append(modHelper.Translation.Get("foodstore.lastweek.flower", new { LastweekFlowerSold = model.FlowerSold }));

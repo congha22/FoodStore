@@ -653,6 +653,7 @@
   "foodstore.letter.mtrestaurantlicense": "親愛なる@さん、^^レストランライセンスの資格を満たしたことをお知らせします。自由な時間があるときに、ライセンスを購入するためにSaloonに立ち寄ることができます。レストランライセンスは、自分の農場の建物をレストランとして営業することを許可します。^^私もいつかお食事をしに立ち寄りますね^-ガス",
   "foodstore.letter.mtmarkettownlicense": "@さん、こんにちは。あなたのビジネスはとても順調ですね。今ならデザートトレーダーからマーケットタウンライセンスを取得することができますよ。マーケットタウンライセンスがあれば、あなたは自由に何でも販売することができます！-ルイス",
   "foodstore.weeklylog": "週次記録：^^",
+  "foodstore.weeklytotallog": "市場全体の収益：{{totalEarning}}G^",
   "foodstore.forage": "合計フォレージ販売数：{{TotalForageSold}}",
   "foodstore.flower": "合計販売フラワー数: {{TotalFlowerSold}}",
   "foodstore.fruit": "総販売数：{{TotalFruitSold}}個",

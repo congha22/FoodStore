@@ -397,7 +397,7 @@ namespace MarketTown
         private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
         {
             var sc = this.Helper.ModRegistry.GetApi<ISpaceCoreApi>("spacechase0.SpaceCore");
-            sc.RegisterSerializerType(typeof(Mannequin));
+            sc.RegisterSerializerType(typeof(MtMannequin));
         }
 
         private void OnAssetRequested(object sender, AssetRequestedEventArgs e)
@@ -434,7 +434,7 @@ namespace MarketTown
                             return;
                     }
                 }
-                item = new Mannequin(mannType, mannGender, Vector2.Zero);
+                item = new MtMannequin(mannType, mannGender, Vector2.Zero);
             }
 
             if (item == null)
@@ -466,12 +466,12 @@ namespace MarketTown
             {
                 if (shop.ShopId == "Carpenter")
                 {
-                    var mm = new Mannequin(MannequinType.Plain, MannequinGender.Male, Vector2.Zero);
-                    var mf = new Mannequin(MannequinType.Plain, MannequinGender.Female, Vector2.Zero);
+                    var mm = new MtMannequin(MannequinType.Plain, MannequinGender.Male, Vector2.Zero);
+                    var mf = new MtMannequin(MannequinType.Plain, MannequinGender.Female, Vector2.Zero);
                     shop.forSale.Add(mm);
                     shop.forSale.Add(mf);
-                    shop.itemPriceAndStock.Add(mm, new ItemStockInformation(1000, int.MaxValue));
-                    shop.itemPriceAndStock.Add(mf, new ItemStockInformation(1000, int.MaxValue));
+                    shop.itemPriceAndStock.Add(mm, new ItemStockInformation(15000, int.MaxValue));
+                    shop.itemPriceAndStock.Add(mf, new ItemStockInformation(15000, int.MaxValue));
                 }
             }
         }
@@ -718,7 +718,7 @@ namespace MarketTown
                 name: () => SHelper.Translation.Get("foodstore.config.openhour"),
                 getValue: () => Config.OpenHour,
                 setValue: value => Config.OpenHour = (int)value,
-                min: 600,
+                min: 610,
                 max: 2400f,
                 interval: 10f
             );
@@ -728,7 +728,7 @@ namespace MarketTown
                 name: () => SHelper.Translation.Get("foodstore.config.closehour"),
                 getValue: () => Config.CloseHour,
                 setValue: value => Config.CloseHour = (int)value,
-                min: 600,
+                min: 610,
                 max: 2400f,
                 interval: 10f
             );
@@ -1521,26 +1521,26 @@ namespace MarketTown
                             if (enumerator.Current.boundingBox.Value != food.obj.boundingBox.Value)
                                 continue;
 
-                            if (currentObject is Mannequin mannequin)
+                            if (currentObject is MtMannequin mannequin)
                             {
                                 if (mannequin.Hat.Value != null)
                                 {
-                                    salePrice += rand.Next(700, 1500);
+                                    salePrice += rand.Next(1100, 1600);
                                     mannequin.Hat.Value = null;
                                 }
                                 if (mannequin.Shirt.Value != null)
                                 {
-                                    salePrice += rand.Next(900, 1800);
+                                    salePrice += rand.Next(1300, 1800);
                                     mannequin.Shirt.Value = null;
                                 }
                                 if (mannequin.Pants.Value != null)
                                 {
-                                    salePrice += rand.Next(1000, 2000);
+                                    salePrice += rand.Next(1400, 1900);
                                     mannequin.Pants.Value = null;
                                 }
                                 if (mannequin.Boots.Value != null)
                                 {
-                                    salePrice += (int)(mannequin.Boots.Value.salePrice() * 3.5);
+                                    salePrice += (int)(mannequin.Boots.Value.salePrice() * 4);
                                     mannequin.Boots.Value = null;
                                 }
                             }
@@ -1577,7 +1577,7 @@ namespace MarketTown
             {
                 foreach (var obj in x.Values)
                 {
-                    if (obj.name.Contains("nequin") && obj is Mannequin mannequin)
+                    if (obj.name.Contains("nequin") && obj is MtMannequin mannequin)
                     {
                         // Access the name property of the object
                         string objectName = obj.name;
@@ -2074,10 +2074,10 @@ namespace MarketTown
 
                             if (Game1.player.currentLocation.Name == "BusStop" && Config.BusWalk && Game1.MasterPlayer.mailReceived.Contains("ccVault"))
                             {
-                                Game1.warpCharacter(visit, "BusStop", new Point(13, 11));
+                                Game1.warpCharacter(visit, "BusStop", new Point(24, 11));
                                 visit.isCharging = true;
                                 visit.addedSpeed = 1;
-                                visit.temporaryController = new PathFindController(visit, visit.currentLocation, new Point(1, 24), 3,
+                                visit.temporaryController = new PathFindController(visit, visit.currentLocation, new Point(13, 24), 3,
                                 (character, location) => Game1.warpCharacter(visit, building.GetIndoorsName(), randomClearTile));
                             }
                             else Game1.warpCharacter(visit, building.GetIndoorsName(), randomClearTile);
@@ -2088,10 +2088,10 @@ namespace MarketTown
                         {
                             if (Game1.player.currentLocation.Name == "BusStop" && Config.BusWalk && Game1.MasterPlayer.mailReceived.Contains("ccVault"))
                             {
-                                Game1.warpCharacter(visit, "BusStop", new Point(13, 11));
+                                Game1.warpCharacter(visit, "BusStop", new Point(24, 11));
                                 visit.isCharging = true;
                                 visit.addedSpeed = 1;
-                                visit.temporaryController = new PathFindController(visit, visit.currentLocation, new Point(1, 24), 3,
+                                visit.temporaryController = new PathFindController(visit, visit.currentLocation, new Point(13, 24), 3,
                                 (character, location) => Game1.warpCharacter(visit, building.GetIndoorsName(), doorTile));
                             }
                             else Game1.warpCharacter(visit, building.GetIndoorsName(), doorTile);
@@ -2118,10 +2118,10 @@ namespace MarketTown
 
                             if (Game1.player.currentLocation.Name == "BusStop" && Config.BusWalk && Game1.MasterPlayer.mailReceived.Contains("ccVault"))
                             {
-                                Game1.warpCharacter(visit, "BusStop", new Point(13, 11));
+                                Game1.warpCharacter(visit, "BusStop", new Point(24, 11));
                                 visit.isCharging = true;
                                 visit.addedSpeed = 1;
-                                visit.temporaryController = new PathFindController(visit, visit.currentLocation, new Point(1, 24), 3,
+                                visit.temporaryController = new PathFindController(visit, visit.currentLocation, new Point(13, 24), 3,
                                 (character, location) => Game1.warpCharacter(visit, building.GetIndoorsName(), randomClearTile));
                             }
                             else Game1.warpCharacter(visit, building.GetIndoorsName(), randomClearTile);
@@ -2132,10 +2132,10 @@ namespace MarketTown
                         {
                             if (Game1.player.currentLocation.Name == "BusStop" && Config.BusWalk && Game1.MasterPlayer.mailReceived.Contains("ccVault"))
                             {
-                                Game1.warpCharacter(visit, "BusStop", new Point(13, 11));
+                                Game1.warpCharacter(visit, "BusStop", new Point(24, 11));
                                 visit.isCharging = true;
                                 visit.addedSpeed = 1;
-                                visit.temporaryController = new PathFindController(visit, visit.currentLocation, new Point(1, 24), 3,
+                                visit.temporaryController = new PathFindController(visit, visit.currentLocation, new Point(13, 24), 3,
                                 (character, location) => Game1.warpCharacter(visit, building.GetIndoorsName(), new Vector2(obj.TileLocation.X, obj.TileLocation.Y)));
                             }
                             else Game1.warpCharacter(visit, building.GetIndoorsName(), new Vector2(obj.TileLocation.X, obj.TileLocation.Y));
