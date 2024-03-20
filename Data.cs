@@ -153,7 +153,6 @@ namespace MarketTown;
         {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.Append(modHelper.Translation.Get("foodstore.weeklytotallog", new { totalEarning = model.TotalEarning }));
-            stringBuilder.Append(modHelper.Translation.Get("foodstore.weeklylog"));
 
             stringBuilder.Append(modHelper.Translation.Get("foodstore.forage", new { TotalForageSold = model.TotalForageSold }));
             stringBuilder.Append(modHelper.Translation.Get("foodstore.flower", new { TotalFlowerSold = model.TotalFlowerSold }));
@@ -192,6 +191,6 @@ namespace MarketTown;
 
 
 
-        return stringBuilder.ToString();
+            return stringBuilder.ToString();
         }
     }
