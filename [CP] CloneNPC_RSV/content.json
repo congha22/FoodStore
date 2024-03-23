@@ -1,5 +1,5 @@
 {
-"Format": "1.29.4",
+"Format": "2.0.0",
   "Changes": [
     {
         "Action": "Load",
@@ -17,6 +17,183 @@
         "Action": "Load",
         "Target": "Characters/Dialogue/MT.Guest_Acorn,Characters/Dialogue/MT.Guest_Aguar,Characters/Dialogue/MT.Guest_Alissa,Characters/Dialogue/MT.Guest_Althea,Characters/Dialogue/MT.Guest_Anton,Characters/Dialogue/MT.Guest_Ariah,Characters/Dialogue/MT.Guest_Belinda,Characters/Dialogue/MT.Guest_Bert,Characters/Dialogue/MT.Guest_Blair,Characters/Dialogue/MT.Guest_Bliss,Characters/Dialogue/MT.Guest_Bryle,Characters/Dialogue/MT.Guest_Carmen,Characters/Dialogue/MT.Guest_Corine,Characters/Dialogue/MT.Guest_Daia,Characters/Dialogue/MT.Guest_Ezekiel,Characters/Dialogue/MT.Guest_Faye,Characters/Dialogue/MT.Guest_Flor,Characters/Dialogue/MT.Guest_Freddie,Characters/Dialogue/MT.Guest_Helen,Characters/Dialogue/MT.Guest_Ian,Characters/Dialogue/MT.Guest_Irene,Characters/Dialogue/MT.Guest_Jeric,Characters/Dialogue/MT.Guest_Jio,Characters/Dialogue/MT.Guest_June,Characters/Dialogue/MT.Guest_Keahi,Characters/Dialogue/MT.Guest_Kenneth,Characters/Dialogue/MT.Guest_Kiarra,Characters/Dialogue/MT.Guest_Kimpoi,Characters/Dialogue/MT.Guest_Kiwi,Characters/Dialogue/MT.Guest_Lenny,Characters/Dialogue/MT.Guest_Lola,Characters/Dialogue/MT.Guest_Lorenzo,Characters/Dialogue/MT.Guest_Lorraine,Characters/Dialogue/MT.Guest_Louie,Characters/Dialogue/MT.Guest_Maddie,Characters/Dialogue/MT.Guest_Maive,Characters/Dialogue/MT.Guest_Malaya,Characters/Dialogue/MT.Guest_Nadaline,Characters/Dialogue/MT.Guest_Naomi,Characters/Dialogue/MT.Guest_Olga,Characters/Dialogue/MT.Guest_Paula,Characters/Dialogue/MT.Guest_Philip,Characters/Dialogue/MT.Guest_Pika,Characters/Dialogue/MT.Guest_Pipo,Characters/Dialogue/MT.Guest_Raeriyala,Characters/Dialogue/MT.Guest_Richard,Characters/Dialogue/MT.Guest_Sari,Characters/Dialogue/MT.Guest_Sean,Characters/Dialogue/MT.Guest_Shanice,Characters/Dialogue/MT.Guest_Shiro,Characters/Dialogue/MT.Guest_Sonny,Characters/Dialogue/MT.Guest_Trinnie,Characters/Dialogue/MT.Guest_Undreya,Characters/Dialogue/MT.Guest_Ysabelle,Characters/Dialogue/MT.Guest_Yuuma,Characters/Dialogue/MT.Guest_Zachary,Characters/Dialogue/MT.Guest_Zayne",
         "FromFile": "assets/{{Target}}.json"
+    },
+    {
+        "Action": "EditData",
+        "Target": "Mods/Bouhm.NPCMapLocations/NPCs",
+        "Entries": {
+            "MT.Guest_Acorn": {
+                "Exclude": true
+            },
+            "MT.Guest_Aguar": {
+                "Exclude": true
+            },
+            "MT.Guest_Alissa": {
+                "Exclude": true
+            },
+            "MT.Guest_Althea": {
+                "Exclude": true
+            },
+            "MT.Guest_Anton": {
+                "Exclude": true
+            },
+            "MT.Guest_Ariah": {
+                "Exclude": true
+            },
+            "MT.Guest_Belinda": {
+                "Exclude": true
+            },
+            "MT.Guest_Bert": {
+                "Exclude": true
+            },
+            "MT.Guest_Blair": {
+                "Exclude": true
+            },
+            "MT.Guest_Bliss": {
+                "Exclude": true
+            },
+            "MT.Guest_Bryle": {
+                "Exclude": true
+            },
+            "MT.Guest_Carmen": {
+                "Exclude": true
+            },
+            "MT.Guest_Corine": {
+                "Exclude": true
+            },
+            "MT.Guest_Daia": {
+                "Exclude": true
+            },
+            "MT.Guest_Ezekiel": {
+                "Exclude": true
+            },
+            "MT.Guest_Faye": {
+                "Exclude": true
+            },
+            "MT.Guest_Flor": {
+                "Exclude": true
+            },
+            "MT.Guest_Freddie": {
+                "Exclude": true
+            },
+            "MT.Guest_Helen": {
+                "Exclude": true
+            },
+            "MT.Guest_Ian": {
+                "Exclude": true
+            },
+            "MT.Guest_Irene": {
+                "Exclude": true
+            },
+            "MT.Guest_Jeric": {
+                "Exclude": true
+            },
+            "MT.Guest_Jio": {
+                "Exclude": true
+            },
+            "MT.Guest_June": {
+                "Exclude": true
+            },
+            "MT.Guest_Keahi": {
+                "Exclude": true
+            },
+            "MT.Guest_Kenneth": {
+                "Exclude": true
+            },
+            "MT.Guest_Kiarra": {
+                "Exclude": true
+            },
+            "MT.Guest_Kimpoi": {
+                "Exclude": true
+            },
+            "MT.Guest_Kiwi": {
+                "Exclude": true
+            },
+            "MT.Guest_Lenny": {
+                "Exclude": true
+            },
+            "MT.Guest_Lola": {
+                "Exclude": true
+            },
+            "MT.Guest_Lorenzo": {
+                "Exclude": true
+            },
+            "MT.Guest_Lorraine": {
+                "Exclude": true
+            },
+            "MT.Guest_Louie": {
+                "Exclude": true
+            },
+            "MT.Guest_Maddie": {
+                "Exclude": true
+            },
+            "MT.Guest_Maive": {
+                "Exclude": true
+            },
+            "MT.Guest_Malaya": {
+                "Exclude": true
+            },
+            "MT.Guest_Nadaline": {
+                "Exclude": true
+            },
+            "MT.Guest_Naomi": {
+                "Exclude": true
+            },
+            "MT.Guest_Olga": {
+                "Exclude": true
+            },
+            "MT.Guest_Paula": {
+                "Exclude": true
+            },
+            "MT.Guest_Philip": {
+                "Exclude": true
+            },
+            "MT.Guest_Pika": {
+                "Exclude": true
+            },
+            "MT.Guest_Pipo": {
+                "Exclude": true
+            },
+            "MT.Guest_Raeriyala": {
+                "Exclude": true
+            },
+            "MT.Guest_Richard": {
+                "Exclude": true
+            },
+            "MT.Guest_Sari": {
+                "Exclude": true
+            },
+            "MT.Guest_Sean": {
+                "Exclude": true
+            },
+            "MT.Guest_Shanice": {
+                "Exclude": true
+            },
+            "MT.Guest_Shiro": {
+                "Exclude": true
+            },
+            "MT.Guest_Sonny": {
+                "Exclude": true
+            },
+            "MT.Guest_Trinnie": {
+                "Exclude": true
+            },
+            "MT.Guest_Undreya": {
+                "Exclude": true
+            },
+            "MT.Guest_Ysabelle": {
+                "Exclude": true
+            },
+            "MT.Guest_Yuuma": {
+                "Exclude": true
+            },
+            "MT.Guest_Zachary": {
+                "Exclude": true
+            },
+            "MT.Guest_Zayne": {
+                "Exclude": true
+            }
+        }
     },
 
     {

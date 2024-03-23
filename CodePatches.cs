@@ -190,7 +190,7 @@ namespace MarketTown
             catch { }
 
             //Send dish of the day
-            if (__instance.Name == "Lewis" && Game1.timeOfDay == 900 && !Config.DisableChatAll)
+            if (__instance.Name == "Lewis" && Game1.timeOfDay == 900)
             {
                 Random random = new Random();
                 int randomIndex = random.Next(10);
@@ -261,27 +261,27 @@ namespace MarketTown
 
                     if (lastTaste == 0) //love
                     {
-                        __instance.showTextAboveHead(SHelper.Translation.Get("foodstore.randomchat.love." + randomIndex));
+                        NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.love." + randomIndex));
                         if (shareIdea < 0.3 + (lastDecor / 2)) SaySomething(__instance, __instance.currentLocation, lastTasteRate, lastDecorRate);
                     }
                     else if (lastTaste == 2) //like
                     {
-                        __instance.showTextAboveHead(SHelper.Translation.Get("foodstore.randomchat.like." + randomIndex));
+                        NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.like." + randomIndex));
                         if (shareIdea < 0.15 + (lastDecor / 2)) SaySomething(__instance, __instance.currentLocation, lastTasteRate, lastDecorRate);
                     }
                     else if (lastTaste == 4) //dislike
                     {
-                        __instance.showTextAboveHead(SHelper.Translation.Get("foodstore.randomchat.dislike." + randomIndex));
+                        NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.dislike." + randomIndex));
                         if (shareIdea < Math.Abs(-0.15 + (lastDecor / 2.5))) SaySomething(__instance, __instance.currentLocation, lastTasteRate, lastDecorRate);
                     }
                     else if (lastTaste == 6) //hate
                     {
-                        __instance.showTextAboveHead(SHelper.Translation.Get("foodstore.randomchat.hate." + randomIndex));
+                        NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.hate." + randomIndex));
                         if (shareIdea < Math.Abs(-0.3 + (lastDecor / 2.5))) SaySomething(__instance, __instance.currentLocation, lastTasteRate, lastDecorRate);
                     }
                     else if (lastTaste == 8) //neutral
                     {
-                        __instance.showTextAboveHead(SHelper.Translation.Get("foodstore.randomchat.neutral." + randomIndex));
+                        NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.neutral." + randomIndex));
                         if (shareIdea < Math.Abs(lastDecor / 2.5)) SaySomething(__instance, __instance.currentLocation, lastTasteRate, lastDecorRate);
                     }
                     else { }
@@ -357,13 +357,13 @@ namespace MarketTown
 
                         if (decorPointComment >= 0.2)
                         {
-                            npc.showTextAboveHead(SHelper.Translation.Get("foodstore.gooddecor." + randomIndex.ToString()), null, 2, 5000);
+                            NPCShowTextAboveHead(npc, SHelper.Translation.Get("foodstore.gooddecor." + randomIndex.ToString()));
                             npc.modData["hapyke.FoodStore/LastSay"] = Game1.timeOfDay.ToString();
                             continue;
                         }
                         else if (decorPointComment <= 0)
                         {
-                            npc.showTextAboveHead(SHelper.Translation.Get("foodstore.baddecor." + randomIndex.ToString()), null, 2, 5000);
+                            NPCShowTextAboveHead(npc, SHelper.Translation.Get("foodstore.baddecor." + randomIndex.ToString()));
                             npc.modData["hapyke.FoodStore/LastSay"] = Game1.timeOfDay.ToString();
                             continue;
                         }
@@ -377,13 +377,13 @@ namespace MarketTown
 
                         if (decorPointComment >= 0.2)
                         {
-                            npc.showTextAboveHead(SHelper.Translation.Get("foodstore.gooddecor." + randomIndex.ToString()), null, 2, 5000);
+                            NPCShowTextAboveHead(npc, SHelper.Translation.Get("foodstore.gooddecor." + randomIndex.ToString()));
                             npc.modData["hapyke.FoodStore/LastSay"] = Game1.timeOfDay.ToString();
                             continue;
                         }
                         else if (decorPointComment <= 0)
                         {
-                            npc.showTextAboveHead(SHelper.Translation.Get("foodstore.baddecor." + randomIndex.ToString()), null, 2, 5000);
+                            NPCShowTextAboveHead(npc, SHelper.Translation.Get("foodstore.baddecor." + randomIndex.ToString()));
                             npc.modData["hapyke.FoodStore/LastSay"] = Game1.timeOfDay.ToString();
                             continue;
                         }
@@ -391,7 +391,7 @@ namespace MarketTown
 
                     if (randomSayChance.NextDouble() < (talkChance / localNpcCount / 2))            //Send Dish of Week message
                     {
-                        npc.showTextAboveHead(SHelper.Translation.Get("foodstore.dishweek." + randomIndex.ToString(), new { dishWeek = DishPrefer.dishWeek }), null, 2, 8000);
+                        NPCShowTextAboveHead(npc, SHelper.Translation.Get("foodstore.dishweek." + randomIndex.ToString(), new { dishWeek = DishPrefer.dishWeek }));
                         npc.modData["hapyke.FoodStore/LastSay"] = Game1.timeOfDay.ToString();
                     }
                 }

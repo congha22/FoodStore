@@ -1,5 +1,5 @@
 {
-    "Format": "1.29.4",
+    "Format": "2.0.0",
     "Changes": [
       // Clone NPC SVE
         {
@@ -20,6 +20,51 @@
             "FromFile": "assets/{{Target}}.json"
         },
 
+        {
+            "Action": "EditData",
+            "Target": "Mods/Bouhm.NPCMapLocations/NPCs",
+            "Entries": {
+                "MT.Guest_Andy": {
+                    "Exclude": true
+                },
+                "MT.Guest_Camilla": {
+                    "Exclude": true
+                },
+                "MT.Guest_Claire": {
+                    "Exclude": true
+                },
+                "MT.Guest_Isaac": {
+                    "Exclude": true
+                },
+                "MT.Guest_Jolyne": {
+                    "Exclude": true
+                },
+                "MT.Guest_Lance": {
+                    "Exclude": true
+                },
+                "MT.Guest_Martin": {
+                    "Exclude": true
+                },
+                "MT.Guest_Morgan": {
+                    "Exclude": true
+                },
+                "MT.Guest_Olivia": {
+                    "Exclude": true
+                },
+                "MT.Guest_Scarlett": {
+                    "Exclude": true
+                },
+                "MT.Guest_Sophia": {
+                    "Exclude": true
+                },
+                "MT.Guest_Susan": {
+                    "Exclude": true
+                },
+                "MT.Guest_Victor": {
+                    "Exclude": true
+                }
+            }
+        },
 
         {
             "Action": "EditData",

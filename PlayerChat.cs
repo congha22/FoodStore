@@ -120,11 +120,12 @@ namespace MarketTown
                     string listKey = "";
                     foreach (string key in helpListKey)
                         listKey += key + " | ";
-                    if (!Config.DisableChatAll) npc.showTextAboveHead(listKey, default, default, 7000);
+
+                    NPCShowTextAboveHead(npc, listKey);
                 }
                 else if (askHelpIndex)        // Show detail of help option
                 {
-                    if (!Config.DisableChatAll) npc.showTextAboveHead(SHelper.Translation.Get("foodstore.help." + index), default, default, 7000);
+                    NPCShowTextAboveHead(npc, SHelper.Translation.Get("foodstore.help." + index));
                 }                       // Invite to visit
                 else if (askVisit && !npc.Name.Contains("MT.Guest_") && npc.modData.ContainsKey("hapyke.FoodStore/inviteTried") && npc.modData.ContainsKey("hapyke.FoodStore/invited")
                     && !bool.Parse(npc.modData["hapyke.FoodStore/inviteTried"]) && !bool.Parse(npc.modData["hapyke.FoodStore/invited"]))
@@ -136,30 +137,30 @@ namespace MarketTown
 
                     if (heartLevel < 2)
                     {
-                        if (!Config.DisableChatAll) npc.showTextAboveHead(SHelper.Translation.Get("foodstore.noinvitevisit." + inviteIndex), default, default, 5000);
+                        NPCShowTextAboveHead(npc, SHelper.Translation.Get("foodstore.noinvitevisit." + inviteIndex));
                     }
                     else if (heartLevel <= 5)
                     {
                         if (rand.NextDouble() > 0.5)
                         {
-                            if (!Config.DisableChatAll) npc.showTextAboveHead(SHelper.Translation.Get("foodstore.willinvitevisit." + inviteIndex), default, default, 5000);
+                            NPCShowTextAboveHead(npc, SHelper.Translation.Get("foodstore.willinvitevisit." + inviteIndex));
                             npc.modData["hapyke.FoodStore/invited"] = "true";
                             npc.modData["hapyke.FoodStore/inviteDate"] = Game1.stats.DaysPlayed.ToString();
                         }
                         else
-                            if (!Config.DisableChatAll) npc.showTextAboveHead(SHelper.Translation.Get("foodstore.cannotinvitevisit." + inviteIndex), default, default, 5000);
+                            NPCShowTextAboveHead(npc, SHelper.Translation.Get("foodstore.cannotinvitevisit." + inviteIndex));
 
                     }
                     else
                     {
                         if (rand.NextDouble() > 0.25)
                         {
-                            if (!Config.DisableChatAll) npc.showTextAboveHead(SHelper.Translation.Get("foodstore.willinvitevisit." + inviteIndex), default, default, 5000);
+                            NPCShowTextAboveHead(npc, SHelper.Translation.Get("foodstore.willinvitevisit." + inviteIndex));
                             npc.modData["hapyke.FoodStore/invited"] = "true";
                             npc.modData["hapyke.FoodStore/inviteDate"] = Game1.stats.DaysPlayed.ToString();
                         }
                         else
-                            if (!Config.DisableChatAll) npc.showTextAboveHead(SHelper.Translation.Get("foodstore.cannotinvitevisit." + inviteIndex), default, default, 5000);
+                            npc.showTextAboveHead(SHelper.Translation.Get("foodstore.cannotinvitevisit." + inviteIndex), default, default, 5000);
 
                     }
                     npc.modData["hapyke.FoodStore/inviteTried"] = "true";
@@ -167,7 +168,7 @@ namespace MarketTown
                 else if (askFood)       // Ask dish of the day
                 {
                     int randomIndex = random.Next(10);
-                    if (!Config.DisableChatAll) npc.showTextAboveHead(SHelper.Translation.Get("foodstore.dishday." + randomIndex.ToString(), new { dishToday = DishPrefer.dishDay }), default, default, 5000);
+                    NPCShowTextAboveHead(npc, SHelper.Translation.Get("foodstore.dishday." + randomIndex.ToString(), new { dishToday = DishPrefer.dishDay }));
                 }
                 else if (askTaste)       // Ask taste of the last dish
                 {
@@ -196,8 +197,7 @@ namespace MarketTown
                             dishTaste = SHelper.Translation.Get("foodstore.asktaste.empty." + randomIndex.ToString());
                             break;
                     }
-
-                    if (!Config.DisableChatAll) npc.showTextAboveHead(dishTaste, default, default, 5000);
+                    NPCShowTextAboveHead(npc, dishTaste);
                 }
             }
             else                        // All other message
@@ -254,7 +254,9 @@ namespace MarketTown
                         npcSocial = "neutral";
                         break;
                 }
-                if (!Config.DisableChatAll) npc.showTextAboveHead(SHelper.Translation.Get("foodstore.general." + npcAge + npcManner + npcSocial + randomIndex.ToString()), default, default, 5000);
+                string text = SHelper.Translation.Get("foodstore.general." + npcAge + npcManner + npcSocial + randomIndex.ToString());
+                //SHelper.Events.Input.ButtonPressed += (sender, args) => { Game1.chatBox.addInfoMessage(args.Button.ToString()); };
+                NPCShowTextAboveHead(npc, text);
             }
             ActionList.Clear();
         }
@@ -343,6 +345,32 @@ namespace MarketTown
             }
         }
 
+
+
+        public void NPCShowTextAboveHead(NPC npc, string message)
+        {
+            Task.Run(async delegate
+            {
+                try
+                {
+                    int charCount = 0;
+                    IEnumerable<string> splits = from w in message.Split(new char[1] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
+                                                 group w by (charCount += w.Length + 1) / 300 into g // Adjust the number to split longer chunks
+                                                 select string.Join(" ", g);
+
+                    foreach (string split in splits)
+                    {
+                        float minDisplayTime = 1000f;
+                        float maxDisplayTime = 3000f;
+                        float percentOfMax = (float)split.Length / (float)60;
+                        int duration = (int)(minDisplayTime + (maxDisplayTime - minDisplayTime) * percentOfMax);
+                        npc.showTextAboveHead(split, default, default, duration, default);
+                        Thread.Sleep(duration);
+                    }
+                }
+                catch (Exception ex) { }
+            });
+        }
     }
     internal class EntryQuestion : DialogueBox
     {

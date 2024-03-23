@@ -44,6 +44,8 @@ using StardewValley.Pathfinding;
 using MailFrameworkMod;
 using StardewValley.GameData.Tools;
 using StardewValley.GameData.Buildings;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace MarketTown
 {
@@ -245,7 +247,7 @@ namespace MarketTown
 
         private void GameLoop_OneSecondUpdateTicked(object sender, StardewModdingAPI.Events.OneSecondUpdateTickedEventArgs e)
         {
-            if (Config.EnableMod && Context.IsPlayerFree && Config.RestaurantLocations.Contains(Game1.player.currentLocation.Name))
+            if (Config.EnableMod && Context.IsPlayerFree && Game1.player != null && Game1.player.currentLocation != null && Config.RestaurantLocations.Contains(Game1.player.currentLocation.Name))
             {
                 UpdateOrders();
             }
@@ -359,7 +361,8 @@ namespace MarketTown
                                                     npcSocial = "neutral";
                                                     break;
                                             }
-                                            if (!Game1.player.friendshipData[__instance.Name].IsMarried())
+                                            if (!Game1.player.friendshipData[__instance.Name].IsMarried() && !Config.DisableChatAll && Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) < 3 
+                                                || __instance.Name.Contains("MT.Guest_"))
                                             {
                                                 __instance.CurrentDialogue.Push(new Dialogue(__instance, "key", SHelper.Translation.Get("foodstore.general." + npcAge + npcManner + npcSocial + randomIndex.ToString())));
                                                 __instance.modData["hapyke.FoodStore/TotalCustomerResponse"] = (Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) + 1).ToString();
@@ -478,7 +481,7 @@ namespace MarketTown
 
         private void GameLoop_UpdateTicked(object sender, UpdateTickedEventArgs e)
         {
-            if (e.IsMultipleOf(6))
+            if (e.IsMultipleOf(30))
             {
                 PlayerChat playerChatInstance = new PlayerChat();
                 playerChatInstance.Validate();
@@ -1368,8 +1371,8 @@ namespace MarketTown
                             if (Config.EnableDecor) salePrice = (int)(salePrice * (1 + decorPoint));
 
                             //Feature dish
-                            if (food.foodObject.Name == DishPrefer.dishDay) { salePrice = (int)(salePrice * 1.2); }
-                            if (food.foodObject.Name == DishPrefer.dishWeek) { salePrice = (int)(salePrice * 1.1); }
+                            if (food.foodObject.Name == DishPrefer.dishDay) { salePrice = (int)(salePrice * 1.5); }
+                            if (food.foodObject.Name == DishPrefer.dishWeek) { salePrice = (int)(salePrice * 1.3); }
 
                             //Config Rush hours Price
                             if (Config.RushHour && tip != 0 && ((800 < Game1.timeOfDay && Game1.timeOfDay < 930) || (1200 < Game1.timeOfDay && Game1.timeOfDay < 1330) || (1800 < Game1.timeOfDay && Game1.timeOfDay < 2000)))
@@ -1403,9 +1406,9 @@ namespace MarketTown
                             {
                                 //Generate chat box
                                 if (tip != 0)
-                                    __instance.showTextAboveHead(reply + SHelper.Translation.Get("foodstore.tip", new { tipValue = tip }), default, default, 7000);
+                                    NPCShowTextAboveHead(__instance, reply + SHelper.Translation.Get("foodstore.tip", new { tipValue = tip }));
                                 else
-                                    __instance.showTextAboveHead(reply, default, default, 7000);
+                                    NPCShowTextAboveHead(__instance, reply);
 
                                 //Generate chat box
                                 if (Game1.IsMultiplayer)
@@ -1443,7 +1446,7 @@ namespace MarketTown
                                 }
                             }           //Food outside farmhouse
 
-                            else
+                            else if (__instance.currentLocation is FarmHouse || __instance.currentLocation is Farm)
                             {
                                 if (__instance.currentLocation is FarmHouse)
                                 {
@@ -1479,9 +1482,8 @@ namespace MarketTown
                                 Random random = new Random();
                                 int randomNumber = random.Next(12);
                                 salePrice = tip = 0;
-
-                                if (!Config.DisableChatAll && food.foodObject.Edibility > 0) __instance.showTextAboveHead(SHelper.Translation.Get("foodstore.visitoreat." + randomNumber), default, default, 5000);
-                                else if (!Config.DisableChatAll && food.foodObject.Edibility <= 0) __instance.showTextAboveHead(SHelper.Translation.Get("foodstore.visitorpickup." + randomNumber), default, default, 5000);
+                                if (!Config.DisableChatAll && food.foodObject.Edibility > 0) NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.visitoreat." + randomNumber));
+                                else if (!Config.DisableChatAll && food.foodObject.Edibility <= 0) NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.visitorpickup." + randomNumber));
                             }           //Food in farmhouse
 
 
@@ -1490,7 +1492,6 @@ namespace MarketTown
                             TodayMoney += salePrice + tip;
 
                             UpdateCount(food.foodObject.Category);
-
                             Game1.player.Money += salePrice + tip;
                             __instance.modData["hapyke.FoodStore/LastFood"] = Game1.timeOfDay.ToString();
                             if (food.foodObject.Category == -7)
@@ -1548,7 +1549,7 @@ namespace MarketTown
                             MyMessage messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.soldclothes", new { locationString = __instance.currentLocation.Name, saleString = salePrice }));
                             SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
 
-                            __instance.showTextAboveHead(SHelper.Translation.Get("foodstore.soldclothesText." + rand.Next(7).ToString()), default, default, 4500);
+                            if (!Config.DisableChatAll) NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.soldclothesText." + rand.Next(7).ToString()));
 
                             Game1.player.Money += salePrice;
                             __instance.modData["hapyke.FoodStore/LastFood"] = Game1.timeOfDay.ToString();
@@ -1840,38 +1841,38 @@ namespace MarketTown
                     //do the work
                     if (getChance < chanceToVisit && lastTasteRate > 0.3 && lastDecorRate > 0)          //Will visit, positive Food, positive Decor
                     {
-                        thisCharacter.showTextAboveHead(tasteString + ". " + decorString, default, 2, 8000);
+                        NPCShowTextAboveHead(thisCharacter, tasteString + ". " + decorString);
                         if (rand.NextDouble() > localNpcCount) continue;
 
                         if (newCharacter.modData["hapyke.FoodStore/LastFood"] == null) newCharacter.modData["hapyke.FoodStore/LastFood"] = "0";
                         newCharacter.modData["hapyke.FoodStore/LastFood"] = (Int32.Parse(newCharacter.modData["hapyke.FoodStore/LastFood"]) - Config.MinutesToHungry + 30).ToString();
-                        newCharacter.showTextAboveHead(SHelper.Translation.Get("foodstore.willVisit." + randomIndex2), default, 2, 7000);
+                        NPCShowTextAboveHead(newCharacter, SHelper.Translation.Get("foodstore.willVisit." + randomIndex2));
                     }
                     else if (getChance < chanceToVisit)                                                 //Will visit, normal or negative Food , Decor
                     {
-                        thisCharacter.showTextAboveHead(tasteString + ". " + decorString, default, 2, 8000);
+                        NPCShowTextAboveHead(thisCharacter, tasteString + ". " + decorString);
                         if (rand.NextDouble() > localNpcCount) continue;
 
                         if (newCharacter.modData["hapyke.FoodStore/LastFood"] == null) newCharacter.modData["hapyke.FoodStore/LastFood"] = "0";
                         if (Config.MinutesToHungry >= 60)
                             newCharacter.modData["hapyke.FoodStore/LastFood"] = (Int32.Parse(newCharacter.modData["hapyke.FoodStore/LastFood"]) - (Config.MinutesToHungry / 2)).ToString();
-                        newCharacter.showTextAboveHead(SHelper.Translation.Get("foodstore.mayVisit." + randomIndex2), default, 2, 7000);
+                        NPCShowTextAboveHead(newCharacter, SHelper.Translation.Get("foodstore.mayVisit." + randomIndex2));
                     }
                     else if (getChance >= chanceToVisit && lastTasteRate < 0.3 && lastDecorRate < 0)     //No visit, negative Food, negative Decor
                     {
-                        thisCharacter.showTextAboveHead(tasteString + ". " + decorString, default, 2, 8000);
+                        NPCShowTextAboveHead(thisCharacter, tasteString + ". " + decorString);
                         if (rand.NextDouble() > localNpcCount) continue;
 
                         if (newCharacter.modData["hapyke.FoodStore/LastFood"] == null) newCharacter.modData["hapyke.FoodStore/LastFood"] = "2600";
                         newCharacter.modData["hapyke.FoodStore/LastFood"] = "2600";
-                        newCharacter.showTextAboveHead(SHelper.Translation.Get("foodstore.noVisit." + randomIndex2), default, 2, 7000);
+                        NPCShowTextAboveHead(newCharacter, SHelper.Translation.Get("foodstore.noVisit." + randomIndex2));
                     }
                     else if (getChance >= chanceToVisit)                                                 //No visit, normal or positive Food, Decor
                     {
-                        thisCharacter.showTextAboveHead(tasteString + ". " + decorString, default, 2, 8000);
+                        NPCShowTextAboveHead(thisCharacter, tasteString + ". " + decorString);
                         if (rand.NextDouble() > localNpcCount) continue;
 
-                        newCharacter.showTextAboveHead(SHelper.Translation.Get("foodstore.mayVisit." + randomIndex2), default, 2, 7000);
+                        NPCShowTextAboveHead(newCharacter, SHelper.Translation.Get("foodstore.mayVisit." + randomIndex2));
                     }
                     else { }    //Handle
                 }
@@ -2201,6 +2202,30 @@ namespace MarketTown
         internal static List<string> Animals { get; private set; } = new();
         internal static Dictionary<int, string> Crops { get; private set; } = new();
 
+        private static void NPCShowTextAboveHead(NPC npc, string message)
+        {
+            Task.Run(async delegate
+            {
+                try
+                {
+                    int charCount = 0;
+                    IEnumerable<string> splits = from w in message.Split(new char[1] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
+                                                 group w by (charCount += w.Length + 1) / 60 into g // Adjust the number to split longer chunks
+                                                 select string.Join(" ", g);
+
+                    foreach (string split in splits)
+                    {
+                        float minDisplayTime = 1000f;
+                        float maxDisplayTime = 3000f;
+                        float percentOfMax = (float)split.Length / (float)60;
+                        int duration = (int)(minDisplayTime + (maxDisplayTime - minDisplayTime) * percentOfMax);
+                        npc.showTextAboveHead(split, default, default, duration, default);
+                        Thread.Sleep(duration);
+                    }
+                }
+                catch (Exception ex) { }
+            });
+        }
         // unused for weapon
         /*
         private static T XmlDeserialize<T>(string toDeserialize)

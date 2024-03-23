@@ -1,5 +1,5 @@
 {
-    "Format": "1.29.4",
+    "Format": "2.0.0",
     "Changes": [
       // CLONE NPC Vanilla
         {
@@ -20,6 +20,105 @@
             "FromFile": "assets/{{Target}}.json"
         },
 
+        {
+            "Action": "EditData",
+            "Target": "Mods/Bouhm.NPCMapLocations/NPCs",
+            "Entries": {
+                "MT.Guest_Abigail": {
+                    "Exclude": true
+                },
+                "MT.Guest_Alex": {
+                    "Exclude": true
+                },
+                "MT.Guest_Caroline": {
+                    "Exclude": true
+                },
+                "MT.Guest_Clint": {
+                    "Exclude": true
+                },
+                "MT.Guest_Demetrius": {
+                    "Exclude": true
+                },
+                "MT.Guest_Elliott": {
+                    "Exclude": true
+                },
+                "MT.Guest_Emily": {
+                    "Exclude": true
+                },
+                "MT.Guest_Evelyn": {
+                    "Exclude": true
+                },
+                "MT.Guest_George": {
+                    "Exclude": true
+                },
+                "MT.Guest_Gus": {
+                    "Exclude": true
+                },
+                "MT.Guest_Haley": {
+                    "Exclude": true
+                },
+                "MT.Guest_Harvey": {
+                    "Exclude": true
+                },
+                "MT.Guest_Jas": {
+                    "Exclude": true
+                },
+                "MT.Guest_Jodi": {
+                    "Exclude": true
+                },
+                "MT.Guest_Kent": {
+                    "Exclude": true
+                },
+                "MT.Guest_Leah": {
+                    "Exclude": true
+                },
+                "MT.Guest_Lewis": {
+                    "Exclude": true
+                },
+                "MT.Guest_Linus": {
+                    "Exclude": true
+                },
+                "MT.Guest_Marnie": {
+                    "Exclude": true
+                },
+                "MT.Guest_Maru": {
+                    "Exclude": true
+                },
+                "MT.Guest_Pam": {
+                    "Exclude": true
+                },
+                "MT.Guest_Penny": {
+                    "Exclude": true
+                },
+                "MT.Guest_Pierre": {
+                    "Exclude": true
+                },
+                "MT.Guest_Robin": {
+                    "Exclude": true
+                },
+                "MT.Guest_Sam": {
+                    "Exclude": true
+                },
+                "MT.Guest_Sandy": {
+                    "Exclude": true
+                },
+                "MT.Guest_Sebastian": {
+                    "Exclude": true
+                },
+                "MT.Guest_Shane": {
+                    "Exclude": true
+                },
+                "MT.Guest_Vincent": {
+                    "Exclude": true
+                },
+                "MT.Guest_Willy": {
+                    "Exclude": true
+                },
+                "MT.Guest_Wizard": {
+                    "Exclude": true
+                }
+            }
+        },
 
         {
             "Action": "EditData",
