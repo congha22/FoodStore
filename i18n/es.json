@@ -648,10 +648,13 @@
   "neutral-order-reaction-2": "Bueno, ¡vamos!",
   "neutral-order-reaction-3": "¡Genial!",
   "foodstore.config.shedvisitor": "Solicitud Especial para Visitantes",
-  "foodstore.mailtotal": "Ingresos totales del mercado: {{totalEarning}}G^ Ganancias de ayer: {{sellMoney}}G^ Interacción del cliente de ayer: {{todayCustomerInteraction}}.",
-  "foodstore.letter.mtwelcome": "Bienvenido a Market Town. Aquí puedes establecer tu propia tienda y vender bienes a los aldeanos!!!^^ Empecemos por elegir un buen lugar para tu tienda, luego coloca una mesa y comienza a vender cualquier artículo que prefieras.^^ Si quieres convertir un edificio en un restaurante, una tienda de conveniencia, o cualquier tipo que desees, necesitas obtener una licencia de restaurante del Salón, o una licencia de Market Town del Comerciante del Desierto.^^ -Requisito para la licencia de restaurante: Ganancias totales de más de 10000, y haber vendido al menos 20 platos cocinados.^^ -Requisito para la licencia de Market Town: Ganancias totales de más de 30000, y haber vendido al menos 30 de cada Cosecha, Verdura, Producto de Artesanía, Producto Animal, Platos cocinados, Pescado y Mineral.^^ -HaPyke^^ Gracias por usar Market Town!!!^ Este Mod es altamente configurable para adaptarse al estilo de juego de la mayoría de los jugadores. Por favor, revisa los detalles en la Configuración antes de reportar cualquier problema.^^ ¿Encontraste algún error? Por favor, repórtalo en la página del Mod junto con el registro de SMA",
-  "foodstore.letter.mtrestaurantlicense": "Querido @. ^^ Como has cumplido con los requisitos para obtener una Licencia de Restaurante, puedes pasar por el Salón cuando estés libre para comprar la licencia. La Licencia de Restaurante te permitirá operar cualquier edificio de tu Granja como restaurante. ^^ Pasaré por allí para comer algún día. -Gus",
-  "foodstore.letter.mtmarkettownlicense": "Querido @.^^Estás haciendo un gran trabajo con tu negocio. Ahora puedes obtener una Licencia de Pueblo de Mercado de Desert Trader.^¡La Licencia de Pueblo de Mercado te permite vender todo lo que quieras!^^-Lewis",
+  "foodstore.mailtotal": "Ganancias totales del mercado: {{totalEarning}}G^ Ganancias de ayer: {{sellMoney}}G^ Interacción con clientes de ayer: {{todayCustomerInteraction}}.^",
+
+"foodstore.letter.mtwelcome": " Bienvenido a Market Town @. ¡Aquí puedes dirigir tu propia tienda y vender productos a los aldeanos!!^^ Comencemos eligiendo un buen lugar, coloca una mesa y comienza a vender cualquier artículo que prefieras.^^ Para usar cualquiera de tus Edificios como un museo, un restaurante, una tienda de conveniencia, necesitas obtener una Licencia de Museo de la Guild de Aventureros, una Licencia de Restaurante del Saloon, o una Licencia de Market Town del Comerciante del Desierto. ( continuar > )^ -Requisito para la Licencia de Museo: Donar 30 artículos al museo local.^^ -Requisito para la Licencia de Restaurante: Ganancias totales superiores a 10000, y haber vendido al menos 20 platos cocinados.^^ -Requisito para la Licencia de Market Town: Ganancias totales superiores a 30000, y haber vendido al menos 30 de cada cosecha, vegetal, producto artesanal, producto animal, plato cocinado, pescado y mineral. ( continuar > )^^ Este Mod es altamente configurable para adaptarse al estilo de juego de la mayoría de los jugadores. Por favor, revisa los detalles en la Configuración antes de informar cualquier problema.^^ ¿Encontraste errores? Informa en la página del Mod junto con el registro de SMAPI, o contáctame a través de Discord: hapyke",
+
+"foodstore.letter.mtrestaurantlicense": " Estimado @.^^Como has cumplido con el requisito para obtener una Licencia de Restaurante, puedes pasar por el Saloon cuando estés libre para adquirir la licencia.^La Licencia de Restaurante te permite operar cualquiera de tus Edificios Agrícolas como restaurante.^^Pasaremos por aquí para comer alguna vez^-Gus",
+
+"foodstore.letter.mtmarkettownlicense": " Estimado @.^^Estás haciendo un gran trabajo con tu negocio. Ahora puedes obtener una Licencia de Market Town del Comerciante del Desierto.^¡La Licencia de Market Town te permite vender lo que quieras!^^-Lewis",
   "foodstore.weeklylog": "Registro Semanal:",
   "foodstore.weeklytotallog": "Ganancias totales del mercado: {{totalEarning}}G^",
   "foodstore.forage": "Total de forraje vendido: {{TotalForageSold}}",
@@ -683,5 +686,11 @@
   "foodstore.lastweek.crafting": "La semana pasada se vendió: {{LastweekCraftingSold}}^",
   "foodstore.lastweek.cooking": "La venta de cocina de la semana pasada: {{LastweekCookingSold}}",
   "foodstore.lastweek.fish": "La semana pasada se vendieron peces: {{LastweekFishSold}}",
-  "foodstore.lastweek.gem": "Última semana vendió Gem: {{LastweekGemSold}}"
+  "foodstore.lastweek.gem": "Última semana vendió Gem: {{LastweekGemSold}}",
+  "foodstore.letter.mtmuseumlicense": " Estimado @.^^ Parece que estás haciendo un gran trabajo explorando la mina y donando a nuestro museo. Quería informarte que ahora tenemos una Licencia de Museo disponible para ti en la Guild de Aventureros.^ ¡Esta licencia te permite convertir tu edificio en un museo público, y los visitantes te pagarán un precio de entrada cada vez que lo visiten!^^ -Marlon",
+
+"foodstore.config.museumpricemarkup": "Multiplicador de precio de entrada al museo",
+"foodstore.config.museumpricemarkupText": "Precio de entrada al museo basado en el número de artefactos, minerales y botines de monstruos mostrados adentro. ¡Un valor más alto significa un precio de entrada más alto, pero también reducirá la probabilidad de visitantes!!!",
+
+"foodstore.todaymuseumvisitor": " Visitantes del museo de ayer: {{todayMMuseumVisitor}}.^^"
 }

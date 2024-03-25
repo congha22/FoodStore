@@ -19,6 +19,7 @@ namespace MarketTown;
 
         public int TodayCustomerInteraction = 0;
 
+        public int TodayMuseumVisitor { get; set; } = 0;
         public int ForageSold { get; set; } = 0;
         public int FlowerSold { get; set; } = 0;
         public int FruitSold { get; set; } = 0;
@@ -69,7 +70,7 @@ namespace MarketTown;
                 new Letter(
                     "MT.Welcome",
                     modHelper.Translation.Get("foodstore.letter.mtwelcome"),
-                    (Letter l) => !Game1.player.mailReceived.Contains("MT.Welcome"),
+                    (Letter l) => !Game1.player.mailReceived.Contains("MT.Welcome") || Game1.dayOfMonth == 1 ,
                     delegate (Letter l)
                     {
                         ((NetHashSet<string>)(object)Game1.player.mailReceived).Add(l.Id);
@@ -85,8 +86,24 @@ namespace MarketTown;
 
             if (model == null) { return; }
 
-            // Restaurant License Letter
-            MailRepository.SaveLetter(
+        // Museum License Letter
+        MailRepository.SaveLetter(
+            new Letter(
+                "MT.MuseumLicense",
+                modHelper.Translation.Get("foodstore.letter.mtmuseumlicense"),
+                (Letter l) => !Game1.player.mailReceived.Contains("MT.MuseumLicense") || Game1.netWorldState.Value.MuseumPieces.Count() >= 30,
+                delegate (Letter l)
+                {
+                    ((NetHashSet<string>)(object)Game1.player.mailReceived).Add(l.Id);
+                })
+            {
+                Title = "Museum License available",
+                LetterTexture = letterTexture
+            }
+        );
+
+        // Restaurant License Letter
+        MailRepository.SaveLetter(
                 new Letter(
                     "MT.RestaurantLicense",
                     modHelper.Translation.Get("foodstore.letter.mtrestaurantlicense"),
@@ -106,7 +123,7 @@ namespace MarketTown;
                 new Letter(
                     "MT.MarketTownLicense",
                     modHelper.Translation.Get("foodstore.letter.mtmarkettownlicense"),
-                    (Letter l) => !!Game1.player.mailReceived.Contains("MT.MarketTownLicense") && model.TotalEarning >= 30000 && model.TotalForageSold >= 30 && model.TotalVegetableSold >= 30 && model.TotalArtisanGoodSold >= 30 && model.TotalAnimalProductSold >= 30 && model.TotalCookingSold >= 30 && model.TotalFishSold >= 30 && model.TotalMineralSold >= 30,
+                    (Letter l) => !Game1.player.mailReceived.Contains("MT.MarketTownLicense") && model.TotalEarning >= 30000 && model.TotalForageSold >= 30 && model.TotalVegetableSold >= 30 && model.TotalArtisanGoodSold >= 30 && model.TotalAnimalProductSold >= 30 && model.TotalCookingSold >= 30 && model.TotalFishSold >= 30 && model.TotalMineralSold >= 30,
                     delegate (Letter l)
                     {
                         ((NetHashSet<string>)(object)Game1.player.mailReceived).Add(l.Id);
@@ -119,17 +136,17 @@ namespace MarketTown;
 
 
 
-            // Dynamic Letter --------------------------------------------------------------
+        // Dynamic Letter --------------------------------------------------------------
 
 
 
-            string categoryCountsString = GetCategoryCountsString(model, modHelper);
+        string categoryCountsString = GetCategoryCountsString(model, modHelper);
             // Daily Log letter
             MailRepository.SaveLetter(
                 new Letter(
                     "MT.SellLogMail",
-                    modHelper.Translation.Get("foodstore.mailtotal", new { totalEarning = model.TotalEarning, sellMoney = model.SellMoney, todayCustomerInteraction = model.TodayCustomerInteraction }) + model.SellList,
-                    (Letter l) => model.SellMoney != 0)
+                    modHelper.Translation.Get("foodstore.mailtotal", new { totalEarning = model.TotalEarning, sellMoney = model.SellMoney, todayCustomerInteraction = model.TodayCustomerInteraction }) + modHelper.Translation.Get("foodstore.todaymuseumvisitor", new {todayMMuseumVisitor = model.TodayMuseumVisitor}) + model.SellList,
+                    (Letter l) => model.SellMoney != 0 || model.TodayMuseumVisitor != 0)
                 {
                     LetterTexture = letterTexture
                 }

@@ -1,3 +1,4 @@
+-102:Book
 -81: Forage
 -80: Flower
 -79: Fruit
@@ -22,3 +23,4 @@
 -5:	 Egg
 -4:	 Fish
 -2:	 Gem (Aquamine, Earth cyrstal)
+ 0:  Artifacts

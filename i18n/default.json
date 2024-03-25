@@ -774,11 +774,11 @@
   "neutral-order-reaction-3":                         "Cool!",
 
   "foodstore.config.shedvisitor":                     "  Visitors Special Request",
-  "foodstore.mailtotal":                              "Total Market earning: {{totalEarning}}G^  Yesterday earning: {{sellMoney}}G^  Yesterday customer interaction:{{todayCustomerInteraction}}.^^",
+  "foodstore.mailtotal":                              "Total Market earning: {{totalEarning}}G^  Yesterday earning: {{sellMoney}}G^  Yesterday customer interaction:{{todayCustomerInteraction}}^",
 
-  "foodstore.letter.mtwelcome":                       "  Welcome to Market Town. Here you can set up your own store and sell goods to villagers!!!^^   Let's start by choosing a good place for your store, then place down a table and start selling any item you prefer.^^   If you want to turn Building into a restaurant, a convenience store, or any kind you want, you need to obtain either a Restaurant License from Saloon, or a Market Town License from Desert Trader.^^ -Requirement for Restaurant License: Total earning more than 10000, and has sold at least 20 Cooking.^^ -Requirement for Market Town License: Total earning more than 30000, and has sold at least 30 of each Forage, Vegetable, Artisan Good, Animal Product, Cooking, Fish, and Mineral.^^     -HaPyke^^   Thank you for using Market Town!!!^  This Mod is highly configurable to fit the gameplay of most players. Please review the details in Config before reporting any issues.^^   Found bugs? Report it to Mod page together with SMAPI log, or contact me via Discord: hapyke",
-  "foodstore.letter.mtrestaurantlicense":             "Dear @.^^As you have meet the requirement to hold a Restaurant License, you can drop by the Saloon whenever you are free to purchase the license.^Restaurant License allowing you to operate any of your Farm Building as a restaurant.^^I will drop by for some meal sometime^-Gus",
-  "foodstore.letter.mtmarkettownlicense":             "Dear @.^^You are doing great with your business. Now you can obtain a Market Town License from Desert Trader.^Market Town License let you to sell anything you want!^^-Lewis",
+  "foodstore.letter.mtwelcome":                       "  Welcome to Market Town @. Here you can run your own store and sell goods to villagers!!^^  Let's start by choosing a good place, place down a table and start selling any item you prefer.^^  To use any of your Building as a museum, a restaurant, a convenience store, you need to obtain either a Museum License from Adventurer Guild, a Restaurant License from Saloon, or a Market Town License from Desert Trader.   ( continue > )^ -Requirement for Museum License: Donated 30 items to the local Museum.^^ -Requirement for Restaurant License: Total earning more than 10000, and has sold at least 20 Cooking.^^ -Requirement for Market Town License: Total earning more than 30000, and has sold at least 30 of each Forage, Vegetable, Artisan Good, Animal Product, Cooking, Fish, and Mineral.   ( continue > )^^   This Mod is highly configurable to fit the gameplay of most players. Please review the details in Config before reporting any issues.^^   Found bugs? Report it to Mod page together with SMAPI log, or contact me via Discord: hapyke",
+  "foodstore.letter.mtrestaurantlicense":             "   Dear @.^^As you have meet the requirement to hold a Restaurant License, you can drop by the Saloon whenever you are free to purchase the license.^Restaurant License allowing you to operate any of your Farm Building as a restaurant.^^I will drop by for some meal sometime^-Gus",
+  "foodstore.letter.mtmarkettownlicense":             "   Dear @.^^You are doing great with your business. Now you can obtain a Market Town License from Desert Trader.^Market Town License let you to sell anything you want!^^-Lewis",
   
   "foodstore.weeklytotallog":                         "Total Market earning: {{totalEarning}}G^^",
   "foodstore.forage":                                 "   Total Forage Sold: {{TotalForageSold}}^",
@@ -811,6 +811,12 @@
   "foodstore.lastweek.crafting":                      "   Last week Crafting Sold: {{LastweekCraftingSold}}^",
   "foodstore.lastweek.cooking":                       "   Last week Cooking Sold: {{LastweekCookingSold}}^",
   "foodstore.lastweek.fish":                          "   Last week Fish Sold: {{LastweekFishSold}}^",
-  "foodstore.lastweek.gem":                           "   Last week Gem Sold: {{LastweekGemSold}}^"
+  "foodstore.lastweek.gem":                           "   Last week Gem Sold: {{LastweekGemSold}}^",
+
+  "foodstore.letter.mtmuseumlicense":                 "   Dear @.^^  It seems like you are doing great exploring the mine and donating to our museum. I wanted to inform you that we now have a Museum License available for you at the Adventurer Guild.^  This license allows you to turn your building into a public Museum, and visitors will pay you a ticket price every time they visit!^^   -Marlon",
+  "foodstore.config.museumpricemarkup":               "Museum Ticket price multiplier",
+  "foodstore.config.museumpricemarkupText":           "Museum Ticket price based on number of artifacts, minerals and monster loots displayed inside. Higher this value mean higher price ticket, but it will also lower chance of visitors!!!",
+
+  "foodstore.todaymuseumvisitor":                     "  Yesterday museum visitors: {{todayMMuseumVisitor}}^^"
 
 }

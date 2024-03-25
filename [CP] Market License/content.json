@@ -25,6 +25,16 @@
 
                     "Texture": "{{InternalAssetKey: assets/RestaurantLicense.png}}",
                     "SpriteIndex": 0
+                      },
+                "MT.Objects.MuseumLicense": {
+                    "Name": "Museum License",
+                    "Displayname": "Museum License",
+                    "Description": "Display this on a Sign will register your Building as public Museum and visitors will visits. Any change made will take effect the next day.",
+                    "Type": "Basic",
+                    "Price": 5000,
+
+                    "Texture": "{{InternalAssetKey: assets/MuseumLicense.png}}",
+                    "SpriteIndex": 0
                       }
             }
         },
@@ -72,6 +82,19 @@
                     "TradeItemId": 336,
                     "TradeItemAmount": 2,
                     "Condition": "PLAYER_HAS_MAIL any MT.RestaurantLicense received"
+                }
+            }
+        },
+        {
+            "Action": "EditData",
+            "Target": "Data/Shops",
+            "TargetField": [ "AdventureShop", "Items" ],
+            "Entries": {
+                "MT.Objects.MuseumLicense": {
+                    "Id": "MT.Objects.MuseumLicense",
+                    "ItemId": "(O)MT.Objects.MuseumLicense",
+                    "Price": 10000,
+                    "Condition": "PLAYER_HAS_MAIL any MT.MuseumLicense received"
                 }
             }
         }

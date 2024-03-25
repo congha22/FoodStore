@@ -107,6 +107,7 @@ namespace MarketTown
         public static int TodayCookingSold = 0;
         public static int TodayFishSold = 0;
         public static int TodayGemSold = 0;
+        public static int TodayMuseumVisitor = 0;
         //
         // *************************** ENTRY ***************************
         //
@@ -209,8 +210,13 @@ namespace MarketTown
             TodayCookingSold = 0;
             TodayFishSold = 0;
             TodayGemSold = 0;
+            TodayMuseumVisitor = 0;
 
             listNPCTodayPurchaseTime.Clear();
+            validBuildingObjectPairs.Clear();
+
+            List<int> categoryKeys = new List<int> { 0, -2, -12, -28, -102 };
+            int museumPieces = 0;
 
             foreach (Building building in Game1.getFarm().buildings)
             {
@@ -218,9 +224,28 @@ namespace MarketTown
                 {
                     foreach (var obj in Game1.getLocationFromName(building.GetIndoorsName()).Objects.Values)
                     {
-                        if (obj is Sign sign && sign.displayItem.Value != null && (sign.displayItem.Value.Name == "Market License" || sign.displayItem.Value.Name == "Restaurant License"))
+                        // Case Museum
+                        if (obj is Sign sign && sign.displayItem.Value != null && sign.displayItem.Value.Name == "Museum License")
                         {
-                            validBuildingObjectPairs.Add(new BuildingObjectPair(building, obj));
+                            GameLocation location = Game1.getLocationFromName(building.GetIndoorsName());
+                            foreach (var f in location.furniture)
+                            {
+                                if ( f.heldObject.Value != null && categoryKeys.Contains(f.heldObject.Value.Category) )         // ***** Validate category items *****
+                                {
+                                    museumPieces ++;
+                                }
+                            }
+
+                            validBuildingObjectPairs.Add(new BuildingObjectPair(building, obj, "museum", museumPieces));
+                            if (!Config.RestaurantLocations.Contains(Game1.getLocationFromName(building.GetIndoorsName()).Name)) Config.RestaurantLocations.Add(Game1.getLocationFromName(building.GetIndoorsName()).Name);
+
+                            break;
+                        }
+
+                        //Case Market or Restaurant
+                        if (obj is Sign sign1 && sign1.displayItem.Value != null && (sign1.displayItem.Value.Name == "Market License" || sign1.displayItem.Value.Name == "Restaurant License"))
+                        {
+                            validBuildingObjectPairs.Add(new BuildingObjectPair(building, obj, "market", 0));
                             if ( !Config.RestaurantLocations.Contains(Game1.getLocationFromName(building.GetIndoorsName()).Name)) Config.RestaurantLocations.Add(Game1.getLocationFromName(building.GetIndoorsName()).Name);
                             break;
                         }
@@ -237,11 +262,15 @@ namespace MarketTown
         {
             public Building Building { get; set; }
             public Object Object { get; set; }
+            public string buildingType { get; set; }
+            public int ticketValue { get; set; }
 
-            public BuildingObjectPair(Building building, Object obj)
+            public BuildingObjectPair(Building building, Object obj, string buildingType, int ticketValue)
             {
                 Building = building;
                 Object = obj;
+                this.buildingType = buildingType;
+                this.ticketValue = ticketValue;
             }
         }
 
@@ -664,6 +693,17 @@ namespace MarketTown
                 min: 0.0f,
                 max: 1.0f,
                 interval: 0.01f
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.museumpricemarkup"),
+                tooltip: () => SHelper.Translation.Get("foodstore.config.museumpricemarkupText"),
+                getValue: () => Config.MuseumPriceMarkup,
+                setValue: value => Config.MuseumPriceMarkup = value,
+                min: 0.0f,
+                max: 4.0f,
+                interval: 0.025f
             );
 
             configMenu.AddTextOption(
@@ -1153,21 +1193,23 @@ namespace MarketTown
 
                 TodayCustomerInteraction = TodayCustomerInteraction,
 
-                ForageSold = TodayForageSold + +weeklyForageSold,
-                FlowerSold = TodayFlowerSold + +weeklyFlowerSold,
-                FruitSold = TodayFruitSold + +weeklyFruitSold,
-                VegetableSold = TodayVegetableSold + +weeklyVegetableSold,
-                SeedSold = TodaySeedSold + +weeklySeedSold,
-                MonsterLootSold = TodayMonsterLootSold + +weeklyMonsterLootSold,
-                SyrupSold = TodaySyrupSold + +weeklySyrupSold,
-                ArtisanGoodSold = TodayArtisanGoodSold + +weeklyArtisanGoodSold,
-                AnimalProductSold = TodayAnimalProductSold + +weeklyAnimalProductSold,
-                ResourceMetalSold = TodayResourceMetalSold + +weeklyResourceMetalSold,
-                MineralSold = TodayMineralSold + +weeklyMineralSold,
-                CraftingSold = TodayCraftingSold + +weeklyCraftingSold,
-                CookingSold = TodayCookingSold + +weeklyCookingSold,
-                FishSold = TodayFishSold + +weeklyFishSold,
-                GemSold = TodayGemSold + +weeklyGemSold,
+                TodayMuseumVisitor = TodayMuseumVisitor,
+
+                ForageSold = TodayForageSold + weeklyForageSold,
+                FlowerSold = TodayFlowerSold + weeklyFlowerSold,
+                FruitSold = TodayFruitSold + weeklyFruitSold,
+                VegetableSold = TodayVegetableSold + weeklyVegetableSold,
+                SeedSold = TodaySeedSold + weeklySeedSold,
+                MonsterLootSold = TodayMonsterLootSold + weeklyMonsterLootSold,
+                SyrupSold = TodaySyrupSold + weeklySyrupSold,
+                ArtisanGoodSold = TodayArtisanGoodSold + weeklyArtisanGoodSold,
+                AnimalProductSold = TodayAnimalProductSold + weeklyAnimalProductSold,
+                ResourceMetalSold = TodayResourceMetalSold + weeklyResourceMetalSold,
+                MineralSold = TodayMineralSold + weeklyMineralSold,
+                CraftingSold = TodayCraftingSold + weeklyCraftingSold,
+                CookingSold = TodayCookingSold + weeklyCookingSold,
+                FishSold = TodayFishSold + weeklyFishSold,
+                GemSold = TodayGemSold + weeklyGemSold,
 
                 TotalForageSold = TodayForageSold + totalForageSold,
                 TotalFlowerSold = TodayFlowerSold + totalFlowerSold,
@@ -1574,15 +1616,28 @@ namespace MarketTown
 
             List<PlacedFoodData> foodList = new List<PlacedFoodData>();
 
+            var buildingIsFarm = false;
+            bool buildingIsMarket = false;
+            bool buildingIsRestaurant = false;
+
+            foreach (var building in Game1.getFarm().buildings)
+            {
+                if (building != null && building.GetIndoorsName() != null && building.GetIndoorsName().Contains(location.Name)) buildingIsFarm = true;
+            }
+
             foreach (var x in location.Objects)                 // Check valid Mannequin
             {
                 foreach (var obj in x.Values)
                 {
+                    if (obj is Sign sign && buildingIsFarm)
+                    {
+                        if (sign != null && sign.displayItem != null && sign.displayItem.Value.Name == "Museum License" ) return null;
+                        else if (sign != null && sign.displayItem != null && sign.displayItem.Value.Name == "Restaurant License") buildingIsRestaurant = true;
+                        else if (sign != null && sign.displayItem != null && sign.displayItem.Value.Name == "Market License") buildingIsMarket = true;
+                    }
+
                     if (obj.name.Contains("nequin") && obj is MtMannequin mannequin)
                     {
-                        // Access the name property of the object
-                        string objectName = obj.name;
-
                         bool hasHat = mannequin.Hat.Value != null;
                         bool hasShirt = mannequin.Shirt.Value != null;
                         bool hasPants = mannequin.Pants.Value != null;
@@ -1592,21 +1647,10 @@ namespace MarketTown
                         int yLocation = (obj.boundingBox.Y / 64) + (obj.boundingBox.Height / 64 / 2);
                         var fLocation = new Vector2(xLocation, yLocation);
 
-                        float signRange = Config.SignRange;
-                        bool hasSignInRange = x.Values.Any(otherObj => otherObj is Sign sign && Vector2.Distance(fLocation, sign.TileLocation) <= signRange);
+                        bool hasSignInRange = x.Values.Any(otherObj => otherObj is Sign sign && Vector2.Distance(fLocation, sign.TileLocation) <= Config.SignRange);
 
-                        Sign foundSign = location.Objects.Values
-                                        .OfType<Sign>()
-                                        .FirstOrDefault(sign => sign.displayItem.Value != null);
-
-                        var tempCheck = false;
-                        foreach (var building in Game1.getFarm().buildings)
-                        {
-                            if (building != null && building.GetIndoorsName() != null && building.GetIndoorsName().Contains(location.Name)) tempCheck = true;
-                        }
-
-                        if ((Config.SignRange == 0 && !tempCheck) 
-                            || (tempCheck && foundSign != null && foundSign.displayItem != null && foundSign.displayItem.Value.Name == "Market License")) hasSignInRange = true;
+                        if ( Config.SignRange == 0
+                            || (buildingIsFarm && (buildingIsMarket || buildingIsRestaurant)) ) hasSignInRange = true;
 
                         // Add to foodList only if there is no sign within the range
                         if (hasSignInRange && Vector2.Distance(fLocation, npc.Tile) < Config.MaxDistanceToFind && (hasHat || hasPants || hasShirt || hasBoots))
@@ -1628,26 +1672,14 @@ namespace MarketTown
                     int yLocation = (f.boundingBox.Y / 64) + (f.boundingBox.Height / 64 / 2);
                     var fLocation = new Vector2(xLocation, yLocation);
 
-                    float signRange = Config.SignRange;
-                    bool hasSignInRange = location.Objects.Values.Any(obj => obj is Sign sign && Vector2.Distance(fLocation, sign.TileLocation) <= signRange);
+                    bool hasSignInRange = location.Objects.Values.Any(obj => obj is Sign sign && Vector2.Distance(fLocation, sign.TileLocation) <= Config.SignRange);
 
-                    Sign foundSign = location.Objects.Values
-                                    .OfType<Sign>()
-                                    .FirstOrDefault(sign => sign.displayItem.Value != null);
-                    var tempCheck = false;
-                    foreach ( var building in Game1.getFarm().buildings)
-                    {
-                        if (building != null && building.GetIndoorsName() != null && building.GetIndoorsName().Contains(location.Name)) tempCheck = true;
-                    }
-
-                    if ( (Config.SignRange == 0 && !tempCheck)
-                          || (tempCheck && foundSign != null && foundSign.displayItem != null && foundSign.displayItem.Value.Name == "Market License")
-                          || (tempCheck && foundSign != null && f.heldObject.Value.Category == -7 && foundSign.displayItem != null && foundSign.displayItem.Value.Name == "Restaurant License")
-                            
-                        ) hasSignInRange = true;
+                    if ( Config.SignRange == 0
+                          || (buildingIsFarm && buildingIsMarket)
+                          || (buildingIsFarm && f.heldObject.Value.Category == -7 && buildingIsRestaurant) ) hasSignInRange = true;
 
                     // Add to foodList only if there is no sign within the range
-                    if (hasSignInRange&& Vector2.Distance(fLocation, npc.Tile) < Config.MaxDistanceToFind)
+                    if (hasSignInRange && Vector2.Distance(fLocation, npc.Tile) < Config.MaxDistanceToFind)
                     {
                         foodList.Add(new PlacedFoodData(f, fLocation, f.heldObject.Value, -1));
                     }
@@ -2005,9 +2037,12 @@ namespace MarketTown
                 {
                     Building building = pair.Building;
                     Object obj = pair.Object;
+                    string buildingType = pair.buildingType;
+                    int ticketValue = pair.ticketValue;
+
                     Vector2 doorTile = new(0f, 0f);
 
-                    if (GlobalNPCList.Count == 0 || building == null || obj == null || CountShedVisitor(Game1.getLocationFromName(building.GetIndoorsName())) >= Config.MaxShedCapacity) return;
+                    if (GlobalNPCList.Count == 0 || building == null || obj == null || CountShedVisitor(Game1.getLocationFromName(building.GetIndoorsName())) >= Config.MaxShedCapacity || buildingType == "museum" && Config.MuseumPriceMarkup / 4.1 > random.NextDouble() ) return;
 
                     if (building != null && building.GetIndoorsName() != null)
                     {
@@ -2147,6 +2182,11 @@ namespace MarketTown
                         clearTiles.Clear();
                     }
 
+                    if (buildingType == "museum")
+                    {
+                        TodayMuseumVisitor++;
+                        Game1.player.Money += (int)(10 * ticketValue * Config.MuseumPriceMarkup);
+                    }
                     visit.modData["hapyke.FoodStore/timeVisitShed"] = Game1.timeOfDay.ToString();
                 }
             }   // ****** end of shed visitor ******

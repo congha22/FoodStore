@@ -648,10 +648,13 @@
   "neutral-order-reaction-2": "Tudo bem. Confie em mim, não é legal.",
   "neutral-order-reaction-3": "Legal!",
   "foodstore.config.shedvisitor": "Pedido Especial dos Visitantes",
-  "foodstore.mailtotal": "Ganho total de mercado: {{totalEarning}}G^ Ontem ganho: {{sellMoney}}G^ Interação com clientes ontem: {{todayCustomerInteraction}}.^",
-  "foodstore.letter.mtwelcome": "Bem-vindo(a) à Cidade do Mercado. Aqui você pode montar sua própria loja e vender mercadorias para os aldeões!!!^^ Vamos começar escolhendo um bom lugar para sua loja, então coloque uma mesa e comece a vender qualquer item que preferir.^^ Se quiser transformar um prédio em um restaurante, uma loja de conveniência ou qualquer outro tipo, você precisará obter uma Licença de Restaurante da Saloon ou uma Licença da Cidade do Mercado do Desert Trader.^^ - Requisito para Licença de Restaurante: Ganho total acima de 10000 e ter vendido pelo menos 20 pratos cozinhando.^^ - Requisito para Licença da Cidade do Mercado: Ganho total acima de 30000 e ter vendido pelo menos 30 de cada Categoria de Vantagem, Verdura, Produto Artesanal, Produto Animal, Comida, Peixe e Mineral.^^ - HaPyke^^ Muito obrigado(a) por utilizar a Cidade do Mercado!!!^ Este Mod é altamente configurável para se adequar à jogabilidade da maioria dos jogadores. Por favor, revise os detalhes em Config antes de reportar quaisquer problemas.^^ Encontrou algum bug? Por favor, informe na página do Mod j",
-  "foodstore.letter.mtrestaurantlicense": "Caro @.^^Como você cumpriu os requisitos para obter uma Licença de Restaurante, você pode passar pelo Saloon sempre que estiver livre para comprar a licença.^A Licença de Restaurante permite que você opere qualquer um dos seus Prédios da Fazenda como um restaurante.^^Eu passarei para fazer uma refeição algum tempo^-Gus",
-  "foodstore.letter.mtmarkettownlicense": "Caro @.^^Você está indo muito bem com o seu negócio. Agora você pode obter uma Licença da Cidade Mercantil do Desert Trader.^A Licença da Cidade Mercantil permite que você venda o que quiser!^^-Lewis",
+  "foodstore.mailtotal": "Lucro total do mercado: {{totalEarning}}G^ Lucro de ontem: {{sellMoney}}G^ Interação com clientes de ontem: {{todayCustomerInteraction}}.^",
+
+"foodstore.letter.mtwelcome": " Bem-vindo à Market Town @. Aqui você pode administrar sua própria loja e vender produtos para os aldeões!!^^ Vamos começar escolhendo um bom local, colocando uma mesa e começando a vender qualquer item que preferir.^^ Para usar qualquer um de seus Edifícios como um museu, um restaurante, uma loja de conveniência, você precisa obter uma Licença de Museu da Guilda dos Aventureiros, uma Licença de Restaurante do Saloon ou uma Licença de Market Town do Comerciante do Deserto. ( continuar > )^ -Requisito para a Licença de Museu: Doar 30 itens para o museu local.^^ -Requisito para a Licença de Restaurante: Lucro total superior a 10000 e ter vendido pelo menos 20 pratos de cozinha.^^ -Requisito para a Licença de Market Town: Lucro total superior a 30000 e ter vendido pelo menos 30 de cada item Forrageiro, Vegetal, Produto Artesanal, Produto Animal, Cozinha, Peixe e Mineral. ( continuar > )^^ Este Mod é altamente configurável para se adequar ao estilo de jogo da maioria dos jogadores. Por favor, revise os detalhes na Configuração antes de relatar quaisquer problemas.^^ Encontrou bugs? Relate na página do Mod junto com o registro SMAPI ou entre em contato comigo via Discord: hapyke",
+
+"foodstore.letter.mtrestaurantlicense": " Caro @.^^Como você cumpriu o requisito para obter uma Licença de Restaurante, pode passar pelo Saloon sempre que estiver livre para adquirir a licença.^A Licença de Restaurante permite que você opere qualquer um de seus Edifícios Agrícolas como um restaurante.^^Passarei por aqui para uma refeição em algum momento^-Gus",
+
+"foodstore.letter.mtmarkettownlicense": " Caro @.^^Você está se saindo muito bem com o seu negócio. Agora você pode obter uma Licença de Market Town do Comerciante do Deserto.^A Licença de Market Town permite que você venda o que quiser!^^-Lewis",
   "foodstore.weeklylog": "Registro Semanal:",
   "foodstore.weeklytotallog": "Ganhos totais do mercado: {{totalEarning}}G^",
   "foodstore.forage": "Total de Forragem Vendida: {{TotalForageSold}}",
@@ -683,5 +686,11 @@
   "foodstore.lastweek.crafting": "Na semana passada, a Crafting vendeu: {{ÚltimaSemanaCraftingVendida}}^",
   "foodstore.lastweek.cooking": "Na semana passada, Vendas de Cozinha: {{VendasSemanaPassadaCozinha}}.",
   "foodstore.lastweek.fish": "Na semana passada, peixe vendido: {{LastweekFishSold}}.",
-  "foodstore.lastweek.gem": "Vendido por Gem na última semana: {{LastweekGemSold}}^"
+  "foodstore.lastweek.gem": "Vendido por Gem na última semana: {{LastweekGemSold}}^",
+  "foodstore.letter.mtmuseumlicense": " Caro @.^^ Parece que você está se saindo muito bem explorando a mina e doando para o nosso museu. Gostaria de informar que agora temos uma Licença de Museu disponível para você na Guilda dos Aventureiros.^ Esta licença permite que você transforme seu prédio em um museu público e os visitantes pagarão um preço de ingresso toda vez que visitarem!^^ -Marlon",
+
+"foodstore.config.museumpricemarkup": "Multiplicador do preço do bilhete do museu",
+"foodstore.config.museumpricemarkupText": "Preço do bilhete do museu baseado no número de artefatos, minerais e saques de monstros exibidos dentro. Um valor mais alto significa um preço de bilhete mais alto, mas também reduzirá a chance de visitantes!!!",
+
+"foodstore.todaymuseumvisitor": " Visitantes do museu de ontem: {{todayMMuseumVisitor}}.^^"
 }

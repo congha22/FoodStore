@@ -648,10 +648,14 @@
   "neutral-order-reaction-2": "좋아, 내일 보자",
   "neutral-order-reaction-3": "멋져요!",
   "foodstore.config.shedvisitor": "방문객 특별 요청",
-  "foodstore.mailtotal": "전체 시장 수익: {{totalEarning}}G^ 어제의 수익: {{sellMoney}}G^ 어제 고객 상호 작용: {{todayCustomerInteraction}}.^^",
-  "foodstore.letter.mtwelcome": "마켓 타운에 오신 것을 환영합니다. 여기에서는 당신의 상점을 설치하고 마을 주민들에게 물건을 판매할 수 있습니다!!!^^ 먼저 상점에 좋은 자리를 고르고, 테이블을 놓고 원하는 물건을 판매하겠습니다.^^ 건물을 음식점이나 편의점 등 다른 종류로 바꾸려면, 살룬에서 음식점 라이센스를, 또는 데저트 트레이더에서 마켓 타운 라이센스를 발급받아야 합니다.^^ -음식점 라이센스 요구조건: 총 수입 10000 이상, 음식 20개 이상 판매^^ -마켓 타운 라이센스 요구조건: 총 수입 30000 이상, 포레지, 채소, 수공예품,",
-  "foodstore.letter.mtrestaurantlicense": "친애하는 @.^^당신은 레스토랑 면허를 소지하기에 충분한 조건을 충족하였기에, 여유로운 시간이 생기면 언제든지 샐러운을 들러 면허를 구매할 수 있습니다.^레스토랑 면허를 통해 당신의 농장 건물 중 어떤 것이든 레스토랑으로 운영할 수 있습니다.^^나도 언젠가 식사를 하러 들를게요^-구스",
-  "foodstore.letter.mtmarkettownlicense": "사랑하는 @.^^당신은 사업을 아주 잘하고 있어요. 이제 사막상인으로부터 시장마을면허를 받을 수 있어요.^시장마을면허를 얻으면 원하는 것을 어떤 것이든 판매할 수 있어요!^^-Lewis",
+ 
+"foodstore.mailtotal": "시장 총 수익: {{totalEarning}}G^ 어제 수익: {{sellMoney}}G^ 어제 고객 상호 작용: {{todayCustomerInteraction}}.^",
+
+"foodstore.letter.mtwelcome": " 마켓 타운에 오신 것을 환영합니다 @. 여기서는 자신의 가게를 운영하고 마을 사람들에게 상품을 판매할 수 있습니다!!^^ 좋은 장소를 선택하고 테이블을 놓고 선호하는 아이템을 판매하는 것부터 시작합시다.^^ 건물을 박물관, 레스토랑, 편의점으로 사용하려면 모험가 길드에서 박물관 라이센스, 술집에서 레스토랑 라이센스 또는 사막 상인에서 마켓 타운 라이센스를 획득해야합니다. ( 계속 > )^ -박물관 라이센스 요구 사항: 지역 박물관에 30 개의 아이템 기부.^^ -레스토랑 라이센스 요구 사항: 총 수익이 10000G 이상이고 적어도 20 개의 요리를 판매했습니다.^^ -마켓 타운 라이센스 요구 사항: 총 수익이 30000G 이상이고 각각의 채집, 채소, 장인품, 동물 제품, 요리, 물고기 및 광물을 적어도 30 개 판매했습니다. ( 계속 > )^^ 이 모드는 대부분의 플레이어의 게임 스타일에 맞게 매우 유연하게 구성할 수 있습니다. 문제를 보고하기 전에 설정을 검토하십시오.^^ 버그를 발견했습니까? SMAPI 로그와 함께 모드 페이지에 보고하거나 Discord를 통해 저에게 연락하세요: hapyke",
+
+"foodstore.letter.mtrestaurantlicense": " 친애하는 @.^^레스토랑 라이센스 획득 요건을 충족했으므로 여가가 있을 때마다 술집에 들러 라이센스를 구입할 수 있습니다.^레스토랑 라이센스를 획득하면 농장 건물 중 하나를 레스토랑으로 운영할 수 있습니다.^^언젠가 식사를 위해 들를 것입니다^-구스",
+
+"foodstore.letter.mtmarkettownlicense": " 친애하는 @.^^비즈니스를 잘하고 있습니다. 이제 사막 상인으로부터 마켓 타운 라이센스를 획득할 수 있습니다.^마켓 타운 라이센스를 획득하면 원하는 것을 판매할 수 있습니다!^^-루이스",
   "foodstore.weeklylog": "주간 일지: ^^",
   "foodstore.weeklytotallog": "시장 총수입: {{totalEarning}}G^",
   "foodstore.forage": "전체 포리지 판매량: {{TotalForageSold}}",
@@ -683,5 +687,11 @@
   "foodstore.lastweek.crafting": "지난 주 수작 판매량: {{LastweekCraftingSold}}",
   "foodstore.lastweek.cooking": "지난주 요리 판매량: {{LastweekCookingSold}}",
   "foodstore.lastweek.fish": "지난주 물고기 판매량: {{LastweekFishSold}}개",
-  "foodstore.lastweek.gem": "지난 주 보석 판매량: {{지난주보석판매량}}^"
+  "foodstore.lastweek.gem": "지난 주 보석 판매량: {{지난주보석판매량}}^",
+  "foodstore.letter.mtmuseumlicense": " 친애하는 @.^^ 광산 탐험과 박물관에 기부하는 데 잘하고 있는 것 같습니다. 이제 모험가 길드에서 당신을 위한 박물관 라이센스가 준비되어 있다는 것을 알려드리고 싶습니다.^ 이 라이센스를 사용하면 건물을 공개 박물관으로 변환할 수 있으며 방문자들은 방문할 때마다 티켓 값을 지불할 것입니다!^^ -말론",
+
+"foodstore.config.museumpricemarkup": "박물관 입장권 가격 배수",
+"foodstore.config.museumpricemarkupText": "안에 전시된 유물, 광물 및 몬스터 전리품의 수에 따라 박물관 입장권 가격이 결정됩니다. 이 값을 높이면 입장료가 높아지지만 방문자의 가능성이 낮아집니다!!!",
+
+"foodstore.todaymuseumvisitor": " 어제의 박물관 방문자: {{todayMMuseumVisitor}}.^^"
 }

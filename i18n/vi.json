@@ -648,10 +648,14 @@
   "neutral-order-reaction-2": "Bây giờ, chúng ta ăn thôi.",
   "neutral-order-reaction-3": "Tuyệt vời!",
   "foodstore.config.shedvisitor": "Yêu cầu đặc biệt của khách thăm quan",
-  "foodstore.mailtotal": "Tổng thu nhập thị trường: {{totalEarning}}G^ Ngày hôm qua thu nhập: {{sellMoney}}G^ Tương tác khách hàng ngày hôm qua: {{todayCustomerInteraction}}.^^",
-"foodstore.letter.mtwelcome": " Chào mừng đến với Thị trấn Thị trường. Ở đây bạn có thể thiết lập cửa hàng riêng của mình và bán hàng cho các dân làng!!!^^ Hãy bắt đầu bằng cách chọn một nơi tốt cho cửa hàng của bạn, sau đó đặt một cái bàn và bắt đầu bán bất kỳ mặt hàng nào bạn thích.^^ Nếu bạn muốn biến Tòa nhà thành nhà hàng, cửa hàng tiện ích, hoặc bất kỳ loại nào bạn muốn, bạn cần phải có được một Giấy phép Nhà hàng từ Quán rượu, hoặc một Giấy phép Thị trấn Thị trường từ Thương nhân sa mạc.^^ - Yêu cầu cho Giấy phép Nhà hàng: Tổng thu nhập hơn 10000, và đã bán ít nhất 20 món Nấu ăn.^^ - Yêu cầu cho Giấy phép Thị trấn Thị trường: Tổng thu nhập hơn 30000, và đã bán ít nhất 30 mỗi món Hái lượm, Rau củ, Sản phẩm nghệ thuật, Sản phẩm động vật, Nấu ăn, Cá, và Khoáng sản.^^ - HaPyke^^ Cảm ơn bạn đã sử dụng Thị trấn Thị trường!!!^ Mod này có thể được điều chỉnh cao để phù hợp với gameplay của hầu hết các người chơi. Vui lòng xem xét các chi tiết trong Cấu hình trước khi báo cáo bất kỳ vấn đề nào.^^ Phát hiện lỗi? Vui lòng báo cáo nó trên trang Mod cùng với nhật ký SMAPI, hoặc liên hệ với tôi qua Discord: hapyke.",
-"foodstore.letter.mtrestaurantlicense": "Chào @.^^Bạn đã đáp ứng được yêu cầu để sở hữu Giấy phép Nhà hàng, bạn có thể ghé qua nhà hàng bất cứ khi nào bạn rảnh để mua giấy phép.^Giấy phép Nhà hàng cho phép bạn vận hành bất kỳ tòa nhà Nông trại nào của bạn như một nhà hàng.^^Tôi sẽ ghé qua ăn một bữa trong tương lai^-Gus",
-  "foodstore.letter.mtmarkettownlicense": "Chào @.^^Bạn đang làm tốt với công việc kinh doanh của mình. Bây giờ bạn có thể nhận được Giấy phép Thị trấn thị trường từ Người bán lưu động sa mạc. ^Gói Giấy phép Thị trấn thị trường cho phép bạn bán bất cứ thứ gì bạn muốn!^^-Lewis",
+  
+"foodstore.mailtotal": "Tổng thu nhập từ thị trường: {{totalEarning}}G^ Thu nhập ngày hôm qua: {{sellMoney}}G^ Tương tác với khách hàng ngày hôm qua: {{todayCustomerInteraction}}.^",
+
+"foodstore.letter.mtwelcome": " Chào mừng đến với Thị trấn Thị trường @. Ở đây bạn có thể vận hành cửa hàng của mình và bán hàng cho người dân trong làng!!^^ Hãy bắt đầu bằng cách chọn một nơi tốt, đặt một cái bàn và bắt đầu bán bất kỳ mặt hàng nào bạn thích.^^ Để sử dụng bất kỳ một trong các Tòa nhà của bạn như một bảo tàng, một nhà hàng, một cửa hàng tiện lợi, bạn cần có một Giấy phép Bảo tàng từ Hội Phiêu Lưu, một Giấy phép Nhà hàng từ Quán Rượu hoặc một Giấy phép Thị trấn Thị trường từ Người giao dịch Sa mạc. ( tiếp tục > )^ -Yêu cầu cho Giấy phép Bảo tàng: Quyên góp 30 mục cho Bảo tàng địa phương.^^ -Yêu cầu cho Giấy phép Nhà hàng: Tổng thu nhập lớn hơn 10000, và đã bán ít nhất 20 món ăn.^^ -Yêu cầu cho Giấy phép Thị trấn Thị trường: Tổng thu nhập lớn hơn 30000, và đã bán ít nhất 30 mỗi mặt hàng Hái, Rau củ, Hàng thủ công, Sản phẩm Động vật, Món ăn, Cá, và Khoáng sản. ( tiếp tục > )^^ Mod này có thể cấu hình cao để phù hợp với lối chơi của phần lớn người chơi. Vui lòng xem xét chi tiết trong Cấu hình trước khi báo cáo bất kỳ vấn đề nào.^^ Phát hiện lỗi? Báo cáo nó trên trang Mod cùng với nhật ký SMAPI, hoặc liên hệ với tôi qua Discord: hapyke",
+
+"foodstore.letter.mtrestaurantlicense": " Kính gửi @.^^Vì bạn đã đáp ứng được yêu cầu để có Giấy phép Nhà hàng, bạn có thể ghé qua Quán Rượu bất cứ khi nào bạn rảnh để mua giấy phép.^Giấy phép Nhà hàng cho phép bạn vận hành bất kỳ Mô hình Nông trại nào của bạn như một nhà hàng.^^Tôi sẽ ghé qua để ăn một bữa vào một ngày nào đó^-Gus",
+
+"foodstore.letter.mtmarkettownlicense": " Kính gửi @.^^Bạn đang làm rất tốt với doanh nghiệp của bạn. Bây giờ bạn có thể nhận được Giấy phép Thị trấn Thị trường từ Người giao dịch Sa mạc.^Giấy phép Thị trấn Thị trường cho phép bạn bán bất cứ thứ gì bạn muốn!^^-Lewis",
   "foodstore.weeklylog": "Nhật ký hàng tuần: ^^",
   "foodstore.weeklytotallog": "Thu nhập tổng cộng từ thị trường: {{totalEarning}}G^",
   "foodstore.forage": "Tổng số Thức ăn để bán: {{TotalForageSold}}",
@@ -683,5 +687,11 @@
   "foodstore.lastweek.crafting": "Tuần trước Điêu khắc Đã bán: {{LastweekCraftingSold}}",
   "foodstore.lastweek.cooking": "Tuần trước Bán món ăn: {{LastweekCookingSold}}^",
   "foodstore.lastweek.fish": "Tuần trước cá đã bán: {{LastweekFishSold}}^",
-  "foodstore.lastweek.gem": "Tuần trước đã bán Gem: {{LastweekGemSold}}"
+  "foodstore.lastweek.gem": "Tuần trước đã bán Gem: {{LastweekGemSold}}",
+  "foodstore.letter.mtmuseumlicense": " Kính gửi @.^^ Dường như bạn đang làm rất tốt trong việc khám phá mỏ và quyên góp cho bảo tàng của chúng tôi. Tôi muốn thông báo rằng hiện tại chúng tôi có sẵn một Giấy phép Bảo tàng cho bạn tại Hội Phiêu Lưu.^ Giấy phép này cho phép bạn biến tòa nhà của mình thành một Bảo tàng công cộng, và các khách tham quan sẽ trả cho bạn một giá vé mỗi lần họ ghé thăm!^^ -Marlon",
+
+"foodstore.config.museumpricemarkup": "Hệ số nhân giá vé Bảo tàng",
+"foodstore.config.museumpricemarkupText": "Giá vé Bảo tàng dựa trên số lượng hiện vật, khoáng sản và phần thưởng quái vật được trưng bày bên trong. Giá trị cao hơn có nghĩa là giá vé cao hơn, nhưng cũng làm giảm cơ hội của khách tham quan!!!",
+
+"foodstore.todaymuseumvisitor": " Khách tham quan bảo tàng ngày hôm qua: {{todayMMuseumVisitor}}.^^"
 }
