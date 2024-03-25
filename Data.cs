@@ -37,7 +37,6 @@ namespace MarketTown;
         public int GemSold { get; set; } = 0;
 
 
-
         public int TotalForageSold { get; set; } = 0;
         public int TotalFlowerSold { get; set; } = 0;
         public int TotalFruitSold { get; set; } = 0;
@@ -86,24 +85,24 @@ namespace MarketTown;
 
             if (model == null) { return; }
 
-        // Museum License Letter
-        MailRepository.SaveLetter(
-            new Letter(
-                "MT.MuseumLicense",
-                modHelper.Translation.Get("foodstore.letter.mtmuseumlicense"),
-                (Letter l) => !Game1.player.mailReceived.Contains("MT.MuseumLicense") || Game1.netWorldState.Value.MuseumPieces.Count() >= 30,
-                delegate (Letter l)
+            // Museum License Letter
+            MailRepository.SaveLetter(
+                new Letter(
+                    "MT.MuseumLicense",
+                    modHelper.Translation.Get("foodstore.letter.mtmuseumlicense"),
+                    (Letter l) => !Game1.player.mailReceived.Contains("MT.MuseumLicense") && Game1.netWorldState.Value.MuseumPieces.Count() >= 30,
+                    delegate (Letter l)
+                    {
+                        ((NetHashSet<string>)(object)Game1.player.mailReceived).Add(l.Id);
+                    })
                 {
-                    ((NetHashSet<string>)(object)Game1.player.mailReceived).Add(l.Id);
-                })
-            {
-                Title = "Museum License available",
-                LetterTexture = letterTexture
-            }
-        );
+                    Title = "Museum License available",
+                    LetterTexture = letterTexture
+                }
+            );
 
-        // Restaurant License Letter
-        MailRepository.SaveLetter(
+            // Restaurant License Letter
+            MailRepository.SaveLetter(
                 new Letter(
                     "MT.RestaurantLicense",
                     modHelper.Translation.Get("foodstore.letter.mtrestaurantlicense"),
@@ -118,7 +117,7 @@ namespace MarketTown;
                 }
             );
 
-            // Market Town License Letter
+                // Market Town License Letter
             MailRepository.SaveLetter(
                 new Letter(
                     "MT.MarketTownLicense",
@@ -136,16 +135,18 @@ namespace MarketTown;
 
 
 
-        // Dynamic Letter --------------------------------------------------------------
+            // Dynamic Letter --------------------------------------------------------------
+            string categoryCountsString = GetCategoryCountsString(model, modHelper);
 
 
 
-        string categoryCountsString = GetCategoryCountsString(model, modHelper);
             // Daily Log letter
             MailRepository.SaveLetter(
                 new Letter(
                     "MT.SellLogMail",
-                    modHelper.Translation.Get("foodstore.mailtotal", new { totalEarning = model.TotalEarning, sellMoney = model.SellMoney, todayCustomerInteraction = model.TodayCustomerInteraction }) + modHelper.Translation.Get("foodstore.todaymuseumvisitor", new {todayMMuseumVisitor = model.TodayMuseumVisitor}) + model.SellList,
+                    modHelper.Translation.Get("foodstore.mailtotal", 
+                    new { totalEarning = model.TotalEarning, sellMoney = model.SellMoney, todayCustomerInteraction = model.TodayCustomerInteraction }) 
+                                        + modHelper.Translation.Get("foodstore.todaymuseumvisitor", new {todayMMuseumVisitor = model.TodayMuseumVisitor}) + model.SellList,
                     (Letter l) => model.SellMoney != 0 || model.TodayMuseumVisitor != 0)
                 {
                     LetterTexture = letterTexture
@@ -162,8 +163,6 @@ namespace MarketTown;
                     LetterTexture = letterTexture
                 }
             );
-
-
         }
 
         public string GetCategoryCountsString(MailData model, IModHelper modHelper)

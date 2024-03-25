@@ -1625,17 +1625,20 @@ namespace MarketTown
                 if (building != null && building.GetIndoorsName() != null && building.GetIndoorsName().Contains(location.Name)) buildingIsFarm = true;
             }
 
+            foreach ( var obj in location.Objects.Values)
+            {
+                if (obj is Sign sign && buildingIsFarm && sign != null && sign.displayItem != null && sign.displayItem.Value.Name != null)
+                {
+                    if ( sign.displayItem.Value.Name == "Museum License") return null;
+                    else if ( sign.displayItem.Value.Name == "Restaurant License") buildingIsRestaurant = true;
+                    else if ( sign.displayItem.Value.Name == "Market License") buildingIsMarket = true;
+                }
+            }
+
             foreach (var x in location.Objects)                 // Check valid Mannequin
             {
                 foreach (var obj in x.Values)
                 {
-                    if (obj is Sign sign && buildingIsFarm)
-                    {
-                        if (sign != null && sign.displayItem != null && sign.displayItem.Value.Name == "Museum License" ) return null;
-                        else if (sign != null && sign.displayItem != null && sign.displayItem.Value.Name == "Restaurant License") buildingIsRestaurant = true;
-                        else if (sign != null && sign.displayItem != null && sign.displayItem.Value.Name == "Market License") buildingIsMarket = true;
-                    }
-
                     if (obj.name.Contains("nequin") && obj is MtMannequin mannequin)
                     {
                         bool hasHat = mannequin.Hat.Value != null;
@@ -1649,11 +1652,10 @@ namespace MarketTown
 
                         bool hasSignInRange = x.Values.Any(otherObj => otherObj is Sign sign && Vector2.Distance(fLocation, sign.TileLocation) <= Config.SignRange);
 
-                        if ( Config.SignRange == 0
-                            || (buildingIsFarm && (buildingIsMarket || buildingIsRestaurant)) ) hasSignInRange = true;
+                        if ( Config.SignRange == 0 || buildingIsFarm ) hasSignInRange = true;
 
-                        // Add to foodList only if there is no sign within the range
-                        if (hasSignInRange && Vector2.Distance(fLocation, npc.Tile) < Config.MaxDistanceToFind && (hasHat || hasPants || hasShirt || hasBoots))
+                        // Add to foodList only if there is sign within the range
+                        if (hasSignInRange && Vector2.Distance(fLocation, npc.Tile) < Config.MaxDistanceToFind && (hasHat || hasPants || hasShirt || hasBoots) && buildingIsMarket)
                         {
                             foodList.Add(new PlacedFoodData( obj, fLocation, obj, -1));
                         }
@@ -1674,11 +1676,11 @@ namespace MarketTown
 
                     bool hasSignInRange = location.Objects.Values.Any(obj => obj is Sign sign && Vector2.Distance(fLocation, sign.TileLocation) <= Config.SignRange);
 
-                    if ( Config.SignRange == 0
+                    if ( (Config.SignRange == 0 && !buildingIsFarm)
                           || (buildingIsFarm && buildingIsMarket)
                           || (buildingIsFarm && f.heldObject.Value.Category == -7 && buildingIsRestaurant) ) hasSignInRange = true;
 
-                    // Add to foodList only if there is no sign within the range
+                    // Add to foodList only if there is sign within the range
                     if (hasSignInRange && Vector2.Distance(fLocation, npc.Tile) < Config.MaxDistanceToFind)
                     {
                         foodList.Add(new PlacedFoodData(f, fLocation, f.heldObject.Value, -1));
