@@ -1127,7 +1127,14 @@ namespace MarketTown
             int totalFishSold = 0;
             int totalGemSold = 0;
 
-            var model = this.Helper.Data.ReadSaveData<MailData>("MT.MailLog");
+            MailData model = null;
+
+            if (Game1.IsMasterGame)
+            {
+                model = this.Helper.Data.ReadSaveData<MailData>("MT.MailLog");
+            }
+
+            //var model = this.Helper.Data.ReadSaveData<MailData>("MT.MailLog");
             if (model != null)
             {
                 totalMoney = model.TotalEarning;
@@ -1227,7 +1234,10 @@ namespace MarketTown
                 TotalFishSold = TodayFishSold + totalFishSold,
                 TotalGemSold = TodayGemSold + totalGemSold
             };
-            this.Helper.Data.WriteSaveData("MT.MailLog", dataToSave);
+            if (Game1.IsMasterGame)
+            {
+                this.Helper.Data.WriteSaveData("MT.MailLog", dataToSave);
+            }
             new MailLoader(SHelper);
 
         }
@@ -1534,7 +1544,15 @@ namespace MarketTown
                             TodayMoney += salePrice + tip;
 
                             UpdateCount(food.foodObject.Category);
-                            Game1.player.Money += salePrice + tip;
+
+                            if (Game1.hasLoadedGame)
+                            {
+                                foreach (Farmer farmer in Game1.getOnlineFarmers())
+                                {
+                                    farmer.Money += (int)((salePrice + tip) / Game1.getOnlineFarmers().Count);
+                                }
+                            }
+
                             __instance.modData["hapyke.FoodStore/LastFood"] = Game1.timeOfDay.ToString();
                             if (food.foodObject.Category == -7)
                             {
@@ -1593,7 +1611,15 @@ namespace MarketTown
 
                             if (!Config.DisableChatAll) NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.soldclothesText." + rand.Next(7).ToString()));
 
-                            Game1.player.Money += salePrice;
+                            if (Game1.hasLoadedGame)
+                            {
+                                foreach (Farmer farmer in Game1.getOnlineFarmers())
+                                {
+                                    farmer.Money += (int)((salePrice) / Game1.getOnlineFarmers().Count);
+                                }
+                            }
+
+                            //Game1.player.Money += salePrice + tip;
                             __instance.modData["hapyke.FoodStore/LastFood"] = Game1.timeOfDay.ToString();
                             __instance.modData["hapyke.FoodStore/LastFoodTaste"] = "-1";
                             __instance.modData["hapyke.FoodStore/gettingFood"] = "false";
@@ -1730,7 +1756,7 @@ namespace MarketTown
             {
                 foreach (var building in Game1.getFarm().buildings)
                 {
-                    if (npc.currentLocation != null && building.GetIndoorsName().Contains(npc.currentLocation.Name)) return minutesSinceLastFood > Config.ShedMinuteToHungry;
+                    if (npc.currentLocation != null && building != null && building.GetIndoorsName() != null && building.GetIndoorsName().Contains(npc.currentLocation.Name)) return minutesSinceLastFood > Config.ShedMinuteToHungry;
                     break;
                 }
             } catch { }
@@ -2187,7 +2213,14 @@ namespace MarketTown
                     if (buildingType == "museum")
                     {
                         TodayMuseumVisitor++;
-                        Game1.player.Money += (int)(10 * ticketValue * Config.MuseumPriceMarkup);
+                            
+                        if (Game1.hasLoadedGame)
+                        {
+                            foreach (Farmer farmer in Game1.getOnlineFarmers())
+                            {
+                                farmer.Money += (int)((10 * ticketValue * Config.MuseumPriceMarkup) / Game1.getOnlineFarmers().Count);
+                            }
+                        }
                     }
                     visit.modData["hapyke.FoodStore/timeVisitShed"] = Game1.timeOfDay.ToString();
                 }

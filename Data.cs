@@ -79,9 +79,12 @@ namespace MarketTown;
                     LetterTexture = letterTexture
                 }
             );
+            MailData model = null;
 
-
-            var model = modHelper.Data.ReadSaveData<MailData>("MT.MailLog");
+            if (Game1.IsMasterGame)
+            {
+                model = modHelper.Data.ReadSaveData<MailData>("MT.MailLog");
+            }
 
             if (model == null) { return; }
 
