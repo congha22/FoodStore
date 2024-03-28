@@ -134,6 +134,8 @@ namespace MarketTown
             helper.Events.GameLoop.DayEnding += GameLoop_DayEnding;
             Helper.Events.GameLoop.DayStarted += GameLoop_DayStarted;
 
+            Helper.Events.Player.InventoryChanged += Player_InventoryChanged;
+
             Helper.Events.GameLoop.OneSecondUpdateTicked += GameLoop_OneSecondUpdateTicked;
 
             helper.Events.GameLoop.GameLaunched += this.OnGameLaunched;
@@ -1545,13 +1547,24 @@ namespace MarketTown
 
                             UpdateCount(food.foodObject.Category);
 
-                            if (Game1.hasLoadedGame)
+                            if (Game1.hasLoadedGame && Game1.player.useSeparateWallets)
                             {
+                                List<Farmer> onlineFarmers = new List<Farmer>();
+
                                 foreach (Farmer farmer in Game1.getOnlineFarmers())
                                 {
-                                    farmer.Money += (int)((salePrice + tip) / Game1.getOnlineFarmers().Count);
+                                    onlineFarmers.Add(farmer);
                                 }
+
+                                int moneyToAddPerPlayer = (int)((salePrice + tip) / onlineFarmers.Count);
+
+                                foreach (Farmer farmer in onlineFarmers)
+                                {
+                                    farmer.Money += moneyToAddPerPlayer;
+                                }
+                                onlineFarmers.Clear();
                             }
+                            else if (Game1.hasLoadedGame) Game1.player.Money += salePrice + tip;
 
                             __instance.modData["hapyke.FoodStore/LastFood"] = Game1.timeOfDay.ToString();
                             if (food.foodObject.Category == -7)
@@ -1611,15 +1624,25 @@ namespace MarketTown
 
                             if (!Config.DisableChatAll) NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.soldclothesText." + rand.Next(7).ToString()));
 
-                            if (Game1.hasLoadedGame)
+                            if (Game1.hasLoadedGame && Game1.player.useSeparateWallets)
                             {
+                                List<Farmer> onlineFarmers = new List<Farmer>();
+
                                 foreach (Farmer farmer in Game1.getOnlineFarmers())
                                 {
-                                    farmer.Money += (int)((salePrice) / Game1.getOnlineFarmers().Count);
+                                    onlineFarmers.Add(farmer);
                                 }
-                            }
 
-                            //Game1.player.Money += salePrice + tip;
+                                int moneyToAddPerPlayer = (int)((salePrice) / onlineFarmers.Count);
+
+                                foreach (Farmer farmer in onlineFarmers)
+                                {
+                                    farmer.Money += moneyToAddPerPlayer;
+                                }
+                                onlineFarmers.Clear();
+                            }
+                            else if (Game1.hasLoadedGame) Game1.player.Money += salePrice;
+
                             __instance.modData["hapyke.FoodStore/LastFood"] = Game1.timeOfDay.ToString();
                             __instance.modData["hapyke.FoodStore/LastFoodTaste"] = "-1";
                             __instance.modData["hapyke.FoodStore/gettingFood"] = "false";
@@ -1651,13 +1674,21 @@ namespace MarketTown
                 if (building != null && building.GetIndoorsName() != null && building.GetIndoorsName().Contains(location.Name)) buildingIsFarm = true;
             }
 
-            foreach ( var obj in location.Objects.Values)
+            if (buildingIsFarm)
             {
-                if (obj is Sign sign && buildingIsFarm && sign != null && sign.displayItem != null && sign.displayItem.Value.Name != null)
+                foreach (var obj in location.Objects.Values)           // Case MUSEUM return no valid food
                 {
-                    if ( sign.displayItem.Value.Name == "Museum License") return null;
-                    else if ( sign.displayItem.Value.Name == "Restaurant License") buildingIsRestaurant = true;
-                    else if ( sign.displayItem.Value.Name == "Market License") buildingIsMarket = true;
+                    if (obj is Sign sign && sign != null && sign.displayItem != null && sign.displayItem.Value.Name != null
+                        && sign.displayItem.Value.Name == "Museum License") return null;
+                }
+
+                foreach (var obj in location.Objects.Values)            // Case Market or Restaurant
+                {
+                    if (obj is Sign sign && sign != null && sign.displayItem != null && sign.displayItem.Value.Name != null)
+                    {
+                        if (sign.displayItem.Value.Name == "Restaurant License") buildingIsRestaurant = true;
+                        else if (sign.displayItem.Value.Name == "Market License") buildingIsMarket = true;
+                    }
                 }
             }
 
@@ -2002,7 +2033,12 @@ namespace MarketTown
                     || Game1.eventUp
                     || Game1.isFestival()
                     || Game1.IsFading()
-                    || Game1.activeClickableMenu != null)
+                    || Game1.activeClickableMenu != null
+                    || !Game1.player.CanMove
+                    || Game1.dialogueUp
+                    || Game1.player.UsingTool
+                    || Game1.player.ActiveItem is Tool
+                    || Game1.player.ActiveItem is MeleeWeapon)
                 )
             {
                 TodaySelectedKid.Clear();
@@ -2213,14 +2249,25 @@ namespace MarketTown
                     if (buildingType == "museum")
                     {
                         TodayMuseumVisitor++;
-                            
-                        if (Game1.hasLoadedGame)
+
+                        if (Game1.hasLoadedGame && Game1.player.useSeparateWallets)
                         {
+                            List<Farmer> onlineFarmers = new List<Farmer>();
+
                             foreach (Farmer farmer in Game1.getOnlineFarmers())
                             {
-                                farmer.Money += (int)((10 * ticketValue * Config.MuseumPriceMarkup) / Game1.getOnlineFarmers().Count);
+                                onlineFarmers.Add(farmer);
                             }
+
+                            int moneyToAddPerPlayer = (int)((10 * ticketValue * Config.MuseumPriceMarkup) / onlineFarmers.Count);
+
+                            foreach (Farmer farmer in onlineFarmers)
+                            {
+                                farmer.Money += moneyToAddPerPlayer;
+                            }
+                            onlineFarmers.Clear();
                         }
+                        else if (Game1.hasLoadedGame) Game1.player.Money += (int)(10 * ticketValue * Config.MuseumPriceMarkup);
                     }
                     visit.modData["hapyke.FoodStore/timeVisitShed"] = Game1.timeOfDay.ToString();
                 }
@@ -2300,6 +2347,67 @@ namespace MarketTown
                 }
                 catch (Exception ex) { }
             });
+        }
+
+        internal static void Player_InventoryChanged (object sender, InventoryChangedEventArgs e)
+        {
+            foreach (Item item in e.Added)
+            {
+                if (item.Name == "Museum License")
+                {
+                    var letterTexture = ModEntry.Instance.Helper.ModContent.Load<Texture2D>("Assets/LtBG.png");
+                    MailRepository.SaveLetter(
+                        new Letter(
+                            "MT.ReceiveMuseumLicense",
+                            SHelper.Translation.Get("foodstore.letter.receivemuseumlicense"),
+                            (Letter l) => !Game1.player.mailReceived.Contains("MT.ReceiveMuseumLicense"),
+                            delegate (Letter l)
+                            {
+                                ((NetHashSet<string>)(object)Game1.player.mailReceived).Add(l.Id);
+                            })
+                        {
+                            Title = "About Museum License",
+                            LetterTexture = letterTexture
+                        }
+                    );
+                }
+                if (item.Name == "Restaurant License")
+                {
+                    var letterTexture = ModEntry.Instance.Helper.ModContent.Load<Texture2D>("Assets/LtBG.png");
+                    MailRepository.SaveLetter(
+                        new Letter(
+                            "MT.ReceiveRestaurantLicense",
+                            SHelper.Translation.Get("foodstore.letter.receiverestaurantlicense"),
+                            (Letter l) => !Game1.player.mailReceived.Contains("MT.ReceiveRestaurantLicense"),
+                            delegate (Letter l)
+                            {
+                                ((NetHashSet<string>)(object)Game1.player.mailReceived).Add(l.Id);
+                            })
+                        {
+                            Title = "About Restaurant License",
+                            LetterTexture = letterTexture
+                        }
+                    );
+                }
+                if (item.Name == "Market License")
+                {
+                    var letterTexture = ModEntry.Instance.Helper.ModContent.Load<Texture2D>("Assets/LtBG.png");
+                    MailRepository.SaveLetter(
+                        new Letter(
+                            "MT.ReceiveMarketTownLicense",
+                            SHelper.Translation.Get("foodstore.letter.receivemarkettownlicense"),
+                            (Letter l) => !Game1.player.mailReceived.Contains("MT.ReceiveMarketTownLicense"),
+                            delegate (Letter l)
+                            {
+                                ((NetHashSet<string>)(object)Game1.player.mailReceived).Add(l.Id);
+                            })
+                        {
+                            Title = "About Market Town License",
+                            LetterTexture = letterTexture
+                        }
+                    );
+                }
+            }
         }
         // unused for weapon
         /*
