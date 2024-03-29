@@ -46,6 +46,7 @@ using StardewValley.GameData.Tools;
 using StardewValley.GameData.Buildings;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Text;
 
 namespace MarketTown
 {
@@ -194,6 +195,12 @@ namespace MarketTown
 
         private void GameLoop_DayStarted(object sender, StardewModdingAPI.Events.DayStartedEventArgs e)
         {
+            //try
+            //{
+            //    GameLocation locat = Game1.getLocationFromName("Custom_Village");
+            //    locat.isAlwaysActive.Value = true;
+            //} catch { }
+
             TodaySell = ""; 
             TodayMoney = 0;
             TodayCustomerInteraction = 0;
@@ -232,10 +239,9 @@ namespace MarketTown
                             GameLocation location = Game1.getLocationFromName(building.GetIndoorsName());
                             foreach (var f in location.furniture)
                             {
-                                if ( f.heldObject.Value != null && categoryKeys.Contains(f.heldObject.Value.Category) )         // ***** Validate category items *****
-                                {
-                                    museumPieces ++;
-                                }
+                                if ( f.heldObject.Value != null && categoryKeys.Contains(f.heldObject.Value.Category) )  museumPieces ++;
+                                if ( f is FishTankFurniture fishtank ) museumPieces += (int)(fishtank.tankFish.Count / 2);
+                                if ( f.Name.Contains("Statue") ) museumPieces += 2; 
                             }
 
                             validBuildingObjectPairs.Add(new BuildingObjectPair(building, obj, "museum", museumPieces));
@@ -889,6 +895,14 @@ namespace MarketTown
             //sell multiplier
 
             configMenu.AddPage(mod: ModManifest, "salePrice", () => SHelper.Translation.Get("foodstore.config.saleprice"));
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.multiplayermode"),
+                tooltip: () => SHelper.Translation.Get("foodstore.config.multiplayermodeText"),
+                getValue: () => Config.MultiplayerMode,
+                setValue: value => Config.MultiplayerMode = value
+            );
+
             configMenu.AddBoolOption(
                 mod: ModManifest,
                 name: () => SHelper.Translation.Get("foodstore.config.enableprice"),
@@ -1547,7 +1561,7 @@ namespace MarketTown
 
                             UpdateCount(food.foodObject.Category);
 
-                            if (Game1.hasLoadedGame && Game1.player.useSeparateWallets)
+                            if (Game1.hasLoadedGame && Game1.player.useSeparateWallets && Config.MultiplayerMode)
                             {
                                 List<Farmer> onlineFarmers = new List<Farmer>();
 
@@ -1564,7 +1578,7 @@ namespace MarketTown
                                 }
                                 onlineFarmers.Clear();
                             }
-                            else if (Game1.hasLoadedGame) Game1.player.Money += salePrice + tip;
+                            else Game1.player.Money += salePrice + tip;
 
                             __instance.modData["hapyke.FoodStore/LastFood"] = Game1.timeOfDay.ToString();
                             if (food.foodObject.Category == -7)
@@ -1618,13 +1632,13 @@ namespace MarketTown
                                     mannequin.Boots.Value = null;
                                 }
                             }
-                            Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.soldclothes", new { locationString = __instance.currentLocation.Name, saleString = salePrice }));
+                            if (!Config.DisableChatAll && !Config.DisableChat) Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.soldclothes", new { locationString = __instance.currentLocation.Name, saleString = salePrice }));
                             MyMessage messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.soldclothes", new { locationString = __instance.currentLocation.Name, saleString = salePrice }));
                             SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
 
                             if (!Config.DisableChatAll) NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.soldclothesText." + rand.Next(7).ToString()));
 
-                            if (Game1.hasLoadedGame && Game1.player.useSeparateWallets)
+                            if (Game1.hasLoadedGame && Game1.player.useSeparateWallets && Config.MultiplayerMode)
                             {
                                 List<Farmer> onlineFarmers = new List<Farmer>();
 
@@ -1641,7 +1655,7 @@ namespace MarketTown
                                 }
                                 onlineFarmers.Clear();
                             }
-                            else if (Game1.hasLoadedGame) Game1.player.Money += salePrice;
+                            else Game1.player.Money += salePrice;
 
                             __instance.modData["hapyke.FoodStore/LastFood"] = Game1.timeOfDay.ToString();
                             __instance.modData["hapyke.FoodStore/LastFoodTaste"] = "-1";
@@ -2000,6 +2014,16 @@ namespace MarketTown
 
         private void OnTimeChange(object sender, TimeChangedEventArgs e)
         {
+           // NPC npc = Game1.getCharacterFromName("MT.Guest_Lewis");
+           //// npc.Schedule.Clear();
+           // npc.addedSpeed = 3;
+           // SchedulePathDescription schedulePath = npc.pathfindToNextScheduleLocation("customSchedule", "BusStop", 20, 10, "Mountain", 93, 26, Game1.down, "continue", "Moving to Town");
+           // Dictionary<int, SchedulePathDescription> schedule = new Dictionary<int, SchedulePathDescription>();
+           // schedule.Add(700, schedulePath); // Assuming 600 is the time you want this schedule to execute
+
+           // // Set the schedule for the NPC
+           // npc.TryLoadSchedule("customSchedule", schedule);
+
             Random random = new Random();
 
             if (Game1.timeOfDay > Config.InviteComeTime || Game1.timeOfDay > Config.OpenHour)
@@ -2250,7 +2274,7 @@ namespace MarketTown
                     {
                         TodayMuseumVisitor++;
 
-                        if (Game1.hasLoadedGame && Game1.player.useSeparateWallets)
+                        if (Game1.hasLoadedGame && Game1.player.useSeparateWallets && Config.MultiplayerMode)
                         {
                             List<Farmer> onlineFarmers = new List<Farmer>();
 
@@ -2267,7 +2291,7 @@ namespace MarketTown
                             }
                             onlineFarmers.Clear();
                         }
-                        else if (Game1.hasLoadedGame) Game1.player.Money += (int)(10 * ticketValue * Config.MuseumPriceMarkup);
+                        else Game1.player.Money += (int)(10 * ticketValue * Config.MuseumPriceMarkup);
                     }
                     visit.modData["hapyke.FoodStore/timeVisitShed"] = Game1.timeOfDay.ToString();
                 }

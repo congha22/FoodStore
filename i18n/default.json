@@ -821,7 +821,10 @@
 
   "foodstore.letter.receivemuseumlicense":            "   Dear @.^^   Congrat on obtaining your Museum License. Let me walk you through how to set it up^   You can use any Farm Building as a Museum. The only requirement is to have a Sign displaying the License, and then visitors will start arriving tomorrow.^   Museum visitors do not purchase items on display, but they will pay a ticket price upon entrance. The price is determined by the number of artifacts, rare gems, as well as exotic fish or statues. You can decide on your ticket markup; however, keep in mind that the higher the markup, the fewer visitors you may attract.^^   I will visit your Museum once it is ready.^     -Lewis",
   "foodstore.letter.receiverestaurantlicense":        "   Dear @.^^   I have noticed that you have obtained the Restaurant License. This License will allow you to use any Farm Building as a Restaurant. Simply display the License on a Sign, and visitors will start arriving tomorrow.^   Restaurant visitors will browse around and purchase food that appeals to them. Sometimes, they will request a special dish, which you can sell to them directly for a higher price.^^   I am really looking forward to trying your food.^     -Lewis",
-  "foodstore.letter.receivemarkettownlicense":        "   Dear @.^^   Finally, you have obtained the Market Town License. From now on, you can own from a small convenient store to even a supermarket. This License allows you to sell any goods you want, including foods, harvests, materials, and more.^^   Thank you so much for creating a convenient hub for all the folks in our village.^     -Lewis"
+  "foodstore.letter.receivemarkettownlicense":        "   Dear @.^^   Finally, you have obtained the Market Town License. From now on, you can own from a small convenient store to even a supermarket. This License allows you to sell any goods you want, including foods, harvests, materials, and more.^^   Thank you so much for creating a convenient hub for all the folks in our village.^     -Lewis",
+
+  "foodstore.config.multiplayermode":                 "Enable Sale money for multiplayer?",
+  "foodstore.config.multiplayermodeText":             "WARNING BUG. Default false. Enable this will split the sale money between connected player. WARNING: Sometimes the other players dont receive the money."
 
 
 

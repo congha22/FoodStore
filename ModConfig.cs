@@ -68,7 +68,8 @@ namespace MarketTown
             "Big Shed"
         };
         public int NPCCheckTimer { get; set; } = 1;
-
         public float MuseumPriceMarkup { get; set; } = 1.0f;
+        public bool MultiplayerMode { get; set; } = false;
+
     }
 }

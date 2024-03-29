@@ -75,7 +75,7 @@ namespace MarketTown
                 {
                     DishPrefer.dishWeek = GetRandomDish();      //Get dish of the week
 
-                    if (!Config.DisableChatAll)
+                    if (!Config.DisableChatAll && !Config.DisableChat)
                     {
                         MyMessage messageToSend = new MyMessage("");
                         //Send thanks
@@ -190,7 +190,7 @@ namespace MarketTown
             catch { }
 
             //Send dish of the day
-            if (__instance.Name == "Lewis" && Game1.timeOfDay == 900)
+            if (__instance.Name == "Lewis" && Game1.timeOfDay == 900 && !Config.DisableChatAll)
             {
                 Random random = new Random();
                 int randomIndex = random.Next(10);
