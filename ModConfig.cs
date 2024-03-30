@@ -61,7 +61,7 @@ namespace MarketTown
         public int MaxNPCOrdersPerNight { get; set; } = 3;
         public float PriceMarkup { get; set; } = 3f;
         public float OrderChance { get; set; } = 0.02f;
-        public float LovedDishChance { get; set; } = 0.5f;
+        public float LovedDishChance { get; set; } = 0.8f;
         public List<string> RestaurantLocations { get; set; } = new List<string>()
         {
             "Shed",

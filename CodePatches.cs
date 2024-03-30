@@ -473,7 +473,7 @@ namespace MarketTown
                                 {
                                     Random random = new Random();
                                     int randomIndex = random.Next(15);
-                                    text = SHelper.Translation.Get("foodstore.coming." + randomIndex.ToString(), new { vName = npc.Name });
+                                    text = SHelper.Translation.Get("foodstore.coming." + randomIndex.ToString(), new { vName = npc.displayName });
 
                                     Game1.chatBox.addInfoMessage(text);
                                     MyMessage messageToSend = new MyMessage(text);

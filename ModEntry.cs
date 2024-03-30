@@ -398,7 +398,7 @@ namespace MarketTown
                                                     npcSocial = "neutral";
                                                     break;
                                             }
-                                            if (!Game1.player.friendshipData[__instance.Name].IsMarried() && !Config.DisableChatAll && Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) < 3 
+                                            if (!Game1.player.friendshipData[__instance.Name].IsMarried() && !Config.DisableChatAll && Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) < 2 
                                                 || __instance.Name.Contains("MT.Guest_"))
                                             {
                                                 __instance.CurrentDialogue.Push(new Dialogue(__instance, "key", SHelper.Translation.Get("foodstore.general." + npcAge + npcManner + npcSocial + randomIndex.ToString())));
@@ -1288,7 +1288,7 @@ namespace MarketTown
 
                             if (food.foodObject.Category == -7)
                             {
-                                itemName = food.foodObject.Name;
+                                itemName = food.foodObject.DisplayName;
                                 // Get Reply, Sale Price, Tip for each taste
                                 if (taste == 0)         //Love
                                 {
@@ -1412,7 +1412,7 @@ namespace MarketTown
                             //}
                             else    // Non-food case
                             {
-                                itemName = food.foodObject.Name;
+                                itemName = food.foodObject.displayName;
                                 tip = 0;
                                 switch (food.foodObject.Quality)
                                 {
@@ -1454,7 +1454,7 @@ namespace MarketTown
                             {
                                 if (__instance.modData["hapyke.FoodStore/TotalCustomerResponse"] != null)
                                 {
-                                    double totalInteract = Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) / 10;
+                                    double totalInteract = Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) / 6.67;
                                     if (totalInteract > 0.3) totalInteract = 0.3;
                                     salePrice = (int)(salePrice * (1 + totalInteract));
                                 }
@@ -1481,35 +1481,35 @@ namespace MarketTown
                                 //Generate chat box
                                 if (Game1.IsMultiplayer)
                                 {
-                                    Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.sold", new { foodObjName = itemName, locationString = __instance.currentLocation.Name, saleString = salePrice }));
-                                    MyMessage messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.sold", new { foodObjName = itemName, locationString = __instance.currentLocation.Name, saleString = salePrice }));
+                                    Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.sold", new { foodObjName = itemName, locationString = __instance.currentLocation.DisplayName, saleString = salePrice }));
+                                    MyMessage messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.sold", new { foodObjName = itemName, locationString = __instance.currentLocation.DisplayName, saleString = salePrice }));
                                     SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
 
                                     if (!Config.DisableChat)
                                     {
                                         if (tip != 0)
                                         {
-                                            Game1.chatBox.addInfoMessage($"   {__instance.Name}: " + reply + SHelper.Translation.Get("foodstore.tip", new { tipValue = tip }));
-                                            messageToSend = new MyMessage($"   {__instance.Name}: " + reply + SHelper.Translation.Get("foodstore.tip", new { tipValue = tip }));
+                                            Game1.chatBox.addInfoMessage($"   {__instance.displayName}: " + reply + SHelper.Translation.Get("foodstore.tip", new { tipValue = tip }));
+                                            messageToSend = new MyMessage($"   {__instance.displayName}: " + reply + SHelper.Translation.Get("foodstore.tip", new { tipValue = tip }));
                                             SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
                                         }
                                         else
                                         {
-                                            Game1.chatBox.addInfoMessage($"   {__instance.Name}: " + reply);
-                                            messageToSend = new MyMessage($"   {__instance.Name}: " + reply);
+                                            Game1.chatBox.addInfoMessage($"   {__instance.displayName}: " + reply);
+                                            messageToSend = new MyMessage($"   {__instance.displayName}: " + reply);
                                             SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
                                         }
                                     }
                                 }
                                 else
                                 {
-                                    Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.sold", new { foodObjName = itemName, locationString = __instance.currentLocation.Name, saleString = salePrice }));
+                                    Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.sold", new { foodObjName = itemName, locationString = __instance.currentLocation.DisplayName, saleString = salePrice }));
                                     if (!Config.DisableChat)
                                     {
                                         if (tip != 0)
-                                            Game1.chatBox.addInfoMessage($"   {__instance.Name}: " + reply + SHelper.Translation.Get("foodstore.tip", new { tipValue = tip }));
+                                            Game1.chatBox.addInfoMessage($"   {__instance.displayName}: " + reply + SHelper.Translation.Get("foodstore.tip", new { tipValue = tip }));
                                         else
-                                            Game1.chatBox.addInfoMessage($"   {__instance.Name}: " + reply);
+                                            Game1.chatBox.addInfoMessage($"   {__instance.displayName}: " + reply);
                                     }
                                 }
                             }           //Food outside farmhouse
@@ -1632,8 +1632,8 @@ namespace MarketTown
                                     mannequin.Boots.Value = null;
                                 }
                             }
-                            if (!Config.DisableChatAll && !Config.DisableChat) Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.soldclothes", new { locationString = __instance.currentLocation.Name, saleString = salePrice }));
-                            MyMessage messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.soldclothes", new { locationString = __instance.currentLocation.Name, saleString = salePrice }));
+                            if (!Config.DisableChatAll && !Config.DisableChat) Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.soldclothes", new { locationString = __instance.currentLocation.DisplayName, saleString = salePrice }));
+                            MyMessage messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.soldclothes", new { locationString = __instance.currentLocation.DisplayName, saleString = salePrice }));
                             SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
 
                             if (!Config.DisableChatAll) NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.soldclothesText." + rand.Next(7).ToString()));
@@ -1679,7 +1679,8 @@ namespace MarketTown
 
             List<PlacedFoodData> foodList = new List<PlacedFoodData>();
 
-            var buildingIsFarm = false;
+            bool buildingIsFarm = false;
+            bool buildingIsMuseum = false;
             bool buildingIsMarket = false;
             bool buildingIsRestaurant = false;
 
@@ -1692,13 +1693,13 @@ namespace MarketTown
             {
                 foreach (var obj in location.Objects.Values)           // Case MUSEUM return no valid food
                 {
-                    if (obj is Sign sign && sign != null && sign.displayItem != null && sign.displayItem.Value.Name != null
-                        && sign.displayItem.Value.Name == "Museum License") return null;
+                    if (obj != null && obj is Sign sign && sign != null && sign.displayItem != null && sign.displayItem.Value != null && sign.displayItem.Value.Name != null
+                        && sign.displayItem.Value.Name == "Museum License")  buildingIsMuseum = true;
                 }
 
                 foreach (var obj in location.Objects.Values)            // Case Market or Restaurant
                 {
-                    if (obj is Sign sign && sign != null && sign.displayItem != null && sign.displayItem.Value.Name != null)
+                    if (obj != null && obj is Sign sign && sign != null && sign.displayItem != null && sign.displayItem.Value != null && sign.displayItem.Value.Name != null)
                     {
                         if (sign.displayItem.Value.Name == "Restaurant License") buildingIsRestaurant = true;
                         else if (sign.displayItem.Value.Name == "Market License") buildingIsMarket = true;
@@ -1726,7 +1727,7 @@ namespace MarketTown
                         if ( Config.SignRange == 0 || buildingIsFarm ) hasSignInRange = true;
 
                         // Add to foodList only if there is sign within the range
-                        if (hasSignInRange && Vector2.Distance(fLocation, npc.Tile) < Config.MaxDistanceToFind && (hasHat || hasPants || hasShirt || hasBoots) && buildingIsMarket)
+                        if (hasSignInRange && Vector2.Distance(fLocation, npc.Tile) < Config.MaxDistanceToFind && (hasHat || hasPants || hasShirt || hasBoots) && buildingIsMarket && !buildingIsMuseum)
                         {
                             foodList.Add(new PlacedFoodData( obj, fLocation, obj, -1));
                         }
@@ -1752,7 +1753,7 @@ namespace MarketTown
                           || (buildingIsFarm && f.heldObject.Value.Category == -7 && buildingIsRestaurant) ) hasSignInRange = true;
 
                     // Add to foodList only if there is sign within the range
-                    if (hasSignInRange && Vector2.Distance(fLocation, npc.Tile) < Config.MaxDistanceToFind)
+                    if (hasSignInRange && Vector2.Distance(fLocation, npc.Tile) < Config.MaxDistanceToFind && !buildingIsMuseum)
                     {
                         foodList.Add(new PlacedFoodData(f, fLocation, f.heldObject.Value, -1));
                     }
