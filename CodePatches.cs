@@ -204,7 +204,7 @@ namespace MarketTown
                 && Microsoft.Xna.Framework.Vector2.Distance(__instance.Tile, Game1.player.Tile) < 30
                 && __instance.modData["hapyke.FoodStore/LastFoodTaste"] != "-1" && Config.EnableDecor && !Config.DisableChatAll)
             {
-                if (Game1.random.NextDouble() < 0.1)
+                if (Game1.random.NextDouble() < 0.033)
                 {
                     Random random = new Random();
                     int randomIndex = random.Next(8);
@@ -330,7 +330,7 @@ namespace MarketTown
 
             foreach (NPC npc in __instance.characters)
             {
-                double talkChance = 0.000025;
+                double talkChance = 0.00002;
                 Random randomSayChance = new Random();
 
                 //Send bubble about decoration, dish of the week

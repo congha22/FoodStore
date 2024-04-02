@@ -143,10 +143,10 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "BusStop",
+                "Location": "Custom_MT_Location",
                 "Tile": {
-                    "X": "9999",
-                    "Y": "9999"
+                    "X": "4",
+                    "Y": "4"
                 }
             }
         ]
@@ -169,10 +169,10 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "BusStop",
+                "Location": "Custom_MT_Location",
                 "Tile": {
-                    "X": "9999",
-                    "Y": "9999"
+                    "X": "4",
+                    "Y": "4"
                 }
             }
         ]
@@ -195,10 +195,10 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "BusStop",
+                "Location": "Custom_MT_Location",
                 "Tile": {
-                    "X": "9999",
-                    "Y": "9999"
+                    "X": "4",
+                    "Y": "4"
                 }
             }
         ]
@@ -221,10 +221,10 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "BusStop",
+                "Location": "Custom_MT_Location",
                 "Tile": {
-                    "X": "9999",
-                    "Y": "9999"
+                    "X": "4",
+                    "Y": "4"
                 }
             }
         ]
@@ -247,10 +247,10 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "BusStop",
+                "Location": "Custom_MT_Location",
                 "Tile": {
-                    "X": "9999",
-                    "Y": "9999"
+                    "X": "4",
+                    "Y": "4"
                 }
             }
         ]
@@ -273,10 +273,10 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "BusStop",
+                "Location": "Custom_MT_Location",
                 "Tile": {
-                    "X": "9999",
-                    "Y": "9999"
+                    "X": "4",
+                    "Y": "4"
                 }
             }
         ]
@@ -299,10 +299,10 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "BusStop",
+                "Location": "Custom_MT_Location",
                 "Tile": {
-                    "X": "9999",
-                    "Y": "9999"
+                    "X": "4",
+                    "Y": "4"
                 }
             }
         ]
@@ -325,10 +325,10 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "BusStop",
+                "Location": "Custom_MT_Location",
                 "Tile": {
-                    "X": "9999",
-                    "Y": "9999"
+                    "X": "4",
+                    "Y": "4"
                 }
             }
         ]
@@ -351,10 +351,10 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "BusStop",
+                "Location": "Custom_MT_Location",
                 "Tile": {
-                    "X": "9999",
-                    "Y": "9999"
+                    "X": "4",
+                    "Y": "4"
                 }
             }
         ]
@@ -377,10 +377,10 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "BusStop",
+                "Location": "Custom_MT_Location",
                 "Tile": {
-                    "X": "9999",
-                    "Y": "9999"
+                    "X": "4",
+                    "Y": "4"
                 }
             }
         ]
@@ -403,10 +403,10 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "BusStop",
+                "Location": "Custom_MT_Location",
                 "Tile": {
-                    "X": "9999",
-                    "Y": "9999"
+                    "X": "4",
+                    "Y": "4"
                 }
             }
         ]
@@ -429,10 +429,10 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "BusStop",
+                "Location": "Custom_MT_Location",
                 "Tile": {
-                    "X": "9999",
-                    "Y": "9999"
+                    "X": "4",
+                    "Y": "4"
                 }
             }
         ]
@@ -455,10 +455,10 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "BusStop",
+                "Location": "Custom_MT_Location",
                 "Tile": {
-                    "X": "9999",
-                    "Y": "9999"
+                    "X": "4",
+                    "Y": "4"
                 }
             }
         ]
@@ -481,10 +481,10 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "BusStop",
+                "Location": "Custom_MT_Location",
                 "Tile": {
-                    "X": "9999",
-                    "Y": "9999"
+                    "X": "4",
+                    "Y": "4"
                 }
             }
         ]
@@ -507,10 +507,10 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "BusStop",
+                "Location": "Custom_MT_Location",
                 "Tile": {
-                    "X": "9999",
-                    "Y": "9999"
+                    "X": "4",
+                    "Y": "4"
                 }
             }
         ]
@@ -533,10 +533,10 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "BusStop",
+                "Location": "Custom_MT_Location",
                 "Tile": {
-                    "X": "9999",
-                    "Y": "9999"
+                    "X": "4",
+                    "Y": "4"
                 }
             }
         ]
@@ -559,10 +559,10 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "BusStop",
+                "Location": "Custom_MT_Location",
                 "Tile": {
-                    "X": "9999",
-                    "Y": "9999"
+                    "X": "4",
+                    "Y": "4"
                 }
             }
         ]
@@ -585,10 +585,10 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "BusStop",
+                "Location": "Custom_MT_Location",
                 "Tile": {
-                    "X": "9999",
-                    "Y": "9999"
+                    "X": "4",
+                    "Y": "4"
                 }
             }
         ]
@@ -611,10 +611,10 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "BusStop",
+                "Location": "Custom_MT_Location",
                 "Tile": {
-                    "X": "9999",
-                    "Y": "9999"
+                    "X": "4",
+                    "Y": "4"
                 }
             }
         ]
@@ -637,10 +637,10 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "BusStop",
+                "Location": "Custom_MT_Location",
                 "Tile": {
-                    "X": "9999",
-                    "Y": "9999"
+                    "X": "4",
+                    "Y": "4"
                 }
             }
         ]
@@ -663,10 +663,10 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "BusStop",
+                "Location": "Custom_MT_Location",
                 "Tile": {
-                    "X": "9999",
-                    "Y": "9999"
+                    "X": "4",
+                    "Y": "4"
                 }
             }
         ]
@@ -689,10 +689,10 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "BusStop",
+                "Location": "Custom_MT_Location",
                 "Tile": {
-                    "X": "9999",
-                    "Y": "9999"
+                    "X": "4",
+                    "Y": "4"
                 }
             }
         ]
@@ -715,10 +715,10 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "BusStop",
+                "Location": "Custom_MT_Location",
                 "Tile": {
-                    "X": "9999",
-                    "Y": "9999"
+                    "X": "4",
+                    "Y": "4"
                 }
             }
         ]
@@ -741,10 +741,10 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "BusStop",
+                "Location": "Custom_MT_Location",
                 "Tile": {
-                    "X": "9999",
-                    "Y": "9999"
+                    "X": "4",
+                    "Y": "4"
                 }
             }
         ]
@@ -767,10 +767,10 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "BusStop",
+                "Location": "Custom_MT_Location",
                 "Tile": {
-                    "X": "9999",
-                    "Y": "9999"
+                    "X": "4",
+                    "Y": "4"
                 }
             }
         ]
@@ -793,10 +793,10 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "BusStop",
+                "Location": "Custom_MT_Location",
                 "Tile": {
-                    "X": "9999",
-                    "Y": "9999"
+                    "X": "4",
+                    "Y": "4"
                 }
             }
         ]
@@ -819,10 +819,10 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "BusStop",
+                "Location": "Custom_MT_Location",
                 "Tile": {
-                    "X": "9999",
-                    "Y": "9999"
+                    "X": "4",
+                    "Y": "4"
                 }
             }
         ]
@@ -845,10 +845,10 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "BusStop",
+                "Location": "Custom_MT_Location",
                 "Tile": {
-                    "X": "9999",
-                    "Y": "9999"
+                    "X": "4",
+                    "Y": "4"
                 }
             }
         ]
@@ -871,10 +871,10 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "BusStop",
+                "Location": "Custom_MT_Location",
                 "Tile": {
-                    "X": "9999",
-                    "Y": "9999"
+                    "X": "4",
+                    "Y": "4"
                 }
             }
         ]
@@ -897,10 +897,10 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "BusStop",
+                "Location": "Custom_MT_Location",
                 "Tile": {
-                    "X": "9999",
-                    "Y": "9999"
+                    "X": "4",
+                    "Y": "4"
                 }
             }
         ]
@@ -923,10 +923,10 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "BusStop",
+                "Location": "Custom_MT_Location",
                 "Tile": {
-                    "X": "9999",
-                    "Y": "9999"
+                    "X": "4",
+                    "Y": "4"
                 }
             }
         ]

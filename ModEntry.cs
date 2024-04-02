@@ -1100,6 +1100,8 @@ namespace MarketTown
 
             try
             {
+                Config.RestaurantLocations.Clear();
+
                 var mailHistory = MailRepository.FindLetter("MT.SellLogMail");
                 var weeklyHistory = MailRepository.FindLetter("MT.WeeklyLogMail");
 
@@ -1284,11 +1286,11 @@ namespace MarketTown
                             int tip = 0;
                             double decorPoint = GetDecorPoint(food.foodTile, __instance.currentLocation);
                             Random rand = new Random();
-                            String itemName = "";
+                            String itemName = (food == null || food.foodObject == null || food.foodObject.DisplayName == null)
+                                ? "Item" : food.foodObject.displayName;
 
                             if (food.foodObject.Category == -7)
                             {
-                                itemName = food.foodObject.DisplayName;
                                 // Get Reply, Sale Price, Tip for each taste
                                 if (taste == 0)         //Love
                                 {
@@ -1412,7 +1414,6 @@ namespace MarketTown
                             //}
                             else    // Non-food case
                             {
-                                itemName = food.foodObject.displayName;
                                 tip = 0;
                                 switch (food.foodObject.Quality)
                                 {
@@ -1481,8 +1482,8 @@ namespace MarketTown
                                 //Generate chat box
                                 if (Game1.IsMultiplayer)
                                 {
-                                    Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.sold", new { foodObjName = itemName, locationString = __instance.currentLocation.DisplayName, saleString = salePrice }));
-                                    MyMessage messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.sold", new { foodObjName = itemName, locationString = __instance.currentLocation.DisplayName, saleString = salePrice }));
+                                    Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.sold", new { foodObjName = itemName, locationString = __instance.currentLocation.Name, saleString = salePrice }));
+                                    MyMessage messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.sold", new { foodObjName = itemName, locationString = __instance.currentLocation.Name, saleString = salePrice }));
                                     SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
 
                                     if (!Config.DisableChat)
@@ -1503,7 +1504,7 @@ namespace MarketTown
                                 }
                                 else
                                 {
-                                    Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.sold", new { foodObjName = itemName, locationString = __instance.currentLocation.DisplayName, saleString = salePrice }));
+                                    Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.sold", new { foodObjName = itemName, locationString = __instance.currentLocation.Name, saleString = salePrice }));
                                     if (!Config.DisableChat)
                                     {
                                         if (tip != 0)
@@ -1519,6 +1520,50 @@ namespace MarketTown
                                 if (__instance.currentLocation is FarmHouse)
                                 {
                                     Farmer owner = (__instance.currentLocation as FarmHouse).owner;
+
+                                    try
+                                    {
+                                        if (__instance != null && __instance.Name != null && __instance.Name.Contains("Mt.Guest_"))
+                                        {
+                                            string[] parts = __instance.Name.Split('_');
+                                            string realName = "";
+                                            if (parts.Length >= 2)
+                                            {
+                                                realName = parts[1];
+                                            }
+
+                                            NPC realNPC = Game1.getCharacterFromName(realName);
+
+                                            if (owner.friendshipData.ContainsKey(realName))
+                                            {
+                                                int points = 3;
+                                                switch (taste)
+                                                {
+                                                    case 0:
+                                                        points = 8;
+                                                        break;
+                                                    case 2:
+                                                        points = 5;
+                                                        break;
+                                                    case 4:
+                                                        points = 0;
+                                                        break;
+                                                    case 6:
+                                                        points = -3;
+                                                        break;
+                                                    case 8:
+                                                        points = 3;
+                                                        break;
+                                                    default:
+                                                        __instance.doEmote(20);
+                                                        break;
+                                                }
+                                                owner.friendshipData[realName].Points += (int)points;
+                                            }
+                                        }
+                                    }
+                                    catch { }
+
                                     if (owner.friendshipData.ContainsKey(__instance.Name))
                                     {
                                         int points = 5;
@@ -1632,8 +1677,8 @@ namespace MarketTown
                                     mannequin.Boots.Value = null;
                                 }
                             }
-                            if (!Config.DisableChatAll && !Config.DisableChat) Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.soldclothes", new { locationString = __instance.currentLocation.DisplayName, saleString = salePrice }));
-                            MyMessage messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.soldclothes", new { locationString = __instance.currentLocation.DisplayName, saleString = salePrice }));
+                            if (!Config.DisableChatAll && !Config.DisableChat) Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.soldclothes", new { locationString = __instance.currentLocation.Name, saleString = salePrice }));
+                            MyMessage messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.soldclothes", new { locationString = __instance.currentLocation.Name, saleString = salePrice }));
                             SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
 
                             if (!Config.DisableChatAll) NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.soldclothesText." + rand.Next(7).ToString()));
@@ -1691,10 +1736,12 @@ namespace MarketTown
 
             if (buildingIsFarm)
             {
-                foreach (var obj in location.Objects.Values)           // Case MUSEUM return no valid food
+                foreach (var obj in location.Objects.Values)
                 {
+                    buildingIsMuseum = true;
                     if (obj != null && obj is Sign sign && sign != null && sign.displayItem != null && sign.displayItem.Value != null && sign.displayItem.Value.Name != null
-                        && sign.displayItem.Value.Name == "Museum License")  buildingIsMuseum = true;
+                        && sign.displayItem.Value.Name == "Museum License") break;
+                    else buildingIsMuseum = false;
                 }
 
                 foreach (var obj in location.Objects.Values)            // Case Market or Restaurant
@@ -1759,7 +1806,7 @@ namespace MarketTown
                     }
                 }
             }
-            if (foodList.Count == 0)
+            if (foodList.Count == 0 || buildingIsFarm && buildingIsMuseum)
             {
                 //SMonitor.Log("Got no food");
                 return null;
@@ -2043,7 +2090,8 @@ namespace MarketTown
                             FarmOutside.WalkAround(c.Name);
                         }
 
-                        if (c.IsVillager && c.currentLocation != null && c.Name.Contains("MT.Guest_") && !c.currentLocation.Name.Contains("BusStop"))
+                        if (c.IsVillager && c.currentLocation != null && c.Name.Contains("MT.Guest_") 
+                            && c.currentLocation.Name != c.DefaultMap && !c.currentLocation.Name.Contains("BusStop"))
                         {
                             FarmOutside.WalkAround(c.Name);
                         }
@@ -2362,7 +2410,7 @@ namespace MarketTown
 
                     foreach (string split in splits)
                     {
-                        float minDisplayTime = 1000f;
+                        float minDisplayTime = 1500f;
                         float maxDisplayTime = 3000f;
                         float percentOfMax = (float)split.Length / (float)60;
                         int duration = (int)(minDisplayTime + (maxDisplayTime - minDisplayTime) * percentOfMax);

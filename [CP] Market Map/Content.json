@@ -1,0 +1,10 @@
+{
+	"Format": "2.0",
+	"CustomLocations": [
+		{
+			"Name": "Custom_MT_Location",
+			"FromMapFile": "assets/Custom_MT_Location.tbin"
+		}
+	]
+}
+	
