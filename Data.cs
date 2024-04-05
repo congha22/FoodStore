@@ -20,6 +20,7 @@ namespace MarketTown;
         public int TodayCustomerInteraction = 0;
 
         public int TodayMuseumVisitor { get; set; } = 0;
+        public int TodayMuseumEarning { get; set; } = 0;
         public int ForageSold { get; set; } = 0;
         public int FlowerSold { get; set; } = 0;
         public int FruitSold { get; set; } = 0;
@@ -93,7 +94,7 @@ namespace MarketTown;
                 new Letter(
                     "MT.MuseumLicense",
                     modHelper.Translation.Get("foodstore.letter.mtmuseumlicense"),
-                    (Letter l) => !Game1.player.mailReceived.Contains("MT.MuseumLicense") && Game1.netWorldState.Value.MuseumPieces.Count() >= 30,
+                    (Letter l) => !Game1.player.mailReceived.Contains("MT.MuseumLicense") && ( Game1.netWorldState.Value.MuseumPieces.Count() >= 30 || modHelper.ReadConfig<ModConfig>().EasyLicense),
                     delegate (Letter l)
                     {
                         ((NetHashSet<string>)(object)Game1.player.mailReceived).Add(l.Id);
@@ -109,7 +110,7 @@ namespace MarketTown;
                 new Letter(
                     "MT.RestaurantLicense",
                     modHelper.Translation.Get("foodstore.letter.mtrestaurantlicense"),
-                    (Letter l) => !Game1.player.mailReceived.Contains("MT.RestaurantLicense") && model.TotalEarning >= 10000 && model.TotalCookingSold >= 20,
+                    (Letter l) => !Game1.player.mailReceived.Contains("MT.RestaurantLicense") && ( model.TotalEarning >= 10000 && model.TotalCookingSold >= 20 || modHelper.ReadConfig<ModConfig>().EasyLicense),
                     delegate (Letter l)
                     {
                         ((NetHashSet<string>)(object)Game1.player.mailReceived).Add(l.Id);
@@ -125,7 +126,8 @@ namespace MarketTown;
                 new Letter(
                     "MT.MarketTownLicense",
                     modHelper.Translation.Get("foodstore.letter.mtmarkettownlicense"),
-                    (Letter l) => !Game1.player.mailReceived.Contains("MT.MarketTownLicense") && model.TotalEarning >= 30000 && model.TotalForageSold >= 30 && model.TotalVegetableSold >= 30 && model.TotalArtisanGoodSold >= 30 && model.TotalAnimalProductSold >= 30 && model.TotalCookingSold >= 30 && model.TotalFishSold >= 30 && model.TotalMineralSold >= 30,
+                    (Letter l) => !Game1.player.mailReceived.Contains("MT.MarketTownLicense") && ( modHelper.ReadConfig<ModConfig>().EasyLicense 
+                    || model.TotalEarning >= 30000 && model.TotalForageSold >= 30 && model.TotalVegetableSold >= 30 && model.TotalArtisanGoodSold >= 30 && model.TotalAnimalProductSold >= 30 && model.TotalCookingSold >= 30 && model.TotalFishSold >= 30 && model.TotalMineralSold >= 30 ),
                     delegate (Letter l)
                     {
                         ((NetHashSet<string>)(object)Game1.player.mailReceived).Add(l.Id);
@@ -149,7 +151,7 @@ namespace MarketTown;
                     "MT.SellLogMail",
                     modHelper.Translation.Get("foodstore.mailtotal", 
                     new { totalEarning = model.TotalEarning, sellMoney = model.SellMoney, todayCustomerInteraction = model.TodayCustomerInteraction }) 
-                                        + modHelper.Translation.Get("foodstore.todaymuseumvisitor", new {todayMMuseumVisitor = model.TodayMuseumVisitor}) + model.SellList,
+                                        + modHelper.Translation.Get("foodstore.todaymuseumvisitor", new {todayMMuseumVisitor = model.TodayMuseumVisitor, todayMuseumEarning = model.TodayMuseumEarning}) + model.SellList,
                     (Letter l) => model.SellMoney != 0 || model.TodayMuseumVisitor != 0)
                 {
                     LetterTexture = letterTexture

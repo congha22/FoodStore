@@ -109,6 +109,7 @@ namespace MarketTown
         public static int TodayFishSold = 0;
         public static int TodayGemSold = 0;
         public static int TodayMuseumVisitor = 0;
+        public static int TodayMuseumEarning = 0;
         //
         // *************************** ENTRY ***************************
         //
@@ -220,6 +221,7 @@ namespace MarketTown
             TodayFishSold = 0;
             TodayGemSold = 0;
             TodayMuseumVisitor = 0;
+            TodayMuseumEarning = 0;
 
             listNPCTodayPurchaseTime.Clear();
             validBuildingObjectPairs.Clear();
@@ -239,9 +241,9 @@ namespace MarketTown
                             GameLocation location = Game1.getLocationFromName(building.GetIndoorsName());
                             foreach (var f in location.furniture)
                             {
-                                if ( f.heldObject.Value != null && categoryKeys.Contains(f.heldObject.Value.Category) )  museumPieces ++;
-                                if ( f is FishTankFurniture fishtank ) museumPieces += (int)(fishtank.tankFish.Count / 2);
-                                if ( f.Name.Contains("Statue") ) museumPieces += 2; 
+                                if (f.heldObject.Value != null && categoryKeys.Contains(f.heldObject.Value.Category)) { Game1.chatBox.addInfoMessage("1"); museumPieces++; }
+                                if (f is FishTankFurniture fishtank) { museumPieces += (int)(fishtank.tankFish.Count / 2); Game1.chatBox.addInfoMessage("2"); }
+                                if (f.Name.Contains("Statue")) { museumPieces += 2; Game1.chatBox.addInfoMessage("3"); }
                             }
 
                             validBuildingObjectPairs.Add(new BuildingObjectPair(building, obj, "museum", museumPieces));
@@ -518,6 +520,8 @@ namespace MarketTown
 
         private void GameLoop_UpdateTicked(object sender, UpdateTickedEventArgs e)
         {
+            if (Config.DisableTextChat) { return; }
+
             if (e.IsMultipleOf(30))
             {
                 PlayerChat playerChatInstance = new PlayerChat();
@@ -692,6 +696,13 @@ namespace MarketTown
             // Shed setting
             configMenu.AddPage(mod: ModManifest, "shed", () => SHelper.Translation.Get("foodstore.config.shed"));
 
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.easylicense"),
+                getValue: () => Config.EasyLicense,
+                setValue: value => Config.EasyLicense = value
+            );
+
             configMenu.AddNumberOption(
                 mod: ModManifest,
                 name: () => SHelper.Translation.Get("foodstore.config.shedvisitchance"),
@@ -836,6 +847,12 @@ namespace MarketTown
                 tooltip: () => SHelper.Translation.Get("foodstore.config.dialoguetimeText"),
                 getValue: () => "" + Config.DialogueTime,
                 setValue: delegate (string value) { try { Config.DialogueTime = Int32.Parse(value, CultureInfo.InvariantCulture); } catch { } }
+            );
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.textchat"),
+                getValue: () => Config.DisableTextChat,
+                setValue: value => Config.DisableTextChat = value
             );
             configMenu.AddBoolOption(
                 mod: ModManifest,
@@ -1219,6 +1236,7 @@ namespace MarketTown
                 TodayCustomerInteraction = TodayCustomerInteraction,
 
                 TodayMuseumVisitor = TodayMuseumVisitor,
+                TodayMuseumEarning = TodayMuseumEarning,
 
                 ForageSold = TodayForageSold + weeklyForageSold,
                 FlowerSold = TodayFlowerSold + weeklyFlowerSold,
@@ -2338,9 +2356,14 @@ namespace MarketTown
                             {
                                 farmer.Money += moneyToAddPerPlayer;
                             }
+                            TodayMuseumEarning += (int)(10 * ticketValue * Config.MuseumPriceMarkup);
                             onlineFarmers.Clear();
                         }
-                        else Game1.player.Money += (int)(10 * ticketValue * Config.MuseumPriceMarkup);
+                        else
+                        {
+                            TodayMuseumEarning += (int)(10 * ticketValue * Config.MuseumPriceMarkup);
+                            Game1.player.Money += (int)(10 * ticketValue * Config.MuseumPriceMarkup);
+                        }
                     }
                     visit.modData["hapyke.FoodStore/timeVisitShed"] = Game1.timeOfDay.ToString();
                 }
