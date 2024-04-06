@@ -1,5 +1,4 @@
 ﻿using HarmonyLib;
-using MarketTown;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
@@ -47,6 +46,7 @@ using StardewValley.GameData.Buildings;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Text;
+using MarketTown.Data;
 
 namespace MarketTown
 {
@@ -196,11 +196,12 @@ namespace MarketTown
 
         private void GameLoop_DayStarted(object sender, StardewModdingAPI.Events.DayStartedEventArgs e)
         {
-            //try
-            //{
-            //    GameLocation locat = Game1.getLocationFromName("Custom_Village");
-            //    locat.isAlwaysActive.Value = true;
-            //} catch { }
+            try
+            {
+                GameLocation locat = Game1.getLocationFromName("Custom_MT_Island");
+                if ( locat != null) locat.isAlwaysActive.Value = true;
+            }
+            catch { }
 
             TodaySell = ""; 
             TodayMoney = 0;
@@ -304,7 +305,7 @@ namespace MarketTown
 
                 try
                 {
-                    foreach (NPC __instance in Utility.getAllCharacters())
+                    foreach (NPC __instance in Utility.getAllVillagers())
                     {
 
                         // ******* Check NPC valid tile *******
@@ -496,7 +497,7 @@ namespace MarketTown
         {
             if (!Game1.hasLoadedGame) return;
 
-            foreach (var x in Utility.getAllCharacters())
+            foreach (var x in Utility.getAllVillagers())
             {
                 if (x.Name.Contains("MT.Guest_"))
                 {
@@ -576,7 +577,7 @@ namespace MarketTown
             Microsoft.Xna.Framework.Rectangle displayArea = new Microsoft.Xna.Framework.Rectangle(0, 0, newWidth, newHeight);
 
             // get Generic Mod Config Menu's API (if it's installed)
-            var configMenu = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
+            var configMenu = Helper.ModRegistry.GetApi<MarketTown.Data.IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
             if (configMenu is null)
                 return;
 
@@ -1037,7 +1038,7 @@ namespace MarketTown
             ChairPositions.Clear();
 
             //Assign visit value
-            foreach (NPC __instance in Utility.getAllCharacters())
+            foreach (NPC __instance in Utility.getAllVillagers())
             {
                 if (__instance is not null && __instance.IsVillager)
                 {
@@ -1090,7 +1091,7 @@ namespace MarketTown
             // Wipe invitation
             try
             {
-                foreach (NPC __instance in Utility.getAllCharacters())
+                foreach (NPC __instance in Utility.getAllVillagers())
                 {
 
                     TodayCustomerInteraction += Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]);
@@ -1104,12 +1105,7 @@ namespace MarketTown
 
                     if (__instance.Name.Contains("MT.Guest_"))
                     {
-                        Game1.player.friendshipData.Remove(__instance.Name);
-
-                        __instance.Halt();
-                        __instance.temporaryController = null;
-                        __instance.controller = null;
-                        Game1.warpCharacter(__instance, __instance.DefaultMap, __instance.DefaultPosition / 64);
+                        Game1.characterData.Remove(__instance.Name);
                     }
                 }
             }
@@ -1278,7 +1274,7 @@ namespace MarketTown
 
         }
 
-        private static bool TryToEatFood(NPC __instance, PlacedFoodData food)
+        private static bool TryToEatFood(NPC __instance, DataPlacedFood food)
         {
             try
             {
@@ -1736,11 +1732,11 @@ namespace MarketTown
             return false;
         }
 
-        private static PlacedFoodData GetClosestFood(NPC npc, GameLocation location)
+        private static DataPlacedFood GetClosestFood(NPC npc, GameLocation location)
         {
             List<int> categoryKeys = new List<int> { -81, -80, -79, -75, -74, -28, -27, -26, -23, -22, -21, -20, -19, -18, -17, -16, -15, -12, -8, -7, -6, -5, -4, -2};
 
-            List<PlacedFoodData> foodList = new List<PlacedFoodData>();
+            List<DataPlacedFood> foodList = new List<DataPlacedFood>();
 
             bool buildingIsFarm = false;
             bool buildingIsMuseum = false;
@@ -1794,7 +1790,7 @@ namespace MarketTown
                         // Add to foodList only if there is sign within the range
                         if (hasSignInRange && Vector2.Distance(fLocation, npc.Tile) < Config.MaxDistanceToFind && (hasHat || hasPants || hasShirt || hasBoots) && buildingIsMarket && !buildingIsMuseum)
                         {
-                            foodList.Add(new PlacedFoodData( obj, fLocation, obj, -1));
+                            foodList.Add(new DataPlacedFood( obj, fLocation, obj, -1));
                         }
                     }
                 }
@@ -1820,7 +1816,7 @@ namespace MarketTown
                     // Add to foodList only if there is sign within the range
                     if (hasSignInRange && Vector2.Distance(fLocation, npc.Tile) < Config.MaxDistanceToFind && !buildingIsMuseum)
                     {
-                        foodList.Add(new PlacedFoodData(f, fLocation, f.heldObject.Value, -1));
+                        foodList.Add(new DataPlacedFood(f, fLocation, f.heldObject.Value, -1));
                     }
                 }
             }
@@ -1835,7 +1831,7 @@ namespace MarketTown
                 foodList[i].value = 0;
             }
 
-            foodList.Sort(delegate (PlacedFoodData a, PlacedFoodData b)
+            foodList.Sort(delegate (DataPlacedFood a, DataPlacedFood b)
             {
                 var compare = b.value.CompareTo(a.value);
                 if (compare != 0)
@@ -2094,7 +2090,7 @@ namespace MarketTown
 
             if (Game1.timeOfDay > Config.InviteComeTime || Game1.timeOfDay > Config.OpenHour)
             {
-                foreach (NPC c in Utility.getAllCharacters())
+                foreach (NPC c in Utility.getAllVillagers())
                 {
                     try
                     {

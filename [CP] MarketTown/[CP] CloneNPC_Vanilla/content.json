@@ -1,5 +1,14 @@
 {
     "Format": "2.0.0",
+
+    "CustomLocations": [
+		{
+			"Name": "Custom_MT_VanillaBase",
+			"FromMapFile": "assets/Custom_MT_VanillaBase.tbin"
+		}
+	],
+
+
     "Changes": [
       // CLONE NPC Vanilla
         {
@@ -143,7 +152,7 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "Custom_MT_Location",
+                "Location": "Custom_MT_VanillaBase",
                 "Tile": {
                     "X": "4",
                     "Y": "4"
@@ -169,7 +178,7 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "Custom_MT_Location",
+                "Location": "Custom_MT_VanillaBase",
                 "Tile": {
                     "X": "4",
                     "Y": "4"
@@ -195,7 +204,7 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "Custom_MT_Location",
+                "Location": "Custom_MT_VanillaBase",
                 "Tile": {
                     "X": "4",
                     "Y": "4"
@@ -221,7 +230,7 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "Custom_MT_Location",
+                "Location": "Custom_MT_VanillaBase",
                 "Tile": {
                     "X": "4",
                     "Y": "4"
@@ -247,7 +256,7 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "Custom_MT_Location",
+                "Location": "Custom_MT_VanillaBase",
                 "Tile": {
                     "X": "4",
                     "Y": "4"
@@ -273,7 +282,7 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "Custom_MT_Location",
+                "Location": "Custom_MT_VanillaBase",
                 "Tile": {
                     "X": "4",
                     "Y": "4"
@@ -299,7 +308,7 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "Custom_MT_Location",
+                "Location": "Custom_MT_VanillaBase",
                 "Tile": {
                     "X": "4",
                     "Y": "4"
@@ -325,7 +334,7 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "Custom_MT_Location",
+                "Location": "Custom_MT_VanillaBase",
                 "Tile": {
                     "X": "4",
                     "Y": "4"
@@ -351,7 +360,7 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "Custom_MT_Location",
+                "Location": "Custom_MT_VanillaBase",
                 "Tile": {
                     "X": "4",
                     "Y": "4"
@@ -377,7 +386,7 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "Custom_MT_Location",
+                "Location": "Custom_MT_VanillaBase",
                 "Tile": {
                     "X": "4",
                     "Y": "4"
@@ -403,7 +412,7 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "Custom_MT_Location",
+                "Location": "Custom_MT_VanillaBase",
                 "Tile": {
                     "X": "4",
                     "Y": "4"
@@ -429,7 +438,7 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "Custom_MT_Location",
+                "Location": "Custom_MT_VanillaBase",
                 "Tile": {
                     "X": "4",
                     "Y": "4"
@@ -455,7 +464,7 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "Custom_MT_Location",
+                "Location": "Custom_MT_VanillaBase",
                 "Tile": {
                     "X": "4",
                     "Y": "4"
@@ -481,7 +490,7 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "Custom_MT_Location",
+                "Location": "Custom_MT_VanillaBase",
                 "Tile": {
                     "X": "4",
                     "Y": "4"
@@ -507,7 +516,7 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "Custom_MT_Location",
+                "Location": "Custom_MT_VanillaBase",
                 "Tile": {
                     "X": "4",
                     "Y": "4"
@@ -533,7 +542,7 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "Custom_MT_Location",
+                "Location": "Custom_MT_VanillaBase",
                 "Tile": {
                     "X": "4",
                     "Y": "4"
@@ -559,7 +568,7 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "Custom_MT_Location",
+                "Location": "Custom_MT_VanillaBase",
                 "Tile": {
                     "X": "4",
                     "Y": "4"
@@ -585,7 +594,7 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "Custom_MT_Location",
+                "Location": "Custom_MT_VanillaBase",
                 "Tile": {
                     "X": "4",
                     "Y": "4"
@@ -611,7 +620,7 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "Custom_MT_Location",
+                "Location": "Custom_MT_VanillaBase",
                 "Tile": {
                     "X": "4",
                     "Y": "4"
@@ -637,7 +646,7 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "Custom_MT_Location",
+                "Location": "Custom_MT_VanillaBase",
                 "Tile": {
                     "X": "4",
                     "Y": "4"
@@ -663,7 +672,7 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "Custom_MT_Location",
+                "Location": "Custom_MT_VanillaBase",
                 "Tile": {
                     "X": "4",
                     "Y": "4"
@@ -689,7 +698,7 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "Custom_MT_Location",
+                "Location": "Custom_MT_VanillaBase",
                 "Tile": {
                     "X": "4",
                     "Y": "4"
@@ -715,7 +724,7 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "Custom_MT_Location",
+                "Location": "Custom_MT_VanillaBase",
                 "Tile": {
                     "X": "4",
                     "Y": "4"
@@ -741,7 +750,7 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "Custom_MT_Location",
+                "Location": "Custom_MT_VanillaBase",
                 "Tile": {
                     "X": "4",
                     "Y": "4"
@@ -767,7 +776,7 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "Custom_MT_Location",
+                "Location": "Custom_MT_VanillaBase",
                 "Tile": {
                     "X": "4",
                     "Y": "4"
@@ -793,7 +802,7 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "Custom_MT_Location",
+                "Location": "Custom_MT_VanillaBase",
                 "Tile": {
                     "X": "4",
                     "Y": "4"
@@ -819,7 +828,7 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "Custom_MT_Location",
+                "Location": "Custom_MT_VanillaBase",
                 "Tile": {
                     "X": "4",
                     "Y": "4"
@@ -845,7 +854,7 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "Custom_MT_Location",
+                "Location": "Custom_MT_VanillaBase",
                 "Tile": {
                     "X": "4",
                     "Y": "4"
@@ -871,7 +880,7 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "Custom_MT_Location",
+                "Location": "Custom_MT_VanillaBase",
                 "Tile": {
                     "X": "4",
                     "Y": "4"
@@ -897,7 +906,7 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "Custom_MT_Location",
+                "Location": "Custom_MT_VanillaBase",
                 "Tile": {
                     "X": "4",
                     "Y": "4"
@@ -923,7 +932,7 @@
         "Home": [
             {
                 "Id": "Default",
-                "Location": "Custom_MT_Location",
+                "Location": "Custom_MT_VanillaBase",
                 "Tile": {
                     "X": "4",
                     "Y": "4"

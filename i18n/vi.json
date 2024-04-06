@@ -698,6 +698,9 @@
   "foodstore.letter.receiverestaurantlicense": "Thân gửi @.^^ Tôi đã nhận thấy rằng bạn đã có được Giấy phép Nhà hàng. Giấy phép này sẽ cho phép bạn sử dụng bất kỳ Tòa nhà Nông nghiệp nào như một Nhà hàng. Chỉ cần hiển thị Giấy phép trên một Biển hiệu, và khách tham quan sẽ bắt đầu đến vào ngày mai. Khách tham quan Nhà hàng sẽ lục lọi và mua thức ăn mà họ thích. Đôi khi, họ sẽ yêu cầu một món đặc biệt, mà bạn có thể bán cho họ trực tiếp với giá cao hơn.^^ Tôi thực sự rất mong được thử thức ăn của bạn. -Lewis",
   "foodstore.letter.receivemarkettownlicense": "Thân gửi @.^^ Cuối cùng, bạn đã có được Giấy phép Thị trấn Thị trường. Từ bây giờ, bạn có thể sở hữu từ một cửa hàng tiện lợi nhỏ đến thậm chí là một siêu thị. Giấy phép này cho phép bạn bán bất kỳ hàng hóa nào bạn muốn, bao gồm thực phẩm, sản phẩm nông sản, vật liệu và nhiều hơn nữa.^^ Cảm ơn bạn rất nhiều vì đã tạo ra một trung tâm thuận tiện cho tất cả mọi người trong làng chúng ta. -Lewis",
   "foodstore.config.multiplayermode": "Kích hoạt chia sẻ tiền bán hàng cho chế độ đa người chơi?",
-  "foodstore.config.multiplayermodeText": "CẢNH BÁO: LỖI. Mặc định là false. Kích hoạt điều này sẽ chia tiền bán hàng giữa các người chơi kết nối. CẢNH BÁO: Đôi khi các người chơi khác không nhận được tiền."
+  "foodstore.config.multiplayermodeText": "CẢNH BÁO: LỖI. Mặc định là false. Kích hoạt điều này sẽ chia tiền bán hàng giữa các người chơi kết nối. CẢNH BÁO: Đôi khi các người chơi khác không nhận được tiền.",
+
+  "foodstore.config.easylicense": "Bỏ qua Yêu cầu Giấy phép?",
+"foodstore.config.textchat": "Vô hiệu hóa trò chuyện văn bản với NPC?"
 
 }

@@ -697,6 +697,10 @@
   "foodstore.letter.receiverestaurantlicense": "Estimado/a @.^^ He notado que has obtenido la Licencia de Restaurante. Esta Licencia te permitirá usar cualquier Edificio Agrícola como un Restaurante. Simplemente muestra la Licencia en un letrero, y los visitantes comenzarán a llegar mañana. Los visitantes del Restaurante buscarán y comprarán alimentos que les llamen la atención. A veces, solicitarán un plato especial, que puedes venderles directamente a un precio más alto.^^ Estoy realmente deseando probar tu comida. -Lewis",
   "foodstore.letter.receivemarkettownlicense": "Estimado/a @.^^ Finalmente, has obtenido la Licencia del Pueblo Mercado. A partir de ahora, puedes tener desde una pequeña tienda de conveniencia hasta incluso un supermercado. Esta Licencia te permite vender cualquier mercancía que desees, incluyendo alimentos, cosechas, materiales y más.^^ Muchas gracias por crear un centro conveniente para todas las personas en nuestro pueblo. -Lewis",
   "foodstore.config.multiplayermode": "¿Activar la división del dinero de venta para el modo multijugador?",
-  "foodstore.config.multiplayermodeText": "ADVERTENCIA: BUG. Por defecto es falso. Activar esto dividirá el dinero de venta entre los jugadores conectados. ADVERTENCIA: A veces los otros jugadores no reciben el dinero."
+  "foodstore.config.multiplayermodeText": "ADVERTENCIA: BUG. Por defecto es falso. Activar esto dividirá el dinero de venta entre los jugadores conectados. ADVERTENCIA: A veces los otros jugadores no reciben el dinero.",
+
+  
+"foodstore.config.easylicense": "¿Omitir requisito de licencia?",
+"foodstore.config.textchat": "¿Desactivar chat de escritura con PNJ?"
 
 }

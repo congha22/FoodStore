@@ -1,4 +1,4 @@
-﻿using MarketTown;
+﻿using MarketTown.Data;
 using Netcode;
 using Newtonsoft.Json;
 using StardewValley;
@@ -35,7 +35,7 @@ namespace MarketTown
             if (npc.modData.TryGetValue(orderKey, out string orderData) && rand.NextDouble() < Config.OrderChance)
             {
                 //npc.modData.Remove(orderKey);
-                UpdateOrder(npc, JsonConvert.DeserializeObject<OrderData>(orderData));
+                UpdateOrder(npc, JsonConvert.DeserializeObject<DataOrder>(orderData));
                 return;
             }
             if (!Game1.NPCGiftTastes.ContainsKey(npc.Name) || npcOrderNumbers.Value.TryGetValue(npc.Name, out int amount) && amount >= Config.MaxNPCOrdersPerNight)
@@ -46,7 +46,7 @@ namespace MarketTown
             }
         }
 
-        private void UpdateOrder(NPC npc, OrderData orderData)
+        private void UpdateOrder(NPC npc, DataOrder orderData)
         {
             if (!npc.IsEmoting)
             {
@@ -136,7 +136,7 @@ namespace MarketTown
                 price = (int)(Game1.objectData[dish.ToString()].Price);
 
 
-                npc.modData[orderKey] = JsonConvert.SerializeObject(new OrderData(dish, name, price, loved));
+                npc.modData[orderKey] = JsonConvert.SerializeObject(new DataOrder(dish, name, price, loved));
             } catch { }
         }
     }

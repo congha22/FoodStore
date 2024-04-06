@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.10" tiledversion="1.10.2" name="z_IslandTiles" tilewidth="16" tileheight="16" tilecount="816" columns="17">
- <image source="z_summer_IslandTiles.png" width="272" height="768"/>
+<tileset version="1.10" tiledversion="1.10.2" name="IslandTiles" tilewidth="16" tileheight="16" tilecount="816" columns="17">
+ <image source="summer_IslandTiles.png" width="272" height="768"/>
  <tile id="0">
   <properties>
    <property name="Water" value="T"/>

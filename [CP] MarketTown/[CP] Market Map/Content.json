@@ -2,10 +2,6 @@
 	"Format": "2.0",
 	"CustomLocations": [
 		{
-			"Name": "Custom_MT_Location",
-			"FromMapFile": "assets/Custom_MT_Location.tbin"
-		},
-		{
 			"Name": "Custom_MT_Island",
 			"FromMapFile": "assets/Custom_MT_Island.tmx"
 		}
@@ -14,18 +10,116 @@
 	"Changes": [
 
     {
+            "Action": "EditMap",
+            "Target": "Maps/Custom_MT_Island",
+            "MapTiles": [
+                {
+                    "Position": { "X": 50, "Y": 26 },
+                    "Layer": "Buildings",
+                    "SetProperties": {
+                        "Action": "Warp 66 22 Beach"
+                    }
+                },
+                {
+                    "Position": { "X": 51, "Y": 26 },
+                    "Layer": "Buildings",
+                    "SetProperties": {
+                        "Action": "Warp 66 22 Beach"
+                    }
+                },
+                {
+                    "Position": { "X": 52, "Y": 26 },
+                    "Layer": "Buildings",
+                    "SetProperties": {
+                        "Action": "Warp 66 22 Beach"
+                    }
+                },
+                {
+                    "Position": { "X": 51, "Y": 27 },
+                    "Layer": "Buildings",
+                    "SetProperties": {
+                        "Action": "Warp 66 22 Beach"
+                    }
+                },
+                {
+                    "Position": { "X": 51, "Y": 27 },
+                    "Layer": "Buildings",
+                    "SetProperties": {
+                        "Action": "Warp 66 22 Beach"
+                    }
+                },
+                {
+                    "Position": { "X": 51, "Y": 27 },
+                    "Layer": "Buildings",
+                    "SetProperties": {
+                        "Action": "Warp 66 22 Beach"
+                    }
+                }
+            ]
+        },
+    
+    {
 		"Action": "EditMap",
 		"Target": "Maps/Beach",
-		"FromFile": "Assets/CustomWay.tmx",
+		"FromFile": "Assets/Custom_MT_BeachBoat.tmx",
 		"ToArea": {
-			"X": 73,
-			"Y": 26,
-			"Width": 3,
-			"Height": 2
-		}
-	},
+			"X": 64,
+			"Y": 17,
+			"Width": 5,
+			"Height": 5
+		},
+    "PatchMode": "Overlay"
+    },
 
-    
+    {
+      "Action": "EditMap",
+      "Target": "Maps/Beach",
+      "MapTiles": [
+          {
+              "Position": { "X": 64, "Y": 20 },
+              "Layer": "Buildings",
+              "SetProperties": {
+                  "Action": "Warp 53 28 Custom_MT_Island"
+              }
+          },
+          {
+              "Position": { "X": 65, "Y": 20 },
+              "Layer": "Buildings",
+              "SetProperties": {
+                  "Action": "Warp 53 28 Custom_MT_Island"
+              }
+          },
+          {
+              "Position": { "X": 66, "Y": 20 },
+              "Layer": "Buildings",
+              "SetProperties": {
+                  "Action": "Warp 53 28 Custom_MT_Island"
+              }
+          },
+          {
+              "Position": { "X": 64, "Y": 21 },
+              "Layer": "Buildings",
+              "SetProperties": {
+                  "Action": "Warp 53 28 Custom_MT_Island"
+              }
+          },
+          {
+              "Position": { "X": 65, "Y": 21 },
+              "Layer": "Buildings",
+              "SetProperties": {
+                  "Action": "Warp 53 28 Custom_MT_Island"
+              }
+          },
+          {
+              "Position": { "X": 66, "Y": 21 },
+              "Layer": "Buildings",
+              "SetProperties": {
+                  "Action": "Warp 53 28 Custom_MT_Island"
+              }
+          }
+      ]
+      },
+
     {
 			"Action": "EditData",
 			"Target": "Data/Locations",
@@ -150,6 +244,91 @@
       }
     },
     "Fish": [
+      {
+        "Chance": 0.1,
+        "Season": null,
+        "FishAreaId": null,
+        "BobberPosition": null,
+        "PlayerPosition": null,
+        "MinFishingLevel": 0,
+        "MinDistanceFromShore": 0,
+        "MaxDistanceFromShore": -1,
+        "ApplyDailyLuck": false,
+        "CuriosityLureBuff": -1.0,
+        "CatchLimit": -1,
+        "IsBossFish": false,
+        "SetFlagOnCatch": null,
+        "RequireMagicBait": false,
+        "Precedence": 0,
+        "IgnoreFishDataRequirements": false,
+        "CanBeInherited": true,
+        "ChanceModifiers": null,
+        "ChanceModifierMode": 0,
+        "ChanceBoostPerLuckLevel": 0.0,
+        "UseFishCaughtSeededRandom": false,
+        "Condition": null,
+        "Id": "(O)837",
+        "ItemId": "(O)837",
+        "RandomItemId": null,
+        "MaxItems": null,
+        "MinStack": -1,
+        "MaxStack": -1,
+        "Quality": -1,
+        "ObjectInternalName": null,
+        "ObjectDisplayName": null,
+        "ToolUpgradeLevel": -1,
+        "IsRecipe": false,
+        "StackModifiers": null,
+        "StackModifierMode": 0,
+        "QualityModifiers": null,
+        "QualityModifierMode": 0,
+        "ModData": null,
+        "PerItemCondition": null
+      },
+      {
+        "Chance": 0.1,
+        "Season": null,
+        "FishAreaId": null,
+        "BobberPosition": null,
+        "PlayerPosition": null,
+        "MinFishingLevel": 0,
+        "MinDistanceFromShore": 0,
+        "MaxDistanceFromShore": -1,
+        "ApplyDailyLuck": false,
+        "CuriosityLureBuff": -1.0,
+        "CatchLimit": -1,
+        "IsBossFish": false,
+        "SetFlagOnCatch": null,
+        "RequireMagicBait": false,
+        "Precedence": 0,
+        "IgnoreFishDataRequirements": false,
+        "CanBeInherited": true,
+        "ChanceModifiers": null,
+        "ChanceModifierMode": 0,
+        "ChanceBoostPerLuckLevel": 0.0,
+        "UseFishCaughtSeededRandom": false,
+        "Condition": null,
+        "Id": "(O)836",
+        "ItemId": "(O)836",
+        "RandomItemId": null,
+        "MaxItems": null,
+        "MinStack": -1,
+        "MaxStack": -1,
+        "Quality": -1,
+        "ObjectInternalName": null,
+        "ObjectDisplayName": null,
+        "ToolUpgradeLevel": -1,
+        "IsRecipe": false,
+        "StackModifiers": null,
+        "StackModifierMode": 0,
+        "QualityModifiers": null,
+        "QualityModifierMode": 0,
+        "ModData": null,
+        "PerItemCondition": null
+      },
+
+
+
       {
         "Chance": 0.18,
         "Season": null,
