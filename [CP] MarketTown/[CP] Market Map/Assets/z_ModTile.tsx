@@ -1440,4 +1440,28 @@
    <property name="Passable" value="T"/>
   </properties>
  </tile>
+ <tile id="812">
+  <properties>
+   <property name="TouchAction" value="PoolEntrance"/>
+   <property name="Water" value="T"/>
+  </properties>
+ </tile>
+ <tile id="813">
+  <properties>
+   <property name="TouchAction" value="ChangeOutOfSwimsuit"/>
+   <property name="Water" value="T"/>
+  </properties>
+ </tile>
+ <tile id="814">
+  <properties>
+   <property name="TouchAction" value="ChangeIntoSwimsuit"/>
+   <property name="Water" value="T"/>
+  </properties>
+ </tile>
+ <tile id="815">
+  <properties>
+   <property name="Passable" value="T"/>
+   <property name="Water" value="T"/>
+  </properties>
+ </tile>
 </tileset>

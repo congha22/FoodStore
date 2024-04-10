@@ -51,7 +51,7 @@ namespace MarketTown
 
                 foreach (NPC who in Game1.getLocationFromName("BusStop").characters.ToList())
                 {
-                    if (who.Name.Contains("MT.Guest_") && who.Tile != who.DefaultPosition / 64)
+                    if (who.Name.Contains("MT.Guest_"))
                     {
                         npcsToWarp.Add(who);
                     }

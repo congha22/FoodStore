@@ -242,9 +242,9 @@ namespace MarketTown
                             GameLocation location = Game1.getLocationFromName(building.GetIndoorsName());
                             foreach (var f in location.furniture)
                             {
-                                if (f.heldObject.Value != null && categoryKeys.Contains(f.heldObject.Value.Category)) { Game1.chatBox.addInfoMessage("1"); museumPieces++; }
-                                if (f is FishTankFurniture fishtank) { museumPieces += (int)(fishtank.tankFish.Count / 2); Game1.chatBox.addInfoMessage("2"); }
-                                if (f.Name.Contains("Statue")) { museumPieces += 2; Game1.chatBox.addInfoMessage("3"); }
+                                if (f.heldObject.Value != null && categoryKeys.Contains(f.heldObject.Value.Category)) { museumPieces++; }
+                                if (f is FishTankFurniture fishtank) { museumPieces += (int)(fishtank.tankFish.Count / 2); }
+                                if (f.Name.Contains("Statue")) { museumPieces += 2; }
                             }
 
                             validBuildingObjectPairs.Add(new BuildingObjectPair(building, obj, "museum", museumPieces));
@@ -1114,6 +1114,7 @@ namespace MarketTown
             try
             {
                 Config.RestaurantLocations.Clear();
+                validBuildingObjectPairs.Clear();
 
                 var mailHistory = MailRepository.FindLetter("MT.SellLogMail");
                 var weeklyHistory = MailRepository.FindLetter("MT.WeeklyLogMail");
