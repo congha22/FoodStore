@@ -1738,6 +1738,7 @@ namespace MarketTown
             List<int> categoryKeys = new List<int> { -81, -80, -79, -75, -74, -28, -27, -26, -23, -22, -21, -20, -19, -18, -17, -16, -15, -12, -8, -7, -6, -5, -4, -2};
 
             List<DataPlacedFood> foodList = new List<DataPlacedFood>();
+            foodList.Clear();
 
             bool buildingIsFarm = false;
             bool buildingIsMuseum = false;
