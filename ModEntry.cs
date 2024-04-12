@@ -1784,6 +1784,8 @@ namespace MarketTown
                 }
             }
 
+            if (buildingIsMuseum) return null;
+
             foreach (var x in location.Objects)                 // Check valid Mannequin
             {
                 foreach (var obj in x.Values)
