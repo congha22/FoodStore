@@ -210,6 +210,11 @@
    <property name="Water" value="T"/>
   </properties>
  </tile>
+ <tile id="123">
+  <properties>
+   <property name="Water" value="T"/>
+  </properties>
+ </tile>
  <tile id="124">
   <properties>
    <property name="Water" value="T"/>

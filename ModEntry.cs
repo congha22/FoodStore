@@ -229,11 +229,11 @@ namespace MarketTown
 
             List<int> categoryKeys = new List<int> { 0, -2, -12, -28, -102 };
             int museumPieces = 0;
-
             foreach (Building building in Game1.getFarm().buildings)
             {
                 if ( building != null && building.GetIndoorsName() != null)
                 {
+                    bool isMuseumBuilding = false;
                     foreach (var obj in Game1.getLocationFromName(building.GetIndoorsName()).Objects.Values)
                     {
                         // Case Museum
@@ -249,16 +249,20 @@ namespace MarketTown
 
                             validBuildingObjectPairs.Add(new BuildingObjectPair(building, obj, "museum", museumPieces));
                             if (!Config.RestaurantLocations.Contains(Game1.getLocationFromName(building.GetIndoorsName()).Name)) Config.RestaurantLocations.Add(Game1.getLocationFromName(building.GetIndoorsName()).Name);
-
-                            break;
+                            isMuseumBuilding = true;
                         }
+                    }
 
-                        //Case Market or Restaurant
-                        if (obj is Sign sign1 && sign1.displayItem.Value != null && (sign1.displayItem.Value.Name == "Market License" || sign1.displayItem.Value.Name == "Restaurant License"))
+                    if (!isMuseumBuilding)
+                    {
+                        foreach (var obj in Game1.getLocationFromName(building.GetIndoorsName()).Objects.Values)
                         {
-                            validBuildingObjectPairs.Add(new BuildingObjectPair(building, obj, "market", 0));
-                            if ( !Config.RestaurantLocations.Contains(Game1.getLocationFromName(building.GetIndoorsName()).Name)) Config.RestaurantLocations.Add(Game1.getLocationFromName(building.GetIndoorsName()).Name);
-                            break;
+                            //Case Market or Restaurant
+                            if (obj is Sign sign1 && sign1.displayItem.Value != null && (sign1.displayItem.Value.Name == "Market License" || sign1.displayItem.Value.Name == "Restaurant License"))
+                            {
+                                validBuildingObjectPairs.Add(new BuildingObjectPair(building, obj, "market", 0));
+                                if (!Config.RestaurantLocations.Contains(Game1.getLocationFromName(building.GetIndoorsName()).Name)) Config.RestaurantLocations.Add(Game1.getLocationFromName(building.GetIndoorsName()).Name);
+                            }
                         }
                     }
                 }
@@ -1737,6 +1741,16 @@ namespace MarketTown
         {
             List<int> categoryKeys = new List<int> { -81, -80, -79, -75, -74, -28, -27, -26, -23, -22, -21, -20, -19, -18, -17, -16, -15, -12, -8, -7, -6, -5, -4, -2};
 
+            foreach (var pair in validBuildingObjectPairs)
+            {
+                Building building = pair.Building;
+                string buildingType = pair.buildingType;
+
+                var museumCheck = Game1.getLocationFromName(building.GetIndoorsName());
+
+                if (museumCheck == location && buildingType == "museum") return null ;
+            }
+
             List<DataPlacedFood> foodList = new List<DataPlacedFood>();
             foodList.Clear();
 
@@ -1774,7 +1788,7 @@ namespace MarketTown
             {
                 foreach (var obj in x.Values)
                 {
-                    if (obj.name.Contains("nequin") && obj is MtMannequin mannequin)
+                    if (obj != null && obj.Name != null && obj.Name.Contains("nequin") && obj is MtMannequin mannequin)
                     {
                         bool hasHat = mannequin.Hat.Value != null;
                         bool hasShirt = mannequin.Shirt.Value != null;

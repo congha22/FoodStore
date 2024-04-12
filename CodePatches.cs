@@ -320,6 +320,16 @@ namespace MarketTown
                 __instance.MovePosition(Game1.currentGameTime, Game1.viewport, __instance.currentLocation);
             }
 
+            foreach (var pair in validBuildingObjectPairs)
+            {
+                Building building = pair.Building;
+                string buildingType = pair.buildingType;
+
+                var museumCheck = Game1.getLocationFromName(building.GetIndoorsName());
+
+                if (museumCheck == __instance.currentLocation && buildingType == "museum") return;
+            }
+
             DataPlacedFood food = GetClosestFood(__instance, __instance.currentLocation);
             TryToEatFood(__instance, food);
         }
@@ -421,6 +431,17 @@ namespace MarketTown
                         if (npc != null && WantsToEat(npc) && Game1.random.NextDouble() < moveToFoodChance / 100f && npc.modData["hapyke.FoodStore/walkingBlock"] == "false")
                         {
                             DataPlacedFood food = GetClosestFood(npc, __instance);
+
+                            foreach (var pair in validBuildingObjectPairs)
+                            {
+                                Building building = pair.Building;
+                                string buildingType = pair.buildingType;
+
+                                var museumCheck = Game1.getLocationFromName(building.GetIndoorsName());
+
+                                if (museumCheck == npc.currentLocation && buildingType == "museum") return;
+                            }
+
                             if (food == null || (!Config.AllowRemoveNonFood && food.foodObject.Edibility <= 0 && (npc.currentLocation is Farm || npc.currentLocation is FarmHouse)))
                                 return;
                             if (TryToEatFood(npc, food))
