@@ -11,6 +11,36 @@
     }
   ],
   "Changes": [
+{
+      "Action": "EditData",
+      "Target": "Data/BigCraftables",
+      "Entries": {
+        "MT.Objects.ParadiseIslandBrazier": {
+          "Name": "Paradise Island Brazier",
+          "DisplayName": "Paradise Island Brazier",
+          "Description": "Light up the fire of Paradise Island and attract travelers from away!",
+          "Price": 2000,
+          "Fragility": 0,
+          "CanBePlacedOutdoors": true,
+          "CanBePlacedIndoors": true,
+          "IsLamp": false,
+          "Texture": "{{InternalAssetKey: assets/ParadiseIslandBrazier.png}}",
+          "SpriteIndex": 0,
+          "ContextTags": [
+            "light_source",
+            "torch_item"
+          ],
+          "CustomFields": null
+        }
+      }
+    },
+    {
+      "Action": "EditData",
+      "Target": "Data/CraftingRecipes",
+      "Entries": {
+        "MT.Objects.ParadiseIslandBrazier": "394 5 72 2 62 3 84 5/Home/MT.Objects.ParadiseIslandBrazier/true/default/"
+      }
+    },
     {
       "Action": "EditData",
       "Target": "Data/Events/Farm",
@@ -50,14 +80,24 @@
             "Action": "kitchen"
           }
         },
-        {
+{
           "Position": {
             "X": 32,
             "Y": 23
           },
           "Layer": "Back",
           "SetProperties": {
-            "TouchAction": "bed"
+            "TouchAction": "Sleep"
+          }
+        },
+{
+          "Position": {
+            "X": 32,
+            "Y": 23
+          },
+          "Layer": "Back",
+          "SetProperties": {
+            "Bed": "T"
           }
         }
       ]
@@ -134,6 +174,26 @@
           "Layer": "Back",
           "SetProperties": {
             "TouchAction": "Warp Custom_MT_Island_House 8 32"
+          }
+        },
+        {
+          "Position": {
+            "X": 21,
+            "Y": 36
+          },
+          "Layer": "Buildings",
+          "SetProperties": {
+            "Action": "MineSign TEST"
+          }
+        },
+        {
+          "Position": {
+            "X": 21,
+            "Y": 37
+          },
+          "Layer": "Buildings",
+          "SetProperties": {
+            "Action": "MineSign Right here, the enchanting fire from Paradise Island brazier draws travelers from afar!"
           }
         }
       ]
