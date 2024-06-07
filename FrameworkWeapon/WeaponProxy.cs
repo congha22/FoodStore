@@ -20,7 +20,7 @@
 //                }
 //            }
 //        }
-//        public string WeaponName
+//        public int WeaponName
 //        {
 //            get { return Weapon?.Name ?? ""; }
 //        }

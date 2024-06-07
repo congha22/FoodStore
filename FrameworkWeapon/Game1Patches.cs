@@ -111,7 +111,7 @@
 //                    }
 //                    Game1.currentQuestionChoice = 0;
 //                }
-//                string exitDialogue = null;
+//                int exitDialogue = null;
 //                if (Game1.currentSpeaker != null)
 //                {
 //                    if (Game1.currentSpeaker.immediateSpeak)
@@ -377,13 +377,13 @@
 //                    Game1.chatBox.addInfoMessage("ASD");
 //                    if (Game1.player.team.SpecialOrderRuleActive("SC_NO_FOOD") && Game1.player.currentLocation is MineShaft && (Game1.player.currentLocation as MineShaft).getMineArea() == 121)
 //                    {
-//                        Game1.addHUDMessage(new HUDMessage(Game1.content.LoadString("Strings\\StringsFromCSFiles:Object.cs.13053"), 3));
+//                        Game1.addHUDMessage(new HUDMessage(Game1.content.Loadint("ints\\intsFromCSFiles:Object.cs.13053"), 3));
 //                        __result = false;
 //                        return false;
 //                    }
 //                    if (Game1.player.hasBuff("25") && Game1.player.ActiveObject != null && !Game1.player.ActiveObject.HasContextTag("ginger_item"))
 //                    {
-//                        Game1.addHUDMessage(new HUDMessage(Game1.content.LoadString("Strings\\StringsFromCSFiles:Nauseous_CantEat"), 3));
+//                        Game1.addHUDMessage(new HUDMessage(Game1.content.Loadint("ints\\intsFromCSFiles:Nauseous_CantEat"), 3));
 //                        __result = false;
 //                        return false;
 //                    }
@@ -392,9 +392,9 @@
 //                    Game1.player.FarmerSprite.setCurrentSingleAnimation(304);
 //                    if (Game1.objectData.TryGetValue(Game1.player.ActiveObject.ItemId, out var value3))
 //                    {
-//                        Game1.currentLocation.createQuestionDialogue(value3.IsDrink ? Game1.content.LoadString("Strings\\StringsFromCSFiles:Game1.cs.3159", Game1.player.ActiveObject.DisplayName) : Game1.content.LoadString("Strings\\StringsFromCSFiles:Game1.cs.3160", Game1.player.ActiveObject.DisplayName), Game1.currentLocation.createYesNoResponses(), "Eat");
+//                        Game1.currentLocation.createQuestionDialogue(value3.IsDrink ? Game1.content.Loadint("ints\\intsFromCSFiles:Game1.cs.3159", Game1.player.ActiveObject.DisplayName) : Game1.content.Loadint("ints\\intsFromCSFiles:Game1.cs.3160", Game1.player.ActiveObject.DisplayName), Game1.currentLocation.createYesNoResponses(), "Eat");
 //                    }
-//                    //Game1.currentLocation.createQuestionDialogue(Game1.objectData[Game1.player.ActiveObject.parentSheetIndex].Split('/')[6].Equals("drink") ? Game1.content.LoadString("Strings\\StringsFromCSFiles:Game1.cs.3159", Game1.player.ActiveObject.DisplayName) : Game1.content.LoadString("Strings\\StringsFromCSFiles:Game1.cs.3160", Game1.player.ActiveObject.DisplayName), Game1.currentLocation.createYesNoResponses(), "Eat");
+//                    //Game1.currentLocation.createQuestionDialogue(Game1.objectData[Game1.player.ActiveObject.parentSheetIndex].Split('/')[6].Equals("drink") ? Game1.content.Loadint("ints\\intsFromCSFiles:Game1.cs.3159", Game1.player.ActiveObject.DisplayName) : Game1.content.Loadint("ints\\intsFromCSFiles:Game1.cs.3160", Game1.player.ActiveObject.DisplayName), Game1.currentLocation.createYesNoResponses(), "Eat");
 //                    Game1.oldKBState = currentKBState;
 //                    Game1.oldMouseState = Game1.input.GetMouseState();
 //                    Game1.oldPadState = currentPadState;

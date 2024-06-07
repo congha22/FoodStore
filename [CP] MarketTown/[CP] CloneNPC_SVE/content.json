@@ -10,7 +10,23 @@
 
     "Changes": [
       // Clone NPC SVE
-        {
+{
+"Action": "EditMap",
+"Target": "Maps/Custom_MT_RSVBase",
+"MapTiles": [
+    {
+      "Position": {
+        "X": 1,
+        "Y": 1
+      },
+      "Layer": "Back",
+              "SetProperties": {
+                "TouchAction": "Warp Custom_MT_Island 13 52"
+
+      }
+    }
+  ]
+},        {
             "Action": "Load",
             "Target": "Characters/MT.Guest_Andy, Characters/MT.Guest_Camilla, Characters/MT.Guest_Claire, Characters/MT.Guest_Isaac, Characters/MT.Guest_Jolyne, Characters/MT.Guest_Lance, Characters/MT.Guest_Martin, Characters/MT.Guest_Morgan, Characters/MT.Guest_Olivia, Characters/MT.Guest_Scarlett, Characters/MT.Guest_Sophia, Characters/MT.Guest_Susan, Characters/MT.Guest_Victor",
             "FromFile": "assets/{{Target}}.png"

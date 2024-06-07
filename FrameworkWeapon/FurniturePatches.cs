@@ -12,7 +12,7 @@
 //{
 //    public class FurniturePatches
 //    {
-//        private static Dictionary<string, string> _frontTextureName;
+//        private static Dictionary<int, int> _frontTextureName;
 
 //        public static bool clicked_Prefix(ref Furniture __instance, Farmer who, ref bool __result)
 //        {
@@ -90,7 +90,7 @@
 //            drawn_source_rect.X += drawn_source_rect.Width * ___sourceIndexOffset.Value;
 //            ParsedItemData dataOrErrorItem = ItemRegistry.GetDataOrErrorItem(__instance.ItemId);
 //            Texture2D texture = dataOrErrorItem.GetTexture();
-//            string textureName = dataOrErrorItem.TextureName;
+//            int textureName = dataOrErrorItem.TextureName;
 
 
 //            //if (__instance.heldObject.Value !=null) Game1.chatBox.addInfoMessage(__instance.heldObject.Value.Name);
@@ -103,7 +103,7 @@
 
 //            if (_frontTextureName == null)
 //            {
-//                _frontTextureName = new Dictionary<string, string>();
+//                _frontTextureName = new Dictionary<int, int>();
 //            }
 
 //            if (Furniture.isDrawingLocationFurniture)
@@ -185,7 +185,7 @@
 //            }
 //            if (Game1.debugMode)
 //            {
-//                spriteBatch.DrawString(Game1.smallFont, string.Concat((object)__instance.parentSheetIndex), Game1.GlobalToLocal(Game1.viewport, new Vector2(___drawPosition.X, ___drawPosition.Y)), Color.Yellow, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+//                spriteBatch.Drawint(Game1.smallFont, int.Concat((object)__instance.parentSheetIndex), Game1.GlobalToLocal(Game1.viewport, new Vector2(___drawPosition.X, ___drawPosition.Y)), Color.Yellow, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
 //            }
 //            return false;
 //        }

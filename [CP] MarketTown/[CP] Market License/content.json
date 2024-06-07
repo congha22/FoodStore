@@ -2,6 +2,14 @@
     "Format": "2.0.0",
     "Changes": [
         // add item
+      {
+          "Action": "EditData",
+          "Target": "Data/Furniture",
+          "Entries": {
+            "MT.Objects.ASD": "ASD/decor/-1/-1/1/1000/-1/ASD/0/{{InternalAssetKey: assets/ASD.png}}"
+          }
+        },
+
         {
             "Action": "EditData",
             "Target": "Data/Objects",
@@ -35,11 +43,55 @@
 
                     "Texture": "{{InternalAssetKey: assets/MuseumLicense.png}}",
                     "SpriteIndex": 0
+                      },
+                "MT.Objects.InviteLetter": {
+                    "Name": "Invite Letter",
+                    "Displayname": "Invite Letter",
+                    "Description": "Give this Letter to the guest you want to invite to your place.",
+                    "Type": "Basic",
+                    "Price": 200,
+                    "ContextTags": [
+                          "not_giftable"
+                        ],
+                    "Texture": "{{InternalAssetKey: assets/InviteLetter.png}}",
+                    "SpriteIndex": 0
+                      },
+                "MT.Objects.CustomerNote": {
+                    "Name": "Customer Note",
+                    "Displayname": "Customer Note",
+                    "Description": "Give this Note to your customer to gather their opinion about your sold dish.",
+                    "Type": "Basic",
+                    "Price": 20,
+                    "ContextTags": [
+                          "not_giftable"
+                        ],
+                    "Texture": "{{InternalAssetKey: assets/CustomerNote.png}}",
+                    "SpriteIndex": 0
                       }
             }
         },
 
+        {
+          "Action": "EditData",
+          "Target": "Data/CraftingRecipes",
+          "Entries": {
+            "MT.Objects.InviteLetter": "393 2 92 2 338 2/Field/MT.Objects.InviteLetter/false/default/",
+            "MT.Objects.CustomerNote": "771 5 92 2 382 1/Field/MT.Objects.CustomerNote/false/default/"
+          }
+        },
 
+        {
+          "Action": "EditData",
+          "Target": "Data/NPCGiftTastes",
+          "TextOperations": [
+                {
+                    "Operation": "Append",
+                    "Target": ["Entries", "Universal_Like"],
+                    "Value": "MT.Objects.InviteLetter MT.Objects.CustomerNote",
+                    "Delimiter": " "
+                }
+            ]
+        },
 
         {
             "Action": "EditData",

@@ -8,6 +8,24 @@
 	],
 
   "Changes": [
+   {
+"Action": "EditMap",
+"Target": "Maps/Custom_MT_RSVBase",
+"MapTiles": [
+    {
+      "Position": {
+        "X": 1,
+        "Y": 1
+      },
+      "Layer": "Back",
+              "SetProperties": {
+                "TouchAction": "Warp Custom_MT_Island 13 52"
+
+      }
+    }
+  ]
+},
+
     {
         "Action": "Load",
         "Target": "Characters/MT.Guest_Acorn,Characters/MT.Guest_Aguar,Characters/MT.Guest_Alissa,Characters/MT.Guest_Althea,Characters/MT.Guest_Anton,Characters/MT.Guest_Ariah,Characters/MT.Guest_Belinda,Characters/MT.Guest_Bert,Characters/MT.Guest_Blair,Characters/MT.Guest_Bliss,Characters/MT.Guest_Bryle,Characters/MT.Guest_Carmen,Characters/MT.Guest_Corine,Characters/MT.Guest_Daia,Characters/MT.Guest_Ezekiel,Characters/MT.Guest_Faye,Characters/MT.Guest_Flor,Characters/MT.Guest_Freddie,Characters/MT.Guest_Helen,Characters/MT.Guest_Ian,Characters/MT.Guest_Irene,Characters/MT.Guest_Jeric,Characters/MT.Guest_Jio,Characters/MT.Guest_June,Characters/MT.Guest_Keahi,Characters/MT.Guest_Kenneth,Characters/MT.Guest_Kiarra,Characters/MT.Guest_Kimpoi,Characters/MT.Guest_Kiwi,Characters/MT.Guest_Lenny,Characters/MT.Guest_Lola,Characters/MT.Guest_Lorenzo,Characters/MT.Guest_Lorraine,Characters/MT.Guest_Louie,Characters/MT.Guest_Maddie,Characters/MT.Guest_Maive,Characters/MT.Guest_Malaya,Characters/MT.Guest_Nadaline,Characters/MT.Guest_Naomi,Characters/MT.Guest_Olga,Characters/MT.Guest_Paula,Characters/MT.Guest_Philip,Characters/MT.Guest_Pika,Characters/MT.Guest_Pipo,Characters/MT.Guest_Raeriyala,Characters/MT.Guest_Richard,Characters/MT.Guest_Sari,Characters/MT.Guest_Sean,Characters/MT.Guest_Shanice,Characters/MT.Guest_Shiro,Characters/MT.Guest_Sonny,Characters/MT.Guest_Trinnie,Characters/MT.Guest_Undreya,Characters/MT.Guest_Ysabelle,Characters/MT.Guest_Yuuma,Characters/MT.Guest_Zachary,Characters/MT.Guest_Zayne",

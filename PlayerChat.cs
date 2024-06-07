@@ -203,11 +203,13 @@ namespace MarketTown
             else                        // All other message
             {
                 int randomIndex = random.Next(1, 8);
-                string npcAge, npcManner, npcSocial;
+                string npcAge, npcManner, npcSocial, npcHeartLevel;
 
                 int age = npc.Age;
                 int manner = npc.Manners;
                 int social = npc.SocialAnxiety;
+                int heartLevel = 0;
+                if (Game1.player.friendshipData.ContainsKey(npc.Name)) heartLevel = (int)Game1.player.friendshipData[npc.Name].Points / 250;
 
                 switch (age)
                 {
@@ -254,7 +256,23 @@ namespace MarketTown
                         npcSocial = "neutral";
                         break;
                 }
-                string text = SHelper.Translation.Get("foodstore.general." + npcAge + npcManner + npcSocial + randomIndex.ToString());
+                switch (heartLevel)
+                {
+                    case 0:
+                    case 1:
+                    case 2:
+                        npcHeartLevel = ".0";
+                        break;
+                    case 3:
+                    case 4:
+                    case 5:
+                        npcHeartLevel = ".3";
+                        break;
+                    default:
+                        npcHeartLevel = ".6";
+                        break;
+                }
+                string text = SHelper.Translation.Get("foodstore.general." + npcAge + npcManner + npcSocial + randomIndex.ToString() + npcHeartLevel);
                 //SHelper.Events.Input.ButtonPressed += (sender, args) => { Game1.chatBox.addInfoMessage(args.Button.ToString()); };
                 NPCShowTextAboveHead(npc, text);
             }
@@ -334,11 +352,11 @@ namespace MarketTown
         {
             foreach (NPC npc in Game1.currentLocation.characters)
             {
-                if (npc.isVillager() && npc.displayName != Target && npc.isGlowing)
+                if (npc.IsVillager && npc.displayName != Target && npc.isGlowing)
                 {
                     npc.stopGlowing();
                 }
-                else if (npc.isVillager() && npc.displayName == Target && !npc.isGlowing)
+                else if (npc.IsVillager && npc.displayName == Target && !npc.isGlowing)
                 {
                     npc.startGlowing(Color.Purple, false, 0.01f);
                 }

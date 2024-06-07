@@ -1,4 +1,6 @@
 -102:Book
+-100:Cloths
+-95: Hats
 -81: Forage
 -80: Flower
 -79: Fruit

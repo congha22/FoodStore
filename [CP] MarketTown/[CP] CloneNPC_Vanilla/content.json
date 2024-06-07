@@ -10,7 +10,22 @@
 
 
     "Changes": [
-      // CLONE NPC Vanilla
+        {
+        "Action": "EditMap",
+        "Target": "Maps/Custom_MT_RSVBase",
+        "MapTiles": [
+            {
+              "Position": {
+                "X": 1,
+                "Y": 1
+              },
+              "Layer": "Back",
+              "SetProperties": {
+                "TouchAction": "Warp Custom_MT_Island 13 52"
+              }
+            }
+          ]
+        },
         {
             "Action": "Load",
             "Target": "Characters/MT.Guest_Abigail, Characters/MT.Guest_Alex, Characters/MT.Guest_Caroline, Characters/MT.Guest_Clint, Characters/MT.Guest_Demetrius, Characters/MT.Guest_Elliott, Characters/MT.Guest_Emily, Characters/MT.Guest_Evelyn, Characters/MT.Guest_George, Characters/MT.Guest_Gus, Characters/MT.Guest_Haley, Characters/MT.Guest_Harvey, Characters/MT.Guest_Jas, Characters/MT.Guest_Jodi, Characters/MT.Guest_Kent, Characters/MT.Guest_Leah, Characters/MT.Guest_Lewis, Characters/MT.Guest_Linus, Characters/MT.Guest_Marnie, Characters/MT.Guest_Maru, Characters/MT.Guest_Pam, Characters/MT.Guest_Penny, Characters/MT.Guest_Pierre, Characters/MT.Guest_Robin, Characters/MT.Guest_Sam, Characters/MT.Guest_Sandy, Characters/MT.Guest_Sebastian, Characters/MT.Guest_Shane, Characters/MT.Guest_Vincent, Characters/MT.Guest_Willy, Characters/MT.Guest_Wizard",

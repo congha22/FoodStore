@@ -55,11 +55,11 @@
 //                //{
 //                //    if (who.currentUpgrade.daysLeftTillUpgradeDone == 1)
 //                //    {
-//                //        Game1.DrawDialogue(Game1.getCharacterFromName("Robin"), Game1.content.LoadString("Data\\ExtraDialogue:Farm_RobinWorking_ReadyTomorrow"));
+//                //        Game1.DrawDialogue(Game1.getCharacterFromName("Robin"), Game1.content.Loadint("Data\\ExtraDialogue:Farm_RobinWorking_ReadyTomorrow"));
 //                //    }
 //                //    else
 //                //    {
-//                //        Game1.DrawDialogue(Game1.getCharacterFromName("Robin"), Game1.content.LoadString("Data\\ExtraDialogue:Farm_RobinWorking" + (Game1.random.Next(2) + 1)));
+//                //        Game1.DrawDialogue(Game1.getCharacterFromName("Robin"), Game1.content.Loadint("Data\\ExtraDialogue:Farm_RobinWorking" + (Game1.random.Next(2) + 1)));
 //                //    }
 //                //}
 //                foreach (ResourceClump current3 in location.resourceClumps)
@@ -219,7 +219,7 @@
 //                        }
 //                    }
 //                }
-//                string text = null;
+//                int text = null;
 //                Tile tile = location.map.GetLayer("Buildings").PickTile(new Location(tileLocation.X * 64, tileLocation.Y * 64), viewport.Size);
 //                if (tile != null)
 //                {
