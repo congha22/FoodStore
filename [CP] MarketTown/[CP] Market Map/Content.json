@@ -352,7 +352,16 @@
         "Height": 5
       },
       "PatchMode": "Overlay"
-    },
+    }, 
+    {
+      "Action": "EditMap",
+      "Target": "Maps/Custom_MT_Island_House",
+      "FromFile": "Assets/Custom_MT_Island_House_Rain.tmx",
+      "PatchMode": "Overlay",
+      "When": {
+        "Weather": "Rain, Storm, GreenRain"
+      }
+    }, 
     {
       "Action": "EditMap",
       "Target": "Maps/Custom_MT_Island_House",
