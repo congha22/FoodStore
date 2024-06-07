@@ -57,6 +57,7 @@ using static System.Net.WebRequestMethods;
 using static StardewValley.Pathfinding.PathFindController;
 using System.Xml.Linq;
 using SpaceCore.UI;
+using static StardewValley.Minigames.CraneGame;
 
 namespace MarketTown
 {
@@ -1409,7 +1410,7 @@ namespace MarketTown
                             {
                                 FarmOutside.AddRandomScheduleIsland(visit, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{visit.currentLocation.NameOrUniqueName}", $"{randomTile.X}", $"{randomTile.Y}", $"{randomDirection}");
                                 visit.modData["hapyke.FoodStore/specialOrder"] = $"{randomTile.X},{randomTile.Y}";
-                                Console.WriteLine(visit.name + visit.modData["hapyke.FoodStore/specialOrder"]);
+
                                 if (!RestaurantSpot.ContainsKey(visit.currentLocation)) RestaurantSpot[visit.currentLocation] = new List<Vector2>();
                                 RestaurantSpot[visit.currentLocation].Add(randomTile);
 
@@ -1794,24 +1795,28 @@ namespace MarketTown
 
                             UpdateCount(food.foodObject.Category);
 
-                            if (Game1.hasLoadedGame && Game1.player.useSeparateWallets && Config.MultiplayerMode)
-                            {
-                                List<Farmer> onlineFarmers = new List<Farmer>();
+                            // *****************************************************************************************************************************************************
+                            //if (Game1.hasLoadedGame && Game1.player.useSeparateWallets && Config.MultiplayerMode)
+                            //{
+                            //    List<Farmer> onlineFarmers = new List<Farmer>();
 
-                                foreach (Farmer farmer in Game1.getOnlineFarmers())
-                                {
-                                    onlineFarmers.Add(farmer);
-                                }
+                            //    foreach (Farmer farmer in Game1.getOnlineFarmers())
+                            //    {
+                            //        onlineFarmers.Add(farmer);
+                            //    }
 
-                                int moneyToAddPerPlayer = (int)((salePrice + tip) / onlineFarmers.Count);
+                            //    int moneyToAddPerPlayer = (int)((salePrice + tip) / onlineFarmers.Count);
 
-                                foreach (Farmer farmer in onlineFarmers)
-                                {
-                                    farmer.Money += moneyToAddPerPlayer;
-                                }
-                                onlineFarmers.Clear();
-                            }
-                            else Game1.player.Money += salePrice + tip;
+                            //    foreach (Farmer farmer in onlineFarmers)
+                            //    {
+                            //        farmer.Money += moneyToAddPerPlayer;
+                            //    }
+                            //    onlineFarmers.Clear();
+                            //}
+                            //else Game1.player.Money += salePrice + tip;
+
+                            AddToPlayerFunds(salePrice + tip);
+
 
                             __instance.modData["hapyke.FoodStore/LastFood"] = Game1.timeOfDay.ToString();
                             if (food.foodObject.Category == -7)

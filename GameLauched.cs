@@ -1294,9 +1294,9 @@ namespace MarketTown
         {
             Random random = new Random();
 
-            GameLocation islandInstance = Game1.getLocationFromName("Custom_MT_Island");
             if (FestivalToday && Game1.timeOfDay > Config.FestivalTimeStart && Game1.timeOfDay < Config.FestivalTimeEnd)
             {
+                GameLocation islandInstance = Game1.getLocationFromName("Custom_MT_Island");
                 foreach (var shopData in TodayShopInventory)
                 {
                     var npcList = Utility.GetNpcsWithinDistance(shopData.Tile + new Vector2(1, 0), 2, islandInstance).ToList();
@@ -1358,10 +1358,13 @@ namespace MarketTown
                                     npcBuy.showTextAboveHead(GetSoldMessage(randomItemSold, "PlayerShop"), randomColor, 2, 4000, 1000);
                                     npcBuy.modData["hapyke.FoodStore/festivalLastPurchase"] = Game1.timeOfDay.ToString();
 
+                                    var price = itemObj.sellToStorePrice() * 2;
+                                    AddToPlayerFunds(price);
+
                                     break;
                                 }
                             }
-                            else if (nonPlayerChance > 0.7 && playerChance > 0.7)
+                            else if (nonPlayerChance > 0.6 && playerChance > 0.6)
                             {
                                 npcBuy.doEmote(10);
                                 break;
@@ -1369,6 +1372,28 @@ namespace MarketTown
                         }
                     }
                 }
+            }
+        }
+        private static void AddToPlayerFunds(int salePrice)
+        {
+            var farmers = Game1.getAllFarmers().Where(f => f.isActive()).ToList();
+            var multiplayer = farmers.Count > 1;
+
+            if (Game1.player.team.useSeparateWallets.Value && multiplayer)
+            {
+                try
+                {
+                    foreach (var farmer in farmers)
+                    {
+                        Game1.player.team.AddIndividualMoney(farmer, (int)salePrice / farmers.Count);
+                    }
+                    
+                }
+                catch { Game1.player.Money += salePrice; }
+            }
+            else
+            {
+                Game1.player.Money += salePrice;
             }
         }
 
