@@ -699,5 +699,14 @@
   "foodstore.config.multiplayermodeText": "警告：バグあり。デフォルトはfalseです。これを有効にすると、販売金が接続されたプレイヤー間で分割されます。警告：他のプレイヤーがお金を受け取らない場合があります。",
 
   "foodstore.config.easylicense": "ライセンスの必要性をスキップしますか？",
-"foodstore.config.textchat": "NPCとのテキストチャットを無効にしますか？"
+"foodstore.config.textchat": "NPCとのテキストチャットを無効にしますか？",
+
+"foodstore.island.building": "炎が舞い、訪問者がやってきています。パラダイスアイランドでの建設は停止しています",
+
+"foodstore.islandtravel.sun": "ボートでかなりの距離でした。少し疲れを感じます！",
+"foodstore.islandtravel.rain": "雨が旅をより困難にしました。疲れきっています。",
+"foodstore.islandtravel.wind": "風は時々前進させ、他の時には進行方向に逆らいます。",
+"foodstore.islandtravel.storm": "嵐の天気は容赦ありませんでした。旅から疲れきっています。",
+"foodstore.islandtravel.greenrain": "異常な緑色の雨が方向感覚を失わせました。弱体化しています。",
+"foodstore.islandtravel.snow": "雪の中を歩くのは疲れます。エネルギーが消耗していくのを感じます。"
 }

@@ -26,7 +26,7 @@
 		<None Update="Assets\**\*">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="[CP] MarketTown\[CP] Market License\**\*">
+		<!--<None Update="[CP] MarketTown\[CP] Market License\**\*">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 		<None Update="[CP] MarketTown\[CP] CloneNPC_Vanilla\**\*">
@@ -40,7 +40,12 @@
 		</None>
 		<None Update="[CP] MarketTown\[CP] Market Map\**\*">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>-->
+		
+		<None Update="[CP] MarketTown\**\*">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+		
 		<None Update="[] MarketTown\**\*">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>

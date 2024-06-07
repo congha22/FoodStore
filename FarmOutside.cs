@@ -4,12 +4,15 @@ using Newtonsoft.Json.Linq;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
+using StardewValley.Locations;
 using StardewValley.Network;
 using StardewValley.Pathfinding;
 using StardewValley.TerrainFeatures;
+using StardewValley.Tools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using xTile.Dimensions;
 using lv = StardewModdingAPI.LogLevel;
 
 namespace MarketTown
@@ -38,9 +41,64 @@ namespace MarketTown
 
         internal static void PlayerWarp(object sender, WarpedEventArgs e)
         {
-            if (e.NewLocation.Name.Contains("Custom_MT_Island"))
+            Random random = new Random();
+            if (e.NewLocation.Name.Contains("Custom_MT_Island") && e.OldLocation is Beach || e.OldLocation.Name.Contains("Custom_MT_Island") && e.NewLocation is Beach)
             {
-                Game1.chatBox.addInfoMessage("Let me know what do you think about the map on Nexus page_____. This is Market Paradise Island for ALPHA TESTING. The map likely to change: SHOULD NOT build anything on yet!!!!");
+                try
+                {
+                    if (e.NewLocation.Name == ("Custom_MT_Island"))
+                    {
+                        Game1.chatBox.addInfoMessage("This is the last time you can make recommendation for Island/Island house map. Next major update will be permanent");
+                        foreach (NPC __instance in Game1.player.currentLocation.characters)
+                        {
+                            Point zero = new Point((int)__instance.Tile.X, (int)__instance.Tile.Y);
+                            var location = __instance.currentLocation;
+                            bool isWaterTile = location.isWaterTile(zero.X, zero.Y);
+
+                            bool isValid = location.isTileOnMap(__instance.Tile) && !isWaterTile
+                                && location.isTilePassable(new Location(zero.X, zero.Y), Game1.viewport);
+
+
+                            if (!isValid)
+                            {
+                                __instance.Halt();
+                                Game1.warpCharacter(__instance,
+                                    Game1.getLocationFromName("Custom_MT_Island"),
+                                    ModEntry.islandWarp[random.Next(ModEntry.islandWarp.Count)]);
+                            }
+                        }
+
+                    }
+                } catch { }
+                string weather = e.NewLocation.GetWeather().Weather;
+
+                switch (weather)
+                {
+                    case "Rain":
+                        e.Player.Stamina += (float)(e.Player.MaxStamina * random.Next(-15, -8) / 100);
+                        if (!ModEntry.Config.DisableChatAll && !ModEntry.Config.DisableChat) Game1.addHUDMessage(new HUDMessage(ModEntry.SHelper.Translation.Get("foodstore.islandtravel.rain"), 3500, true));
+                        break;
+                    case "Wind":
+                        e.Player.Stamina += (float)(e.Player.MaxStamina * random.Next(-8, 4) / 100);
+                        if (!ModEntry.Config.DisableChatAll && !ModEntry.Config.DisableChat) Game1.addHUDMessage(new HUDMessage(ModEntry.SHelper.Translation.Get("foodstore.islandtravel.wind"), 3500, true));
+                        break;
+                    case "storm":
+                        e.Player.Stamina += (float)(e.Player.MaxStamina * random.Next(-30, -20) / 100);
+                        if (!ModEntry.Config.DisableChatAll && !ModEntry.Config.DisableChat) Game1.addHUDMessage(new HUDMessage(ModEntry.SHelper.Translation.Get("foodstore.islandtravel.storm"), 3500, true));
+                        break;
+                    case "GreenRain":
+                        e.Player.Stamina += (float)(e.Player.MaxStamina * random.Next(-23, -18) / 100);
+                        if (!ModEntry.Config.DisableChatAll && !ModEntry.Config.DisableChat) Game1.addHUDMessage(new HUDMessage(ModEntry.SHelper.Translation.Get("foodstore.islandtravel.greenrain"), 3500, true));
+                        break;
+                    case "Snow":
+                        e.Player.Stamina += (float)(e.Player.MaxStamina * random.Next(-20, -8) / 100);
+                        if (!ModEntry.Config.DisableChatAll && !ModEntry.Config.DisableChat) Game1.addHUDMessage(new HUDMessage(ModEntry.SHelper.Translation.Get("foodstore.islandtravel.snow"), 3500, true));
+                        break;
+                    default:
+                        e.Player.Stamina += (float)(e.Player.MaxStamina * random.Next(-7, -3) / 100);
+                        if (!ModEntry.Config.DisableChatAll && !ModEntry.Config.DisableChat) Game1.addHUDMessage(new HUDMessage(ModEntry.SHelper.Translation.Get("foodstore.islandtravel.sun"), 3500, true));
+                        break;
+                }
             }
 
             var isBusStop = e.NewLocation.Name.Contains("BusStop");
@@ -152,7 +210,7 @@ namespace MarketTown
         }
 
 
-        internal static Point getRandomOpenPointInFarm(GameLocation location, Random r, int tries = 5, int maxDistance = 15)
+        internal static Point getRandomOpenPointInFarm(GameLocation location, Random r, int tries = 5, int maxDistance = 75)
         {
             foreach (NPC who in Utility.getAllVillagers())
             {
@@ -167,11 +225,11 @@ namespace MarketTown
                     for (int i = 0; i < tries; i++)
                     {
                         //we get random position using width and height of map
-                        zero = new Point(r.Next(1, map.Layers[0].LayerWidth - 1), r.Next(1, map.Layers[0].LayerHeight - 1));
+                        zero = new Point(r.Next(2, map.Layers[0].LayerWidth - 2), r.Next(2, map.Layers[0].LayerHeight - 2));
 
                         bool isFloorValid = location.isTileOnMap(zero.ToVector2()) && location.isTilePassable(new xTile.Dimensions.Location(zero.X, zero.Y), Game1.viewport) && !location.isWaterTile(zero.X, zero.Y);
                         bool IsBehindTree = location.isBehindTree(zero.ToVector2());
-                        Warp WarpOrDoor = location.isCollidingWithWarpOrDoor(new Rectangle(zero, new Point(1, 1)));
+                        Warp WarpOrDoor = location.isCollidingWithWarpOrDoor(new Microsoft.Xna.Framework.Rectangle(zero, new Point(1, 1)));
 
                         //check that location is clear + not water tile + not behind tree + not a warp
                         CanGetHere = !location.IsTileBlockedBy(new Vector2(zero.X, zero.Y)) && location.CanItemBePlacedHere(new Vector2(zero.X, zero.Y)) 

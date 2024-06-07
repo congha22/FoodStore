@@ -700,6 +700,16 @@
   "foodstore.config.multiplayermodeText": "AVISO: BUG. Padrão é falso. Ativar isso dividirá o dinheiro da venda entre os jogadores conectados. AVISO: Às vezes, os outros jogadores não recebem o dinheiro.",
 
   "foodstore.config.easylicense": "Ignorar requisito de licença?",
-"foodstore.config.textchat": "Desativar bate-papo por digitação com NPC?"
+"foodstore.config.textchat": "Desativar bate-papo por digitação com NPC?",
+
+
+"foodstore.island.building": "As chamas dançam e os visitantes estão chegando. A construção na Ilha Paraíso está interrompida",
+
+"foodstore.islandtravel.sun": "Foi uma distância considerável de barco. Você se sente um pouco cansado!",
+"foodstore.islandtravel.rain": "A chuva tornou a jornada mais difícil. Você se sente exausto.",
+"foodstore.islandtravel.wind": "O vento às vezes empurra você para frente, mas outras vezes vai contra sua direção.",
+"foodstore.islandtravel.storm": "O clima tempestuoso foi implacável. Você se sente esgotado da jornada.",
+"foodstore.islandtravel.greenrain": "A chuva verde incomum foi desorientadora. Você se sente enfraquecido.",
+"foodstore.islandtravel.snow": "Andar pela neve foi exaustivo. Você sente sua energia se esvaindo."
 
 }

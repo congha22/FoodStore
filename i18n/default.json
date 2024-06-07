@@ -827,9 +827,16 @@
   "foodstore.config.multiplayermodeText":             "WARNING BUG. Default false. Enable this will split the sale money between connected player. WARNING: Sometimes the other players dont receive the money.",
 
   "foodstore.config.easylicense":                     "Skip Requirement for License?",
-  "foodstore.config.textchat":                        "Disable typing chat with NPC?"
+  "foodstore.config.textchat":                        "Disable typing chat with NPC?",
 
+  "foodstore.island.building":                        "Flames are dancing and visitors are coming. Building on Paradise Island is halted",
 
+  "foodstore.islandtravel.sun":                       "It was quite a distance on the boat. You feel a little tired!",
+  "foodstore.islandtravel.rain":                      "The rain made the journey more difficult. You feel exhausted.",
+  "foodstore.islandtravel.wind":                      "The wind sometimes pushes you forward, but other times it goes against your direction.",
+  "foodstore.islandtravel.storm":                     "The stormy weather was relentless. You feel drained from the journey.",
+  "foodstore.islandtravel.greenrain":                 "The unusual green rain was disorienting. You feel weakened.",
+  "foodstore.islandtravel.snow":                      "Trudging through the snow was exhausting. You feel your energy draining away."
 
 
 }

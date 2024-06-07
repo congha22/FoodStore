@@ -701,6 +701,16 @@
   "foodstore.config.multiplayermodeText": "CẢNH BÁO: LỖI. Mặc định là false. Kích hoạt điều này sẽ chia tiền bán hàng giữa các người chơi kết nối. CẢNH BÁO: Đôi khi các người chơi khác không nhận được tiền.",
 
   "foodstore.config.easylicense": "Bỏ qua Yêu cầu Giấy phép?",
-"foodstore.config.textchat": "Vô hiệu hóa trò chuyện văn bản với NPC?"
+"foodstore.config.textchat": "Vô hiệu hóa trò chuyện văn bản với NPC?",
+
+
+"foodstore.island.building": "Ngọn lửa đang nhảy múa và khách thăm đang đến. Việc xây dựng trên Đảo Thiên Đường đã bị tạm ngừng",
+
+"foodstore.islandtravel.sun": "Đó là một quãng đường khá xa trên thuyền. Bạn cảm thấy mệt mỏi một chút!",
+"foodstore.islandtravel.rain": "Mưa làm cho hành trình trở nên khó khăn hơn. Bạn cảm thấy mệt mỏi.",
+"foodstore.islandtravel.wind": "Gió đôi khi đẩy bạn về phía trước, nhưng đôi khi lại đi ngược hướng của bạn.",
+"foodstore.islandtravel.storm": "Thời tiết bão táp không ngừng. Bạn cảm thấy kiệt sức từ chuyến đi.",
+"foodstore.islandtravel.greenrain": "Mưa xanh lạ thường khiến bạn lạc hướng. Bạn cảm thấy suy nhược.",
+"foodstore.islandtravel.snow": "Đi qua tuyết làm bạn mệt mỏi. Bạn cảm thấy năng lượng đang dần mất đi."
 
 }

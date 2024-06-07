@@ -12,6 +12,7 @@ using StardewValley.BellsAndWhistles;
 using StardewValley.Buildings;
 using StardewValley.Characters;
 using StardewValley.GameData;
+using StardewValley.GameData.Characters;
 using StardewValley.Locations;
 using StardewValley.Menus;
 using StardewValley.Network;
@@ -21,17 +22,21 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using System.Reflection.Metadata;
 using System.Security.AccessControl;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 using xTile.Dimensions;
 using xTile.ObjectModel;
 using xTile.Tiles;
+using static StardewValley.Minigames.CraneGame;
 using static StardewValley.Minigames.TargetGame;
+using static System.Collections.Specialized.BitVector32;
 using static System.Net.Mime.MediaTypeNames;
 using Object = StardewValley.Object;
 
@@ -62,45 +67,8 @@ namespace MarketTown
             __instance.modData["hapyke.FoodStore/LastSay"] = "0";
             __instance.modData["hapyke.FoodStore/TotalCustomerResponse"] = "0";
             __instance.modData["hapyke.FoodStore/inviteTried"] = "false";
-            __instance.modData["hapyke.FoodStore/finishedDailyChat"] = "false";
-            __instance.modData["hapyke.FoodStore/chatDone"] = "0";
             __instance.modData["hapyke.FoodStore/walkingBlock"] = "false";
 
-            if (__instance.Name == "Lewis")
-            {
-
-                DishPrefer.dishDay = GetRandomDish();
-
-                if (Game1.dayOfMonth == 1 || Game1.dayOfMonth == 8 || Game1.dayOfMonth == 15 || Game1.dayOfMonth == 22)
-                {
-                    DishPrefer.dishWeek = GetRandomDish();      //Get dish of the week
-
-                    if (!Config.DisableChatAll && !Config.DisableChat)
-                    {
-                        MyMessage messageToSend = new MyMessage("");
-                        //Send thanks
-                        //Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.thankyou"));
-                        //messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.thankyou"));
-                        //SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
-
-                        // ******** Send mod Note ********
-                        //string modNote = SHelper.Translation.Get("foodstore.note");
-                        //if (modNote != "")
-                        //{
-                        //    Game1.chatBox.addInfoMessage(modNote);
-                        //    messageToSend = new MyMessage(modNote);
-                        //    SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
-                        //}
-
-                        //Send hidden reveal
-                        Random random = new Random();
-                        int randomIndex = random.Next(11);
-                        Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.hidden." + randomIndex.ToString()));
-                        messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.hidden." + randomIndex.ToString()));
-                        SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
-                    }
-                }
-            }
         }
         private static void KidJoin(Dictionary<string, int> todaySelectedKid)
         {
@@ -114,11 +82,118 @@ namespace MarketTown
         }
         private static void NPC_performTenMinuteUpdate_Postfix(NPC __instance)
         {
-            if (!Config.EnableMod)
+            if (!Config.EnableMod || __instance == null || !__instance.IsVillager)
                 return;
+
+            Random random = new Random();
+
+            Farmer farmerInstance = Game1.player;
+            NetStringDictionary<Friendship, NetRef<Friendship>> friendshipData = farmerInstance.friendshipData;
+
+            try     //Walk around
+            {
+                if (__instance.currentLocation != null && __instance.currentLocation == Game1.player.currentLocation 
+                    && ( Game1.player.currentLocation.characters.ToList().Count > 10 && random.NextDouble() < 0.4 || __instance.currentLocation.Name.Contains("Custom_MT_Island")) )
+                {
+                    if (( __instance.currentLocation.Name == "Farm" || __instance.currentLocation.Name == "FarmHouse") && __instance.modData["hapyke.FoodStore/invited"] == "true" && __instance.modData["hapyke.FoodStore/inviteDate"] == (Game1.stats.DaysPlayed - 1).ToString())
+                    {
+                        FarmOutside.WalkAround(__instance.Name);
+                    }
+
+                    if (__instance.Name.Contains("MT.Guest_") && !__instance.currentLocation.Name.Contains("Custom_MT_Island")
+                        && __instance.currentLocation.Name != __instance.DefaultMap && !__instance.currentLocation.Name.Contains("BusStop"))
+                    {
+                        FarmOutside.WalkAround(__instance.Name);
+                    }
+
+                    if (__instance.Name.Contains("MT.Guest_") && __instance.currentLocation.Name.Contains("Custom_MT_Island")
+                        && (Game1.timeOfDay < 620 || random.NextDouble() < 0.1))
+                    {
+                        FarmOutside.WalkAround(__instance.Name);
+                    }
+                }
+            }
+            catch { }
+
+
+            if ( random.NextDouble() < 0.3 && Game1.hasLoadedGame && __instance.currentLocation == Game1.player.currentLocation
+                && ( (friendshipData.TryGetValue(__instance.Name, out var friendship) && !__instance.Name.Contains("MT.Guest_") && friendshipData[__instance.Name].TalkedToToday) || __instance.Name.Contains("MT.Guest_") )
+                && __instance.CurrentDialogue.Count == 0 && __instance.Name != "Krobus" && __instance.Name != "Dwarf"
+                && !(Game1.currentLocation == null
+                    || Game1.eventUp
+                    || Game1.isFestival()
+                    || Game1.IsFading()
+                    || Game1.activeClickableMenu != null))
+            {
+                try
+                {
+                    int randomIndex = random.Next(1, 8);
+
+                    string npcAge, npcManner, npcSocial;
+
+                    int age = __instance.Age;
+                    int manner = __instance.Manners;
+                    int social = __instance.SocialAnxiety;
+
+                    switch (age)
+                    {
+                        case 0:
+                            npcAge = "adult.";
+                            break;
+                        case 1:
+                            npcAge = "teens.";
+                            break;
+                        case 2:
+                            npcAge = "child.";
+                            break;
+                        default:
+                            npcAge = "adult.";
+                            break;
+                    }
+                    switch (manner)
+                    {
+                        case 0:
+                            npcManner = "neutral.";
+                            break;
+                        case 1:
+                            npcManner = "polite.";
+                            break;
+                        case 2:
+                            npcManner = "rude.";
+                            break;
+                        default:
+                            npcManner = "neutral.";
+                            break;
+                    }
+                    switch (social)
+                    {
+                        case 0:
+                            npcSocial = "outgoing.";
+                            break;
+                        case 1:
+                            npcSocial = "shy.";
+                            break;
+                        case 2:
+                            npcSocial = "neutral.";
+                            break;
+                        default:
+                            npcSocial = "neutral";
+                            break;
+                    }
+                    if (__instance.Name.Contains("MT.Guest_") || !Game1.player.friendshipData[__instance.Name].IsMarried() && !Config.DisableChatAll && Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) < 2
+                       )
+                    {
+                        __instance.CurrentDialogue.Push(new Dialogue(__instance, "key", SHelper.Translation.Get("foodstore.general." + npcAge + npcManner + npcSocial + randomIndex.ToString())));
+                        __instance.modData["hapyke.FoodStore/TotalCustomerResponse"] = (Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) + 1).ToString();
+                    }
+                }
+                catch (NullReferenceException) { }
+            }
+
             try
             {
-                if (__instance.IsVillager && __instance.Name.Contains("MT.Guest_") && !__instance.currentLocation.Name.Contains("BusStop") && !bool.Parse(__instance.modData["hapyke.FoodStore/gettingFood"])
+                if (__instance.Name.Contains("MT.Guest_") && !bool.Parse(__instance.modData["hapyke.FoodStore/gettingFood"])
+                    && !__instance.currentLocation.Name.Contains("Custom_MT_Island") && !__instance.currentLocation.Name.Contains("BusStop")
                     && (Int32.Parse(__instance.modData["hapyke.FoodStore/timeVisitShed"]) <= (Game1.timeOfDay - Config.TimeStay) || Game1.timeOfDay > Config.CloseHour || Game1.timeOfDay >= 2500))
                 {
                     __instance.Halt();
@@ -147,7 +222,7 @@ namespace MarketTown
 
             try             //Warp invited NPC to and away
             {
-                if (__instance.IsVillager && !Utility.isFestivalDay() && __instance.modData["hapyke.FoodStore/inviteDate"] == (Game1.stats.DaysPlayed - 1).ToString())
+                if (!Utility.isFestivalDay() && __instance.modData["hapyke.FoodStore/inviteDate"] == (Game1.stats.DaysPlayed - 1).ToString())
                 {
                     Random rand = new Random();
                     int index = rand.Next(7);
@@ -189,104 +264,89 @@ namespace MarketTown
             }
             catch { }
 
-            //Send dish of the day
-            if (__instance.Name == "Lewis" && Game1.timeOfDay == 900 && !Config.DisableChatAll)
-            {
-                Random random = new Random();
-                int randomIndex = random.Next(10);
-                Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.dishday." + randomIndex.ToString(), new { dishToday = DishPrefer.dishDay }));
-                MyMessage messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.dishday." + randomIndex.ToString(), new { dishToday = DishPrefer.dishDay }));
-                SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
-            }
-
             //Get taste and decoration score, call to SaySomething for NPC to send bubble text
-            if (Config.EnableMod && !Game1.eventUp && __instance.currentLocation is not null && __instance.IsVillager && !WantsToEat(__instance) 
-                && Microsoft.Xna.Framework.Vector2.Distance(__instance.Tile, Game1.player.Tile) < 30
+            if (random.NextDouble() < 0.033 && Config.EnableMod && !Game1.eventUp && __instance.currentLocation is not null && !WantsToEat(__instance)
+                && Microsoft.Xna.Framework.Vector2.Distance(__instance.Tile, Game1.player.Tile) < 15
                 && __instance.modData["hapyke.FoodStore/LastFoodTaste"] != "-1" && Config.EnableDecor && !Config.DisableChatAll)
             {
-                if (Game1.random.NextDouble() < 0.033)
+                int randomIndex = random.Next(8);
+                double shareIdea = random.NextDouble();
+
+                //Get Taste score, Decoration score
+                int lastTaste;
+                if (__instance.modData.ContainsKey("hapyke.FoodStore/LastFoodTaste")) lastTaste = Int32.Parse(__instance.modData["hapyke.FoodStore/LastFoodTaste"]);
+                else lastTaste = 8;
+
+                double lastDecor;
+                if (__instance.modData.ContainsKey("hapyke.FoodStore/LastFoodDecor")) lastDecor = Convert.ToDouble(__instance.modData["hapyke.FoodStore/LastFoodDecor"]);
+                else lastDecor = 0;
+
+                double lastTasteRate; // Variable to store the result
+                switch (lastTaste)
                 {
-                    Random random = new Random();
-                    int randomIndex = random.Next(8);
-                    double shareIdea = random.NextDouble();
+                    case 0:
+                        lastTasteRate = 0.4;
+                        break;
 
-                    //Get Taste score, Decoration score
-                    int lastTaste;
-                    if (__instance.modData.ContainsKey("hapyke.FoodStore/LastFoodTaste")) lastTaste = Int32.Parse(__instance.modData["hapyke.FoodStore/LastFoodTaste"]);
-                    else lastTaste = 8;
+                    case 2:
+                        lastTasteRate = 0.35;
+                        break;
 
-                    double lastDecor;
-                    if (__instance.modData.ContainsKey("hapyke.FoodStore/LastFoodDecor")) lastDecor = Convert.ToDouble(__instance.modData["hapyke.FoodStore/LastFoodDecor"]);
-                    else lastDecor = 0;
+                    case 4:
+                        lastTasteRate = 0.25;
+                        break;
 
-                    double lastTasteRate; // Variable to store the result
-                    switch (lastTaste)
-                    {
-                        case 0:
-                            lastTasteRate = 0.4;
-                            break;
+                    case 6:
+                        lastTasteRate = 0.2;
+                        break;
 
-                        case 2:
-                            lastTasteRate = 0.35;
-                            break;
-
-                        case 4:
-                            lastTasteRate = 0.25;
-                            break;
-
-                        case 6:
-                            lastTasteRate = 0.2;
-                            break;
-
-                        default:
-                            lastTasteRate = 0.3;
-                            break;
-                    }
-
-                    double lastDecorRate; // Variable to store the result
-                    switch (lastDecor)
-                    {
-                        case double n when n >= -0.2 && n < 0:
-                            lastDecorRate = -0.2;
-                            break;
-
-                        case double n when n >= 0 && n < 0.2:
-                            lastDecorRate = 0;
-                            break;
-
-                        default:
-                            lastDecorRate = 0.2;
-                            break;
-                    }
-
-                    if (lastTaste == 0) //love
-                    {
-                        NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.love." + randomIndex));
-                        if (shareIdea < 0.3 + (lastDecor / 2)) SaySomething(__instance, __instance.currentLocation, lastTasteRate, lastDecorRate);
-                    }
-                    else if (lastTaste == 2) //like
-                    {
-                        NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.like." + randomIndex));
-                        if (shareIdea < 0.15 + (lastDecor / 2)) SaySomething(__instance, __instance.currentLocation, lastTasteRate, lastDecorRate);
-                    }
-                    else if (lastTaste == 4) //dislike
-                    {
-                        NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.dislike." + randomIndex));
-                        if (shareIdea < Math.Abs(-0.15 + (lastDecor / 2.5))) SaySomething(__instance, __instance.currentLocation, lastTasteRate, lastDecorRate);
-                    }
-                    else if (lastTaste == 6) //hate
-                    {
-                        NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.hate." + randomIndex));
-                        if (shareIdea < Math.Abs(-0.3 + (lastDecor / 2.5))) SaySomething(__instance, __instance.currentLocation, lastTasteRate, lastDecorRate);
-                    }
-                    else if (lastTaste == 8) //neutral
-                    {
-                        NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.neutral." + randomIndex));
-                        if (shareIdea < Math.Abs(lastDecor / 2.5)) SaySomething(__instance, __instance.currentLocation, lastTasteRate, lastDecorRate);
-                    }
-                    else { }
+                    default:
+                        lastTasteRate = 0.3;
+                        break;
                 }
-                return;
+
+                double lastDecorRate; // Variable to store the result
+                switch (lastDecor)
+                {
+                    case double n when n >= -0.2 && n < 0:
+                        lastDecorRate = -0.2;
+                        break;
+
+                    case double n when n >= 0 && n < 0.2:
+                        lastDecorRate = 0;
+                        break;
+
+                    default:
+                        lastDecorRate = 0.2;
+                        break;
+                }
+
+                if (lastTaste == 0) //love
+                {
+                    NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.love." + randomIndex));
+                    if (shareIdea < 0.3 + (lastDecor / 2)) SaySomething(__instance, __instance.currentLocation, lastTasteRate, lastDecorRate);
+                }
+                else if (lastTaste == 2) //like
+                {
+                    NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.like." + randomIndex));
+                    if (shareIdea < 0.15 + (lastDecor / 2)) SaySomething(__instance, __instance.currentLocation, lastTasteRate, lastDecorRate);
+                }
+                else if (lastTaste == 4) //dislike
+                {
+                    NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.dislike." + randomIndex));
+                    if (shareIdea < Math.Abs(-0.15 + (lastDecor / 2.5))) SaySomething(__instance, __instance.currentLocation, lastTasteRate, lastDecorRate);
+                }
+                else if (lastTaste == 6) //hate
+                {
+                    NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.hate." + randomIndex));
+                    if (shareIdea < Math.Abs(-0.3 + (lastDecor / 2.5))) SaySomething(__instance, __instance.currentLocation, lastTasteRate, lastDecorRate);
+                }
+                else if (lastTaste == 8) //neutral
+                {
+                    NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.neutral." + randomIndex));
+                    if (shareIdea < Math.Abs(lastDecor / 2.5)) SaySomething(__instance, __instance.currentLocation, lastTasteRate, lastDecorRate);
+                }
+                else { }
             }
 
 
@@ -306,13 +366,13 @@ namespace MarketTown
                 }
             }
 
-            if (listNPCTodayPurchaseTime.ContainsKey(__instance)  
-                && __instance.Tile.X >= __instance.currentLocation.Map.Layers[0].LayerWidth - 1
-                || __instance.Tile.Y >= __instance.currentLocation.Map.Layers[0].LayerHeight - 1
-                || __instance.Tile.X <= 1
-                || __instance.Tile.Y <= 1
+            if (listNPCTodayPurchaseTime.ContainsKey(__instance)
                 && !__instance.IsReturningToEndPoint()
                 && __instance.Tile != __instance.DefaultPosition / 64
+                && ( __instance.Tile.X > __instance.currentLocation.Map.Layers[0].LayerWidth - 1
+                || __instance.Tile.Y > __instance.currentLocation.Map.Layers[0].LayerHeight - 1
+                || __instance.Tile.X < 1
+                || __instance.Tile.Y < 1)
                 )
             {
                 __instance.isCharging = true;
@@ -333,6 +393,7 @@ namespace MarketTown
             DataPlacedFood food = GetClosestFood(__instance, __instance.currentLocation);
             TryToEatFood(__instance, food);
         }
+
         private static void FarmHouse_updateEvenIfFarmerIsntHere_Postfix(GameLocation __instance)
         {
             if (!Config.EnableMod)
@@ -344,7 +405,7 @@ namespace MarketTown
                 Random randomSayChance = new Random();
 
                 //Send bubble about decoration, dish of the week
-                if (npc.IsVillager
+                if (npc.IsVillager && __instance == Game1.player.currentLocation
                     && randomSayChance.NextDouble() < talkChance
                     && WantsToSay(npc, 360)
                     && Utility.isThereAFarmerWithinDistance(new Microsoft.Xna.Framework.Vector2(npc.Tile.X, npc.Tile.Y), 20, npc.currentLocation) != null
@@ -416,7 +477,9 @@ namespace MarketTown
                     {
                         if (npc.Name != null && npc.Name.Contains("MT.Guest_"))
                         {
-                            moveToFoodChance = Config.ShedMoveToFoodChance;
+                            if (npc.currentLocation.Name == "Custom_MT_Island") moveToFoodChance = Config.MoveToFoodChance * 2.5;
+                            else if (npc.currentLocation.Name == "Custom_MT_Island_House") moveToFoodChance = Config.MoveToFoodChance * 3.5;
+                            else moveToFoodChance = Config.ShedMoveToFoodChance;
                         }
                     }
                     catch { }
@@ -667,6 +730,30 @@ namespace MarketTown
                     return false;
                 }
                 return true;
+            }
+            public static void Postfix(ref bool __result, NPC __instance, Farmer who, bool probe)
+            {
+                Farmer farmerInstance = Game1.player;
+                NetStringDictionary<Friendship, NetRef<Friendship>> friendshipData = farmerInstance.friendshipData;
+                friendshipData.TryGetValue(__instance.Name, out var friendship);
+
+                if (who.ActiveItem != null && (who.ActiveItem.Name == "Invite Letter" || who.ActiveItem.Name == "Customer Note"))
+                {
+                    if (!probe)
+                    {
+                        var pc = new PlayerChat();
+
+                        if (who.ActiveItem.Name == "Invite Letter") pc.OnPlayerSend(__instance, "invite");
+                        if (who.ActiveItem.Name == "Customer Note") pc.OnPlayerSend(__instance, "last dish");
+
+                        __instance.receiveGift(who.ActiveObject, who, false, 0f, false);
+                        who.reduceActiveItemByOne();
+                        who.completelyStopAnimatingOrDoingAction();
+                        __instance.faceTowardFarmerForPeriod(4000, 3, faceAway: false, who);
+
+                        __result = true;
+                    }
+                }
             }
         }
     }

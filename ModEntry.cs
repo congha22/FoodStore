@@ -81,6 +81,8 @@ namespace MarketTown
 
         internal static List<string> GlobalNPCList = new List<string>();
 
+        internal static List<string> IslandNPCList = new List<string>();
+
         internal static List<string> CurrentShopper = new List<string>();
 
         internal static List<string> ShoppersToRemove = new List<string>();
@@ -88,6 +90,12 @@ namespace MarketTown
         internal static Dictionary<string, int> TodaySelectedKid = new Dictionary<string, int>();
         internal static List<(string locationName, int x, int y)> ChairPositions { get; private set; } = new List<(string, int, int)>();
 
+        internal static List<Vector2> islandWarp = new List<Vector2>()
+            {
+                new Vector2(15, 47), new Vector2(15, 49), new Vector2(8, 52), new Vector2(10, 52),
+                new Vector2(14, 56), new Vector2(14, 54), new Vector2(14, 51), new Vector2(17, 51),
+                new Vector2(15, 52), new Vector2(17, 52), new Vector2(15, 53), new Vector2(17, 53)
+            };
 
         internal static MailData mailData = new MailData();
         public static string TodaySell = "";
@@ -196,12 +204,82 @@ namespace MarketTown
 
         private void GameLoop_DayStarted(object sender, StardewModdingAPI.Events.DayStartedEventArgs e)
         {
+            Random rand = new Random();
+            int islandCount = 0;
+            IslandNPCList.Clear();
+
+            if (Game1.player == Game1.MasterPlayer)
+            {
+                DishPrefer.dishDay = GetRandomDish();
+
+                if (Game1.dayOfMonth == 1 || Game1.dayOfMonth == 8 || Game1.dayOfMonth == 15 || Game1.dayOfMonth == 22)
+                {
+                    DishPrefer.dishWeek = GetRandomDish();      //Get dish of the week
+
+                    if (!Config.DisableChatAll && !Config.DisableChat)
+                    {
+                        MyMessage messageToSend = new MyMessage("");
+
+                        //Send hidden reveal
+                        Random random = new Random();
+                        int randomIndex = random.Next(11);
+                        Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.hidden." + randomIndex.ToString()));
+                        messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.hidden." + randomIndex.ToString()));
+                        SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
+                    }
+                }
+            }
+
             try
             {
                 GameLocation locat = Game1.getLocationFromName("Custom_MT_Island");
-                if ( locat != null) locat.isAlwaysActive.Value = true;
+
+                var obj = locat.getObjectAtTile(22, 36);
+                if (obj != null && obj.ItemId != null && obj.ItemId == "MT.Objects.ParadiseIslandBrazier" && obj.IsOn)
+                {
+                    locat.isAlwaysActive.Value = false;
+                    while (islandCount <= 10 && islandCount <= GlobalNPCList.Count)
+                    {
+                        var tempNPC = GlobalNPCList[rand.Next(GlobalNPCList.Count)];
+                        bool available = false;
+
+                        if (tempNPC != null && !IslandNPCList.Contains(tempNPC))
+                        {
+                            available = true;
+                        }
+
+                        if (available)
+                        {
+                            IslandNPCList.Add(tempNPC);
+                            islandCount++;
+                        }
+                    }
+                }
+                else locat.isAlwaysActive.Value = true;
             }
             catch { }
+
+            foreach (var islandVisitorName in IslandNPCList)
+            {
+                NPC islandVisitor = Game1.getCharacterFromName(islandVisitorName);
+
+                if (islandVisitor != null)
+                {
+                    Game1.warpCharacter(islandVisitor, Game1.getLocationFromName("Custom_MT_Island"), islandWarp[rand.Next(islandWarp.Count)]);
+                    islandVisitor.faceDirection(rand.Next(0, 4));
+
+
+                    //if (islandVisitor.Schedule != null) islandVisitor.Schedule.Clear();
+                    //islandVisitor.addedSpeed = 3;
+                    //SchedulePathDescription schedulePath = islandVisitor.pathfindToNextScheduleLocation("customSchedule", "Custom_MT_Island", (int)islandVisitor.Tile.X, (int)islandVisitor.Tile.Y, "Custom_MT_Island_House", 7, 25, Game1.down, "continue", "Moving to Town");
+                    //Dictionary<int, SchedulePathDescription> schedule = new Dictionary<int, SchedulePathDescription>();
+                    //schedule.Add(700, schedulePath); // Assuming 600 is the time you want this schedule to execute
+
+                    //// Set the schedule for the NPC
+                    //islandVisitor.TryLoadSchedule("customSchedule", schedule);
+
+                }
+            }
 
             TodaySell = ""; 
             TodayMoney = 0;
@@ -291,153 +369,45 @@ namespace MarketTown
 
         private void GameLoop_OneSecondUpdateTicked(object sender, StardewModdingAPI.Events.OneSecondUpdateTickedEventArgs e)
         {
+            if (!Game1.hasLoadedGame) return;
+
+            Random random = new Random();
+
             if (Config.EnableMod && Context.IsPlayerFree && Game1.player != null && Game1.player.currentLocation != null && Config.RestaurantLocations.Contains(Game1.player.currentLocation.Name))
             {
                 UpdateOrders();
             }
 
-            if (Game1.hasLoadedGame
-                && !(Game1.player.isRidingHorse()
-                    || Game1.currentLocation == null
-                    || Game1.eventUp
-                    || Game1.isFestival()
-                    || Game1.IsFading()
-                    || Game1.activeClickableMenu != null))
+            // ******* Check NPC valid tile *******
+            foreach (NPC __instance in Game1.player.currentLocation.characters)
             {
-                Farmer farmerInstance = Game1.player;
-                NetStringDictionary<Friendship, NetRef<Friendship>> friendshipData = farmerInstance.friendshipData;
-
-                try
+                if (__instance != null && __instance.IsVillager && Config.NPCCheckTimer != 0 && e.IsMultipleOf(60 * (uint)Config.NPCCheckTimer)
+                    && __instance.currentLocation != null && __instance.currentLocation is not BusStop
+                    && __instance.Tile != __instance.DefaultPosition / 64
+                    && __instance.Sprite.CurrentFrame >= 0 && __instance.Sprite.CurrentFrame <= 15
+                    && !ChairPositions.Any(chairPosition => chairPosition.locationName == __instance.currentLocation.Name &&
+                                chairPosition.x == (int)__instance.Tile.X &&
+                                chairPosition.y == (int)__instance.Tile.Y)
+                    )
                 {
-                    foreach (NPC __instance in Utility.getAllVillagers())
+                    Point zero = new Point((int)__instance.Tile.X, (int)__instance.Tile.Y);
+                    var location = __instance.currentLocation;
+                    bool isWaterTile = location.isWaterTile(zero.X, zero.Y);
+
+                    if (Game1.player.currentLocation.Name == "Custom_MT_Island") isWaterTile = false;
+
+                    bool isValid = location.isTileOnMap(__instance.Tile) && !isWaterTile
+                        && location.isTilePassable(new Location(zero.X, zero.Y), Game1.viewport);
+
+
+                    if (!isValid)
                     {
-
-                        // ******* Check NPC valid tile *******
-                        if (__instance != null && __instance.IsVillager)
-                        {
-                            if (Config.NPCCheckTimer != 0 && e.IsMultipleOf(60 * (uint)Config.NPCCheckTimer) 
-                                && __instance.currentLocation != null && __instance.currentLocation is not BusStop
-                                && __instance.Tile != __instance.DefaultPosition / 64
-                                && __instance.Sprite.CurrentFrame >= 0 && __instance.Sprite.CurrentFrame <= 15
-                                && !ChairPositions.Any(chairPosition => chairPosition.locationName == __instance.currentLocation.Name &&
-                                            chairPosition.x == (int)__instance.Tile.X &&
-                                            chairPosition.y == (int)__instance.Tile.Y)
-                                )
-                            {
-                                Point zero = new Point((int)__instance.Tile.X, (int)__instance.Tile.Y);
-                                var location = __instance.currentLocation;
-
-                                bool isValid = location.isTileOnMap(__instance.Tile) && !location.isWaterTile(zero.X, zero.Y)
-                                    && location.isTilePassable(new Location(zero.X, zero.Y), Game1.viewport);
-
-
-                                if (!isValid)
-                                {
-                                    __instance.isCharging = true;
-                                    __instance.addedSpeed = 1;
-                                    __instance.returnToEndPoint();
-                                    __instance.MovePosition(Game1.currentGameTime, Game1.viewport, __instance.currentLocation);
-                                }
-                            }
-
-                            // ******* end of check *******
-
-
-                            if (friendshipData.TryGetValue(__instance.Name, out var friendship) || __instance.Name.Contains("MT.Guest_"))
-                            {
-                                if ( ( !__instance.Name.Contains("MT.Guest_") && friendshipData[__instance.Name].TalkedToToday ) || __instance.Name.Contains("MT.Guest_"))
-                                {
-                                    try
-                                    {
-                                        if (__instance.CurrentDialogue.Count == 0 && __instance.Name != "Krobus" && __instance.Name != "Dwarf")
-                                        {
-                                            Random random = new Random();
-                                            int randomIndex = random.Next(1, 8);
-
-                                            string npcAge, npcManner, npcSocial;
-
-                                            int age = __instance.Age;
-                                            int manner = __instance.Manners;
-                                            int social = __instance.SocialAnxiety;
-
-                                            switch (age)
-                                            {
-                                                case 0:
-                                                    npcAge = "adult.";
-                                                    break;
-                                                case 1:
-                                                    npcAge = "teens.";
-                                                    break;
-                                                case 2:
-                                                    npcAge = "child.";
-                                                    break;
-                                                default:
-                                                    npcAge = "adult.";
-                                                    break;
-                                            }
-                                            switch (manner)
-                                            {
-                                                case 0:
-                                                    npcManner = "neutral.";
-                                                    break;
-                                                case 1:
-                                                    npcManner = "polite.";
-                                                    break;
-                                                case 2:
-                                                    npcManner = "rude.";
-                                                    break;
-                                                default:
-                                                    npcManner = "neutral.";
-                                                    break;
-                                            }
-                                            switch (social)
-                                            {
-                                                case 0:
-                                                    npcSocial = "outgoing.";
-                                                    break;
-                                                case 1:
-                                                    npcSocial = "shy.";
-                                                    break;
-                                                case 2:
-                                                    npcSocial = "neutral.";
-                                                    break;
-                                                default:
-                                                    npcSocial = "neutral";
-                                                    break;
-                                            }
-                                            if (!Game1.player.friendshipData[__instance.Name].IsMarried() && !Config.DisableChatAll && Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) < 2 
-                                                || __instance.Name.Contains("MT.Guest_"))
-                                            {
-                                                __instance.CurrentDialogue.Push(new Dialogue(__instance, "key", SHelper.Translation.Get("foodstore.general." + npcAge + npcManner + npcSocial + randomIndex.ToString())));
-                                                __instance.modData["hapyke.FoodStore/TotalCustomerResponse"] = (Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) + 1).ToString();
-
-
-                                                if (__instance.modData["hapyke.FoodStore/finishedDailyChat"] == "true"
-                                                    && Int32.Parse(__instance.modData["hapyke.FoodStore/chatDone"]) < Config.DialogueTime
-                                                    && !__instance.Name.Contains("MT.Guest_"))
-                                                {
-                                                    __instance.modData["hapyke.FoodStore/chatDone"] = (Int32.Parse(__instance.modData["hapyke.FoodStore/chatDone"]) + 1).ToString();
-                                                    var formattedQuestion = string.Format(SHelper.Translation.Get("foodstore.responselist.main"), __instance);
-                                                    var entryQuestion = new EntryQuestion(formattedQuestion, ResponseList, ActionList);
-                                                    Game1.activeClickableMenu = entryQuestion;
-
-                                                    var pc = new PlayerChat();
-                                                    ActionList.Add(() => pc.OnPlayerSend(__instance, "hi"));
-                                                    ActionList.Add(() => pc.OnPlayerSend(__instance, "invite"));
-                                                    ActionList.Add(() => pc.OnPlayerSend(__instance, "last dish"));
-                                                    ActionList.Add(() => pc.OnPlayerSend(__instance, "special today"));
-                                                }
-                                                __instance.modData["hapyke.FoodStore/finishedDailyChat"] = "true";
-                                            }
-                                        }
-                                    }
-                                    catch { }
-                                }
-                            }
-                        }
+                        __instance.isCharging = true;
+                        __instance.addedSpeed = 1;
+                        __instance.returnToEndPoint();
+                        __instance.MovePosition(Game1.currentGameTime, Game1.viewport, __instance.currentLocation);
                     }
                 }
-                catch (NullReferenceException) { }
             }
         }
 
@@ -519,6 +489,9 @@ namespace MarketTown
                     shop.forSale.Add(mf);
                     shop.itemPriceAndStock.Add(mm, new ItemStockInformation(15000, int.MaxValue));
                     shop.itemPriceAndStock.Add(mf, new ItemStockInformation(15000, int.MaxValue));
+
+                    bool islandStatus = Game1.getLocationFromName("Custom_MT_Island").isAlwaysActive;
+                    if (!islandStatus) { Game1.addHUDMessage(new HUDMessage(SHelper.Translation.Get("foodstore.island.building"), 5000, true)); }
                 }
             }
         }
@@ -846,13 +819,6 @@ namespace MarketTown
 
             //Dialogue setting
             configMenu.AddPage(mod: ModManifest, "dialogue", () => SHelper.Translation.Get("foodstore.config.dialogue"));
-            configMenu.AddTextOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.dialoguetime"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.dialoguetimeText"),
-                getValue: () => "" + Config.DialogueTime,
-                setValue: delegate (string value) { try { Config.DialogueTime = Int32.Parse(value, CultureInfo.InvariantCulture); } catch { } }
-            );
             configMenu.AddBoolOption(
                 mod: ModManifest,
                 name: () => SHelper.Translation.Get("foodstore.config.textchat"),
@@ -1029,13 +995,6 @@ namespace MarketTown
                 KidResponseList.Add(new Response("No", SHelper.Translation.Get("foodstore.kidresponselist.no")));
             }
 
-            //Generate Dish of day and dish of week on Save Loaded
-            DishPrefer.dishDay = GetRandomDish();
-            if (Game1.dayOfMonth == 1 || Game1.dayOfMonth == 8 || Game1.dayOfMonth == 15 || Game1.dayOfMonth == 22)
-            {
-                DishPrefer.dishWeek = GetRandomDish();      //Get dish of the week
-            }
-
             GlobalKidList.Clear();
             GlobalNPCList.Clear();
             ShoppersToRemove.Clear();
@@ -1050,8 +1009,6 @@ namespace MarketTown
                     __instance.modData["hapyke.FoodStore/gettingFood"] = "false";
                     __instance.modData["hapyke.FoodStore/invited"] = "false";
                     __instance.modData["hapyke.FoodStore/inviteDate"] = "-99";
-                    __instance.modData["hapyke.FoodStore/finishedDailyChat"] = "false";
-                    __instance.modData["hapyke.FoodStore/chatDone"] = "0";
                     __instance.modData["hapyke.FoodStore/timeVisitShed"] = "0";
                     __instance.modData["hapyke.FoodStore/LastFood"] = "0";
                     __instance.modData["hapyke.FoodStore/LastCheck"] = "0";
@@ -2094,42 +2051,15 @@ namespace MarketTown
 
         private void OnTimeChange(object sender, TimeChangedEventArgs e)
         {
-           // NPC npc = Game1.getCharacterFromName("MT.Guest_Lewis");
-           //// npc.Schedule.Clear();
-           // npc.addedSpeed = 3;
-           // SchedulePathDescription schedulePath = npc.pathfindToNextScheduleLocation("customSchedule", "BusStop", 20, 10, "Mountain", 93, 26, Game1.down, "continue", "Moving to Town");
-           // Dictionary<int, SchedulePathDescription> schedule = new Dictionary<int, SchedulePathDescription>();
-           // schedule.Add(700, schedulePath); // Assuming 600 is the time you want this schedule to execute
-
-           // // Set the schedule for the NPC
-           // npc.TryLoadSchedule("customSchedule", schedule);
-
             Random random = new Random();
 
-            if (Game1.timeOfDay > Config.InviteComeTime || Game1.timeOfDay > Config.OpenHour)
+            //Send dish of the day
+            if (Game1.timeOfDay == 900 && !Config.DisableChatAll && Game1.player == Game1.MasterPlayer)
             {
-                foreach (NPC c in Utility.getAllVillagers())
-                {
-                    try
-                    {
-                        if (c.IsVillager && c.currentLocation!= null && c.currentLocation.Name == "Farm" && c.modData["hapyke.FoodStore/invited"] == "true" && c.modData["hapyke.FoodStore/inviteDate"] == (Game1.stats.DaysPlayed - 1).ToString())
-                        {
-                            FarmOutside.WalkAround(c.Name);
-                        }
-
-                        if (c.IsVillager && c.currentLocation != null && c.currentLocation.Name == "FarmHouse" && c.modData["hapyke.FoodStore/invited"] == "true" && c.modData["hapyke.FoodStore/inviteDate"] == (Game1.stats.DaysPlayed - 1).ToString())
-                        {
-                            FarmOutside.WalkAround(c.Name);
-                        }
-
-                        if (c.IsVillager && c.currentLocation != null && c.Name.Contains("MT.Guest_") 
-                            && c.currentLocation.Name != c.DefaultMap && !c.currentLocation.Name.Contains("BusStop"))
-                        {
-                            FarmOutside.WalkAround(c.Name);
-                        }
-                    }
-                    catch { }
-                }
+                int randomIndex = random.Next(10);
+                Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.dishday." + randomIndex.ToString(), new { dishToday = DishPrefer.dishDay }));
+                MyMessage messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.dishday." + randomIndex.ToString(), new { dishToday = DishPrefer.dishDay }));
+                SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
             }
 
             if (Game1.timeOfDay == 630 && Game1.player.currentLocation.Name == "Farm" && !Config.DisableKidAsk && random.NextDouble() < Config.KidAskChance
@@ -2251,6 +2181,7 @@ namespace MarketTown
                     {
                         blockedNPC = visit == null
                             || Game1.getCharacterFromName(randomNPCName).currentLocation.Name.Contains("Shed")
+                            || Game1.getCharacterFromName(randomNPCName).currentLocation.Name.Contains("Custom_MT_Island")
                             || (Int32.Parse(Game1.getCharacterFromName(randomNPCName).modData["hapyke.FoodStore/timeVisitShed"])
                                     >= (Game1.timeOfDay - Config.TimeStay * 3) && (Game1.timeOfDay >= 600 + Config.TimeStay * 3));
                     } catch { }
@@ -2387,20 +2318,7 @@ namespace MarketTown
         {
             if (environment == null) return 99999;
 
-            int count = 0;
-
-            foreach (var validName in GlobalNPCList)
-            {
-                NPC c = Game1.getCharacterFromName(validName);
-                if (c != null && c.currentLocation.Name == environment.Name) count += 1;         // Count NPC in Shed
-                
-                if (c != null && c.currentLocation.Name.Contains("BusStop")                      // Count NPC walking at BusStop
-                    && c.temporaryController != null
-                    && c.Tile != c.DefaultPosition / 64) count += 1;
-
-            }
-
-            return count;
+            return environment.characters.ToList().Count + Game1.getLocationFromName("BusStop").characters.ToList().Count;
         }
 
         public static void UpdateCount(int category)

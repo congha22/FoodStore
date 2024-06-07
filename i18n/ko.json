@@ -702,6 +702,15 @@
 
   
 "foodstore.config.easylicense": "라이선스 요구 사항을 건너뛸까요?",
-"foodstore.config.textchat": "NPC와의 텍스트 채팅 비활성화?"
+"foodstore.config.textchat": "NPC와의 텍스트 채팅 비활성화?",
+
+"foodstore.island.building": "불길이 춤을 추고 방문자들이 오고 있습니다. 파라다이스 아일랜드의 건설이 중단되었습니다",
+
+"foodstore.islandtravel.sun": "보트를 타고 상당한 거리였습니다. 조금 피곤한 느낌이에요!",
+"foodstore.islandtravel.rain": "비 때문에 여정이 더 어려워졌어요. 지친 느낌이에요.",
+"foodstore.islandtravel.wind": "바람은 때로는 앞으로 밀어주고, 때로는 반대 방향으로 밀어냅니다.",
+"foodstore.islandtravel.storm": "폭풍우는 끝없이 계속되었습니다. 여정에서 기운이 빠져나갑니다.",
+"foodstore.islandtravel.greenrain": "이상한 녹색 비는 방향을 헷갈리게 했습니다. 약해진 느낌이에요.",
+"foodstore.islandtravel.snow": "눈을 헤치고 걸어가는 것은 힘들어요. 에너지가 빠져나가는 느낌입니다."
 
 }

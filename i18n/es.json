@@ -701,6 +701,15 @@
 
   
 "foodstore.config.easylicense": "¿Omitir requisito de licencia?",
-"foodstore.config.textchat": "¿Desactivar chat de escritura con PNJ?"
+"foodstore.config.textchat": "¿Desactivar chat de escritura con NPC?",
+
+"foodstore.island.building": "Las llamas bailan y los visitantes llegan. La construcción en la Isla Paraíso está detenida",
+
+"foodstore.islandtravel.sun": "Fue una distancia considerable en el bote. ¡Te sientes un poco cansado!",
+"foodstore.islandtravel.rain": "La lluvia hizo que el viaje fuera más difícil. Te sientes agotado.",
+"foodstore.islandtravel.wind": "El viento a veces te empuja hacia adelante, pero otras veces va en contra de tu dirección.",
+"foodstore.islandtravel.storm": "El clima tormentoso fue implacable. Te sientes agotado por el viaje.",
+"foodstore.islandtravel.greenrain": "La inusual lluvia verde fue desconcertante. Te sientes debilitado.",
+"foodstore.islandtravel.snow": "Avanzar por la nieve fue agotador. Sientes que tu energía se está agotando."
 
 }
