@@ -387,7 +387,7 @@ namespace MarketTown
             catch { }
 
             //Get taste and decoration score, call to SaySomething for __instance to send bubble text
-            if (random.NextDouble() < 0.033 && !Game1.eventUp && __instanceLocation is not null && !WantsToEat(__instance)
+            if (random.NextDouble() < 10.033 && !Game1.eventUp && __instanceLocation is not null && !WantsToEat(__instance)
                 && Microsoft.Xna.Framework.Vector2.Distance(__instance.Tile, Game1.player.Tile) < 15
                 && __instance.modData["hapyke.FoodStore/LastFoodTaste"] != "-1" && Config.EnableDecor && !Config.DisableChatAll)
             {
@@ -504,10 +504,10 @@ namespace MarketTown
 
         private static void FarmHouse_updateEvenIfFarmerIsntHere_Postfix(GameLocation __instance)
         {
+            Random random = new Random();
             foreach (NPC npc in __instance.characters)
             {
                 double talkChance = 0.00002;
-                Random random = new Random();
 
                 //Send bubble about decoration, dish of the week
                 if (npc.IsVillager && (npc.getMasterScheduleRawData() != null || npc.Name.Contains("MT.Guest_")) && __instance == Game1.player.currentLocation
@@ -813,7 +813,7 @@ namespace MarketTown
                     if (Config.PriceMarkup > 0)
                     {
                         int price = (int)Math.Round(who.ActiveObject.Price * Config.PriceMarkup);
-                        Game1.player.Money += price;
+                        AddToPlayerFunds(price);
                     }
 
                     who.reduceActiveItemByOne();
@@ -1125,6 +1125,21 @@ namespace MarketTown
                     __instance.GetParentLocation().setTileProperty(__result.X + 1, __result.Y, "Back", "NoPath", "T");
 
                 }
+            }
+        }
+        public static void DrawAtNonTileSpot_Prefix(Furniture __instance, ref Vector2 location, float layerDepth, float alpha)
+        {
+            if (__instance != null && __instance.QualifiedItemId == "(F)MT.Objects.RestaurantDecor")
+            {
+                location.X -= 32;
+                location.Y += 12;
+            }
+        }
+        public static void LoadDescription_Postfix(Furniture __instance, ref string __result)
+        {
+            if (__instance != null && __instance.QualifiedItemId == "(F)MT.Objects.RestaurantDecor")
+            {
+                __result = "Customers would love to sit at the table with this lovely decoration!";
             }
         }
     }

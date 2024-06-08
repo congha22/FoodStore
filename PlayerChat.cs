@@ -79,7 +79,6 @@ namespace MarketTown
 
         public void OnPlayerSend(NPC npc, string textInput)
         {
-
             Random random = new Random();
             // Available option
             string helpKey = "help";
@@ -160,7 +159,7 @@ namespace MarketTown
                             npc.modData["hapyke.FoodStore/inviteDate"] = Game1.stats.DaysPlayed.ToString();
                         }
                         else
-                            npc.showTextAboveHead(SHelper.Translation.Get("foodstore.cannotinvitevisit." + inviteIndex), default, default, 5000);
+                            NPCShowTextAboveHead(npc, SHelper.Translation.Get("foodstore.cannotinvitevisit." + inviteIndex));
 
                     }
                     npc.modData["hapyke.FoodStore/inviteTried"] = "true";
@@ -373,13 +372,13 @@ namespace MarketTown
                 {
                     int charCount = 0;
                     IEnumerable<string> splits = from w in message.Split(new char[1] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
-                                                 group w by (charCount += w.Length + 1) / 300 into g // Adjust the number to split longer chunks
+                                                 group w by (charCount += w.Length + 1) / 60 into g // Adjust the number to split longer chunks
                                                  select string.Join(" ", g);
 
                     foreach (string split in splits)
                     {
-                        float minDisplayTime = 1500f;
-                        float maxDisplayTime = 3000f;
+                        float minDisplayTime = 2000f;
+                        float maxDisplayTime = 3500f;
                         float percentOfMax = (float)split.Length / (float)60;
                         int duration = (int)(minDisplayTime + (maxDisplayTime - minDisplayTime) * percentOfMax);
                         npc.showTextAboveHead(split, default, default, duration, default);

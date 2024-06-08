@@ -201,7 +201,7 @@ namespace MarketTown
                 Dictionary<int, SchedulePathDescription> schedule = npc.Schedule;
                 SortedDictionary<int, string> tempSche = new SortedDictionary<int, string>();
 
-                if (schedule != null)
+                if (schedule != null && schedule.Count > 0)
                 {
                     if (currentDirection == null && !npc.isMoving())
                     {
@@ -306,6 +306,10 @@ namespace MarketTown
                     // add requested schedule
                     string addSche = $"{addTime} {addEndLocation} {addEndX} {addEndY} {addEndDirection}/";
                     tempSche.Add(Int32.Parse(addTime), addSche);
+
+                    // add current tile AFTER request
+                    tempSche.Add(ModEntry.ConvertToHour(Int32.Parse(addTime) + 10),
+                    $"{ModEntry.ConvertToHour(Int32.Parse(addTime) + 10)} {npc.currentLocation.Name} {npc.Tile.X} {npc.Tile.Y} {npc.FacingDirection}/");
                 }
 
                 if (tempSche.Any())
@@ -316,6 +320,7 @@ namespace MarketTown
 
                 if (initSche == null || initSche == "") return false;
 
+                Console.WriteLine(npc.Name + initSche);
                 ModEntry.ResetErrorNpc(npc);
                 npc.TryLoadSchedule("default", initSche);
                 return true;

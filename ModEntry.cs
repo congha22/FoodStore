@@ -141,6 +141,7 @@ namespace MarketTown
         public static IDictionary<GameLocation, List<Vector2>> RestaurantSpot = new Dictionary<GameLocation, List<Vector2>>();
         public static IDictionary<GameLocation, List<Vector2>> TilePropertyChanged = new Dictionary<GameLocation, List<Vector2>>();
 
+        private PlayerChat playerChatInstance;
 
         // ===============================================================================================================================
         // ===============================================================================================================================
@@ -779,169 +780,8 @@ namespace MarketTown
 
             }
             catch { }
-            int totalVisitorVisited = 0;
-            int totalMoney = 0;
 
-            int totalCustomerNote = 0;
-            int totalCustomerNoteYes = 0;
-            int totalCustomerNoteNo = 0;
-            int totalCustomerNoteNone = 0;
-
-            int weeklyForageSold = 0;
-            int weeklyFlowerSold = 0;
-            int weeklyFruitSold = 0;
-            int weeklyVegetableSold = 0;
-            int weeklySeedSold = 0;
-            int weeklyMonsterLootSold = 0;
-            int weeklySyrupSold = 0;
-            int weeklyArtisanGoodSold = 0;
-            int weeklyAnimalProductSold = 0;
-            int weeklyResourceMetalSold = 0;
-            int weeklyMineralSold = 0;
-            int weeklyCraftingSold = 0;
-            int weeklyCookingSold = 0;
-            int weeklyFishSold = 0;
-            int weeklyGemSold = 0;
-
-            int totalForageSold = 0;
-            int totalFlowerSold = 0;
-            int totalFruitSold = 0;
-            int totalVegetableSold = 0;
-            int totalSeedSold = 0;
-            int totalMonsterLootSold = 0;
-            int totalSyrupSold = 0;
-            int totalArtisanGoodSold = 0;
-            int totalAnimalProductSold = 0;
-            int totalResourceMetalSold = 0;
-            int totalMineralSold = 0;
-            int totalCraftingSold = 0;
-            int totalCookingSold = 0;
-            int totalFishSold = 0;
-            int totalGemSold = 0;
-
-            MailData model = null;
-
-            if (Game1.IsMasterGame)
-            {
-                model = this.Helper.Data.ReadSaveData<MailData>("MT.MailLog");
-            }
-
-            if (model != null)
-            {
-                totalVisitorVisited = model.TotalVisitorVisited;
-
-                totalMoney = model.TotalEarning;
-
-                totalCustomerNote = model.TotalCustomerNote;
-                totalCustomerNoteYes = model.TotalCustomerNoteYes;
-                totalCustomerNoteNo = model.TotalCustomerNoteNo;
-
-                weeklyForageSold = model.ForageSold;
-                weeklyFlowerSold = model.FlowerSold;
-                weeklyFruitSold = model.FruitSold;
-                weeklyVegetableSold = model.VegetableSold;
-                weeklySeedSold = model.SeedSold;
-                weeklyMonsterLootSold = model.MonsterLootSold;
-                weeklySyrupSold = model.SyrupSold;
-                weeklyArtisanGoodSold = model.ArtisanGoodSold;
-                weeklyAnimalProductSold = model.AnimalProductSold;
-                weeklyResourceMetalSold = model.ResourceMetalSold;
-                weeklyMineralSold = model.MineralSold;
-                weeklyCraftingSold = model.CraftingSold;
-                weeklyCookingSold = model.CookingSold;
-                weeklyFishSold = model.FishSold;
-                weeklyGemSold = model.GemSold;
-
-                totalForageSold = model.TotalForageSold;
-                totalFlowerSold = model.TotalFlowerSold;
-                totalFruitSold = model.TotalFruitSold;
-                totalVegetableSold = model.TotalVegetableSold;
-                totalSeedSold = model.TotalSeedSold;
-                totalMonsterLootSold = model.TotalMonsterLootSold;
-                totalSyrupSold = model.TotalSyrupSold;
-                totalArtisanGoodSold = model.TotalArtisanGoodSold;
-                totalAnimalProductSold = model.TotalAnimalProductSold;
-                totalResourceMetalSold = model.TotalResourceMetalSold;
-                totalMineralSold = model.TotalMineralSold;
-                totalCraftingSold = model.TotalCraftingSold;
-                totalCookingSold = model.TotalCookingSold;
-                totalFishSold = model.TotalFishSold;
-                totalGemSold = model.TotalGemSold;
-
-                if (Game1.dayOfMonth == 1 || Game1.dayOfMonth == 8 || Game1.dayOfMonth == 15 || Game1.dayOfMonth == 22)
-                {
-                    weeklyForageSold = 0;
-                    weeklyFlowerSold = 0;
-                    weeklyFruitSold = 0;
-                    weeklyVegetableSold = 0;
-                    weeklySeedSold = 0;
-                    weeklyMonsterLootSold = 0;
-                    weeklySyrupSold = 0;
-                    weeklyArtisanGoodSold = 0;
-                    weeklyAnimalProductSold = 0;
-                    weeklyResourceMetalSold = 0;
-                    weeklyMineralSold = 0;
-                    weeklyCraftingSold = 0;
-                    weeklyCookingSold = 0;
-                    weeklyFishSold = 0;
-                    weeklyGemSold = 0;
-                }
-            }
-
-            MailData dataToSave = new MailData
-            {
-                TotalVisitorVisited = totalVisitorVisited + TodayVisitorVisited,
-                TotalEarning = totalMoney + TodayMoney,
-                SellMoney = TodayMoney,
-                SellList = TodaySell,
-
-                TodayCustomerInteraction = TodayCustomerInteraction,
-
-                TodayMuseumVisitor = TodayMuseumVisitor,
-                TodayMuseumEarning = TodayMuseumEarning,
-
-                TotalCustomerNote = TodayCustomerNoteYes + TodayCustomerNoteNo + TodayCustomerNoteNone + totalCustomerNote,
-                TotalCustomerNoteYes = TodayCustomerNoteYes + totalCustomerNoteYes,
-                TotalCustomerNoteNo = TodayCustomerNoteNo + totalCustomerNoteNo,
-
-
-                ForageSold = TodayForageSold + weeklyForageSold,
-                FlowerSold = TodayFlowerSold + weeklyFlowerSold,
-                FruitSold = TodayFruitSold + weeklyFruitSold,
-                VegetableSold = TodayVegetableSold + weeklyVegetableSold,
-                SeedSold = TodaySeedSold + weeklySeedSold,
-                MonsterLootSold = TodayMonsterLootSold + weeklyMonsterLootSold,
-                SyrupSold = TodaySyrupSold + weeklySyrupSold,
-                ArtisanGoodSold = TodayArtisanGoodSold + weeklyArtisanGoodSold,
-                AnimalProductSold = TodayAnimalProductSold + weeklyAnimalProductSold,
-                ResourceMetalSold = TodayResourceMetalSold + weeklyResourceMetalSold,
-                MineralSold = TodayMineralSold + weeklyMineralSold,
-                CraftingSold = TodayCraftingSold + weeklyCraftingSold,
-                CookingSold = TodayCookingSold + weeklyCookingSold,
-                FishSold = TodayFishSold + weeklyFishSold,
-                GemSold = TodayGemSold + weeklyGemSold,
-
-                TotalForageSold = TodayForageSold + totalForageSold,
-                TotalFlowerSold = TodayFlowerSold + totalFlowerSold,
-                TotalFruitSold = TodayFruitSold + totalFruitSold,
-                TotalVegetableSold = TodayVegetableSold + totalVegetableSold,
-                TotalSeedSold = TodaySeedSold + totalSeedSold,
-                TotalMonsterLootSold = TodayMonsterLootSold + totalMonsterLootSold,
-                TotalSyrupSold = TodaySyrupSold + totalSyrupSold,
-                TotalArtisanGoodSold = TodayArtisanGoodSold + totalArtisanGoodSold,
-                TotalAnimalProductSold = TodayAnimalProductSold + totalAnimalProductSold,
-                TotalResourceMetalSold = TodayResourceMetalSold + totalResourceMetalSold,
-                TotalMineralSold = TodayMineralSold + totalMineralSold,
-                TotalCraftingSold = TodayCraftingSold + totalCraftingSold,
-                TotalCookingSold = TodayCookingSold + totalCookingSold,
-                TotalFishSold = TodayFishSold + totalFishSold,
-                TotalGemSold = TodayGemSold + totalGemSold
-            };
-            if (Game1.IsMasterGame)
-            {
-                this.Helper.Data.WriteSaveData("MT.MailLog", dataToSave);
-                new MailLoader(SHelper);
-            }
+            EndOfDaySave();
 
             // Island logic
             GameLocation locat = Game1.getLocationFromName("Custom_MT_Island");
@@ -982,7 +822,10 @@ namespace MarketTown
 
             if (e.IsMultipleOf(30))
             {
-                PlayerChat playerChatInstance = new PlayerChat();
+                if (playerChatInstance == null)
+                {
+                    playerChatInstance = new PlayerChat();
+                }
                 playerChatInstance.Validate();
             }
         }
@@ -1072,7 +915,6 @@ namespace MarketTown
         private void OnTimeChange(object sender, TimeChangedEventArgs e)
         {
             Random random = new Random();
-
 
             if ( Game1.timeOfDay % 200 == 0)
             {
@@ -1345,29 +1187,9 @@ namespace MarketTown
                     {
                         TodayMuseumVisitor++;
 
-                        if (Game1.hasLoadedGame && Game1.player.useSeparateWallets && Config.MultiplayerMode)
-                        {
-                            List<Farmer> onlineFarmers = new List<Farmer>();
+                        AddToPlayerFunds((int)(10 * ticketValue * Config.MuseumPriceMarkup));
+                        TodayMuseumEarning += (int)(10 * ticketValue * Config.MuseumPriceMarkup);
 
-                            foreach (Farmer farmer in Game1.getOnlineFarmers())
-                            {
-                                onlineFarmers.Add(farmer);
-                            }
-
-                            int moneyToAddPerPlayer = (int)((10 * ticketValue * Config.MuseumPriceMarkup) / onlineFarmers.Count);
-
-                            foreach (Farmer farmer in onlineFarmers)
-                            {
-                                farmer.Money += moneyToAddPerPlayer;
-                            }
-                            TodayMuseumEarning += (int)(10 * ticketValue * Config.MuseumPriceMarkup);
-                            onlineFarmers.Clear();
-                        }
-                        else
-                        {
-                            TodayMuseumEarning += (int)(10 * ticketValue * Config.MuseumPriceMarkup);
-                            Game1.player.Money += (int)(10 * ticketValue * Config.MuseumPriceMarkup);
-                        }
                     }
                     else if (random.NextDouble() < Config.TableSit)
                     {
@@ -1795,26 +1617,6 @@ namespace MarketTown
 
                             UpdateCount(food.foodObject.Category);
 
-                            // *****************************************************************************************************************************************************
-                            //if (Game1.hasLoadedGame && Game1.player.useSeparateWallets && Config.MultiplayerMode)
-                            //{
-                            //    List<Farmer> onlineFarmers = new List<Farmer>();
-
-                            //    foreach (Farmer farmer in Game1.getOnlineFarmers())
-                            //    {
-                            //        onlineFarmers.Add(farmer);
-                            //    }
-
-                            //    int moneyToAddPerPlayer = (int)((salePrice + tip) / onlineFarmers.Count);
-
-                            //    foreach (Farmer farmer in onlineFarmers)
-                            //    {
-                            //        farmer.Money += moneyToAddPerPlayer;
-                            //    }
-                            //    onlineFarmers.Clear();
-                            //}
-                            //else Game1.player.Money += salePrice + tip;
-
                             AddToPlayerFunds(salePrice + tip);
 
 
@@ -1875,25 +1677,8 @@ namespace MarketTown
                             SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
 
                             if (!Config.DisableChatAll) NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.soldclothesText." + rand.Next(7).ToString()));
-
-                            if (Game1.hasLoadedGame && Game1.player.useSeparateWallets && Config.MultiplayerMode)
-                            {
-                                List<Farmer> onlineFarmers = new List<Farmer>();
-
-                                foreach (Farmer farmer in Game1.getOnlineFarmers())
-                                {
-                                    onlineFarmers.Add(farmer);
-                                }
-
-                                int moneyToAddPerPlayer = (int)((salePrice) / onlineFarmers.Count);
-
-                                foreach (Farmer farmer in onlineFarmers)
-                                {
-                                    farmer.Money += moneyToAddPerPlayer;
-                                }
-                                onlineFarmers.Clear();
-                            }
-                            else Game1.player.Money += salePrice;
+          
+                            AddToPlayerFunds(salePrice);
 
                             __instance.modData["hapyke.FoodStore/LastFood"] = Game1.timeOfDay.ToString();
                             __instance.modData["hapyke.FoodStore/LastFoodTaste"] = "-1";
