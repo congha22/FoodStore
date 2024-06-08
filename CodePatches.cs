@@ -387,7 +387,7 @@ namespace MarketTown
             catch { }
 
             //Get taste and decoration score, call to SaySomething for __instance to send bubble text
-            if (random.NextDouble() < 10.033 && !Game1.eventUp && __instanceLocation is not null && !WantsToEat(__instance)
+            if (random.NextDouble() < 0.1 && !Game1.eventUp && __instanceLocation is not null && !WantsToEat(__instance)
                 && Microsoft.Xna.Framework.Vector2.Distance(__instance.Tile, Game1.player.Tile) < 15
                 && __instance.modData["hapyke.FoodStore/LastFoodTaste"] != "-1" && Config.EnableDecor && !Config.DisableChatAll)
             {
@@ -445,28 +445,28 @@ namespace MarketTown
 
                 if (lastTaste == 0) //love
                 {
-                    NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.love." + randomIndex));
-                    if (shareIdea < 0.3 + (lastDecor / 2)) SaySomething(__instance, __instanceLocation, lastTasteRate, lastDecorRate);
+                    if (shareIdea < 0.4 + (lastDecor / 2)) SaySomething(__instance, __instanceLocation, lastTasteRate, lastDecorRate);
+                    else NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.love." + randomIndex));
                 }
                 else if (lastTaste == 2) //like
                 {
-                    NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.like." + randomIndex));
-                    if (shareIdea < 0.15 + (lastDecor / 2)) SaySomething(__instance, __instanceLocation, lastTasteRate, lastDecorRate);
+                    if (shareIdea < 0.3 + (lastDecor / 2)) SaySomething(__instance, __instanceLocation, lastTasteRate, lastDecorRate);
+                    else NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.like." + randomIndex));
                 }
                 else if (lastTaste == 4) //dislike
                 {
-                    NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.dislike." + randomIndex));
-                    if (shareIdea < Math.Abs(-0.15 + (lastDecor / 2.5))) SaySomething(__instance, __instanceLocation, lastTasteRate, lastDecorRate);
+                    if (shareIdea < Math.Abs(-0.2 + (lastDecor / 2.5))) SaySomething(__instance, __instanceLocation, lastTasteRate, lastDecorRate);
+                    else NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.dislike." + randomIndex));
                 }
                 else if (lastTaste == 6) //hate
                 {
-                    NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.hate." + randomIndex));
                     if (shareIdea < Math.Abs(-0.3 + (lastDecor / 2.5))) SaySomething(__instance, __instanceLocation, lastTasteRate, lastDecorRate);
+                    else NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.hate." + randomIndex));
                 }
                 else if (lastTaste == 8) //neutral
                 {
-                    NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.neutral." + randomIndex));
-                    if (shareIdea < Math.Abs(lastDecor / 2.5)) SaySomething(__instance, __instanceLocation, lastTasteRate, lastDecorRate);
+                    if (shareIdea < 0.15 + (lastDecor / 2.5)) SaySomething(__instance, __instanceLocation, lastTasteRate, lastDecorRate);
+                    else NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.neutral." + randomIndex));
                 }
                 else { }
             }
@@ -485,7 +485,7 @@ namespace MarketTown
                 || __instance.Tile.Y < 0)
                 )
             {
-                SMonitor.Log("OFF MAP " + __instance.Name + __instance.Tile + __instanceLocation.Name, LogLevel.Warn);
+                SMonitor.Log("NPC OFF MAP " + __instance.Name + __instance.Tile + __instanceLocation.Name, LogLevel.Error);
             }
 
             foreach (var pair in validBuildingObjectPairs)
