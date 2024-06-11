@@ -2,11 +2,18 @@
     "Format": "2.0.0",
     "Changes": [
         // add item
+      //load the image for new items
+		{
+			"Action" : "Load",
+			"Target": "Mods/d5a1lamdtd.MarketTown.Item/RestaurantDecor",
+        	"FromFile": "assets/RestaurantDecor.png"
+		},
+
       {
           "Action": "EditData",
           "Target": "Data/Furniture",
           "Entries": {
-            "MT.Objects.ASD": "ASD/decor/-1/-1/1/1000/-1/ASD/0/{{InternalAssetKey: assets/ASD.png}}"
+            "MT.Objects.RestaurantDecor": "Restaurant Decor/decor/2 2/1 1/1/300/-1/Restaurant Decor/0/Mods\\d5a1lamdtd.MarketTown.Item\\RestaurantDecor/true"
           }
         },
 

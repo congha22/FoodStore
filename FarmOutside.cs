@@ -320,7 +320,6 @@ namespace MarketTown
 
                 if (initSche == null || initSche == "") return false;
 
-                Console.WriteLine(npc.Name + initSche);
                 ModEntry.ResetErrorNpc(npc);
                 npc.TryLoadSchedule("default", initSche);
                 return true;

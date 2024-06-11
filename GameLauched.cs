@@ -38,6 +38,8 @@ using StardewValley.Pathfinding;
 using System.Runtime.CompilerServices;
 using StardewValley.Characters;
 using SpaceCore.UI;
+using StardewValley.GameData.FarmAnimals;
+using StardewValley.Locations;
 
 namespace MarketTown
 {
@@ -114,6 +116,25 @@ namespace MarketTown
                 postfix: new HarmonyMethod(typeof(ModEntry), nameof(LoadDescription_Postfix))
             );
 
+
+            harmony.Patch(
+                original: AccessTools.Method(typeof(FarmAnimal), "getSellPrice"),
+                postfix: new HarmonyMethod(typeof(ModEntry), nameof(GetSellPrice_Postfix))
+            );
+
+            harmony.Patch(
+                original: AccessTools.Method(typeof(FarmAnimal), "GetCursorPetBoundingBox"),
+                postfix: new HarmonyMethod(typeof(ModEntry), nameof(GetCursorPetBoundingBox_Postfix))
+            );
+
+            harmony.Patch(
+                original: AccessTools.Method(typeof(PurchaseAnimalsMenu), "setUpForReturnToShopMenu"),
+                postfix: new HarmonyMethod(typeof(ModEntry), nameof(SetUpForReturnToIslandAfterLivestockPurchase))
+            );
+            harmony.Patch(
+               original: AccessTools.Method(typeof(PurchaseAnimalsMenu), "setUpForReturnAfterPurchasingAnimal"),
+               postfix: new HarmonyMethod(typeof(ModEntry), nameof(SetUpForReturnToIslandAfterLivestockPurchase))
+           );
             //harmony.Patch(original: AccessTools.Method(typeof(StardewValley.Objects.Furniture), nameof(StardewValley.Objects.Furniture.clicked)),
             //              prefix: new HarmonyMethod(typeof(FurniturePatches), nameof(FurniturePatches.clicked_Prefix)));
             //harmony.Patch(original: AccessTools.Method(typeof(StardewValley.Objects.Furniture), nameof(StardewValley.Objects.Furniture.performObjectDropInAction)),
@@ -226,6 +247,8 @@ namespace MarketTown
                     var islandBrazier = locat.getObjectAtTile(22, 36);
                     if (locat == null || islandBrazier == null || islandBrazier.ItemId == null || islandBrazier.ItemId != "MT.Objects.ParadiseIslandBrazier" || !islandBrazier.IsOn)
                         return new[] { "-1" };
+
+                    if (!Config.IslandProgress) islandProgressLevel = "3";
 
                     return new[] { islandProgressLevel };
                 }
@@ -828,12 +851,29 @@ namespace MarketTown
             if (Game1.currentLocation is null) return;
             if (!e.Button.IsActionButton()) return;
             if (Game1.player.currentLocation.Name != "Custom_MT_Island") return;
-            var tile = e.Cursor.Tile;
-            if (tile.X < 66 || tile.X > 68 || tile.Y < 19 || tile.Y > 21) return;
-            var player = Game1.player.Tile;
-            if (player.X < 65 || player.X > 69 || player.Y < 18 || player.Y > 22) return;
 
-            OnActionButton(e);
+            var tile = e.Cursor.Tile;
+            var player = Game1.player.Tile;
+
+            if (tile.X > 65 && tile.X < 69 && tile.Y < 22 && tile.Y > 18 && player.X > 64 && player.X < 70 && player.Y > 17 && player.Y < 23)
+                OnActionButton(e);
+            else if (tile.X > 52 && tile.X < 58 && tile.Y < 19 && tile.Y > 14 && player.X > 51 && player.X < 59 && player.Y > 13 && player.Y < 20
+                && Game1.timeOfDay >= Config.FestivalTimeStart && Game1.timeOfDay <= Config.FestivalTimeEnd)
+            {
+
+                GameLocation island = Game1.getLocationFromName("Custom_MT_Island");
+                Layer buildings1Layer = island.map.GetLayer("Buildings1");
+
+                Location pixelPosition = new Location(54 * Game1.tileSize, 18 * Game1.tileSize);
+                if (buildings1Layer != null && buildings1Layer.PickTile(pixelPosition, Game1.viewport.Size) != null)
+                {
+                    var tileProperty = buildings1Layer.PickTile(pixelPosition, Game1.viewport.Size).TileSheet.Id;
+                    if (tileProperty == "z_marnie2")
+                    {
+                        Game1.currentLocation.ShowAnimalShopMenu();
+                    }
+                }
+            }
         }
 
         internal void OnActionButton(ButtonPressedEventArgs e)
@@ -1009,13 +1049,15 @@ namespace MarketTown
         {
             if (!Game1.hasLoadedGame) return;
 
-            foreach (var x in Utility.getAllVillagers())
-            {
-                if (x.Name.Contains("MT.Guest_"))
-                {
-                    Game1.player.friendshipData.Remove(x.Name);
-                }
-            }
+            //--------------------------------------------------------------------------------------------------------------------------------------------------
+            //Game1.chatBox.addInfoMessage(e.NewMenu.ToString());
+            //foreach (var x in Utility.getAllVillagers())
+            //{
+            //    if (x.Name.Contains("MT.Guest_"))
+            //    {
+            //        Game1.player.friendshipData.Remove(x.Name);
+            //    }
+            //}
 
             if (e.NewMenu is ShopMenu shop)
             {
@@ -1048,10 +1090,10 @@ namespace MarketTown
                         return false;
                     };
                 }
-
             }
         }
 
+        // Check for Shop after Content Patcher patch the map, then generate shop stock and shop owner schedule
         private void SetupShop(bool init)
         {
             if (init)
@@ -1104,7 +1146,6 @@ namespace MarketTown
 
                 GameLocation island = Game1.getLocationFromName("Custom_MT_Island");
                 Layer buildings1Layer = island.map.GetLayer("Buildings1");
-                Layer buildingsLayer = island.map.GetLayer("Buildings");
 
 
                 foreach (var tile in shopLocations)
@@ -1113,79 +1154,93 @@ namespace MarketTown
                     if (buildings1Layer != null && buildings1Layer.PickTile(pixelPosition, Game1.viewport.Size) != null)
                     {
                         var tileProperty = buildings1Layer.PickTile(pixelPosition, Game1.viewport.Size).TileSheet.Id;
-                        if (shopName.ContainsKey(tileProperty.ToString()))
+
+                        // if is Marnie livestock shop
+                        if (tileProperty == "z_marnie2") SetUpMarnieLivestockShop();
+
+                        // if is normal shop
+                        if (shopName.ContainsKey(tileProperty))
                         {
                             for (int i = (int)tile.X; i <= (int)tile.X + 2; i++)
                             {
                                 for (int j = (int)tile.Y - 2; j <= (int)tile.Y; j++)
                                 {
-                                    OpenShopTile.Add(new Vector2(i, j), shopName[tileProperty.ToString()]);
+                                    OpenShopTile.Add(new Vector2(i, j), shopName[tileProperty]);
                                 }
                             }
 
-                            GenerateShop(shopName[tileProperty.ToString()], tile);
-                            SetupChest(shopName[tileProperty.ToString()], tile);
-                            Monitor.Log($"Opening {shopName[tileProperty.ToString()]}", LogLevel.Warn);
+                            GenerateShop(shopName[tileProperty], tile);
+                            SetupChest(shopName[tileProperty], tile);
+                            Monitor.Log($"Opening {shopName[tileProperty]}", LogLevel.Trace);
                         }
                     }
                 }
             }
         }
 
-        private void SetVisitorSchedule()
+        private void SetVisitorSchedule(NPC npc)
         {
             Random random = new Random();
-            foreach (var npcName in IslandNPCList)
+            var locat = Game1.getLocationFromName("Custom_MT_Island");
+
+            if (npc == null || locat == null) return;
+
+            int lastScheduleTime = Config.FestivalTimeStart;
+            int[] weightedNumbers = { 1, 1, 1, 2, 2, 2, 2, 3, 3 };
+            int[] weightedFacing = { 0, 0, 0, 0, 0, 1, 2, 3 };
+
+            var initSche = "";
+            int finalFace = 0;
+
+            Dictionary<int, SchedulePathDescription> schedule = npc.Schedule;
+            if (schedule != null)
             {
-                NPC npc = Game1.getCharacterFromName(npcName);
-                var locat = Game1.getLocationFromName("Custom_MT_Island");
-
-                if (npc == null || locat == null) continue;
-                int lastScheduleTime = Config.FestivalTimeStart;
-                int[] weightedNumbers = { 1, 1, 1, 2, 2, 2, 2, 3, 3 };
-                int[] weightedFacing = { 0,0,0,0,0,1,2,3 };
-
-                var initSche = "";
-                int finalFace = 0;
-
-                Dictionary<int, SchedulePathDescription> schedule = npc.Schedule;
-                if (schedule != null)
+                foreach (KeyValuePair<int, SchedulePathDescription> kvp in schedule)
                 {
-                    foreach (KeyValuePair<int, SchedulePathDescription> kvp in schedule)
-                    {
-                        SchedulePathDescription description = kvp.Value;
-                        string time = kvp.Key.ToString();
-                        string endLocation = description.targetLocationName;
-                        string endX = description.targetTile.X.ToString();
-                        string endY = description.targetTile.Y.ToString();
-                        string endDirection = description.facingDirection.ToString();
+                    SchedulePathDescription description = kvp.Value;
+                    string time = kvp.Key.ToString();
+                    string endLocation = description.targetLocationName;
+                    string endX = description.targetTile.X.ToString();
+                    string endY = description.targetTile.Y.ToString();
+                    string endDirection = description.facingDirection.ToString();
 
-                        initSche += $"{time} {endLocation} {endX} {endY} {endDirection}/";
-                        lastScheduleTime = Int32.Parse(time);
-                    }
+                    initSche += $"{time} {endLocation} {endX} {endY} {endDirection}/";
+                    lastScheduleTime = Int32.Parse(time);
                 }
-
-                while (lastScheduleTime < Config.FestivalTimeEnd)
-                {
-                    MarketShopData randomShop = TodayShopInventory.Count > 0 ? TodayShopInventory[random.Next(TodayShopInventory.Count)] : null;
-
-                    Vector2 availableTile = randomShop.Tile + new Vector2(random.Next(0, 4) - 1, 1);
-                    if (random.NextDouble() < 0.25)
-                    {
-                        var otherTile = FarmOutside.getRandomOpenPointInFarm(npc, npc.currentLocation, false).ToVector2();
-                        if (Utility.distance(67, otherTile.X, 20, otherTile.Y) < 25)
-                        {
-                            availableTile = otherTile;
-                            finalFace = random.Next(1, 4);
-                        }
-                    }
-                    int storeScheduleTime = ConvertToHour(lastScheduleTime + weightedNumbers[random.Next(weightedNumbers.Length)] * 10);
-                    initSche += $"{storeScheduleTime} Custom_MT_Island {availableTile.X} {availableTile.Y} {finalFace}/ ";
-
-                    lastScheduleTime = storeScheduleTime;
-                }
-                npc.TryLoadSchedule("default", initSche);
             }
+
+            if (npc.modData["hapyke.FoodStore/shopOwnerToday"] != "-1,-1")
+            {
+                string[] components = npc.modData["hapyke.FoodStore/shopOwnerToday"].Split(',');
+                var shopStandTile = new Vector2(Int32.Parse(components[0]), Int32.Parse(components[1]));
+
+                initSche += $"{Config.FestivalTimeStart} Custom_MT_Island {shopStandTile.X} {shopStandTile.Y} 2/";
+                npc.TryLoadSchedule("default", initSche);
+
+                return;
+
+            }
+
+            while (lastScheduleTime < Config.FestivalTimeEnd)
+            {
+                MarketShopData randomShop = TodayShopInventory.Count > 0 ? TodayShopInventory[random.Next(TodayShopInventory.Count)] : null;
+
+                Vector2 availableTile = randomShop.Tile + new Vector2(random.Next(0, 4) - 1, 1);
+                if (random.NextDouble() < 0.25)
+                {
+                    var otherTile = FarmOutside.getRandomOpenPointInFarm(npc, npc.currentLocation, false).ToVector2();
+                    if (Utility.distance(67, otherTile.X, 20, otherTile.Y) < 25)
+                    {
+                        availableTile = otherTile;
+                        finalFace = random.Next(1, 4);
+                    }
+                }
+                int storeScheduleTime = ConvertToHour(lastScheduleTime + weightedNumbers[random.Next(weightedNumbers.Length)] * 10);
+                initSche += $"{storeScheduleTime} Custom_MT_Island {availableTile.X} {availableTile.Y} {finalFace}/ ";
+
+                lastScheduleTime = storeScheduleTime;
+            }
+            npc.TryLoadSchedule("default", initSche);
         }
 
 
@@ -1246,6 +1301,12 @@ namespace MarketTown
                 if (!endDay) Game1.addHUDMessage(new HUDMessage(SHelper.Translation.Get("foodstore.festival.end")));
                 if (endDay) TodayShopInventory.Clear();
             } catch { }
+
+            foreach ( var islandVisitorName in IslandNPCList)
+            {
+                NPC npc = Game1.getCharacterFromName(islandVisitorName);
+                if (npc != null) npc.modData["hapyke.FoodStore/shopOwnerToday"] = "-1,-1";
+            }
         }
 
         private void SetupChest(string name, Vector2 tile)
@@ -2233,6 +2294,62 @@ namespace MarketTown
             {
                 SHelper.Data.WriteSaveData("MT.MailLog", dataToSave);
                 new MailLoader(SHelper);
+            }
+        }
+
+        public static void SetUpMarnieLivestockShop()
+        {
+            SMonitor.Log("Opening Marnie Livestock shop", LogLevel.Trace);
+
+            GameLocation island = Game1.getLocationFromName("Custom_MT_Island");
+            var thisNpc = new NPC();
+
+            if (!Config.VisitorClone)
+            {
+                thisNpc = Game1.getCharacterFromName("Marnie");
+                if (!IslandNPCList.Contains("Marnie")) IslandNPCList.Add("Marnie");
+            }
+            else
+            {
+                thisNpc = Game1.getCharacterFromName("MT.Guest_Marnie");
+                if (!IslandNPCList.Contains("MT.Guest_Marnie")) IslandNPCList.Add("MT.Guest_Marnie");
+            }
+            thisNpc.modData["hapyke.FoodStore/shopOwnerToday"] = "57,18";
+
+            TodayShopInventory.Add(new MarketShopData("z_marnie2", new(54, 18), new List<string>()));
+
+            if (Game1.random.NextDouble() < 0.75)
+            {
+                List<string> animalType = new List<string> { "Brown Cow", "White Cow", "Blue Chicken", "Brown Chicken", "White Chicken", "Duck", "Goat", "Pig", "Rabbit", "Sheep" };
+                island.Animals.Add(-999, new FarmAnimal(animalType[Game1.random.Next(animalType.Count)], -999, -999));
+                island.Animals.Add(-998, new FarmAnimal(animalType[Game1.random.Next(animalType.Count)], -998, -999));
+
+
+                var animalInstance1 = Utility.getAnimal(-999);
+                animalInstance1.modData["hapyke.FoodStore/isFakeAnimal"] = "true";
+                animalInstance1.setTileLocation(new Vector2(54, 17));
+
+                var animalInstance2 = Utility.getAnimal(-998);
+                animalInstance2.modData["hapyke.FoodStore/isFakeAnimal"] = "true";
+                animalInstance2.setTileLocation(new Vector2(56, 17));
+            }
+            else
+            {
+                List<string> animalType = new List<string> { "Blue Chicken", "Brown Chicken", "White Chicken", "Duck" };
+                List<Vector2> animalTile = new List<Vector2> { new(54, 17), new(55, 17), new(56, 17), new(54, 16), new(55, 16), new(56, 16) };
+                int count = 0;
+                while (count < 6)
+                {
+                    int id = -999 + count;
+
+                    island.Animals.Add(id, new FarmAnimal(animalType[Game1.random.Next(animalType.Count)], id, -999));
+
+                    var animalInstance1 = Utility.getAnimal(id);
+                    animalInstance1.modData["hapyke.FoodStore/isFakeAnimal"] = "true";
+                    animalInstance1.setTileLocation(animalTile[count]);
+
+                    count++;
+                }
             }
         }
     }

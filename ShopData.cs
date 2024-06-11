@@ -19,7 +19,6 @@ namespace MarketTown
 
         public static void GenerateShop(string shopId, Vector2 tile)
         {
-
             ShopsJsonData.Clear();
             ShopsJsonData = ModEntry.Instance.Helper.ModContent.Load<IDictionary<string, List<string>>>("assets/MarketTownShops.json");
 
@@ -58,6 +57,56 @@ namespace MarketTown
                 "MarketTown.weaponsShop"       // PREFER: WEAPON, MONSTER
             };
 
+            Dictionary<string, string> shopOwner = new Dictionary<string, string>
+            {
+                {"MarketTown.bluemoonShop", "Sophia"  },
+                {"MarketTown.clintShop",    "Clint"  },
+                {"MarketTown.emeraldShop",  "Susan"  },
+                {"MarketTown.emilyShop",    "Emily"  },
+                {"MarketTown.evelynShop",   "Evelyn"  },
+                {"MarketTown.fairhavenShop","Andy"  },
+                {"MarketTown.fishShop",     "Willy"  },
+                {"MarketTown.guntherShop",  "Gunther"  },
+                {"MarketTown.haleyShop",    "Haley"  },
+                {"MarketTown.harveyShop",   "Harvey"  },
+                {"MarketTown.hatsShop",     ""  },
+                {"MarketTown.heapsShop",    "Lorenzo"  },
+                {"MarketTown.jodiShop",     "Jodi"  },
+                {"MarketTown.jvShop",       "Jas"  },
+                {"MarketTown.labShop",      "Demetrius"  },
+                {"MarketTown.leahShop",     "Leah"  },
+                {"MarketTown.linusShop",    "Linus"  },
+                {"MarketTown.marnieShop",   "Marnie"  },
+                {"MarketTown.pikaShop",     "Pika"  },
+                {"MarketTown.primeShop",    "Pierre"  },
+                {"MarketTown.quillShop",    "Elliott"  },
+                {"MarketTown.roboshackShop","Maru"  },
+                {"MarketTown.rockShop",     "Sam"  },
+                {"MarketTown.saloonShop",   "Gus"  },
+                {"MarketTown.serrupShop",   ""  },
+                {"MarketTown.teaShop",      "Caroline"  },
+                {"MarketTown.weaponsShop",  "Marlon"  }    
+            };
+            
+            // Set shop owner tile
+            if (shopOwner.TryGetValue(shopId, out string owner) && owner != null && owner != "" )
+            {
+                var thisNPC = new NPC();
+
+                if (!Config.VisitorClone && Game1.getCharacterFromName(owner) != null)
+                {
+                    thisNPC = Game1.getCharacterFromName(owner);
+                    if (!IslandNPCList.Contains(owner)) IslandNPCList.Add(owner);
+                }
+                else if (Game1.getCharacterFromName("MT.Guest_" + owner) != null)
+                {
+                    thisNPC = Game1.getCharacterFromName("MT.Guest_" + owner);
+                    if (!IslandNPCList.Contains("MT.Guest_" + owner) ) IslandNPCList.Add("MT.Guest_" + owner);
+                }
+
+                thisNPC.modData["hapyke.FoodStore/shopOwnerToday"] = $"{(tile + new Vector2(3, -1)).X}, {(tile + new Vector2(3, -1)).Y}";
+            }
+
             Dictionary<string, List<string>> shopLists = new Dictionary<string, List<string>>();
 
             foreach (var name in shopNames)
@@ -66,6 +115,7 @@ namespace MarketTown
                 shopLists[name] = ShopsJsonData[name];
             }
 
+            // This will add all items in a specified CATEGORY to the possible shop stock
             foreach (var x in shopLists)
             {
                 IEnumerable<string> categoryKeyElements = x.Value.Where(element => element.StartsWith("CATEGORYKEY"));
@@ -154,9 +204,6 @@ namespace MarketTown
                 shopLists["MarketTown.emilyShop"].Add("(S)" + obj.Key);
             }
 
-            bool isLoadedSVE = SHelper.ModRegistry.IsLoaded("FlashShifter.SVECode");
-            bool isLoadedRSV = SHelper.ModRegistry.IsLoaded("Rafseazz.RidgesideVillage");
-
             List<string> initShopStockList = new List<string>();
             foreach (var shop in StardewValley.DataLoader.Shops(Game1.content))
             {
@@ -166,19 +213,27 @@ namespace MarketTown
                     int i = 1;
                     int tried = 0;
                     Console.WriteLine(shopId);
-                    while (i <= shopLists[shopId].Count && i <= 9 && tried <= 15)
+                    while (i <= shopLists[shopId].Count && i <= 9 && tried <= 18)
                     {
                         var randomItemId = shopLists[shopId][Game1.random.Next(shopLists[shopId].Count)];
                         if (randomItemId.Contains("CATEGORYKEY")) { tried++; continue; }
 
                         var salePrice = 100;
 
-                        salePrice = ItemRegistry.Create<Item>(randomItemId).sellToStorePrice();
+                        // try to create the item and add it to the shop stock if item is valid
+                        var realItem = ItemRegistry.Create<Item>(randomItemId, default, default, true);
+                        if (realItem == null)
+                        {
+                            tried++;
+                            continue;
+                        }
+
+                        salePrice = realItem.sellToStorePrice();
                         if (0 < salePrice && salePrice < 10) salePrice *= 15;
                         else if (10 <= salePrice && salePrice < 20) salePrice *= 10;
                         else if (salePrice <= 0)
                         {
-                            salePrice = ItemRegistry.Create<Item>(randomItemId).salePrice();
+                            salePrice = realItem.salePrice();
                             if (0 < salePrice && salePrice < 10) salePrice *= 10;
                             else if (10 <= salePrice && salePrice < 20) salePrice *= 7;
                             else if (salePrice <= 0) salePrice = Game1.random.Next(200, 1000);

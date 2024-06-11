@@ -2,16 +2,16 @@
   // ******** THIS IS THE LIST OF AVAILABLE ITEM IN SHOP *********
 
 
-  // YOU CAN CUSTOMIZE YOUR SHOP STOCK BY ADDING OR REMOVING 
+  // YOU CAN CUSTOMIZE YOUR SHOP STOCK BY ADDING OR REMOVING VALUE
 
   // TO ADD ITEM, GET THE ITEM ID AND ADD IT TO THE LIST
   //      For example: "(O)200", "(F)FancyHousePlant3", "(O)Custom_Mod_Item"
-  // TO ADD ALL ITEM IN A CATEGORY, USING THE CATEGORY ID
+  // TO ADD ALL ITEMS IN A CATEGORY, USING THE CATEGORY ID
   //      For example: use "CATEGORYKEY-7" to add all cooking item 
 
 
   // ITEM ID and CATEGORY ID can be get by enabling CONFIG "GET ITEMS ID?" under tab "ADVANCE"
-  // After enable the CONFIG, a file named _items_by_category.json will be added in the game folder ( .../StardewValley ) 
+  // After enable the CONFIG, a file named _items_by_category.json will be added in the game folder ( .../StardewValley/_items_by_category.json ) 
   //      which are the folder ABOVE the Mods folder
 
 
@@ -39,7 +39,7 @@
 
                 "(F)1301","(F)1302","(F)1303",
 
-                // d5a1.lamdtd.MarketTown
+                // d5a1lamdtd.MarketTown
                 "(O)MT.Objects.MarketLicense", "(O)MT.Objects.RestaurantLicense", "(O)MT.Objects.MuseumLicense", "(O)MT.Objects.InviteLetter",  "(O)MT.Objects.CustomerNote"
   ],
 

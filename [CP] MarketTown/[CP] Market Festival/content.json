@@ -15,7 +15,7 @@
       },{
       "Action": "EditMap",
       "Target": "Maps/Custom_MT_Island",
-      "FromFile": "assets/_market_{{Random:fish, linus, marnie, saloon}}.tmx",
+      "FromFile": "assets/_market_{{Random:rock, linus, saloon}}.tmx",
       "PatchMode": "Overlay",
       "FromArea": {"X": 0, "Y": 0, "Width": 5, "Height": 5},
       "ToArea": {"X": 59, "Y": 21, "Width": 5, "Height": 5},
@@ -37,7 +37,7 @@
     },{
       "Action": "EditMap",
       "Target": "Maps/Custom_MT_Island",
-      "FromFile": "assets/_market_{{Random:rock, tea, weapon}}.tmx",
+      "FromFile": "assets/_market_{{Random: marnie, marnie2, tea, weapon}}.tmx",
       "PatchMode": "Overlay",
       "FromArea": {"X": 0, "Y": 0, "Width": 5, "Height": 5},
       "ToArea": {"X": 53, "Y": 15, "Width": 5, "Height": 5},
@@ -103,7 +103,7 @@
     },{
       "Action": "EditMap",
       "Target": "Maps/Custom_MT_Island",
-      "FromFile": "assets/_market_{{Random:quill, roboshack}}.tmx",
+      "FromFile": "assets/_market_{{Random:fish, quill, roboshack}}.tmx",
       "PatchMode": "Overlay",
       "FromArea": {"X": 0, "Y": 0, "Width": 5, "Height": 5},
       "ToArea": {"X": 65, "Y": 13, "Width": 5, "Height": 5},

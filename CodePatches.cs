@@ -15,6 +15,7 @@ using StardewValley.GameData.LocationContexts;
 using StardewValley.GameData.Shops;
 using StardewValley.GameData.SpecialOrders;
 using StardewValley.Locations;
+using StardewValley.Menus;
 using StardewValley.Network;
 using StardewValley.Objects;
 using StardewValley.Pathfinding;
@@ -56,6 +57,7 @@ namespace MarketTown
             __instance.modData["hapyke.FoodStore/stuckCounter"] = "0";
             __instance.modData["hapyke.FoodStore/festivalLastPurchase"] = "600";
             __instance.modData["hapyke.FoodStore/specialOrder"] = "-1,-1";
+            __instance.modData["hapyke.FoodStore/shopOwnerToday"] = "-1,-1";
 
         }
 
@@ -94,7 +96,7 @@ namespace MarketTown
                 double nextVisitChance = random.NextDouble();
 
                 // if npc is on the island
-                if (__instanceLocation.Name == "Custom_MT_Island" )
+                if (__instanceLocation.Name == "Custom_MT_Island" && __instance.modData["hapyke.FoodStore/shopOwnerToday"] == "-1,-1")
                 {
                     if (nextVisitChance < 0.75) // walk around on the island
                     {
@@ -387,7 +389,7 @@ namespace MarketTown
             catch { }
 
             //Get taste and decoration score, call to SaySomething for __instance to send bubble text
-            if (random.NextDouble() < 10.033 && !Game1.eventUp && __instanceLocation is not null && !WantsToEat(__instance)
+            if (random.NextDouble() < 0.033 && !Game1.eventUp && __instanceLocation is not null && !WantsToEat(__instance)
                 && Microsoft.Xna.Framework.Vector2.Distance(__instance.Tile, Game1.player.Tile) < 15
                 && __instance.modData["hapyke.FoodStore/LastFoodTaste"] != "-1" && Config.EnableDecor && !Config.DisableChatAll)
             {
@@ -475,7 +477,6 @@ namespace MarketTown
             //Fix position, do eating food
             if (Game1.eventUp || __instance is null || __instanceLocation is null || !__instance.IsVillager || !WantsToEat(__instance))
                 return;
-
 
             // ****************************************************************************************************************************
             if ( __instance.currentLocation.Name != __instance.DefaultMap
@@ -574,7 +575,8 @@ namespace MarketTown
 
                 //Control NPC walking to the food
                 string text = "";
-                if ((npc.IsVillager && npc.getMasterScheduleRawData() != null || npc.Name.Contains("MT.Guest_")) && npc.queuedSchedulePaths.Count == 0)
+                if ( (npc.IsVillager && npc.getMasterScheduleRawData() != null || npc.Name.Contains("MT.Guest_"))
+                    && npc.queuedSchedulePaths.Count == 0 && npc.modData["hapyke.FoodStore/shopOwnerToday"] == "-1,-1" )
                 {
                     double moveToFoodChance = Config.MoveToFoodChance;
                     try
@@ -663,7 +665,6 @@ namespace MarketTown
                                     Game1.chatBox.addInfoMessage(text);
                                     MyMessage messageToSend = new MyMessage(text);
                                     SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
-
                                 }
 
                                 npc.modData["hapyke.FoodStore/LastCheck"] = Game1.timeOfDay.ToString();
@@ -1141,6 +1142,47 @@ namespace MarketTown
             {
                 __result = "Customers would love to sit at the table with this lovely decoration!";
             }
+        }
+
+        public static void GetSellPrice_Postfix(ref int __result, FarmAnimal __instance)
+        {
+            if (__instance.modData != null &&
+                __instance.modData.TryGetValue("hapyke.FoodStore/isFakeAnimal", out string isFakeAnimal) &&
+                isFakeAnimal != null &&
+                isFakeAnimal == "true")
+            {
+                __result = 0;
+            }
+        }
+
+        public static void GetCursorPetBoundingBox_Postfix(ref Microsoft.Xna.Framework.Rectangle __result, FarmAnimal __instance)
+        {
+            if (__instance.modData != null &&
+                __instance.modData.TryGetValue("hapyke.FoodStore/isFakeAnimal", out string isFakeAnimal) &&
+                isFakeAnimal != null &&
+                isFakeAnimal == "true")
+            {
+                __result = Microsoft.Xna.Framework.Rectangle.Empty;
+            }
+        }
+
+        public static void SetUpForReturnToIslandAfterLivestockPurchase(PurchaseAnimalsMenu __instance)
+        {
+            if (Game1.player.currentLocation.Name != "Custom_MT_Island") return;
+
+            LocationRequest locationRequest = Game1.getLocationRequest("Custom_MT_Island");
+            locationRequest.OnWarp += delegate
+            {
+                __instance.onFarm = false;
+                Game1.player.viewingLocation.Value = null;
+                Game1.displayHUD = true;
+                Game1.viewportFreeze = false;
+                __instance.namingAnimal = false;
+                __instance.textBox.OnEnterPressed -= __instance.textBoxEvent;
+                __instance.textBox.Selected = false;
+                Game1.exitActiveMenu();
+            };
+            Game1.warpFarmer(locationRequest, Game1.player.TilePoint.X, Game1.player.TilePoint.Y, Game1.player.FacingDirection);
         }
     }
 }   
