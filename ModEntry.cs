@@ -186,13 +186,12 @@ namespace MarketTown
                     __instance.modData["hapyke.FoodStore/specialOrder"] = "-1,-1";
                     __instance.modData["hapyke.FoodStore/shopOwnerToday"] = "-1,-1";
 
-                    if (__instance.Name.Contains("MT.Guest_"))
+                    if (__instance.getMasterScheduleRawData() != null)
                     {
                         GlobalNPCList.Add(__instance.Name);
                     }
 
-
-                    if (__instance.Age == 2 && !__instance.Name.Contains("MT.Guest_"))
+                    if (__instance.Age == 2)
                     {
                         GlobalKidList.Add(__instance.Name);
                     }
@@ -297,7 +296,7 @@ namespace MarketTown
             try
             {
                 float islandCount = 0f;
-                int tried = Utility.getAllVillagers().Count;
+                int tried = GlobalNPCList.Count;
                 IslandValidBuilding.Add(new IslandBuildingProperties("Custom_MT_Island_House", new Vector2(9, 31), new Vector2(73, 18)));
 
                 GameLocation locat = Game1.getLocationFromName("Custom_MT_Island");
@@ -480,11 +479,6 @@ namespace MarketTown
                     FarmOutside.UpdateRandomLocationOpenTile(locat);
                     FarmOutside.UpdateRandomLocationOpenTile(locatHouse);
 
-                    foreach (var buildingLocation in validBuildingObjectPairs)
-                    {
-                        var buildingInstanceName = buildingLocation.Building.GetIndoorsName();
-                        FarmOutside.UpdateRandomLocationOpenTile(Game1.getLocationFromName(buildingInstanceName));
-                    }
 
                     foreach (var buildingLocation in locat.buildings)
                     {
@@ -492,24 +486,16 @@ namespace MarketTown
                         FarmOutside.UpdateRandomLocationOpenTile(Game1.getLocationFromName(buildingInstanceName));
                     }
 
-                    while (islandCount < (int)(Config.ParadiseIslandNPC / IslandProgress()) 
-                        && (islandCount <= GlobalNPCList.Count || islandCount < Utility.getAllVillagers().Count && !Config.VisitorClone) && tried > 0) // Get Visitor List
+                    while ( islandCount < Config.ParadiseIslandNPC / IslandProgress() && islandCount <= GlobalNPCList.Count && tried > 0) // Get Visitor List
                     {
-                        var tempNPC = "";
-                        if (Config.VisitorClone) tempNPC = GlobalNPCList[rand.Next(GlobalNPCList.Count)];
-                        else
-                        {
-                            tempNPC = Utility.getAllVillagers()[rand.Next(GlobalNPCList.Count)].Name;
-                            tried--;
-                            if (tempNPC.Contains("MT.Guest") || Game1.getCharacterFromName(tempNPC).getMasterScheduleRawData() == null) continue;
-                        }
+                        var tempNPC = GlobalNPCList[rand.Next(GlobalNPCList.Count)];
+                        tried--;
+                        //if (tempNPC.Contains("MT.Guest") || Game1.getCharacterFromName(tempNPC).getMasterScheduleRawData() == null) continue;
+                        if ( tempNPC != null || Game1.getCharacterFromName(tempNPC).getMasterScheduleRawData() == null) continue;
 
                         bool available = false;
 
-                        if (tempNPC != null && !IslandNPCList.Contains(tempNPC))
-                        {
-                            available = true;
-                        }
+                        if (!IslandNPCList.Contains(tempNPC))  available = true;
 
                         // more people in sunny, less in rainny
                         if (available)
@@ -654,6 +640,7 @@ namespace MarketTown
                                     break;
                                 }
                             }
+                            //====================================================================================================================================================================================================
                             var newInWarp = new Warp(6, 1, building.GetIndoorsName(), (int)indoorTile.X, (int)indoorTile.Y, false, false);
                             if (!Game1.getLocationFromName("Custom_MT_RSVBase").warps.Contains(newInWarp)) Game1.getLocationFromName("Custom_MT_RSVBase").warps.Add(newInWarp);
                             if (!Game1.getLocationFromName("Custom_MT_SVEBase").warps.Contains(newInWarp)) Game1.getLocationFromName("Custom_MT_SVEBase").warps.Add(newInWarp);
@@ -743,6 +730,13 @@ namespace MarketTown
                     }
                 }
             }
+
+            foreach (var buildingLocation in validBuildingObjectPairs)
+            {
+                var buildingInstanceName = buildingLocation.Building.GetIndoorsName();
+                FarmOutside.UpdateRandomLocationOpenTile(Game1.getLocationFromName(buildingInstanceName));
+            }
+
         }
 
         private void GameLoop_DayEnding(object sender, DayEndingEventArgs e)
@@ -762,10 +756,10 @@ namespace MarketTown
                         __instance.modData["hapyke.FoodStore/inviteDate"] = "-99";
                     }
 
-                    if (__instance.Name.Contains("MT.Guest_"))
-                    {
-                        Game1.characterData.Remove(__instance.Name);
-                    }
+                    //if (__instance.Name.Contains("MT.Guest_"))
+                    //{
+                    //    Game1.characterData.Remove(__instance.Name);
+                    //}
                 }
             }
             catch { }
@@ -926,7 +920,7 @@ namespace MarketTown
         }
 
         private void OnTimeChange(object sender, TimeChangedEventArgs e)
-            {
+        {
             Random random = new Random();
 
             if ( Game1.timeOfDay % 200 == 0)
@@ -936,12 +930,6 @@ namespace MarketTown
 
                 FarmOutside.UpdateRandomLocationOpenTile(islandInstance);
                 FarmOutside.UpdateRandomLocationOpenTile(islandHouseInstance);
-
-                foreach (var buildingLocation in validBuildingObjectPairs)
-                {
-                    var buildingInstanceName = buildingLocation.Building.GetIndoorsName();
-                    FarmOutside.UpdateRandomLocationOpenTile( Game1.getLocationFromName(buildingInstanceName));
-                }
 
                 foreach (var buildingLocation in islandInstance.buildings)
                 {
@@ -1066,24 +1054,16 @@ namespace MarketTown
                     }
 
                     string randomNPCName = GlobalNPCList[new Random().Next(0, GlobalNPCList.Count)];
-
-                    string[] parts = randomNPCName.Split('_');
-                    string realName = "";
-                    if (parts.Length >= 2)
-                    {
-                        realName = parts[1];
-                    }
-
                     var visit = Game1.getCharacterFromName(randomNPCName);
 
                     bool blockedNPC = false;
                     try
                     {
-                        if (Game1.getCharacterFromName(realName) != null)
+                        if (visit != null)
                         {
-                            blockedNPC = Game1.getCharacterFromName(realName).currentLocation.IsFarm
-                                || Game1.player.friendshipData[realName].IsMarried()
-                                || Game1.player.friendshipData[realName].IsRoommate();
+                            blockedNPC = visit.currentLocation.IsFarm || (visit.currentLocation.GetParentLocation() != null && visit.currentLocation.GetParentLocation().IsFarm)
+                                || Game1.player.friendshipData[randomNPCName].IsMarried()
+                                || Game1.player.friendshipData[randomNPCName].IsRoommate();
                         }
 
                     }
@@ -1092,10 +1072,9 @@ namespace MarketTown
                     try
                     {
                         blockedNPC = visit == null
-                            || Game1.getCharacterFromName(randomNPCName).currentLocation.Name.Contains("Shed")
-                            || Game1.getCharacterFromName(randomNPCName).currentLocation.Name.Contains("Custom_MT_Island")
-                            || Game1.getCharacterFromName(randomNPCName).currentLocation.parentLocationName.Contains("Custom_MT_Island")
-                            || (Int32.Parse(Game1.getCharacterFromName(randomNPCName).modData["hapyke.FoodStore/timeVisitShed"])
+                            || visit.currentLocation.Name.Contains("Custom_MT_Island")
+                            || visit.currentLocation.parentLocationName.Contains("Custom_MT_Island")
+                            || (Int32.Parse(visit.modData["hapyke.FoodStore/timeVisitShed"])
                                     >= (Game1.timeOfDay - Config.TimeStay * 3) && (Game1.timeOfDay >= 600 + Config.TimeStay * 3));
                     }
                     catch { }
@@ -1212,22 +1191,14 @@ namespace MarketTown
                         {
                             if (table != null && table.heldObject.Value != null && table.heldObject.Value.QualifiedItemId == "(F)MT.Objects.RestaurantDecor")
                             {
-
                                 Vector2 topLeft = table.TileLocation;
                                 int width = table.getTilesWide();
                                 int height = table.getTilesHigh();
 
                                 for (int x = 0; x < width; x++) surroundingTiles.Add(new Vector2(topLeft.X + x, topLeft.Y - 1), 2); // down
-
-
                                 for (int x = 0; x < width; x++) surroundingTiles.Add(new Vector2(topLeft.X + x, topLeft.Y + height), 0); // up
-
-
                                 for (int y = 0; y < height; y++) surroundingTiles.Add(new Vector2(topLeft.X - 1, topLeft.Y + y), 1); // right
-
-
                                 for (int y = 0; y < height; y++) surroundingTiles.Add(new Vector2(topLeft.X + width, topLeft.Y + y), 3); // left
-
                             }
                         }
 
@@ -1255,6 +1226,8 @@ namespace MarketTown
                             }
                         }
                     }
+
+                    ResetErrorNpc(visit);
                     visit.modData["hapyke.FoodStore/timeVisitShed"] = Game1.timeOfDay.ToString();
                 }
             }   // ****** end of shed visitor ******

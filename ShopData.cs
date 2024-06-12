@@ -93,7 +93,7 @@ namespace MarketTown
             {
                 var thisNPC = new NPC();
 
-                if (!Config.VisitorClone && Game1.getCharacterFromName(owner) != null)
+                if (Game1.getCharacterFromName(owner) != null)
                 {
                     thisNPC = Game1.getCharacterFromName(owner);
                     if (!IslandNPCList.Contains(owner)) IslandNPCList.Add(owner);

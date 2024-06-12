@@ -402,12 +402,12 @@ namespace MarketTown
         }
 
         // this will get a random 'valid' tile from a location
-        internal static Point getRandomOpenPointInFarm(NPC who, GameLocation location, bool update)
+        internal static Point getRandomOpenPointInFarm(NPC who, GameLocation location, bool update, bool bypass = false)
         {
             try
             {
-                if (who != null && who.IsVillager && location != null
-                    && ( ((who.currentLocation.Name == "Farm" || who.currentLocation.Name == "FarmHouse") && who.modData["hapyke.FoodStore/invited"] == "true")
+                if (bypass || who != null && who.IsVillager && location != null
+                    && ( ((who.currentLocation.IsFarm || who.currentLocation.Name == "FarmHouse") && who.modData["hapyke.FoodStore/invited"] == "true")
                         || (who.Name.Contains("MT.Guest_") && !who.currentLocation.Name.Contains("BusStop"))
                         || location.NameOrUniqueName.Contains("Custom_MT_Island")
                         || location.GetParentLocation() != null && location.GetParentLocation().Name == "Custom_MT_Island") ) // ************ check shed name

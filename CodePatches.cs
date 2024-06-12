@@ -63,8 +63,7 @@ namespace MarketTown
 
         private static void NPC_performTenMinuteUpdate_Postfix(NPC __instance)
         {
-            if (__instance == null || !__instance.IsVillager || __instance.currentLocation == null || !Game1.hasLoadedGame
-                || (__instance.getMasterScheduleRawData() == null && !__instance.Name.Contains("MT.Guest_"))  )
+            if (!Game1.hasLoadedGame || __instance == null || !__instance.IsVillager || __instance.currentLocation == null || __instance.getMasterScheduleRawData() == null )
                 return;
             Random random = new Random();
 
@@ -195,10 +194,11 @@ namespace MarketTown
             }
 
             // for farm building store visitor
-            if (__instance.Name.Contains("MT.Guest_") && __instanceLocation.parentLocationName.Value == "Farm" && __instance.modData["hapyke.FoodStore/specialOrder"] == "-1,-1"
-                && !__instance.isMoving() && __instance.controller == null && __instance.temporaryController == null && __instance.timerSinceLastMovement >= 3000)
+            if (__instanceLocation.GetParentLocation() != null && __instanceLocation.GetParentLocation().IsFarm && __instance.modData["hapyke.FoodStore/specialOrder"] == "-1,-1" && __instance.modData["hapyke.FoodStore/invited"] == "false"
+                && !__instance.isMoving() && __instance.controller == null && __instance.temporaryController == null && __instance.timerSinceLastMovement >= 3000
+                && (Game1.player.friendshipData.ContainsKey(__instance.Name) && !Game1.player.friendshipData[__instance.Name].IsMarried() && !Game1.player.friendshipData[__instance.Name].IsRoommate() || !Game1.player.friendshipData.ContainsKey(__instance.Name)) )
             {
-                var randomTile = FarmOutside.getRandomOpenPointInFarm(__instance, __instanceLocation, true).ToVector2();
+                var randomTile = FarmOutside.getRandomOpenPointInFarm(__instance, __instanceLocation, true, true).ToVector2();
                 if (randomTile != Vector2.Zero)
                 {
                     FarmOutside.AddRandomScheduleIsland(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{__instanceLocation.NameOrUniqueName}",
@@ -300,6 +300,7 @@ namespace MarketTown
                 catch (NullReferenceException) { }
             }
 
+            //======================================================================================================================================
             // Leave Farm building Visitors
             try
             {

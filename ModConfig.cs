@@ -77,7 +77,6 @@ namespace MarketTown
         public int ParadiseIslandNPC { get; set; } = 40;
         public bool IslandProgress { get; set; } = true;
         public float IslandWalkAround { get; set; } = 0.2f;
-        public bool VisitorClone { get; set; } = false;
         public bool IslandPlantBoost { get; set; } = true;
         public float IslandPlantBoostChance { get; set; } = 0.2f;
         public bool FestivalMon { get; set; } = false;

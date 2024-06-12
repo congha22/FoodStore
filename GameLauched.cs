@@ -377,13 +377,6 @@ namespace MarketTown
             configMenu.AddPage(mod: ModManifest, "island", () => SHelper.Translation.Get("foodstore.config.island"));
             configMenu.AddBoolOption(
                 mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.visitorclone"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.visitorcloneText"),
-                getValue: () => Config.VisitorClone,
-                setValue: value => Config.VisitorClone = value
-            );
-            configMenu.AddBoolOption(
-                mod: ModManifest,
                 name: () => SHelper.Translation.Get("foodstore.config.islandprogress"),
                 tooltip: () => SHelper.Translation.Get("foodstore.config.islandprogressText"),
                 getValue: () => Config.IslandProgress,
@@ -2304,7 +2297,7 @@ namespace MarketTown
             GameLocation island = Game1.getLocationFromName("Custom_MT_Island");
             var thisNpc = new NPC();
 
-            if (!Config.VisitorClone)
+            if ( 1 == 1)
             {
                 thisNpc = Game1.getCharacterFromName("Marnie");
                 if (!IslandNPCList.Contains("Marnie")) IslandNPCList.Add("Marnie");
