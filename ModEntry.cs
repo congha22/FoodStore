@@ -32,7 +32,7 @@ using static System.Net.Mime.MediaTypeNames;
 using Object = StardewValley.Object;
 using SpaceShared;
 using SpaceShared.APIs;
-using MarketTown.Framework;
+//using MarketTown.Framework;
 using static StardewValley.Minigames.TargetGame;
 using StardewModdingAPI.Utilities;
 using xTile.ObjectModel;
@@ -99,7 +99,6 @@ namespace MarketTown
         internal static List<string> ShoppersToRemove = new List<string>();
 
         internal static Dictionary<string, int> TodaySelectedKid = new Dictionary<string, int>();
-        internal static List<(string locationName, int x, int y)> ChairPositions { get; private set; } = new List<(string, int, int)>();
 
         internal static List<Vector2> islandWarp = new List<Vector2>();
 
@@ -162,7 +161,7 @@ namespace MarketTown
             GlobalKidList.Clear();
             GlobalNPCList.Clear();
             ShoppersToRemove.Clear();
-            ChairPositions.Clear();
+
             //Assign visit value
             foreach (NPC __instance in Utility.getAllVillagers())
             {
@@ -189,24 +188,7 @@ namespace MarketTown
                     if (__instance.getMasterScheduleRawData() != null)
                     {
                         GlobalNPCList.Add(__instance.Name);
-                    }
-
-                    if (__instance.Age == 2)
-                    {
-                        GlobalKidList.Add(__instance.Name);
-                    }
-                }
-            }
-
-            foreach (GameLocation location in Game1.locations)
-            {
-                foreach (MapSeat chair in location.mapSeats)
-                {
-                    var chairLocations = chair.GetSeatPositions();
-
-                    foreach (Vector2 chairPosition in chairLocations)
-                    {
-                        ChairPositions.Add((location.Name, (int)chairPosition.X, (int)chairPosition.Y));
+                        if (__instance.Age == 2) GlobalKidList.Add(__instance.Name);
                     }
                 }
             }
@@ -423,7 +405,7 @@ namespace MarketTown
                 // Set properties for island garden
                 foreach (var x in locatHouseGarden._activeTerrainFeatures)
                 {
-                    if (x is Tree tree) tree.GetData().GrowthChance = 0.3f;
+                    if (x is Tree tree && Config.IslandPlantBoost) tree.GetData().GrowthChance = 0.3f;
                 }
 
                 // Set island is greenhouse in Spring
@@ -490,9 +472,7 @@ namespace MarketTown
                     {
                         var tempNPC = GlobalNPCList[rand.Next(GlobalNPCList.Count)];
                         tried--;
-                        //if (tempNPC.Contains("MT.Guest") || Game1.getCharacterFromName(tempNPC).getMasterScheduleRawData() == null) continue;
-                        if ( tempNPC != null || Game1.getCharacterFromName(tempNPC).getMasterScheduleRawData() == null) continue;
-
+                        if (tempNPC == null || Game1.getCharacterFromName(tempNPC) == null || Game1.getCharacterFromName(tempNPC).getMasterScheduleRawData() == null) continue;
                         bool available = false;
 
                         if (!IslandNPCList.Contains(tempNPC))  available = true;
@@ -554,7 +534,7 @@ namespace MarketTown
                         var displayChest = new Chest(true);
                         displayChest.destroyOvernight = true;
                         while (displayChest.Items.Count < 9) displayChest.Items.Add(null);
-                        locat.setObjectAt(999, 999, displayChest);
+                        locat.setObjectAt(19309, 19309, displayChest);
 
                         List<string> displayChestItem = new List<string>();
                         foreach (var item in displayChest.Items)
@@ -640,11 +620,8 @@ namespace MarketTown
                                     break;
                                 }
                             }
-                            //====================================================================================================================================================================================================
-                            var newInWarp = new Warp(6, 1, building.GetIndoorsName(), (int)indoorTile.X, (int)indoorTile.Y, false, false);
-                            if (!Game1.getLocationFromName("Custom_MT_RSVBase").warps.Contains(newInWarp)) Game1.getLocationFromName("Custom_MT_RSVBase").warps.Add(newInWarp);
-                            if (!Game1.getLocationFromName("Custom_MT_SVEBase").warps.Contains(newInWarp)) Game1.getLocationFromName("Custom_MT_SVEBase").warps.Add(newInWarp);
-                            if (!Game1.getLocationFromName("Custom_MT_VanillaBase").warps.Contains(newInWarp)) Game1.getLocationFromName("Custom_MT_VanillaBase").warps.Add(newInWarp);
+                            var busWarp = new Warp(19309, 19309, building.GetIndoorsName(), (int)indoorTile.X, (int)indoorTile.Y, false, false);
+                            if (!Game1.getLocationFromName("BusStop").warps.Contains(busWarp)) Game1.getLocationFromName("BusStop").warps.Add(busWarp);
 
                             valid = true;
                             break;
@@ -673,10 +650,8 @@ namespace MarketTown
                                         break;
                                     }
                                 }
-                                var newInWarp = new Warp(6, 1, building.GetIndoorsName(), (int)indoorTile.X, (int)indoorTile.Y, false, false);
-                                if (!Game1.getLocationFromName("Custom_MT_RSVBase").warps.Contains(newInWarp)) Game1.getLocationFromName("Custom_MT_RSVBase").warps.Add(newInWarp);
-                                if (!Game1.getLocationFromName("Custom_MT_SVEBase").warps.Contains(newInWarp)) Game1.getLocationFromName("Custom_MT_SVEBase").warps.Add(newInWarp);
-                                if (!Game1.getLocationFromName("Custom_MT_VanillaBase").warps.Contains(newInWarp)) Game1.getLocationFromName("Custom_MT_VanillaBase").warps.Add(newInWarp);
+                                var busWarp = new Warp(19309, 19309, building.GetIndoorsName(), (int)indoorTile.X, (int)indoorTile.Y, false, false);
+                                if (!Game1.getLocationFromName("BusStop").warps.Contains(busWarp)) Game1.getLocationFromName("BusStop").warps.Add(busWarp);
 
                                 valid = true;
                                 break;
@@ -731,12 +706,12 @@ namespace MarketTown
                 }
             }
 
+            // Update open tile list
             foreach (var buildingLocation in validBuildingObjectPairs)
             {
                 var buildingInstanceName = buildingLocation.Building.GetIndoorsName();
                 FarmOutside.UpdateRandomLocationOpenTile(Game1.getLocationFromName(buildingInstanceName));
             }
-
         }
 
         private void GameLoop_DayEnding(object sender, DayEndingEventArgs e)
@@ -755,11 +730,6 @@ namespace MarketTown
                         __instance.modData["hapyke.FoodStore/invited"] = "false";
                         __instance.modData["hapyke.FoodStore/inviteDate"] = "-99";
                     }
-
-                    //if (__instance.Name.Contains("MT.Guest_"))
-                    //{
-                    //    Game1.characterData.Remove(__instance.Name);
-                    //}
                 }
             }
             catch { }
@@ -788,12 +758,15 @@ namespace MarketTown
                 locat.Map.Properties.Add("skipWeedGrowth", true);
 
             CloseShop(true);
+
             try
             {
                 locat.warps.Clear();
-                Game1.getLocationFromName("Custom_MT_RSVBase").warps.Clear();
-                Game1.getLocationFromName("Custom_MT_SVEBase").warps.Clear();
-                Game1.getLocationFromName("Custom_MT_VanillaBase").warps.Clear();
+
+                foreach (var warp in Game1.getLocationFromName("BusStop").warps)
+                {
+                    if (warp.X == 19309 && warp.Y == 19309) Game1.getLocationFromName("BusStop").warps.Remove(warp);
+                }
             } catch { }
 
             foreach (var entry in TilePropertyChanged)
@@ -937,13 +910,10 @@ namespace MarketTown
                     FarmOutside.UpdateRandomLocationOpenTile(Game1.getLocationFromName(buildingInstanceName));
                 }
 
-                if (validBuildingObjectPairs.Any())
+                foreach (var building in validBuildingObjectPairs)
                 {
-                    foreach (var building in validBuildingObjectPairs)
-                    {
-                        var buildingInstanceName = Game1.getLocationFromName(building.Building.GetIndoorsName());
-                        FarmOutside.UpdateRandomLocationOpenTile(buildingInstanceName);
-                    }
+                    var buildingInstanceName = Game1.getLocationFromName(building.Building.GetIndoorsName());
+                    FarmOutside.UpdateRandomLocationOpenTile(buildingInstanceName);
                 }
             }
 
@@ -1026,8 +996,7 @@ namespace MarketTown
                 }
             }
 
-            // ******* Shed visitors *******
-
+            // ******* Farm building visitors *******
             if (random.NextDouble() < Config.ShedVisitChance && Game1.timeOfDay <= Config.CloseHour && Game1.timeOfDay >= Config.OpenHour)
             {
                 foreach (var pair in validBuildingObjectPairs)
@@ -1043,16 +1012,12 @@ namespace MarketTown
                         || CountShedVisitor(Game1.getLocationFromName(building.GetIndoorsName())) >= Config.MaxShedCapacity 
                         || ( buildingType == "museum" && Config.MuseumPriceMarkup / 4.1 > random.NextDouble()) ) return;
 
-                    if (building != null && building.GetIndoorsName() != null)
+                    foreach (var warp in Game1.getLocationFromName(building.GetIndoorsName()).warps)
                     {
-                        var warps = Game1.getLocationFromName(building.GetIndoorsName()).warps;
-                        foreach (var warp in warps)
-                        {
-                            if (warp.TargetName == "Farm") doorTile = new(warp.X, warp.Y - 3);
-                            break;
-                        }
+                        if (warp.TargetName == "Farm") doorTile = new(warp.X, warp.Y - 3);
+                        break;
                     }
-
+                    
                     string randomNPCName = GlobalNPCList[new Random().Next(0, GlobalNPCList.Count)];
                     var visit = Game1.getCharacterFromName(randomNPCName);
 
@@ -1061,29 +1026,19 @@ namespace MarketTown
                     {
                         if (visit != null)
                         {
-                            blockedNPC = visit.currentLocation.IsFarm || (visit.currentLocation.GetParentLocation() != null && visit.currentLocation.GetParentLocation().IsFarm)
-                                || Game1.player.friendshipData[randomNPCName].IsMarried()
-                                || Game1.player.friendshipData[randomNPCName].IsRoommate();
+                            blockedNPC = visit.currentLocation.IsFarm
+                                || (visit.currentLocation.GetParentLocation() != null && visit.currentLocation.GetParentLocation().IsFarm)
+                                || visit.currentLocation == Game1.player.currentLocation
+                                || (Game1.player.friendshipData.ContainsKey(randomNPCName) 
+                                    && ( Game1.player.friendshipData[randomNPCName].IsMarried() || Game1.player.friendshipData[randomNPCName].IsRoommate()) )
+                                || visit.currentLocation.Name.Contains("Custom_MT_Island")
+                                || (visit.currentLocation.GetParentLocation() != null && visit.currentLocation.GetParentLocation().Name == "Custom_MT_Island")
+                                || Int32.Parse(visit.modData["hapyke.FoodStore/timeVisitShed"]) >= (Game1.timeOfDay - Config.TimeStay * 3);
                         }
-
                     }
                     catch { }
 
-                    try
-                    {
-                        blockedNPC = visit == null
-                            || visit.currentLocation.Name.Contains("Custom_MT_Island")
-                            || visit.currentLocation.parentLocationName.Contains("Custom_MT_Island")
-                            || (Int32.Parse(visit.modData["hapyke.FoodStore/timeVisitShed"])
-                                    >= (Game1.timeOfDay - Config.TimeStay * 3) && (Game1.timeOfDay >= 600 + Config.TimeStay * 3));
-                    }
-                    catch { }
-
-                    if (blockedNPC) return;
-
-
-                    visit.modData["hapyke.FoodStore/initLocation"] = visit.Tile.X.ToString() + "," + visit.Tile.Y.ToString();
-                    visit.modData["hapyke.FoodStore/initMap"] = visit.currentLocation.Name;
+                    if (visit == null || blockedNPC) return;
 
                     List<Vector2> clearTiles = new List<Vector2>();
                     if (Config.DoorEntry)          // Alow warp at door
@@ -1175,6 +1130,7 @@ namespace MarketTown
                         clearTiles.Clear();
                     }
 
+                    // Try add museum ticket money, or do special order table sit
                     if (buildingType == "museum")
                     {
                         TodayMuseumVisitor++;
@@ -1520,7 +1476,7 @@ namespace MarketTown
 
                                     try
                                     {
-                                        if (__instance != null && __instance.Name != null && __instance.Name.Contains("Mt.Guest_"))
+                                        if (__instance != null && __instance.Name != null)
                                         {
                                             string[] parts = __instance.Name.Split('_');
                                             string realName = "";
@@ -1635,29 +1591,54 @@ namespace MarketTown
                             if (enumerator.Current.boundingBox.Value != food.obj.boundingBox.Value)
                                 continue;
 
-                            if (currentObject is MtMannequin mannequin)
+                            //if (currentObject is MtMannequin mannequin)
+                            //{
+                            //    if (mannequin.Hat.Value != null)
+                            //    {
+                            //        salePrice += rand.Next(1100, 1600);
+                            //        mannequin.Hat.Value = null;
+                            //    }
+                            //    if (mannequin.Shirt.Value != null)
+                            //    {
+                            //        salePrice += rand.Next(1300, 1800);
+                            //        mannequin.Shirt.Value = null;
+                            //    }
+                            //    if (mannequin.Pants.Value != null)
+                            //    {
+                            //        salePrice += rand.Next(1400, 1900);
+                            //        mannequin.Pants.Value = null;
+                            //    }
+                            //    if (mannequin.Boots.Value != null)
+                            //    {
+                            //        salePrice += (int)(mannequin.Boots.Value.salePrice() * 4);
+                            //        mannequin.Boots.Value = null;
+                            //    }
+                            //}
+
+                            if (currentObject is Mannequin man)
                             {
-                                if (mannequin.Hat.Value != null)
+                                if (man.hat.Value != null)
                                 {
                                     salePrice += rand.Next(1100, 1600);
-                                    mannequin.Hat.Value = null;
+                                    man.hat.Value = null;
                                 }
-                                if (mannequin.Shirt.Value != null)
+                                if (man.shirt.Value != null)
                                 {
                                     salePrice += rand.Next(1300, 1800);
-                                    mannequin.Shirt.Value = null;
+                                    man.shirt.Value = null;
                                 }
-                                if (mannequin.Pants.Value != null)
+                                if (man.pants.Value != null)
                                 {
                                     salePrice += rand.Next(1400, 1900);
-                                    mannequin.Pants.Value = null;
+                                    man.pants.Value = null;
                                 }
-                                if (mannequin.Boots.Value != null)
+                                if (man.boots.Value != null)
                                 {
-                                    salePrice += (int)(mannequin.Boots.Value.salePrice() * 4);
-                                    mannequin.Boots.Value = null;
+                                    salePrice += (int)(man.boots.Value.salePrice() * 4);
+                                    man.boots.Value = null;
                                 }
                             }
+
                             if (!Config.DisableChatAll && !Config.DisableChat) Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.soldclothes", new { locationint = __instance.currentLocation.DisplayName, saleint = salePrice }));
                             MyMessage messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.soldclothes", new { locationint = __instance.currentLocation.DisplayName, saleint = salePrice }));
                             SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
@@ -1735,12 +1716,12 @@ namespace MarketTown
             {
                 foreach (var obj in x.Values)
                 {
-                    if (obj != null && obj.Name != null && obj.Name.Contains("nequin") && obj is MtMannequin mannequin)
+                    if (obj != null && obj is Mannequin mannequin)
                     {
-                        bool hasHat = mannequin.Hat.Value != null;
-                        bool hasShirt = mannequin.Shirt.Value != null;
-                        bool hasPants = mannequin.Pants.Value != null;
-                        bool hasBoots = mannequin.Boots.Value != null;
+                        bool hasHat = mannequin.hat.Value != null;
+                        bool hasShirt = mannequin.shirt.Value != null;
+                        bool hasPants = mannequin.pants.Value != null;
+                        bool hasBoots = mannequin.boots.Value != null;
 
                         int xLocation = (obj.boundingBox.X / 64) + (obj.boundingBox.Width / 64 / 2);
                         int yLocation = (obj.boundingBox.Y / 64) + (obj.boundingBox.Height / 64 / 2);
@@ -1748,12 +1729,12 @@ namespace MarketTown
 
                         bool hasSignInRange = x.Values.Any(otherObj => otherObj is Sign sign && Vector2.Distance(fLocation, sign.TileLocation) <= Config.SignRange);
 
-                        if ( Config.SignRange == 0 || buildingIsFarm ) hasSignInRange = true;
+                        if (Config.SignRange == 0 || buildingIsFarm) hasSignInRange = true;
 
                         // Add to foodList only if there is sign within the range
-                        if (hasSignInRange && Vector2.Distance(fLocation, npc.Tile) < Config.MaxDistanceToFind && (hasHat || hasPants || hasShirt || hasBoots) && buildingIsMarket && !buildingIsMuseum)
+                        if (hasSignInRange && Vector2.Distance(fLocation, npc.Tile) < Config.MaxDistanceToFind && (hasHat || hasPants || hasShirt || hasBoots))
                         {
-                            foodList.Add(new DataPlacedFood( obj, fLocation, obj, -1));
+                            foodList.Add(new DataPlacedFood(obj, fLocation, obj, -1));
                         }
                     }
                 }
@@ -1777,7 +1758,7 @@ namespace MarketTown
                           || (buildingIsFarm && f.heldObject.Value.Category == -7 && buildingIsRestaurant) ) hasSignInRange = true;
 
                     // Add to foodList only if there is sign within the range
-                    if (hasSignInRange && Vector2.Distance(fLocation, npc.Tile) < Config.MaxDistanceToFind && !buildingIsMuseum)
+                    if (hasSignInRange && Vector2.Distance(fLocation, npc.Tile) < Config.MaxDistanceToFind)
                     {
                         foodList.Add(new DataPlacedFood(f, fLocation, f.heldObject.Value, -1));
                     }

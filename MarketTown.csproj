@@ -26,9 +26,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Update="FrameworkClothes\assets\**\*">
+		<!--<None Update="!document\FrameworkClothes\assets\**\*">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
+		</None>-->
 		<None Update="Assets\**\*">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>

@@ -16,7 +16,7 @@ using Object = StardewValley.Object;
 using MailFrameworkMod;
 using System.Threading;
 using System.Threading.Tasks;
-using MarketTown.Framework;
+//using MarketTown.Framework;
 using SpaceShared.APIs;
 using StardewValley.Menus;
 using MarketTown.Data;
@@ -78,8 +78,6 @@ namespace MarketTown
 
             Helper.Events.Player.InventoryChanged += Player_InventoryChanged;
             helper.Events.Display.MenuChanged += this.OnMenuChanged;
-
-            helper.ConsoleCommands.Add("markettown", "display", this.HandleCommand);
 
             helper.Events.Content.AssetRequested += this.OnAssetRequested;
 
@@ -167,14 +165,11 @@ namespace MarketTown
         private void GameLoop_GameLaunched(object sender, StardewModdingAPI.Events.GameLaunchedEventArgs e)
         {
             this.Monitor.Log("Loading Market Town", LogLevel.Trace);
-
-            var sc = this.Helper.ModRegistry.GetApi<ISpaceCoreApi>("spacechase0.SpaceCore"); 
-            sc.RegisterSerializerType(typeof(MtMannequin));
             var api = this.Helper.ModRegistry.GetApi<IContentPatcherAPI>("Pathoschild.ContentPatcher");
 
             api.RegisterToken(this.ModManifest, "IslandSign", () =>
             {
-                if (Context.IsWorldReady && SHelper.Data.ReadSaveData<MailData>("MT.MailLog") != null && SHelper.Data.ReadSaveData<MailData>("MT.MailLog").TotalVisitorVisited != null)
+                if (Context.IsWorldReady && SHelper.Data.ReadSaveData<MailData>("MT.MailLog") != null && SHelper.Data.ReadSaveData<MailData>("MT.MailLog").TotalVisitorVisited != 0)
                 {
                     var totalVisitor = SHelper.Data.ReadSaveData<MailData>("MT.MailLog").TotalVisitorVisited;
 
@@ -850,10 +845,9 @@ namespace MarketTown
 
             if (tile.X > 65 && tile.X < 69 && tile.Y < 22 && tile.Y > 18 && player.X > 64 && player.X < 70 && player.Y > 17 && player.Y < 23)
                 OnActionButton(e);
-            else if (tile.X > 52 && tile.X < 58 && tile.Y < 19 && tile.Y > 14 && player.X > 51 && player.X < 59 && player.Y > 13 && player.Y < 20
+            if (tile.X > 52 && tile.X < 58 && tile.Y < 19 && tile.Y > 14 && player.X > 51 && player.X < 59 && player.Y > 13 && player.Y < 20
                 && Game1.timeOfDay >= Config.FestivalTimeStart && Game1.timeOfDay <= Config.FestivalTimeEnd)
             {
-
                 GameLocation island = Game1.getLocationFromName("Custom_MT_Island");
                 Layer buildings1Layer = island.map.GetLayer("Buildings1");
 
@@ -872,7 +866,7 @@ namespace MarketTown
         internal void OnActionButton(ButtonPressedEventArgs e)
         {
             var location = Game1.getLocationFromName("Custom_MT_Island");
-            var obj = location.getObjectAtTile(999, 999);
+            var obj = location.getObjectAtTile(19309, 19309);
             if (obj is Chest chest && obj is not null)
             {
                 var container = new StorageContainer(chest.Items, 9,
@@ -882,7 +876,7 @@ namespace MarketTown
                 container.AllowExitWithHeldItem = true;
                 Game1.activeClickableMenu = container;
             }
-            
+
             SHelper.Input.Suppress(e.Button);
         }
 
@@ -935,7 +929,7 @@ namespace MarketTown
             MarketShopData playerShop = TodayShopInventory.FirstOrDefault(shop => shop.Name == "PlayerShop");
 
             var location = Game1.getLocationFromName("Custom_MT_Island");
-            var obj = location.getObjectAtTile(999, 999);
+            var obj = location.getObjectAtTile(19309, 19309);
 
             if (obj == null || obj is not Chest chest || location == null || playerShop == null) return;
 
@@ -994,50 +988,6 @@ namespace MarketTown
             }
         }
 
-        private void HandleCommand(string cmd, string[] args)
-        {
-            if (!Context.IsPlayerFree)
-                return;
-
-            if (args.Length == 0)
-            {
-                return;
-            }
-            Item item = null;
-            if (args[0] == "display")
-            {
-                var mannType = MannequinType.Plain;
-                var mannGender = MannequinGender.Male;
-                if (args.Length >= 2)
-                {
-                    switch (args[1].ToLower())
-                    {
-                        case "male":
-                            mannGender = MannequinGender.Male;
-                            break;
-                        case "female":
-                            mannGender = MannequinGender.Female;
-                            break;
-                        default:
-                            return;
-                    }
-                }
-                item = new MtMannequin(mannType, mannGender, Vector2.Zero);
-            }
-
-            if (item == null)
-            {
-                return;
-            }
-
-            if (args.Length >= 3)
-            {
-                item.Stack = int.Parse(args[2]);
-            }
-
-            Game1.player.addItemByMenuIfNecessary(item);
-        }
-
         private void OnMenuChanged(object sender, MenuChangedEventArgs e)
         {
             if (!Game1.hasLoadedGame) return;
@@ -1054,18 +1004,18 @@ namespace MarketTown
 
             if (e.NewMenu is ShopMenu shop)
             {
-                if (shop.ShopId == "Carpenter")
-                {
-                    var mm = new MtMannequin(MannequinType.Plain, MannequinGender.Male, Vector2.Zero);
-                    var mf = new MtMannequin(MannequinType.Plain, MannequinGender.Female, Vector2.Zero);
-                    shop.forSale.Add(mm);
-                    shop.forSale.Add(mf);
-                    shop.itemPriceAndStock.Add(mm, new ItemStockInformation(15000, int.MaxValue));
-                    shop.itemPriceAndStock.Add(mf, new ItemStockInformation(15000, int.MaxValue));
+                //if (shop.ShopId == "Carpenter")
+                //{
+                //    var mm = new MtMannequin(MannequinType.Plain, MannequinGender.Male, Vector2.Zero);
+                //    var mf = new MtMannequin(MannequinType.Plain, MannequinGender.Female, Vector2.Zero);
+                //    shop.forSale.Add(mm);
+                //    shop.forSale.Add(mf);
+                //    shop.itemPriceAndStock.Add(mm, new ItemStockInformation(15000, int.MaxValue));
+                //    shop.itemPriceAndStock.Add(mf, new ItemStockInformation(15000, int.MaxValue));
 
-                    bool islandStatus = Game1.getLocationFromName("Custom_MT_Island").isAlwaysActive;
-                    if (!islandStatus) { Game1.addHUDMessage(new HUDMessage(SHelper.Translation.Get("foodstore.island.building"), 5000, true)); }
-                }
+                //    bool islandStatus = Game1.getLocationFromName("Custom_MT_Island").isAlwaysActive;
+                //    if (!islandStatus) { Game1.addHUDMessage(new HUDMessage(SHelper.Translation.Get("foodstore.island.building"), 5000, true)); }
+                //}
 
                 if (shop.ShopId.Contains("MarketTown."))
                 {
@@ -1386,7 +1336,7 @@ namespace MarketTown
                             }
                             else if (shopData.Name == "PlayerShop" && playerChance < Config.FestivalMaxSellChance / IslandProgress())
                             {
-                                var obj = islandInstance.getObjectAtTile(999, 999);
+                                var obj = islandInstance.getObjectAtTile(19309, 19309);
                                 if (obj != null && obj is Chest chest && chest.Items.Any())
                                 {
                                     var itemObj = chest.Items.FirstOrDefault(item => item?.ItemId == randomItemSold);
@@ -2295,18 +2245,9 @@ namespace MarketTown
             SMonitor.Log("Opening Marnie Livestock shop", LogLevel.Trace);
 
             GameLocation island = Game1.getLocationFromName("Custom_MT_Island");
-            var thisNpc = new NPC();
-
-            if ( 1 == 1)
-            {
-                thisNpc = Game1.getCharacterFromName("Marnie");
-                if (!IslandNPCList.Contains("Marnie")) IslandNPCList.Add("Marnie");
-            }
-            else
-            {
-                thisNpc = Game1.getCharacterFromName("MT.Guest_Marnie");
-                if (!IslandNPCList.Contains("MT.Guest_Marnie")) IslandNPCList.Add("MT.Guest_Marnie");
-            }
+            var thisNpc = Game1.getCharacterFromName("Marnie");
+            if (!IslandNPCList.Contains("Marnie")) IslandNPCList.Add("Marnie");
+            
             thisNpc.modData["hapyke.FoodStore/shopOwnerToday"] = "57,18";
 
             TodayShopInventory.Add(new MarketShopData("z_marnie2", new(54, 18), new List<string>()));
