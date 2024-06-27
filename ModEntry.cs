@@ -30,9 +30,6 @@ using static MarketTown.ModEntry;
 using static MarketTown.PlayerChat;
 using static System.Net.Mime.MediaTypeNames;
 using Object = StardewValley.Object;
-using SpaceShared;
-using SpaceShared.APIs;
-//using MarketTown.Framework;
 using static StardewValley.Minigames.TargetGame;
 using StardewModdingAPI.Utilities;
 using xTile.ObjectModel;
@@ -56,8 +53,8 @@ using xTile;
 using static System.Net.WebRequestMethods;
 using static StardewValley.Pathfinding.PathFindController;
 using System.Xml.Linq;
-using SpaceCore.UI;
 using static StardewValley.Minigames.CraneGame;
+using StardewValley.ItemTypeDefinitions;
 
 namespace MarketTown
 {
@@ -76,31 +73,101 @@ namespace MarketTown
 
         private Harmony harmony;
 
+        // ==============================================================================================
+        // ============================================GLOBAL============================================
+
+        /// <summary>List of valid villagers NPC (has schedule and moving sprite, and not be listed in GlobalNPCBlackList).</summary>
+        internal static List<string> GlobalNPCList = new List<string>();
+
+        /// <summary>List of blacklist villagers NPC that will not be used in most case.</summary>
+        internal static List<string> GlobalNPCBlackList = new List<string> { "Marlon", "Gunther", "Morris"};
+
+        /// <summary>List of kids NPC (age = 2).</summary>
+        internal static List<string> GlobalKidList = new List<string>();
+
+        /// <summary>Dictionary of Location and its list of 'valid' tile for NPC schedule.</summary>
+        public static IDictionary<GameLocation, List<Vector2>> RandomOpenSpot = new Dictionary<GameLocation, List<Vector2>>();
+
+        /// <summary>Dictionary of table that pending for restock from nearby storage</summary>
+        public static IDictionary<IEnumerator<Furniture>, int> RecentSoldTable = new Dictionary<IEnumerator<Furniture>, int>();
+
+        /// <summary>Handle player typing interact</summary>
+        private PlayerChat playerChatInstance;
+
+
+        // ==============================================================================================
+        // ==============================================================================================
+
+
+        internal static List<Action> ActionList { get; private set; } = new();
+        internal static List<Response> KidResponseList { get; private set; } = new();
+
+        /// <summary>List of Kids that will visit farm is request accepted.</summary>
+        internal static Dictionary<string, int> TodaySelectedKid = new Dictionary<string, int>();
+
+
+        //***********************************************************************************************
+
+
+        /// <summary> List of NPC name that has been given Customer Note today.</summary>
+        internal static List<string> TodayCustomerNoteName = new List<string>();
+
+
+        //***********************************************************************************************
+
+
+        /// <summary>List of Builings on Farm valid as store or museum.</summary>
+        public static List<BuildingObjectPair> validBuildingObjectPairs = new List<BuildingObjectPair>();
+
+
+        //***********************************************************************************************
+
+
         public static string orderKey = "marketTown/order";
         public static Texture2D emoteSprite;
         public static PerScreen<Dictionary<string, int>> npcOrderNumbers = new PerScreen<Dictionary<string, int>>();
 
+        /// <summary>Dictionary of Restaurant and its list of tile where NPC will stand for special order.</summary>
+        public static IDictionary<GameLocation, List<Vector2>> RestaurantSpot = new Dictionary<GameLocation, List<Vector2>>();
+
+        /// <summary>Dictionary of Location and its lists of tile that has properties modified.</summary>
+        public static IDictionary<GameLocation, List<Vector2>> TilePropertyChanged = new Dictionary<GameLocation, List<Vector2>>();
+
+
+        //***********************************************************************************************
+
+
+        /// <summary>List of Builings on Island.</summary>
         public static List<IslandBuildingProperties> IslandValidBuilding = new List<IslandBuildingProperties>();
-        public static List<BuildingObjectPair> validBuildingObjectPairs = new List<BuildingObjectPair>();
 
-
-        internal static List<Response> KidResponseList { get; private set; } = new();
-        internal static List<Action> ActionList { get; private set; } = new();
-
-        internal static List<string> GlobalKidList = new List<string>();
-
-        internal static List<string> GlobalNPCList = new List<string>();
-
+        /// <summary>List of NPC that will visit the Island today. This is a subset of GlobalNPCList.</summary>
         internal static List<string> IslandNPCList = new List<string>();
 
-        internal static List<string> TodayCustomerNoteName = new List<string>();
-        internal static List<string> CurrentShopper = new List<string>();
-
-        internal static List<string> ShoppersToRemove = new List<string>();
-
-        internal static Dictionary<string, int> TodaySelectedKid = new Dictionary<string, int>();
-
+        /// <summary>List of list Island visitor will be at when day start.</summary>
         internal static List<Vector2> islandWarp = new List<Vector2>();
+
+
+        //***********************************************************************************************
+
+
+        public static bool IsFestivalToday = false;
+        public static bool IsFestivalIsCurrent = false;
+
+        /// <summary>List of all Festival shop owners.</summary>
+        public static List<string> TodayFestivalOwner = new List<string>();
+
+        /// <summary>Clickable tile that will open the shop menu.</summary>
+        public static IDictionary<Vector2, string> OpenShopTile = new Dictionary<Vector2, string>();
+
+        /// <summary>List of Shop, Tile and Shopstock list.</summary>
+        public static List<MarketShopData> TodayShopInventory = new List<MarketShopData>();
+
+        /// <summary>Dictionary of shop id and shopstock read from Json file.</summary>
+        public static IDictionary<string, List<string>> ShopsJsonData = new Dictionary<string, List<string>>();
+
+
+        //***********************************************************************************************
+
 
         internal static MailData mailData = new MailData();
         public static string TodaySell = "";
@@ -129,22 +196,10 @@ namespace MarketTown
         public static int TodayMuseumVisitor = 0;
         public static int TodayMuseumEarning = 0;
 
-        public static IDictionary<string, List<string>> ShopsJsonData = new Dictionary<string, List<string>> ();
-        public static List<MarketShopData> TodayShopInventory = new List<MarketShopData>();
-        public static IDictionary<Vector2, string> OpenShopTile = new Dictionary<Vector2, string>();
-        public static bool FestivalToday = false;
-        public static bool FestivalIsCurrent = false;
-        public static List<string> TodayFestivalOwner = new List<string> ();
-
-        public static IDictionary<GameLocation, List<Vector2>> RandomOpenSpot = new Dictionary<GameLocation, List<Vector2>>();
-
-        public static IDictionary<GameLocation, List<Vector2>> RestaurantSpot = new Dictionary<GameLocation, List<Vector2>>();
-        public static IDictionary<GameLocation, List<Vector2>> TilePropertyChanged = new Dictionary<GameLocation, List<Vector2>>();
-
-        private PlayerChat playerChatInstance;
 
         // ===============================================================================================================================
         // ===============================================================================================================================
+
 
         private void GameLoop_SaveLoaded(object sender, StardewModdingAPI.Events.SaveLoadedEventArgs e)
         {
@@ -160,7 +215,6 @@ namespace MarketTown
 
             GlobalKidList.Clear();
             GlobalNPCList.Clear();
-            ShoppersToRemove.Clear();
 
             //Assign visit value
             foreach (NPC __instance in Utility.getAllVillagers())
@@ -185,7 +239,7 @@ namespace MarketTown
                     __instance.modData["hapyke.FoodStore/specialOrder"] = "-1,-1";
                     __instance.modData["hapyke.FoodStore/shopOwnerToday"] = "-1,-1";
 
-                    if (__instance.getMasterScheduleRawData() != null)
+                    if (__instance.getMasterScheduleRawData() != null && !GlobalNPCBlackList.Contains(__instance.Name))
                     {
                         GlobalNPCList.Add(__instance.Name);
                         if (__instance.Age == 2) GlobalKidList.Add(__instance.Name);
@@ -243,12 +297,18 @@ namespace MarketTown
             RandomOpenSpot.Clear();
 
             TodayShopInventory.Clear();
-            FestivalToday = false;
+            IsFestivalToday = false;
             TodayFestivalOwner.Clear();
 
             npcOrderNumbers.Value.Clear();
             RestaurantSpot.Clear();
             TilePropertyChanged.Clear();
+
+            var keys = new List<IEnumerator<Furniture>>(RecentSoldTable.Keys);
+            foreach (var key in keys)
+            {
+                RecentSoldTable[key] = 0;
+            }
 
             Random rand = new Random();
 
@@ -515,7 +575,7 @@ namespace MarketTown
                     // If today is Festival day, init chest, sign and visitor schedule
                     if (festivalDay)
                     {
-                        FestivalToday = true;
+                        IsFestivalToday = true;
 
                         var chest = new Chest(true);
                         var sign = new Sign(new Vector2(69, 21), "37");
@@ -568,13 +628,13 @@ namespace MarketTown
                             var randomTile = FarmOutside.getRandomOpenPointInFarm(islandVisitor, islandVisitor.currentLocation, false).ToVector2();
                             if (randomTile != Vector2.Zero)
                             {
-                                FarmOutside.AddRandomScheduleIsland(islandVisitor, $"610", $"{islandVisitor.currentLocation.NameOrUniqueName}",
+                                FarmOutside.AddRandomSchedulePoint(islandVisitor, $"610", $"{islandVisitor.currentLocation.NameOrUniqueName}",
                                     $"{randomTile.X}", $"{randomTile.Y}", $"{Game1.random.Next(0, 4)}");
                             }
 
                             islandVisitor.wearIslandAttire();
 
-                            if (FestivalToday) SetVisitorSchedule(islandVisitor);
+                            if (IsFestivalToday) SetVisitorSchedule(islandVisitor);
                         }
                     }
                 }
@@ -762,6 +822,7 @@ namespace MarketTown
             try
             {
                 locat.warps.Clear();
+                locat.updateWarps();
 
                 foreach (var warp in Game1.getLocationFromName("BusStop").warps)
                 {
@@ -792,21 +853,41 @@ namespace MarketTown
 
                 }
             }
+
+            // restock table item
+            RestockTable(true);
+            RecentSoldTable.Clear();
         }
 
         // ----------- End of Day -----------
 
         private void GameLoop_UpdateTicked(object sender, UpdateTickedEventArgs e)
         {
-            if (Config.DisableTextChat || !Context.IsWorldReady) { return; }
+            if (!Context.IsWorldReady) { return; }
 
-            if (e.IsMultipleOf(30))
+            if (e.IsMultipleOf(30) && !Config.DisableTextChat)
             {
                 if (playerChatInstance == null)
                 {
                     playerChatInstance = new PlayerChat();
                 }
                 playerChatInstance.Validate();
+
+                if (RecentSoldTable.Count > 0)
+                {
+                    foreach (var kvp in RecentSoldTable)
+                    {
+                        var enumerator = kvp.Key;
+                        if (enumerator != null)
+                        {
+                            var location = enumerator.Current.Location;
+                            var tile = enumerator.Current.TileLocation;
+
+                            if (location.getObjectAtTile((int)tile.X, (int)tile.Y) == null || location.getObjectAtTile((int)tile.X, (int)tile.Y).QualifiedItemId != enumerator.Current.QualifiedItemId) 
+                                RecentSoldTable.Remove(kvp);
+                        }
+                    }
+                }
             }
         }
 
@@ -822,79 +903,15 @@ namespace MarketTown
                 UpdateOrders();
             }
 
-            // ******* Check NPC valid tile ******************************************************************************************************************
-            //foreach (NPC __instance in Game1.player.currentLocation.characters)
-            //{
-            //    if (__instance != null && __instance.IsVillager && !__instance.Name.Contains("derby") && Config.NPCCheckTimer != 0 && e.IsMultipleOf(60 * (uint)Config.NPCCheckTimer) && 1 == 2
-            //        && __instance.currentLocation != null && __instance.currentLocation is not BusStop
-            //        && __instance.Tile != __instance.DefaultPosition / 64
-            //        && __instance.Sprite.CurrentFrame >= 0 && __instance.Sprite.CurrentFrame <= 15
-            //        && !ChairPositions.Any(chairPosition => chairPosition.locationName == __instance.currentLocation.Name &&
-            //                    chairPosition.x == (int)__instance.Tile.X &&
-            //                    chairPosition.y == (int)__instance.Tile.Y)
-            //        )
-            //    {
-            //        Point zero = new Point((int)__instance.Tile.X, (int)__instance.Tile.Y);
-            //        var location = __instance.currentLocation;
-
-            //        bool isWaterTile = location.isWaterTile(zero.X, zero.Y);
-            //        bool isTileOnMap = location.isTileOnMap(__instance.Tile);
-            //        bool isTilePassable = location.isTilePassable(new Location(zero.X, zero.Y), Game1.viewport);
-            //        //bool isCharacterCollide = (location.isCollidingWithCharacter(new Microsoft.Xna.Framework.Rectangle(zero.X * Game1.tileSize, zero.Y * Game1.tileSize, Game1.tileSize, Game1.tileSize)) != null 
-            //        //    && location.isCollidingWithCharacter(new Microsoft.Xna.Framework.Rectangle(zero.X * Game1.tileSize, zero.Y * Game1.tileSize, Game1.tileSize, Game1.tileSize)).Name != __instance.Name);
-
-            //        if (Game1.player.currentLocation.Name == "Custom_MT_Island")
-            //        {
-            //            isWaterTile = false;
-            //            if (__instance.Tile.Y <= 4
-            //                || __instance.Tile.Y >= 73
-            //                || __instance.Tile.X <= 4
-            //                || __instance.Tile.X >= 87
-            //                || (__instance.Tile.X >= 35 && __instance.Tile.X <= 48 && __instance.Tile.Y <= 30)
-            //                || (__instance.Tile.X <= 19 && __instance.Tile.Y >= 32 && __instance.Tile.Y <= 45)
-            //                || (__instance.Tile.X <= 25 && __instance.Tile.Y >= 57)
-            //                || (__instance.Tile.X >= 79 && __instance.Tile.Y >= 65)
-            //                )
-            //            {
-            //                __instance.swimming.Value = true;
-            //                __instance.addedSpeed = 0;
-            //            }
-            //            else __instance.swimming.Value = false;
-            //        }
-            //        //if (Game1.player.currentLocation.Name == "Custom_MT_Island" && isCharacterCollide) Console.WriteLine(__instance.Name + " is stuck");
-
-            //        bool isValid = isTileOnMap && !isWaterTile && isTilePassable // && !isCharacterCollide
-            //            ;
-
-            //        if (!isValid)
-            //        {
-            //            SMonitor.Log(__instance.Name + " is stuck at" + __instance.currentLocation.Name, LogLevel.Error);
-            //            //if (Config.AdvanceNpcFix
-            //            //    && Int32.Parse(__instance.modData["hapyke.FoodStore/stuckCounter"]) < 7)
-            //            //{
-            //            //    FarmOutside.WalkAround(__instance.Name);
-            //            //    //__instance.isCharging = true;
-            //            //    __instance.modData["hapyke.FoodStore/stuckCounter"] = (Int32.Parse(__instance.modData["hapyke.FoodStore/stuckCounter"]) + 1).ToString();
-
-            //            //}// ********************** good option?
-            //            //else
-            //            //{
-            //            //    //__instance.isCharging = true;
-            //            //    __instance.addedSpeed = 3;
-            //            //    __instance.returnToEndPoint();
-            //            //    __instance.MovePosition(Game1.currentGameTime, Game1.viewport, __instance.currentLocation);
-            //            //}
-            //        }
-            //        else __instance.modData["hapyke.FoodStore/stuckCounter"] = "0";
-            //    }
-            //}
-
             NpcFestivalPurchase();
         }
 
         private void OnTimeChange(object sender, TimeChangedEventArgs e)
         {
             Random random = new Random();
+
+            // restock table item
+            RestockTable();
 
             if ( Game1.timeOfDay % 200 == 0)
             {
@@ -918,9 +935,10 @@ namespace MarketTown
             }
 
             // Island Festival manager
-            if (e.NewTime == Config.FestivalTimeStart && FestivalToday) OpenShop(OpenShopTile);
-            if (e.NewTime == Config.FestivalTimeEnd && FestivalToday) CloseShop(false);
-            
+            if (e.NewTime == Config.FestivalTimeEnd && IsFestivalToday) CloseShop(false);
+            if ( (e.NewTime - Config.FestivalTimeStart) % 300 == 0 && IsFestivalIsCurrent) SetupShop(false);
+            if (e.NewTime == Config.FestivalTimeStart && IsFestivalToday) OpenShop(OpenShopTile);
+
             //Send dish of the day
             if (Game1.timeOfDay == 900 && !Config.DisableChatAll && Game1.IsMasterGame)
             {
@@ -1039,7 +1057,7 @@ namespace MarketTown
                     catch { }
 
                     if (visit == null || blockedNPC) return;
-
+                    ResetErrorNpc(visit);
                     List<Vector2> clearTiles = new List<Vector2>();
                     if (Config.DoorEntry)          // Alow warp at door
                     {
@@ -1170,7 +1188,7 @@ namespace MarketTown
 
                             if (visit.currentLocation.CanSpawnCharacterHere(randomTile) && (!RestaurantSpot.ContainsKey(visit.currentLocation) || !RestaurantSpot[visit.currentLocation].Contains(randomTile)) )
                             {
-                                FarmOutside.AddRandomScheduleIsland(visit, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{visit.currentLocation.NameOrUniqueName}", $"{randomTile.X}", $"{randomTile.Y}", $"{randomDirection}");
+                                FarmOutside.AddRandomSchedulePoint(visit, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{visit.currentLocation.NameOrUniqueName}", $"{randomTile.X}", $"{randomTile.Y}", $"{randomDirection}");
                                 visit.modData["hapyke.FoodStore/specialOrder"] = $"{randomTile.X},{randomTile.Y}";
 
                                 if (!RestaurantSpot.ContainsKey(visit.currentLocation)) RestaurantSpot[visit.currentLocation] = new List<Vector2>();
@@ -1183,7 +1201,6 @@ namespace MarketTown
                         }
                     }
 
-                    ResetErrorNpc(visit);
                     visit.modData["hapyke.FoodStore/timeVisitShed"] = Game1.timeOfDay.ToString();
                 }
             }   // ****** end of shed visitor ******
@@ -1423,6 +1440,9 @@ namespace MarketTown
                                 continue;
                             enumerator.Current.heldObject.Value = null;
 
+                            if(!RecentSoldTable.ContainsKey(enumerator)) RecentSoldTable.Add(enumerator, Game1.timeOfDay);
+                            else RecentSoldTable[enumerator] = Game1.timeOfDay;
+                            
                             //Money on/off farm
                             if (__instance.currentLocation is not FarmHouse && __instance.currentLocation is not Farm && !Config.DisableChatAll)
                             {
@@ -1567,6 +1587,23 @@ namespace MarketTown
                             {
                                 __instance.modData["hapyke.FoodStore/LastFoodTaste"] = taste.ToString();
                             }
+                            else if ( food.foodObject.Quality >= 1)
+                            {
+                                switch (food.foodObject.Quality)
+                                {
+                                    case 1:
+                                        __instance.modData["hapyke.FoodStore/LastFoodTaste"] = "8";
+                                        break;
+                                    case 2:
+                                        __instance.modData["hapyke.FoodStore/LastFoodTaste"] = "2";
+                                        break;
+                                    case 4:
+                                        __instance.modData["hapyke.FoodStore/LastFoodTaste"] = "0";
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
                             else
                             {
                                 __instance.modData["hapyke.FoodStore/LastFoodTaste"] = "-1";
@@ -1687,7 +1724,7 @@ namespace MarketTown
 
             foreach (var building in Game1.getFarm().buildings)
             {
-                if (building != null && building.GetIndoorsName() != null && building.GetIndoorsName().Contains(location.Name)) buildingIsFarm = true;
+                if (building != null && building.GetIndoorsName() != null && building.GetIndoorsName().Contains(location.NameOrUniqueName)) buildingIsFarm = true;
             }
 
             if (buildingIsFarm)

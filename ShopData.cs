@@ -212,7 +212,6 @@ namespace MarketTown
                     shop.Value.Items.Clear();
                     int i = 1;
                     int tried = 0;
-                    Console.WriteLine(shopId);
                     while (i <= shopLists[shopId].Count && i <= 9 && tried <= 18)
                     {
                         var randomItemId = shopLists[shopId][Game1.random.Next(shopLists[shopId].Count)];
@@ -277,7 +276,6 @@ namespace MarketTown
 
                         if (!initShopStockList.Contains(randomItemId) )
                         {
-                            Console.WriteLine(randomItemId);
                             shop.Value.Items.Add(newItem);
                             initShopStockList.Add(randomItemId);
                             i++;

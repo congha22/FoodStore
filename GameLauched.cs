@@ -16,13 +16,10 @@ using Object = StardewValley.Object;
 using MailFrameworkMod;
 using System.Threading;
 using System.Threading.Tasks;
-//using MarketTown.Framework;
-using SpaceShared.APIs;
 using StardewValley.Menus;
 using MarketTown.Data;
 using StardewValley.Objects;
 using ContentPatcher;
-using SpaceCore;
 using StardewValley.GameData.BigCraftables;
 using StardewValley.GameData.Shops;
 using xTile.Dimensions;
@@ -32,12 +29,10 @@ using xTile;
 using System.Reflection;
 using System.Reflection.Metadata;
 using System.Xml.Linq;
-using SpaceCore.Spawnables;
 using StardewValley.GameData.Objects;
 using StardewValley.Pathfinding;
 using System.Runtime.CompilerServices;
 using StardewValley.Characters;
-using SpaceCore.UI;
 using StardewValley.GameData.FarmAnimals;
 using StardewValley.Locations;
 
@@ -167,669 +162,8 @@ namespace MarketTown
             this.Monitor.Log("Loading Market Town", LogLevel.Trace);
             var api = this.Helper.ModRegistry.GetApi<IContentPatcherAPI>("Pathoschild.ContentPatcher");
 
-            api.RegisterToken(this.ModManifest, "IslandSign", () =>
-            {
-                if (Context.IsWorldReady && SHelper.Data.ReadSaveData<MailData>("MT.MailLog") != null && SHelper.Data.ReadSaveData<MailData>("MT.MailLog").TotalVisitorVisited != 0)
-                {
-                    var totalVisitor = SHelper.Data.ReadSaveData<MailData>("MT.MailLog").TotalVisitorVisited;
+            ConfigMenu(api, this.ModManifest, Helper);
 
-                    GameLocation locat = Game1.getLocationFromName("Custom_MT_Island");
-                    string returnValue = SHelper.Translation.Get("foodstore.islandsign", new { season = locat.GetSeason().ToString(), visitor = totalVisitor.ToString() });
-                    return new[] { returnValue };
-                }
-                else if (Context.IsWorldReady && SHelper.Data.ReadSaveData<MailData>("MT.MailLog") == null)
-                {
-                    GameLocation locat = Game1.getLocationFromName("Custom_MT_Island");
-                    string returnValue = SHelper.Translation.Get("foodstore.islandsign", new { season = locat.GetSeason().ToString(), visitor = "0" });
-                    return new[] { returnValue };
-                }
-                return null;
-            });
-            
-            api.RegisterToken(this.ModManifest, "IslandFestivalDay", () =>
-            {
-                if (Context.IsWorldReady)
-                {
-                    int dayOfWeek = Game1.dayOfMonth % 7;
-                    bool festivalDay = false;
-
-                    switch (dayOfWeek)
-                    {
-                        case 0:
-                            festivalDay = Config.FestivalSun;
-                            break;
-                        case 1:
-                            festivalDay = Config.FestivalMon;
-                            break;
-                        case 2:
-                            festivalDay = Config.FestivalTue;
-                            break;
-                        case 3:
-                            festivalDay = Config.FestivalWed;
-                            break;
-                        case 4:
-                            festivalDay = Config.FestivalThu;
-                            break;
-                        case 5:
-                            festivalDay = Config.FestivalFri;
-                            break;
-                        case 6:
-                            festivalDay = Config.FestivalSat;
-                            break;
-                        default:
-                            // Handle invalid dayOfWeek value
-                            break;
-                    }
-
-                    return new[] { festivalDay.ToString().ToLower() };
-                }
-                return null;
-            });
-
-            api.RegisterToken(this.ModManifest, "IslandProgressLevel", () =>
-            {
-                if (Context.IsWorldReady && Game1.IsMasterGame && this.Helper.Data.ReadSaveData<MailData>("MT.MailLog") != null)
-                {
-                    MailData model = this.Helper.Data.ReadSaveData<MailData>("MT.MailLog");
-                    int level = model.FestivalEarning;
-                    string islandProgressLevel = "0";
-
-                    if (30000 < level && level <= 100000) islandProgressLevel = "1";
-                    else if (100000 < level && level <= 250000) islandProgressLevel = "2";
-                    else if (level > 250000) islandProgressLevel = "3";
-
-                    GameLocation locat = Game1.getLocationFromName("Custom_MT_Island");
-                    var islandBrazier = locat.getObjectAtTile(22, 36);
-                    if (locat == null || islandBrazier == null || islandBrazier.ItemId == null || islandBrazier.ItemId != "MT.Objects.ParadiseIslandBrazier" || !islandBrazier.IsOn)
-                        return new[] { "-1" };
-
-                    if (!Config.IslandProgress) islandProgressLevel = "3";
-
-                    return new[] { islandProgressLevel };
-                }
-                return null;
-            });
-
-            Texture2D originalTexture = ModEntry.Instance.Helper.ModContent.Load<Texture2D>("Assets/markettown.png");
-
-            int newWidth = (int)(originalTexture.Width / 1.35);
-            int newHeight = (int)(originalTexture.Height / 1.35);
-            Texture2D resizedTexture = new Texture2D(originalTexture.GraphicsDevice, newWidth, newHeight);
-
-            Color[] originalData = new Color[originalTexture.Width * originalTexture.Height];
-            originalTexture.GetData(originalData);
-            Color[] resizedData = new Color[newWidth * newHeight];
-
-            // Resize
-            for (int y = 0; y < newHeight; y++)
-            {
-                for (int x = 0; x < newWidth; x++)
-                {
-                    int originalX = (int)(x * 1.35);
-                    int originalY = (int)(y * 1.35);
-                    resizedData[x + y * newWidth] = originalData[originalX + originalY * originalTexture.Width];
-                }
-            }
-            resizedTexture.SetData(resizedData);
-            Microsoft.Xna.Framework.Rectangle displayArea = new Microsoft.Xna.Framework.Rectangle(0, 0, newWidth, newHeight);
-
-            // get Generic Mod Config Menu's API (if it's installed)
-            var configMenu = Helper.ModRegistry.GetApi<MarketTown.Data.IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
-            if (configMenu is null)
-                return;
-
-            // register mod
-            configMenu.Register(
-                mod: ModManifest,
-                reset: () => Config = new ModConfig(),
-                save: () => Helper.WriteConfig(Config)
-            );
-
-            configMenu.AddImage(mod: ModManifest, texture: () => resizedTexture, texturePixelArea: null, scale: 1);
-
-            configMenu.AddBoolOption(
-            mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.disablenonfoodonfarm"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.disablenonfoodonfarmText"),
-                getValue: () => Config.AllowRemoveNonFood,
-                setValue: value => Config.AllowRemoveNonFood = value
-            );
-
-            configMenu.AddNumberOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.minutetohungry"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.minutetohungryText"),
-                getValue: () => Config.MinutesToHungry,
-                setValue: value => Config.MinutesToHungry = value
-            );
-
-            configMenu.AddNumberOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.movetofoodchange"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.movetofoodchangeText"),
-                getValue: () => Config.MoveToFoodChance,
-                setValue: value => Config.MoveToFoodChance = value,
-                min: 0.0f,
-                max: 0.33f,
-                interval: 0.0025f
-            );
-
-            configMenu.AddTextOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.maxdistancetofindfood"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.maxdistancetofindfoodText"),
-                getValue: () => "" + Config.MaxDistanceToFind,
-                setValue: delegate (string value) { try { Config.MaxDistanceToFind = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
-            );
-            configMenu.AddTextOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.maxdistancetoeat"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.maxdistancetoeatText"),
-                getValue: () => "" + Config.MaxDistanceToEat,
-                setValue: delegate (string value) { try { Config.MaxDistanceToEat = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
-            );
-
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.randompurchase"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.randompurchaseText"),
-                getValue: () => Config.RandomPurchase,
-                setValue: value => Config.RandomPurchase = value
-            );
-
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.rushhour"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.rushhourText"),
-                getValue: () => Config.RushHour,
-                setValue: value => Config.RushHour = value
-                );
-
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.enabledecor"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.enabledecorText"),
-                getValue: () => Config.EnableDecor,
-                setValue: value => Config.EnableDecor = value
-            );
-
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.enabletipclose"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.enabletipcloseText"),
-                getValue: () => Config.TipWhenNeaBy,
-                setValue: value => Config.TipWhenNeaBy = value
-            );
-
-            configMenu.AddPageLink(mod: ModManifest, "island", () => SHelper.Translation.Get("foodstore.config.island"));
-            configMenu.AddPageLink(mod: ModManifest, "shed", () => SHelper.Translation.Get("foodstore.config.shed"));
-            configMenu.AddPageLink(mod: ModManifest, "dialogue", () => SHelper.Translation.Get("foodstore.config.dialogue"));
-            configMenu.AddPageLink(mod: ModManifest, "inviteTime", () => SHelper.Translation.Get("foodstore.config.invitetime"));
-            configMenu.AddPageLink(mod: ModManifest, "salePrice", () => SHelper.Translation.Get("foodstore.config.saleprice"));
-            configMenu.AddPageLink(mod: ModManifest, "advance", () => SHelper.Translation.Get("foodstore.config.advance"));
-
-            // Island setting
-            configMenu.AddPage(mod: ModManifest, "island", () => SHelper.Translation.Get("foodstore.config.island"));
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.islandprogress"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.islandprogressText"),
-                getValue: () => Config.IslandProgress,
-                setValue: value => Config.IslandProgress = value
-            );
-
-            configMenu.AddNumberOption(
-               mod: ModManifest,
-               name: () => SHelper.Translation.Get("foodstore.config.maxislandNPC"),
-               tooltip: () => SHelper.Translation.Get("foodstore.config.maxislandNPCText"),
-               getValue: () => Config.ParadiseIslandNPC,
-               setValue: value => Config.ParadiseIslandNPC = value,
-               min: 0,
-               max: 100,
-               interval: 1
-           );
-            configMenu.AddNumberOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.islandwalkaround"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.islandwalkaroundText"),
-                getValue: () => Config.IslandWalkAround,
-                setValue: value => Config.IslandWalkAround = value,
-                min: 0.0f,
-                max: 0.75f,
-                interval: 0.01f
-            );
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.islandplantboost"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.islandplantboostText"),
-                getValue: () => Config.IslandPlantBoost,
-                setValue: value => Config.IslandPlantBoost = value
-            );
-            configMenu.AddNumberOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.islandplantboostchance"),
-                getValue: () => Config.IslandPlantBoostChance,
-                setValue: value => Config.IslandPlantBoostChance = value,
-                min: 0.0f,
-                max: 1.0f,
-                interval: 0.01f
-            );
-            configMenu.AddNumberOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.islandfestivalsellchance"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.islandfestivalsellchanceText"),
-                getValue: () => Config.FestivalMaxSellChance,
-                setValue: value => Config.FestivalMaxSellChance = value,
-                min: 0.0f,
-                max: 1.0f,
-                interval: 0.01f
-            );
-
-            configMenu.AddSectionTitle(
-                mod: ModManifest,
-                text: () => SHelper.Translation.Get("foodstore.config.festivalschedule")
-            );
-            configMenu.AddNumberOption(
-               mod: ModManifest,
-               name: () => SHelper.Translation.Get("foodstore.config.festivaltimestart"),
-               getValue: () => Config.FestivalTimeStart,
-               setValue: value => Config.FestivalTimeStart = value,
-               min: 630,
-               max: 2400,
-               interval: 10
-           );
-            configMenu.AddNumberOption(
-               mod: ModManifest,
-               name: () => SHelper.Translation.Get("foodstore.config.festivaltimeend"),
-               getValue: () => Config.FestivalTimeEnd,
-               setValue: value => Config.FestivalTimeEnd = value,
-               min: 700,
-               max: 2400,
-               interval: 10
-           );
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.festivalmon"),
-                getValue: () => Config.FestivalMon,
-                setValue: value => Config.FestivalMon = value
-            );
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.festivaltue"),
-                getValue: () => Config.FestivalTue,
-                setValue: value => Config.FestivalTue = value
-            );
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.festivalwed"),
-                getValue: () => Config.FestivalWed,
-                setValue: value => Config.FestivalWed = value
-            );
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.festivalthu"),
-                getValue: () => Config.FestivalThu,
-                setValue: value => Config.FestivalThu = value
-            );
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.festivalfri"),
-                getValue: () => Config.FestivalFri,
-                setValue: value => Config.FestivalFri = value
-            );
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.festivalsat"),
-                getValue: () => Config.FestivalSat,
-                setValue: value => Config.FestivalSat = value
-            );
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.festivalsun"),
-                getValue: () => Config.FestivalSun,
-                setValue: value => Config.FestivalSun = value
-            );
-
-            // Shed setting
-            configMenu.AddPage(mod: ModManifest, "shed", () => SHelper.Translation.Get("foodstore.config.shed"));
-
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.easylicense"),
-                getValue: () => Config.EasyLicense,
-                setValue: value => Config.EasyLicense = value
-            );
-
-            configMenu.AddNumberOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.shedvisitchance"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.shedvisitchanceText"),
-                getValue: () => Config.ShedVisitChance,
-                setValue: value => Config.ShedVisitChance = value,
-                min: 0.0f,
-                max: 1.0f,
-                interval: 0.01f
-            );
-
-            configMenu.AddNumberOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.museumpricemarkup"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.museumpricemarkupText"),
-                getValue: () => Config.MuseumPriceMarkup,
-                setValue: value => Config.MuseumPriceMarkup = value,
-                min: 0.0f,
-                max: 4.0f,
-                interval: 0.025f
-            );
-
-            configMenu.AddTextOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.maxshedcapacity"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.maxshedcapacityText"),
-                getValue: () => "" + Config.MaxShedCapacity,
-                setValue: delegate (string value) { try { Config.MaxShedCapacity = Int32.Parse(value, CultureInfo.InvariantCulture); } catch { } }
-            );
-
-            configMenu.AddTextOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.timestay"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.timestayText"),
-                getValue: () => "" + Config.TimeStay,
-                setValue: delegate (string value) { try { Config.TimeStay = Int32.Parse(value, CultureInfo.InvariantCulture); } catch { } }
-            );
-
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.doorentry"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.doorentryText"),
-                getValue: () => Config.DoorEntry,
-                setValue: value => Config.DoorEntry = value
-            );
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.buswalk"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.buswalkText"),
-                getValue: () => Config.BusWalk,
-                setValue: value => Config.BusWalk = value
-            );
-
-            configMenu.AddTextOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.shedminutetohungry"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.shedminutetohungryText"),
-                getValue: () => "" + Config.ShedMinuteToHungry,
-                setValue: delegate (string value) { try { Config.ShedMinuteToHungry = Int32.Parse(value, CultureInfo.InvariantCulture); } catch { } }
-            );
-
-            configMenu.AddNumberOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.shedbuychance"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.shedbuychanceText"),
-                getValue: () => Config.ShedMoveToFoodChance,
-                setValue: value => Config.ShedMoveToFoodChance = value,
-                min: 0.0f,
-                max: 1.0f,
-                interval: 0.01f
-            );
-
-            configMenu.AddNumberOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.openhour"),
-                getValue: () => Config.OpenHour,
-                setValue: value => Config.OpenHour = (int)value,
-                min: 610,
-                max: 2400f,
-                interval: 10f
-            );
-
-            configMenu.AddNumberOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.closehour"),
-                getValue: () => Config.CloseHour,
-                setValue: value => Config.CloseHour = (int)value,
-                min: 610,
-                max: 2400f,
-                interval: 10f
-            );
-
-            configMenu.AddSectionTitle(
-                mod: ModManifest,
-                text: () => SHelper.Translation.Get("foodstore.config.shedvisitor")
-            );
-
-            configMenu.AddKeybind(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.modkey"),
-                getValue: () => Config.ModKey,
-                setValue: value => Config.ModKey = value
-            );
-            configMenu.AddNumberOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.tablesit"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.tablesitText"),
-                getValue: () => Config.TableSit,
-                setValue: value => Config.TableSit = value,
-                min: 0.0f,
-                max: 1.0f,
-                interval: 0.01f
-            );
-            configMenu.AddNumberOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.orderchance"),
-                getValue: () => Config.OrderChance,
-                setValue: value => Config.OrderChance = value,
-                min: 0.0f,
-                max: 1.0f,
-                interval: 0.01f
-            );
-
-            configMenu.AddNumberOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.lovedishchance"),
-                getValue: () => Config.LovedDishChance,
-                setValue: value => Config.LovedDishChance = value,
-                min: 0.0f,
-                max: 1.0f,
-                interval: 0.01f
-            );
-            configMenu.AddTextOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.pricemultiplier"),
-                getValue: () => "" + Config.PriceMarkup,
-                setValue: delegate (string value) { try { Config.PriceMarkup = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
-            );
-            configMenu.AddTextOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.maxordernight"),
-                getValue: () => "" + Config.MaxNPCOrdersPerNight,
-                setValue: delegate (string value) { try { Config.MaxNPCOrdersPerNight = Int32.Parse(value, CultureInfo.InvariantCulture); } catch { } }
-            );
-
-            //Dialogue setting
-            configMenu.AddPage(mod: ModManifest, "dialogue", () => SHelper.Translation.Get("foodstore.config.dialogue"));
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.textchat"),
-                getValue: () => Config.DisableTextChat,
-                setValue: value => Config.DisableTextChat = value
-            );
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.chat"),
-                getValue: () => Config.DisableChat,
-                setValue: value => Config.DisableChat = value
-            );
-            configMenu.AddTextOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.kidaskchance"),
-                getValue: () => "" + Config.KidAskChance,
-                setValue: delegate (string value) { try { Config.KidAskChance = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
-            );
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.disablekidask"),
-                getValue: () => Config.DisableKidAsk,
-                setValue: value => Config.DisableKidAsk = value
-            );
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.disableallmessage"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.disableallmessageText"),
-                getValue: () => Config.DisableChatAll,
-                setValue: value => Config.DisableChatAll = value
-            );
-
-
-            //Villager invite
-            configMenu.AddPage(mod: ModManifest, "inviteTime", () => SHelper.Translation.Get("foodstore.config.invitetime"));
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.enablevisitinside"),
-                getValue: () => Config.EnableVisitInside,
-                setValue: value => Config.EnableVisitInside = value
-            );
-
-            configMenu.AddNumberOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.invitecometime"),
-                getValue: () => Config.InviteComeTime,
-                setValue: value => Config.InviteComeTime = (int)value,
-                min: 600,
-                max: 2400f,
-                interval: 10f
-            );
-
-            configMenu.AddNumberOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.inviteleavetime"),
-                getValue: () => Config.InviteLeaveTime,
-                setValue: value => Config.InviteLeaveTime = (int)value,
-                min: 600,
-                max: 2400f,
-                interval: 10f
-            );
-            //sell multiplier
-
-            configMenu.AddPage(mod: ModManifest, "salePrice", () => SHelper.Translation.Get("foodstore.config.saleprice"));
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.multiplayermode"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.multiplayermodeText"),
-                getValue: () => Config.MultiplayerMode,
-                setValue: value => Config.MultiplayerMode = value
-            );
-
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.enableprice"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.enablepriceText"),
-                getValue: () => Config.EnablePrice,
-                setValue: value => Config.EnablePrice = value
-            );
-
-            configMenu.AddTextOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.pricelovemulti"),
-                getValue: () => "" + Config.LoveMultiplier,
-                setValue: delegate (string value) { try { Config.LoveMultiplier = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
-            );
-            configMenu.AddTextOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.pricelikemulti"),
-                getValue: () => "" + Config.LikeMultiplier,
-                setValue: delegate (string value) { try { Config.LikeMultiplier = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
-            );
-            configMenu.AddTextOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.priceneutralmulti"),
-                getValue: () => "" + Config.NeutralMultiplier,
-                setValue: delegate (string value) { try { Config.NeutralMultiplier = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
-            );
-            configMenu.AddTextOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.pricedislikemulti"),
-                getValue: () => "" + Config.DislikeMultiplier,
-                setValue: delegate (string value) { try { Config.DislikeMultiplier = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
-            );
-            configMenu.AddTextOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.pricehatemulti"),
-                getValue: () => "" + Config.HateMultiplier,
-                setValue: delegate (string value) { try { Config.HateMultiplier = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
-            );
-
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.enabletip"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.enabletipText"),
-                getValue: () => Config.EnableTip,
-                setValue: value => Config.EnableTip = value
-            );
-
-            configMenu.AddTextOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.enabletipcloselove"),
-                getValue: () => "" + Config.TipLove,
-                setValue: delegate (string value) { try { Config.TipLove = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
-            );
-            configMenu.AddTextOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.enabletipcloselike"),
-                getValue: () => "" + Config.TipLike,
-                setValue: delegate (string value) { try { Config.TipLike = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
-            );
-            configMenu.AddTextOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.enabletipcloseneutral"),
-                getValue: () => "" + Config.TipNeutral,
-                setValue: delegate (string value) { try { Config.TipNeutral = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
-            );
-            configMenu.AddTextOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.enabletipclosedislike"),
-                getValue: () => "" + Config.TipDislike,
-                setValue: delegate (string value) { try { Config.TipDislike = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
-            );
-            configMenu.AddTextOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.enabletipclosehate"),
-                getValue: () => "" + Config.TipHate,
-                setValue: delegate (string value) { try { Config.TipHate = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
-            );
-
-            // Advance page
-            configMenu.AddPage(mod: ModManifest, "advance", () => SHelper.Translation.Get("foodstore.config.advance"));
-            configMenu.AddTextOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.signrange"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.signrangeText"),
-                getValue: () => "" + Config.SignRange,
-                setValue: delegate (string value) { try { Config.SignRange = int.Parse(value, CultureInfo.InvariantCulture); } catch { } }
-            );
-            //configMenu.AddNumberOption(
-            //    mod: ModManifest,
-            //    name: () => SHelper.Translation.Get("foodstore.config.pathcheck"),
-            //    tooltip: () => SHelper.Translation.Get("foodstore.config.pathcheckText"),
-            //    getValue: () => Config.NPCCheckTimer,
-            //    setValue: value => Config.NPCCheckTimer = (int)value,
-            //    min: 0,
-            //    max: 7,
-            //    interval: 1
-            //);
-            //configMenu.AddBoolOption(
-            //    mod: ModManifest,
-            //    name: () => SHelper.Translation.Get("foodstore.config.advancenpcfix"),
-            //    tooltip: () => SHelper.Translation.Get("foodstore.config.advancenpcfixText"),
-            //    getValue: () => Config.AdvanceNpcFix,
-            //    setValue: value => Config.AdvanceNpcFix = value
-            //);
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.advanceoutputitemid"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.advanceoutputitemidText"),
-                getValue: () => Config.AdvanceOutputItemId,
-                setValue: value => Config.AdvanceOutputItemId = value
-            );
         }       // **** Config Handle ****
 
         private void OneButtonPressed(object sender, ButtonPressedEventArgs e)
@@ -992,30 +326,13 @@ namespace MarketTown
         {
             if (!Game1.hasLoadedGame) return;
 
-            //--------------------------------------------------------------------------------------------------------------------------------------------------
-            //Game1.chatBox.addInfoMessage(e.NewMenu.ToString());
-            //foreach (var x in Utility.getAllVillagers())
-            //{
-            //    if (x.Name.Contains("MT.Guest_"))
-            //    {
-            //        Game1.player.friendshipData.Remove(x.Name);
-            //    }
-            //}
-
             if (e.NewMenu is ShopMenu shop)
             {
-                //if (shop.ShopId == "Carpenter")
-                //{
-                //    var mm = new MtMannequin(MannequinType.Plain, MannequinGender.Male, Vector2.Zero);
-                //    var mf = new MtMannequin(MannequinType.Plain, MannequinGender.Female, Vector2.Zero);
-                //    shop.forSale.Add(mm);
-                //    shop.forSale.Add(mf);
-                //    shop.itemPriceAndStock.Add(mm, new ItemStockInformation(15000, int.MaxValue));
-                //    shop.itemPriceAndStock.Add(mf, new ItemStockInformation(15000, int.MaxValue));
-
-                //    bool islandStatus = Game1.getLocationFromName("Custom_MT_Island").isAlwaysActive;
-                //    if (!islandStatus) { Game1.addHUDMessage(new HUDMessage(SHelper.Translation.Get("foodstore.island.building"), 5000, true)); }
-                //}
+                if (shop.ShopId == "Carpenter")
+                {
+                    bool islandStatus = Game1.getLocationFromName("Custom_MT_Island").isAlwaysActive.Value;
+                    if (!islandStatus) { Game1.addHUDMessage(new HUDMessage(SHelper.Translation.Get("foodstore.island.building"), 5000, true)); }
+                }
 
                 if (shop.ShopId.Contains("MarketTown."))
                 {
@@ -1025,7 +342,8 @@ namespace MarketTown
                         {
                             if (marketShop.Name == shop.ShopId)
                             {
-                                marketShop.ItemIds.Remove(item.QualifiedItemId);
+                                int index = marketShop.ItemIds.IndexOf(item.QualifiedItemId);
+                                marketShop.ItemIds[index] = null;
                                 break; // Stop searching after removing the item
                             }
                         }
@@ -1036,10 +354,10 @@ namespace MarketTown
             }
         }
 
-        // Check for Shop after Content Patcher patch the map, then generate shop stock and shop owner schedule
+        /// <summary>Check for Shop after Content Patcher patch the map, then generate shop stock and shop owner schedule.</summary>
         private void SetupShop(bool init)
         {
-            if (init)
+            try
             {
                 List<Vector2> shopLocations = new List<Vector2>
                 {
@@ -1085,7 +403,7 @@ namespace MarketTown
                     { "z_weapons", "MarketTown.weaponsShop"}
                 };
 
-                OpenShopTile.Clear();
+                if (init) OpenShopTile.Clear();
 
                 GameLocation island = Game1.getLocationFromName("Custom_MT_Island");
                 Layer buildings1Layer = island.map.GetLayer("Buildings1");
@@ -1099,7 +417,7 @@ namespace MarketTown
                         var tileProperty = buildings1Layer.PickTile(pixelPosition, Game1.viewport.Size).TileSheet.Id;
 
                         // if is Marnie livestock shop
-                        if (tileProperty == "z_marnie2") SetUpMarnieLivestockShop();
+                        if (tileProperty == "z_marnie2" && init) SetUpMarnieLivestockShop();
 
                         // if is normal shop
                         if (shopName.ContainsKey(tileProperty))
@@ -1108,19 +426,31 @@ namespace MarketTown
                             {
                                 for (int j = (int)tile.Y - 2; j <= (int)tile.Y; j++)
                                 {
-                                    OpenShopTile.Add(new Vector2(i, j), shopName[tileProperty]);
+                                    if (init) OpenShopTile.Add(new Vector2(i, j), shopName[tileProperty]);
                                 }
                             }
 
-                            GenerateShop(shopName[tileProperty], tile);
-                            SetupChest(shopName[tileProperty], tile);
-                            Monitor.Log($"Opening {shopName[tileProperty]}", LogLevel.Trace);
+                            if (init)
+                            {
+                                GenerateShop(shopName[tileProperty], tile);
+                                SetupChest(shopName[tileProperty], tile);
+                                Monitor.Log($"Opening {shopName[tileProperty]}", LogLevel.Trace);
+                            }
+                            else if (!init && Game1.random.NextDouble() < 1.5 / IslandProgress() )
+                            {
+                                // renew shop stock
+                                MarketShopData shop = TodayShopInventory.FirstOrDefault(shop => shop.Tile == tile);
+                                if (shop != null && TodayShopInventory.Contains(shop) && !init) { TodayShopInventory.Remove(shop); }
+                                GenerateShop(shopName[tileProperty], tile);
+                            }
                         }
                     }
                 }
             }
+            catch (Exception ex) { SMonitor.Log("Error while generating shop stock: " + ex.Message, LogLevel.Error); }
         }
 
+        /// <summary>Set schedule during Festival for NPC.</summary>
         private void SetVisitorSchedule(NPC npc)
         {
             Random random = new Random();
@@ -1152,6 +482,7 @@ namespace MarketTown
                 }
             }
 
+            // Special schedule for shop owners
             if (npc.modData["hapyke.FoodStore/shopOwnerToday"] != "-1,-1")
             {
                 string[] components = npc.modData["hapyke.FoodStore/shopOwnerToday"].Split(',');
@@ -1168,14 +499,19 @@ namespace MarketTown
             {
                 MarketShopData randomShop = TodayShopInventory.Count > 0 ? TodayShopInventory[random.Next(TodayShopInventory.Count)] : null;
 
-                Vector2 availableTile = randomShop.Tile + new Vector2(random.Next(0, 4) - 1, 1);
-                if (random.NextDouble() < 0.25)
+                // player's shop has 20% higher chance than others
+                Vector2 availableTile = new Vector2();
+                if (random.NextDouble() < 0.2) availableTile = new Vector2(66, 21) + new Vector2(random.Next(0, 4) - 1, 1);
+                else availableTile = randomShop.Tile + new Vector2(random.Next(0, 4) - 1, 1);
+
+                // NPC walk around
+                if (random.NextDouble() < 0.4)
                 {
                     var otherTile = FarmOutside.getRandomOpenPointInFarm(npc, npc.currentLocation, false).ToVector2();
                     if (Utility.distance(67, otherTile.X, 20, otherTile.Y) < 25)
                     {
                         availableTile = otherTile;
-                        finalFace = random.Next(1, 4);
+                        finalFace = weightedFacing[random.Next(weightedFacing.Length)];
                     }
                 }
                 int storeScheduleTime = ConvertToHour(lastScheduleTime + weightedNumbers[random.Next(weightedNumbers.Length)] * 10);
@@ -1186,13 +522,13 @@ namespace MarketTown
             npc.TryLoadSchedule("default", initSche);
         }
 
-
+        /// <summary>Set Map Tile properties for Shop.</summary>
         private void OpenShop(IDictionary<Vector2, string> shopTile)
         {
             Game1.addHUDMessage(new HUDMessage(SHelper.Translation.Get("foodstore.festival.start")));
             var island = Game1.getLocationFromName("Custom_MT_Island");
 
-            FestivalIsCurrent = true;
+            IsFestivalIsCurrent = true;
             foreach (var kvp in shopTile)
             {
                 int tileX = (int)kvp.Key.X;
@@ -1210,9 +546,10 @@ namespace MarketTown
             }
         }
 
+        /// <summary>Remove Map Tile properties for Shop.</summary>
         private void CloseShop(bool endDay)
         {
-            FestivalIsCurrent = false;
+            IsFestivalIsCurrent = false;
             List<Vector2> shopLocations = new List<Vector2>
             {
                 new Vector2(76, 21),
@@ -1252,6 +589,7 @@ namespace MarketTown
             }
         }
 
+        /// <summary>Set up Sign and Chest.</summary>
         private void SetupChest(string name, Vector2 tile)
         {
             var chestTile = new Vector2(tile.X + 3, tile.Y - 2);
@@ -1271,7 +609,7 @@ namespace MarketTown
                 while (chest.Items.Count < randomGold) chest.Items.Add(ItemRegistry.Create<Item>("(O)GoldCoin"));
 
             MarketShopData shop = TodayShopInventory.FirstOrDefault(shop => shop.Name == name);
-
+            if (shop == null) { return; }
 
             sign.displayItem.Value = ItemRegistry.Create<Item>(shop.ItemIds[Game1.random.Next(shop.ItemIds.Count)]);
             sign.displayType.Value = 1;
@@ -1280,11 +618,12 @@ namespace MarketTown
             Game1.getLocationFromName("Custom_MT_Island").setObjectAt(signTile.X, signTile.Y, sign);
         }
 
+        /// <summary>Make NPC purchase during Festival.</summary>
         public static void NpcFestivalPurchase()
         {
             Random random = new Random();
 
-            if (FestivalToday && Game1.timeOfDay > Config.FestivalTimeStart && Game1.timeOfDay < Config.FestivalTimeEnd)
+            if (IsFestivalToday && Game1.timeOfDay > Config.FestivalTimeStart && Game1.timeOfDay < Config.FestivalTimeEnd)
             {
                 GameLocation islandInstance = Game1.getLocationFromName("Custom_MT_Island");
                 foreach (var shopData in TodayShopInventory)
@@ -1364,6 +703,8 @@ namespace MarketTown
                 }
             }
         }
+
+        /// <summary>Add Money to all online players.</summary>
         private static void AddToPlayerFunds(int salePrice)
         {
             var farmers = Game1.getAllFarmers().Where(f => f.isActive()).ToList();
@@ -1483,6 +824,7 @@ namespace MarketTown
             }
         }
 
+        /// <summary>When NPC ready to make new purchase.</summary>
         private static bool WantsToEat(NPC npc)
         {
             if (!npc.modData.ContainsKey("hapyke.FoodStore/LastFood") || npc.modData["hapyke.FoodStore/LastFood"].Length == 0)
@@ -1505,6 +847,7 @@ namespace MarketTown
             return minutesSinceLastFood > Config.MinutesToHungry;
         }
 
+        /// <summary>When NPC ready to show new message.</summary>
         private static bool WantsToSay(NPC npc, int time)
         {
             if (Config.DisableChatAll) { return false; }
@@ -1519,6 +862,7 @@ namespace MarketTown
             return minutesSinceLastFood > time;
         }
 
+        /// <summary>Time dalay between each try to make purchase.</summary>
         private static bool TimeDelayCheck(NPC npc)
         {
             if (!npc.modData.ContainsKey("hapyke.FoodStore/LastCheck") || npc.modData["hapyke.FoodStore/LastCheck"].Length == 0)
@@ -1536,6 +880,7 @@ namespace MarketTown
             return (timeOfDay % 100) + (timeOfDay / 100 * 60);
         }
 
+        /// <summary>Get a score of decoration -0.2 - 0.5. Higher mean better decoration.</summary>
         public static double GetDecorPoint(Vector2 foodLoc, GameLocation gameLocation)
         {
             //init
@@ -1612,6 +957,7 @@ namespace MarketTown
 
         }
 
+        /// <summary>Selected NPC will share their opinion, and nearby NPCs will response to that.</summary>
         public static void SaySomething(NPC thisCharacter, GameLocation thisLocation, double lastTasteRate, double lastDecorRate)
         {
             double chanceToVisit = lastTasteRate + lastDecorRate;
@@ -1723,6 +1069,7 @@ namespace MarketTown
             return environment.characters.ToList().Count + Game1.getLocationFromName("BusStop").characters.ToList().Count;
         }
 
+        /// <summary>Update Count for License progress.</summary>
         public static void UpdateCount(int category)
         {
             Dictionary<int, Action> categoryActions = new Dictionary<int, Action>
@@ -1857,7 +1204,7 @@ namespace MarketTown
             }
         }
 
-        // Get Island Progress point 1 - 4. Lower is better
+        /// <summary>Return a Double 4 - 1 score. The lower the better progress.</summary>
         private static double IslandProgress()
         {
             MailData model = null;
@@ -1883,7 +1230,7 @@ namespace MarketTown
         }
 
 
-        // DEBUG: Get unique ID of all item
+        /// <summary>DEBUG: Output all items' id to a file.</summary>
         private void OutputItemId()
         {
             Dictionary<string, List<string>> itemsByCategory = new Dictionary<string, List<string>>();
@@ -2027,7 +1374,7 @@ namespace MarketTown
             Config.AdvanceOutputItemId = false;
         }
 
-        // Convert minute to HHMM
+        /// <summary>Convert minutes to HHMM.</summary>
         public static int ConvertToHour(int number)
         {
             string numberString = number.ToString();
@@ -2052,7 +1399,7 @@ namespace MarketTown
             return result;
         }
 
-        // Convert HHMM to minute
+        /// <summary>Convert HHMM to Minutes.</summary>
         public static int ConvertToMinute(int number)
         {
             int hours = number / 100;
@@ -2061,6 +1408,7 @@ namespace MarketTown
             return hours * 60 + minutes;
         }
 
+        /// <summary>Clear schedule, endpoint, controller, moving state.</summary>
         public static void ResetErrorNpc (NPC __instance)
         {
             __instance.Halt();
@@ -2073,6 +1421,7 @@ namespace MarketTown
             __instance.Halt();
         }
 
+        /// <summary>Write Save.</summary>
         public static void EndOfDaySave()
         {
             int totalVisitorVisited = 0;
@@ -2285,6 +1634,78 @@ namespace MarketTown
                     count++;
                 }
             }
+        }
+
+        /// <summary> Table try to restock from nearby Market Storage </summary>
+        public static void RestockTable (bool check = false)
+        {
+            Random random = new Random();
+            try
+            {
+                if (RecentSoldTable.Count > 0)
+                {
+                    foreach (var kvp in RecentSoldTable)
+                    {
+                        var enumerator = kvp.Key;
+                        var time = kvp.Value;
+
+                        if (check) time = 0;
+                        if (Game1.timeOfDay < time + 20 || enumerator.Current.heldObject.Value != null) continue;
+
+                        var baseTile = enumerator.Current.TileLocation;
+                        int range = 10;
+                        int x = 0, y = 0;
+                        int dx = 0, dy = -1;
+                        int max = range * 2 + 1;
+                        int halfMax = max / 2;
+
+                        for (int i = 0; i < max * max; i++)
+                        {
+                            int currentX = (int)baseTile.X + x;
+                            int currentY = (int)baseTile.Y + y;
+
+                            if (Math.Abs(x) <= range && Math.Abs(y) <= range)
+                            {
+                                Vector2 currentTile = new Vector2(currentX, currentY);
+                                Object obj = Game1.currentLocation.getObjectAtTile(currentX, currentY);
+
+                                if (obj != null && obj is Chest chest && chest.Items.Count > 0
+                                    && (obj.QualifiedItemId == "(BC)MT.Objects.MarketTownStorageLarge" && random.NextDouble() < Config.RestockChance || obj.QualifiedItemId == "(BC)MT.Objects.MarketTownStorageSmall" && Math.Abs(x) <= 5 && Math.Abs(y) <= 5 && random.NextDouble() < Config.RestockChance / 2))
+                                {
+                                    List<Item> filteredItems = chest.Items.Where(item => item.QualifiedItemId.StartsWith("(O)")).ToList();
+                                    if (filteredItems.Count > 0)
+                                    {
+                                        var randomItemIndex = random.Next(filteredItems.Count);
+                                        var randomItemId = filteredItems[randomItemIndex].itemId;
+                                        var randomQualifiedItemId = filteredItems[randomItemIndex].QualifiedItemId;
+
+                                        var selectedObject = new Object(randomItemId, 1);
+                                        enumerator.Current.heldObject.Value = selectedObject;
+
+                                        var chestItem = chest.Items.Where(item => item.QualifiedItemId == randomQualifiedItemId).FirstOrDefault();
+                                        if (chest.Items[chest.Items.IndexOf(chestItem)].Stack > 1) chest.Items[chest.Items.IndexOf(chestItem)].Stack -= 1;
+                                        else chest.Items.Remove(chestItem);
+
+                                        RecentSoldTable[enumerator] = 9999;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (x == y || (x < 0 && x == -y) || (x > 0 && x == 1 - y))
+                            {
+                                int temp = dx;
+                                dx = -dy;
+                                dy = temp;
+                            }
+
+                            x += dx;
+                            y += dy;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex) { SMonitor.Log("Error while restock table" + ex.Message, LogLevel.Error); }
         }
     }
 }

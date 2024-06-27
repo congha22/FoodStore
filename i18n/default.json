@@ -1365,7 +1365,10 @@
   "foodstore.weeklycustomerreview":                   "Customer review Total/Positive/Negative: {{total}} / {{pos}} / {{neg}}^^",
 
   "foodstore.config.tablesit":                        "Chance visitor sit at a table",
-  "foodstore.config.tablesitText":                    "Visitors would love to sit at table decorated with 'Restaurant Decor'"
+  "foodstore.config.tablesitText":                    "Visitors would love to sit at table decorated with 'Restaurant Decor'",
+
+  "foodstore.config.restockchance":                   "Auto-restock chance",
+  "foodstore.config.restockchanceText":               "Default 0.66. Chance Market Town Storage Large will try to restock nearby table. Chance for Storage Small is halved."
 
 
 }

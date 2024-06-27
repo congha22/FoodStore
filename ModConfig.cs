@@ -93,5 +93,7 @@ namespace MarketTown
         public int FestivalTimeStart { get; set; } = 800;
         public int FestivalTimeEnd { get; set; } = 1600;
         public float FestivalMaxSellChance { get; set; } = 0.3f;
+
+        public float RestockChance { get; set; } = 0.66f;
     }
 }

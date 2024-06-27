@@ -4,7 +4,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Netcode;
 using Newtonsoft.Json;
-using SpaceCore.Spawnables;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.BellsAndWhistles;
@@ -86,7 +85,7 @@ namespace MarketTown
             if (__instanceLocation.Name != null && random.NextDouble() < Config.IslandWalkAround && Game1.timeOfDay > 620 && __instance.timerSinceLastMovement > 10000 && Game1.timeOfDay % 20 == 0
                 && ( __instance.temporaryController == null && __instance.controller == null && !__instance.isMoving() &&  __instance.TilePoint == __instance.previousEndPoint || __instance.timerSinceLastMovement > 20000 )
                 && ( __instanceLocation.Name.Contains("Custom_MT_Island") || __instanceLocation.GetParentLocation() != null && __instanceLocation.GetParentLocation().Name == "Custom_MT_Island")
-                && ( !FestivalToday || Game1.timeOfDay > Config.FestivalTimeEnd + 100 || Game1.timeOfDay < Config.FestivalTimeStart - 130)
+                && ( !IsFestivalToday || Game1.timeOfDay > Config.FestivalTimeEnd + 100 || Game1.timeOfDay < Config.FestivalTimeStart - 130)
                  )
             {
                 // Reset stuck NPC
@@ -99,21 +98,21 @@ namespace MarketTown
                 // if npc is on the island and not shop owner
                 if (__instanceLocation.Name == "Custom_MT_Island" && __instance.modData["hapyke.FoodStore/shopOwnerToday"] == "-1,-1")
                 {
-                    if (nextVisitChance < 0.75) // walk around on the island
+                    if (nextVisitChance < 0.6) // walk around on the island
                     {
                         var randomTile = FarmOutside.getRandomOpenPointInFarm(__instance, __instanceLocation, false).ToVector2();
                         if (randomTile != Vector2.Zero)
                         {
-                            FarmOutside.AddRandomScheduleIsland(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{__instanceLocation.NameOrUniqueName}",
+                            FarmOutside.AddRandomSchedulePoint(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{__instanceLocation.NameOrUniqueName}",
                                 $"{randomTile.X}", $"{randomTile.Y}", $"{random.Next(0, 4)}");
                         }
                     }
-                    else if (nextVisitChance < 0.9 && Game1.timeOfDay >= 700) // visit island house
+                    else if (nextVisitChance < 0.8 && Game1.timeOfDay >= 700) // visit island house
                     {
                         var randomTile = FarmOutside.getRandomOpenPointInFarm(__instance, Game1.getLocationFromName("Custom_MT_Island_House"), false).ToVector2();
                         if (randomTile != Vector2.Zero)
                         {
-                            FarmOutside.AddRandomScheduleIsland(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{Game1.getLocationFromName("Custom_MT_Island_House").NameOrUniqueName}",
+                            FarmOutside.AddRandomSchedulePoint(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{Game1.getLocationFromName("Custom_MT_Island_House").NameOrUniqueName}",
                                 $"{randomTile.X}", $"{randomTile.Y}", $"{random.Next(0, 4)}");
                         }
                     }
@@ -125,7 +124,7 @@ namespace MarketTown
                             var randomTile = FarmOutside.getRandomOpenPointInFarm(__instance, Game1.getLocationFromName(selectedBuilding), false).ToVector2();
                             if (randomTile != Vector2.Zero)
                             {
-                                FarmOutside.AddRandomScheduleIsland(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{Game1.getLocationFromName(selectedBuilding).NameOrUniqueName}",
+                                FarmOutside.AddRandomSchedulePoint(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{Game1.getLocationFromName(selectedBuilding).NameOrUniqueName}",
                                     $"{randomTile.X}", $"{randomTile.Y}", $"{random.Next(0, 4)}");
                             }
                         }
@@ -139,7 +138,7 @@ namespace MarketTown
                         var randomTile = FarmOutside.getRandomOpenPointInFarm(__instance, Game1.getLocationFromName("Custom_MT_Island"), false).ToVector2();
                         if (randomTile != Vector2.Zero)
                         {
-                            FarmOutside.AddRandomScheduleIsland(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{Game1.getLocationFromName("Custom_MT_Island").NameOrUniqueName}",
+                            FarmOutside.AddRandomSchedulePoint(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{Game1.getLocationFromName("Custom_MT_Island").NameOrUniqueName}",
                                 $"{randomTile.X}", $"{randomTile.Y}", $"{random.Next(0, 4)}");
                         }
                     }
@@ -148,7 +147,7 @@ namespace MarketTown
                         var randomTile = FarmOutside.getRandomOpenPointInFarm(__instance, __instanceLocation, false).ToVector2();
                         if (randomTile != Vector2.Zero)
                         {
-                            FarmOutside.AddRandomScheduleIsland(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{__instanceLocation.NameOrUniqueName}",
+                            FarmOutside.AddRandomSchedulePoint(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{__instanceLocation.NameOrUniqueName}",
                                 $"{randomTile.X}", $"{randomTile.Y}", $"{random.Next(0, 4)}");
                         }
                     }
@@ -166,7 +165,7 @@ namespace MarketTown
                             var randomTile = FarmOutside.getRandomOpenPointInFarm(__instance, Game1.getLocationFromName("Custom_MT_Island"), false).ToVector2();
                             if (randomTile != Vector2.Zero)
                             {
-                                FarmOutside.AddRandomScheduleIsland(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{Game1.getLocationFromName("Custom_MT_Island").NameOrUniqueName}",
+                                FarmOutside.AddRandomSchedulePoint(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{Game1.getLocationFromName("Custom_MT_Island").NameOrUniqueName}",
                                     $"{randomTile.X}", $"{randomTile.Y}", $"{random.Next(0, 4)}");
                             }
                         }
@@ -176,7 +175,7 @@ namespace MarketTown
                         var randomTile = FarmOutside.getRandomOpenPointInFarm(__instance, __instanceLocation, false).ToVector2();
                         if (randomTile != Vector2.Zero)
                         {
-                            FarmOutside.AddRandomScheduleIsland(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{__instanceLocation.NameOrUniqueName}",
+                            FarmOutside.AddRandomSchedulePoint(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{__instanceLocation.NameOrUniqueName}",
                                 $"{randomTile.X}", $"{randomTile.Y}", $"{random.Next(0, 4)}");
                         }
                     }
@@ -190,7 +189,7 @@ namespace MarketTown
                 var randomTile = FarmOutside.getRandomOpenPointInFarm(__instance, __instanceLocation, true).ToVector2();
                 if (randomTile != Vector2.Zero)
                 {
-                    FarmOutside.AddRandomScheduleIsland(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{__instanceLocation.NameOrUniqueName}",
+                    FarmOutside.AddRandomSchedulePoint(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{__instanceLocation.NameOrUniqueName}",
                         $"{randomTile.X}", $"{randomTile.Y}", $"{random.Next(0, 4)}");
                 }
             }
@@ -335,6 +334,7 @@ namespace MarketTown
                         }
                         else if (__instance.modData["hapyke.FoodStore/shedEntry"] != "-1,-1" && __instance.modData["hapyke.FoodStore/shedEntry"] != null)        // Walk to Remove
                         {
+                            ResetErrorNpc(__instance);
                             string[] coordinates = __instance.modData["hapyke.FoodStore/shedEntry"].Split(',');
 
                             var shedEntryPoint = Point.Zero;
@@ -383,7 +383,8 @@ namespace MarketTown
                     var randomTile = FarmOutside.getRandomOpenPointInFarm(__instance, __instanceLocation, true, true).ToVector2();
                     if (randomTile != Vector2.Zero)
                     {
-                        FarmOutside.AddRandomScheduleIsland(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{__instanceLocation.NameOrUniqueName}",
+                        //SMonitor.Log("Trying to add schedule. SpaceCore might show warning message but it should not cause issues", LogLevel.Debug);
+                        FarmOutside.AddRandomSchedulePoint(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{__instanceLocation.NameOrUniqueName}",
                             $"{randomTile.X}", $"{randomTile.Y}", $"{random.Next(0, 4)}");
                     }
                 }

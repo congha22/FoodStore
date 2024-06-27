@@ -76,7 +76,7 @@ namespace MarketTown
                 }
             }
 
-            var isBusStop = e.NewLocation.Name.Contains("BusStop");
+            var isBusStop = e.OldLocation.Name.Contains("BusStop");
 
             if (isBusStop)
             {
@@ -84,7 +84,7 @@ namespace MarketTown
 
                 foreach (NPC who in Game1.getLocationFromName("BusStop").characters.ToList())
                 {
-                    if (who.Name.Contains("MT.Guest_"))
+                    if (who.temporaryController != null)
                     {
                         npcsToWarp.Add(who);
                     }
@@ -92,9 +92,8 @@ namespace MarketTown
 
                 foreach (NPC npc in npcsToWarp)
                 {
-                    ModEntry.ResetErrorNpc(npc);
-                    Game1.warpCharacter(npc, npc.DefaultMap, npc.DefaultPosition / 64);
-                    ModEntry.ResetErrorNpc(npc);
+                    if (npc.temporaryController != null ) npc.temporaryController.endBehaviorFunction(npc, npc.currentLocation);
+                    npc.temporaryController = null;
                 }
             }
 
@@ -180,8 +179,8 @@ namespace MarketTown
         }
 
         /// <summary>
-        /// Add schedule to the middle of a schedule and retain the structure
-        /// Might not work all the time, and does not work if NPC has queued schedule
+        /// Add schedule to the middle of a schedule and retain the structure.
+        /// Might not work all the time, and does not work if NPC has queued schedule.
         /// </summary>
         /// <param name="npc">The NPC to which the schedule will be added.</param>
         /// <param name="addTime">The time at which the schedule starts, and must be Game1.timeOfDay + 10 </param>
@@ -256,12 +255,6 @@ namespace MarketTown
                             $"{ModEntry.ConvertToHour(Int32.Parse(addTime) + 10)} {currentDirection.targetLocationName} {currentDirection.targetTile.X} {currentDirection.targetTile.Y} {currentDirection.facingDirection}/";
                         tempSche.Add(ModEntry.ConvertToHour(Int32.Parse(addTime) + 10), currentDirectionString);
 
-                        //Console.WriteLine("***********" + addTime + npc.Name + npc.currentLocation.Name);
-                        //Console.WriteLine(Game1.timeOfDay + $"__{Game1.timeOfDay} {npc.currentLocation.Name} {npc.Tile.X} {npc.Tile.Y} {npc.FacingDirection}/");
-                        //Console.WriteLine(Int32.Parse(addTime) + addSche);
-                        //Console.WriteLine(ModEntry.ConvertToHour(Int32.Parse(addTime) + 10) + currentDirectionString);
-                        //Console.WriteLine();
-
                         foreach (var piece in schedule)
                         {
                             if (piece.Value.time == currentDirection.time) continue; // already added
@@ -332,7 +325,8 @@ namespace MarketTown
 
 
 
-        internal static void AddRandomScheduleIsland(NPC npc, string addTime, string addEndLocation, string addEndX, string addEndY, string addEndDirection)
+        /// <summary>Add a random Tile to the Schedule at the next time change (10 minutes).</summary>
+        internal static void AddRandomSchedulePoint(NPC npc, string addTime, string addEndLocation, string addEndX, string addEndY, string addEndDirection)
         {
             // initSche is the last of the current schedule, then added the new piece
             // if schedule is null, initSche will be the current position of NPC
@@ -367,13 +361,13 @@ namespace MarketTown
         }
 
 
-        // This update the list of 'valid' tile in a location
+        /// <summary>Update the list of 'valid' tile in a location, which can then be selected for NPC schedule.</summary>
         internal static void UpdateRandomLocationOpenTile(GameLocation location)
         {
             List<Vector2> TileBlackList = new List<Vector2> { new Vector2(8, 31), new Vector2(9, 31), new Vector2(8, 32), new Vector2(9, 32), new Vector2(8, 33), new Vector2(9, 33) };
             try
             {
-                if (location != null && location.Name == "Custom_MT_Island" && location.isAlwaysActive) return;
+                if (location != null && location.Name == "Custom_MT_Island" && location.isAlwaysActive.Value) return;
 
                 Random r = new Random();
                 var map = location.Map;
@@ -401,7 +395,8 @@ namespace MarketTown
             catch { Console.WriteLine( $"Error while updating open tile at {location.NameOrUniqueName}"); }
         }
 
-        // this will get a random 'valid' tile from a location
+
+        /// <summary>Get a 'valid' tile from this Location.</summary>
         internal static Point getRandomOpenPointInFarm(NPC who, GameLocation location, bool update, bool bypass = false)
         {
             try

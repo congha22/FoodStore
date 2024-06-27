@@ -1,0 +1,19 @@
+{
+  "Name": "MarketTown - Custom Chests",
+  "Author": "d5a1lamdtd",
+  "Version": "6.0.0",
+  "Description": "Custom Chests for Market Town",
+  "UniqueID": "d5a1lamdtd.MarketTown.Chest",
+  "MinimumApiVersion": "3.15.0",
+  "UpdateKeys": ["Nexus:???"],
+  "ContentPackFor": {
+    "UniqueID": "Pathoschild.ContentPatcher"
+  },
+  "Dependencies": [
+    {
+      "UniqueID": "furyx639.ExpandedStorage",
+      "IsRequired": true,
+      "MinimumVersion": "3.0.0"
+    }
+  ]
+}

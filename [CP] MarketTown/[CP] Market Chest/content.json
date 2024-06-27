@@ -1,0 +1,19 @@
+{
+  "Format": "2.0.0",
+  "Changes": [
+    {
+      "Action": "Include",
+      "FromFile": "data/MarketTownStorageSmall.json"
+    },
+{
+      "Action": "Include",
+      "FromFile": "data/MarketTownStorageLarge.json"
+    },
+    {
+      "LogName": "Load Textures",
+      "Action": "Load",
+      "Target": "Mods/d5a1lamdtd.MarketTown.Chest/MarketTownStorageSmall,Mods/d5a1lamdtd.MarketTown.Chest/MarketTownStorageLarge",
+      "FromFile": "assets/{{TargetWithoutPath}}.png"
+    }
+  ]
+}

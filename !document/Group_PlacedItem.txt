@@ -26,3 +26,6 @@
 -4:	 Fish
 -2:	 Gem (Aquamine, Earth cyrstal)
  0:  Artifacts
+
+
+ Gift taste: hate -> love 6 4 8 2 0

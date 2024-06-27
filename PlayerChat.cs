@@ -302,28 +302,26 @@ namespace MarketTown
         private void Validate_NPCMap()          //Get NPC in map
         {
             NpcMap.Clear();
+            float closetDistance = 999f;
+            float currentDistance = 999f;
+            bool foundOne = false;
+            NPC selectNpc = new NPC();
             foreach (NPC npc in Game1.currentLocation.characters)
             {
                 if (npc.IsVillager)
                 {
-                    string displayName = npc.displayName;
-                    if (NpcMap.ContainsKey(displayName))
+                    currentDistance = (Game1.player.Tile - npc.Tile).Length();
+                    if (currentDistance > closetDistance) continue;
+                    else
                     {
-                        NPC newNPC = npc;
-                        NPC oldNPC = NpcMap[displayName];
-                        Microsoft.Xna.Framework.Vector2 val = Microsoft.Xna.Framework.Vector2.Subtract(Game1.player.Tile, oldNPC.Tile);
-                        float oldDistance = ((Microsoft.Xna.Framework.Vector2)val).Length();
-                        val = Microsoft.Xna.Framework.Vector2.Subtract(Game1.player.Tile, newNPC.Tile);
-                        float newDistance = ((Microsoft.Xna.Framework.Vector2)val).Length();
-                        if (oldDistance < newDistance)
-                        {
-                            continue;
-                        }
-                        NpcMap.Remove(displayName);
+                        closetDistance = currentDistance;
+                        selectNpc = npc;
+                        foundOne = true;
                     }
-                    NpcMap.Add(displayName, npc);
                 }
             }
+
+            if ( selectNpc != null && foundOne ) { NpcMap.Add(selectNpc.displayName, selectNpc); }
         }
 
         private void Validate_Target()          //Get distance from NPC to Player
