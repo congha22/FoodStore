@@ -13,7 +13,7 @@
   <property name="Outdoors" value="T"/>
   <property name="Spring_Objects" value="T"/>
   <property name="Summer_Objects" value="T"/>
-  <property name="Warp" value="73 16 Custom_MT_Island_House 8 32"/>
+  <property name="Warp" value="73 16 Custom_MT_Island_House 8 32 50 26 Beach 66 23 51 26 Beach 66 23 52 26 Beach 66 23 50 27 Beach 66 23 51 27 Beach 66 23 52 27 Beach 66 23"/>
   <property name="Winter_Objects" value="T"/>
  </properties>
  <tileset firstgid="1" name="untitled tile sheet" tilewidth="16" tileheight="16" tilecount="2080" columns="32">

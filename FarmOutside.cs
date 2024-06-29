@@ -244,7 +244,7 @@ namespace MarketTown
                     {
                         // add current tile BEFORE request
                         tempSche.Add(Game1.timeOfDay,
-                        $"{Game1.timeOfDay} {npc.currentLocation.Name} {npc.Tile.X} {npc.Tile.Y} {npc.FacingDirection}/");
+                        $"{Game1.timeOfDay} {npc.currentLocation.NameOrUniqueName} {npc.Tile.X} {npc.Tile.Y} {npc.FacingDirection}/");
 
                         // add requested schedule
                         string addSche = $"{addTime} {addEndLocation} {addEndX} {addEndY} {addEndDirection}/";
@@ -294,7 +294,7 @@ namespace MarketTown
                 {
                     // add current tile BEFORE request
                     tempSche.Add(Game1.timeOfDay,
-                    $"{Game1.timeOfDay} {npc.currentLocation.Name} {npc.Tile.X} {npc.Tile.Y} {npc.FacingDirection}/");
+                    $"{Game1.timeOfDay} {npc.currentLocation.NameOrUniqueName} {npc.Tile.X} {npc.Tile.Y} {npc.FacingDirection}/");
 
                     // add requested schedule
                     string addSche = $"{addTime} {addEndLocation} {addEndX} {addEndY} {addEndDirection}/";
@@ -302,7 +302,7 @@ namespace MarketTown
 
                     // add current tile AFTER request
                     tempSche.Add(ModEntry.ConvertToHour(Int32.Parse(addTime) + 10),
-                    $"{ModEntry.ConvertToHour(Int32.Parse(addTime) + 10)} {npc.currentLocation.Name} {npc.Tile.X} {npc.Tile.Y} {npc.FacingDirection}/");
+                    $"{ModEntry.ConvertToHour(Int32.Parse(addTime) + 10)} {npc.currentLocation.NameOrUniqueName} {npc.Tile.X} {npc.Tile.Y} {npc.FacingDirection}/");
                 }
 
                 if (tempSche.Any())

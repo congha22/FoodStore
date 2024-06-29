@@ -35,6 +35,7 @@ using System.Runtime.CompilerServices;
 using StardewValley.Characters;
 using StardewValley.GameData.FarmAnimals;
 using StardewValley.Locations;
+using StardewValley.Inventories;
 
 namespace MarketTown
 {
@@ -1418,6 +1419,7 @@ namespace MarketTown
             __instance.previousEndPoint = __instance.TilePoint;
             __instance.temporaryController = null;
             __instance.controller = null;
+            if( __instance.Sprite.CurrentFrame > 15 ) __instance.Sprite.CurrentFrame = 0;
             __instance.Halt();
         }
 
@@ -1649,7 +1651,7 @@ namespace MarketTown
                         var enumerator = kvp.Key;
                         var time = kvp.Value;
 
-                        if (check) time = 0;
+                        if (check && time != 9999) time = 0;
                         if (Game1.timeOfDay < time + 20 || enumerator.Current.heldObject.Value != null) continue;
 
                         var baseTile = enumerator.Current.TileLocation;
@@ -1670,24 +1672,30 @@ namespace MarketTown
                                 Object obj = Game1.currentLocation.getObjectAtTile(currentX, currentY);
 
                                 if (obj != null && obj is Chest chest && chest.Items.Count > 0
-                                    && (obj.QualifiedItemId == "(BC)MT.Objects.MarketTownStorageLarge" && random.NextDouble() < Config.RestockChance || obj.QualifiedItemId == "(BC)MT.Objects.MarketTownStorageSmall" && Math.Abs(x) <= 5 && Math.Abs(y) <= 5 && random.NextDouble() < Config.RestockChance / 2))
+                                    && (obj.QualifiedItemId == "(BC)MT.Objects.MarketTownStorageLarge" && random.NextDouble() < Config.RestockChance 
+                                    || obj.QualifiedItemId == "(BC)MT.Objects.MarketTownStorageSmall" && Math.Abs(x) <= 5 && Math.Abs(y) <= 5 && random.NextDouble() < Config.RestockChance / 2))
                                 {
                                     List<Item> filteredItems = chest.Items.Where(item => item.QualifiedItemId.StartsWith("(O)")).ToList();
                                     if (filteredItems.Count > 0)
                                     {
-                                        var randomItemIndex = random.Next(filteredItems.Count);
-                                        var randomItemId = filteredItems[randomItemIndex].itemId;
-                                        var randomQualifiedItemId = filteredItems[randomItemIndex].QualifiedItemId;
+                                        int index = random.Next(filteredItems.Count);
 
-                                        var selectedObject = new Object(randomItemId, 1);
-                                        enumerator.Current.heldObject.Value = selectedObject;
+                                        var itemItem = filteredItems[index];
+                                        var itemToSell = itemItem.getOne();
 
-                                        var chestItem = chest.Items.Where(item => item.QualifiedItemId == randomQualifiedItemId).FirstOrDefault();
-                                        if (chest.Items[chest.Items.IndexOf(chestItem)].Stack > 1) chest.Items[chest.Items.IndexOf(chestItem)].Stack -= 1;
-                                        else chest.Items.Remove(chestItem);
+                                        if (itemToSell is Object itemObject)
+                                        {
+                                            enumerator.Current.SetHeldObject(itemObject);
 
-                                        RecentSoldTable[enumerator] = 9999;
-                                        break;
+                                            var chestItem = chest.Items.Where(item => item == itemItem).FirstOrDefault();
+                                            var chestIndex = chest.Items.IndexOf(chestItem);
+
+                                            if (chest.Items[chestIndex].Stack > 1) chest.Items[chestIndex].Stack -= 1;
+                                            else chest.Items.Remove(chestItem);
+
+                                            RecentSoldTable[enumerator] = 9999;
+                                            break;
+                                        }
                                     }
                                 }
                             }

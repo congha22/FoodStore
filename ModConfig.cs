@@ -95,5 +95,8 @@ namespace MarketTown
         public float FestivalMaxSellChance { get; set; } = 0.3f;
 
         public float RestockChance { get; set; } = 0.66f;
+
+        public float VisitChanceIslandHouse { get; set; } = 0.2f;
+        public float VisitChanceIslandBuilding { get; set; } = 0.2f;
     }
 }

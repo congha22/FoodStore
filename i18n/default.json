@@ -860,7 +860,7 @@
   "foodstore.config.island":                          "Setting - Paradise Island",
 
   "foodstore.config.maxislandNPC":                    "Maximum number of visitors",
-  "foodstore.config.maxislandNPCText":                "Default 20. Max number of visitors when reaching max progress. Setting to high might cause lag",
+  "foodstore.config.maxislandNPCText":                "Default 40. Max number of visitors when reaching max progress. Setting to high might cause lag",
 
   "foodstore.config.islandprogress":                  "Paradise Island progress",
   "foodstore.config.islandprogressText":              "Default True. Set to False will skip challenge (max visitor, max sell price,...)",
@@ -1317,7 +1317,7 @@
   "foodstore.general.child.rude.neutral.6.6":         "Hey there. Let's create a secret hideout in the woods together, okay?",
   "foodstore.general.child.rude.neutral.7.6":         "Ready for a race to the playground? Winner gets bragging rights!",
 
-  "foodstore.config.festivalschedule":                "Festival schedule:",
+  "foodstore.config.festivalschedule":                "Festival:",
   "foodstore.config.festivalmon":                     "Monday",
   "foodstore.config.festivaltue":                     "Tuesday",
   "foodstore.config.festivalwed":                     "Wednesday",
@@ -1368,7 +1368,15 @@
   "foodstore.config.tablesitText":                    "Visitors would love to sit at table decorated with 'Restaurant Decor'",
 
   "foodstore.config.restockchance":                   "Auto-restock chance",
-  "foodstore.config.restockchanceText":               "Default 0.66. Chance Market Town Storage Large will try to restock nearby table. Chance for Storage Small is halved."
+  "foodstore.config.restockchanceText":               "Default 0.66. Chance Market Town Storage Large will try to restock nearby table. Chance for Storage Small is halved.",
+
+  "foodstore.config.islandvisithouse":                "Chance guest visit Island House",
+  "foodstore.config.islandvisithouseText":            "Default 0.2. Chance a NPC will visit the Island House. Recommened < 0.4, and keep Island House chance + Building chance < 1.0",
+
+  "foodstore.config.islandvisitbuilding":             "Chance guest visit a Building",
+  "foodstore.config.islandvisitbuildingText":         "Default 0.2. Chance a NPC will visit a random Building. Recommened < 0.4, and keep Island House chance + Building chance < 1.0",
+
+  "foodstore.config.islandplant":                     "Crops and trees"
 
 
 }

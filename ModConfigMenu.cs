@@ -286,6 +286,31 @@ namespace MarketTown
                 max: 0.75f,
                 interval: 0.01f
             );
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.islandvisithouse"),
+                tooltip: () => SHelper.Translation.Get("foodstore.config.islandvisithouseText"),
+                getValue: () => Config.VisitChanceIslandHouse,
+                setValue: value => Config.VisitChanceIslandHouse = value,
+                min: 0.0f,
+                max: 1.0f,
+                interval: 0.01f
+            );
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.islandvisitbuilding"),
+                tooltip: () => SHelper.Translation.Get("foodstore.config.islandvisitbuildingText"),
+                getValue: () => Config.VisitChanceIslandBuilding,
+                setValue: value => Config.VisitChanceIslandBuilding = value,
+                min: 0.0f,
+                max: 1.0f,
+                interval: 0.01f
+            );
+
+            configMenu.AddSectionTitle(
+                mod: ModManifest,
+                text: () => SHelper.Translation.Get("foodstore.config.islandplant")
+            );
             configMenu.AddBoolOption(
                 mod: ModManifest,
                 name: () => SHelper.Translation.Get("foodstore.config.islandplantboost"),
@@ -302,6 +327,11 @@ namespace MarketTown
                 max: 1.0f,
                 interval: 0.01f
             );
+
+            configMenu.AddSectionTitle(
+                mod: ModManifest,
+                text: () => SHelper.Translation.Get("foodstore.config.festivalschedule")
+            );
             configMenu.AddNumberOption(
                 mod: ModManifest,
                 name: () => SHelper.Translation.Get("foodstore.config.islandfestivalsellchance"),
@@ -311,11 +341,6 @@ namespace MarketTown
                 min: 0.0f,
                 max: 1.0f,
                 interval: 0.01f
-            );
-
-            configMenu.AddSectionTitle(
-                mod: ModManifest,
-                text: () => SHelper.Translation.Get("foodstore.config.festivalschedule")
             );
             configMenu.AddNumberOption(
                mod: ModManifest,

@@ -1438,9 +1438,10 @@ namespace MarketTown
                             //Remove food /// **************************************************************************************************************************************************************************
                             if (enumerator.Current.boundingBox.Value != food.furniture.boundingBox.Value)
                                 continue;
-                            enumerator.Current.heldObject.Value = null;
+                            if (enumerator.Current.heldObject.Value is not Chest) enumerator.Current.heldObject.Value = null;
+                            else if (enumerator.Current.heldObject.Value is Chest chest) chest.Items[food.slot] = null;
 
-                            if(!RecentSoldTable.ContainsKey(enumerator)) RecentSoldTable.Add(enumerator, Game1.timeOfDay);
+                            if (!RecentSoldTable.ContainsKey(enumerator)) RecentSoldTable.Add(enumerator, Game1.timeOfDay);
                             else RecentSoldTable[enumerator] = Game1.timeOfDay;
                             
                             //Money on/off farm
@@ -1628,30 +1629,6 @@ namespace MarketTown
                             if (enumerator.Current.boundingBox.Value != food.obj.boundingBox.Value)
                                 continue;
 
-                            //if (currentObject is MtMannequin mannequin)
-                            //{
-                            //    if (mannequin.Hat.Value != null)
-                            //    {
-                            //        salePrice += rand.Next(1100, 1600);
-                            //        mannequin.Hat.Value = null;
-                            //    }
-                            //    if (mannequin.Shirt.Value != null)
-                            //    {
-                            //        salePrice += rand.Next(1300, 1800);
-                            //        mannequin.Shirt.Value = null;
-                            //    }
-                            //    if (mannequin.Pants.Value != null)
-                            //    {
-                            //        salePrice += rand.Next(1400, 1900);
-                            //        mannequin.Pants.Value = null;
-                            //    }
-                            //    if (mannequin.Boots.Value != null)
-                            //    {
-                            //        salePrice += (int)(mannequin.Boots.Value.salePrice() * 4);
-                            //        mannequin.Boots.Value = null;
-                            //    }
-                            //}
-
                             if (currentObject is Mannequin man)
                             {
                                 if (man.hat.Value != null)
@@ -1781,7 +1758,7 @@ namespace MarketTown
             {
                 if (f.heldObject.Value != null
                     && (categoryKeys.Contains(f.heldObject.Value.Category)
-                        // || (f.heldObject.Value is WeaponProxy && Config.EnableSaleWeapon))
+                    // || (f.heldObject.Value is WeaponProxy && Config.EnableSaleWeapon))
                     ))         // ***** Validate category items *****
                 {
                     int xLocation = (f.boundingBox.X / 64) + (f.boundingBox.Width / 64 / 2);
@@ -1790,14 +1767,41 @@ namespace MarketTown
 
                     bool hasSignInRange = location.Objects.Values.Any(obj => obj is Sign sign && Vector2.Distance(fLocation, sign.TileLocation) <= Config.SignRange);
 
-                    if ( (Config.SignRange == 0 && !buildingIsFarm)
+                    if ((Config.SignRange == 0 && !buildingIsFarm)
                           || (buildingIsFarm && buildingIsMarket)
-                          || (buildingIsFarm && f.heldObject.Value.Category == -7 && buildingIsRestaurant) ) hasSignInRange = true;
+                          || (buildingIsFarm && f.heldObject.Value.Category == -7 && buildingIsRestaurant)) hasSignInRange = true;
 
                     // Add to foodList only if there is sign within the range
                     if (hasSignInRange && Vector2.Distance(fLocation, npc.Tile) < Config.MaxDistanceToFind)
                     {
                         foodList.Add(new DataPlacedFood(f, fLocation, f.heldObject.Value, -1));
+                    }
+                }
+
+                if (f.heldObject.Value != null && f.heldObject.Value is Chest chest) 
+                {
+                    if (chest.Items.Any(item => item != null))
+                    {
+                        int xLocation = (f.boundingBox.X / 64) + (f.boundingBox.Width / 64 / 2);
+                        int yLocation = (f.boundingBox.Y / 64) + (f.boundingBox.Height / 64 / 2);
+                        var fLocation = new Vector2(xLocation, yLocation);
+
+                        bool hasSignInRange = location.Objects.Values.Any(obj => obj is Sign sign && Vector2.Distance(fLocation, sign.TileLocation) <= Config.SignRange);
+
+                        if ((Config.SignRange == 0 && !buildingIsFarm)
+                              || (buildingIsFarm && buildingIsMarket)
+                              || (buildingIsFarm && buildingIsRestaurant)) hasSignInRange = true;
+
+                        if (buildingIsRestaurant && hasSignInRange && Vector2.Distance(fLocation, npc.Tile) < Config.MaxDistanceToFind )
+                        { 
+                            var item = chest.Items.FirstOrDefault(item => item != null && item.Category == -7);
+                            if ( item != null) { foodList.Add(new DataPlacedFood(f, fLocation, new Object(item.ItemId, 1), chest.Items.IndexOf(item))); }
+                        }
+                        else if (buildingIsMarket && hasSignInRange && Vector2.Distance(fLocation, npc.Tile) < Config.MaxDistanceToFind)
+                        {
+                            var item = chest.Items.FirstOrDefault(item => item != null);
+                            if (item != null) { foodList.Add(new DataPlacedFood(f, fLocation, new Object(item.ItemId, 1), chest.Items.IndexOf(item))); }
+                        }
                     }
                 }
             }

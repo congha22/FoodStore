@@ -95,10 +95,13 @@ namespace MarketTown
                 
                 double nextVisitChance = random.NextDouble();
 
+                float islandChance = 1 - Config.VisitChanceIslandHouse - Config.VisitChanceIslandBuilding;
+                float islandHouseChance = 1 - Config.VisitChanceIslandBuilding;
+
                 // if npc is on the island and not shop owner
                 if (__instanceLocation.Name == "Custom_MT_Island" && __instance.modData["hapyke.FoodStore/shopOwnerToday"] == "-1,-1")
                 {
-                    if (nextVisitChance < 0.6) // walk around on the island
+                    if (nextVisitChance < islandChance) // walk around on the island
                     {
                         var randomTile = FarmOutside.getRandomOpenPointInFarm(__instance, __instanceLocation, false).ToVector2();
                         if (randomTile != Vector2.Zero)
@@ -107,7 +110,7 @@ namespace MarketTown
                                 $"{randomTile.X}", $"{randomTile.Y}", $"{random.Next(0, 4)}");
                         }
                     }
-                    else if (nextVisitChance < 0.8 && Game1.timeOfDay >= 700) // visit island house
+                    else if (nextVisitChance < islandHouseChance && Game1.timeOfDay >= 700) // visit island house
                     {
                         var randomTile = FarmOutside.getRandomOpenPointInFarm(__instance, Game1.getLocationFromName("Custom_MT_Island_House"), false).ToVector2();
                         if (randomTile != Vector2.Zero)
