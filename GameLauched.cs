@@ -1651,8 +1651,6 @@ namespace MarketTown
                         var enumerator = kvp.Key;
                         var time = kvp.Value;
 
-                        if (check && time != 9999) time = 0;
-                        if (Game1.timeOfDay < time + 20 || enumerator.Current.heldObject.Value != null) continue;
 
                         var baseTile = enumerator.Current.TileLocation;
                         int range = 10;
@@ -1660,6 +1658,85 @@ namespace MarketTown
                         int dx = 0, dy = -1;
                         int max = range * 2 + 1;
                         int halfMax = max / 2;
+
+                        if (check && time != 9999) time = 0;
+
+                        if (Game1.timeOfDay >= time + 20 && enumerator.Current.heldObject.Value is Chest fChest)
+                        {
+                            List<int> nullIndex = new List<int>();
+                            int currentIndex = 0;
+                            foreach (var i in fChest.Items)
+                            {
+                                if (i == null) nullIndex.Add(currentIndex);
+                                currentIndex ++;
+                            }
+
+                            for (int i = 0; i < max * max; i++)
+                            {
+                                int currentX = (int)baseTile.X + x;
+                                int currentY = (int)baseTile.Y + y;
+
+                                if (Math.Abs(x) <= range && Math.Abs(y) <= range)
+                                {
+                                    Vector2 currentTile = new Vector2(currentX, currentY);
+                                    Object obj = Game1.currentLocation.getObjectAtTile(currentX, currentY);
+
+                                    if (obj != null && obj is Chest chest && chest.Items.Count > 0
+                                        && (obj.QualifiedItemId == "(BC)MT.Objects.MarketTownStorageLarge" && random.NextDouble() < Config.RestockChance
+                                        || obj.QualifiedItemId == "(BC)MT.Objects.MarketTownStorageSmall" && Math.Abs(x) <= 5 && Math.Abs(y) <= 5 && random.NextDouble() < Config.RestockChance / 2))
+                                    {
+                                        int tried = 5;
+                                        int nullCount = nullIndex.Count;
+                                        int currentIndexChest = 0;
+
+                                        while (tried > 0 && nullCount > 0) {
+                                            List<Item> filteredItems = chest.Items.Where(item => item.QualifiedItemId.StartsWith("(O)")).ToList();
+                                            if (filteredItems.Count > 0)
+                                            {
+                                                tried--;
+                                                int index = random.Next(filteredItems.Count);
+
+                                                var itemItem = filteredItems[index];
+                                                var itemToSell = itemItem.getOne();
+
+                                                if (itemToSell is Object itemObject)
+                                                {
+                                                    // *********************************************************************************restock framwork table
+                                                    //enumerator.Current.SetHeldObject(itemObject);
+                                                    fChest.Items[currentIndexChest] = itemItem;
+                                                    currentIndexChest++;
+                                                    nullCount--;
+
+
+                                                    var chestItem = chest.Items.Where(item => item == itemItem).FirstOrDefault();
+                                                    var chestIndex = chest.Items.IndexOf(chestItem);
+
+                                                    if (chest.Items[chestIndex].Stack > 1) chest.Items[chestIndex].Stack -= 1;
+                                                    else chest.Items.Remove(chestItem);
+
+                                                    nullCount--;
+
+                                                    RecentSoldTable[enumerator] = 9999;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (x == y || (x < 0 && x == -y) || (x > 0 && x == 1 - y))
+                                {
+                                    int temp = dx;
+                                    dx = -dy;
+                                    dy = temp;
+                                }
+
+                                x += dx;
+                                y += dy;
+                            }
+                        }
+
+                        if (Game1.timeOfDay < time + 20 || enumerator.Current.heldObject.Value != null) continue;
 
                         for (int i = 0; i < max * max; i++)
                         {

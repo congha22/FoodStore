@@ -24,7 +24,7 @@
                 "MT.Objects.MarketLicense": {
                     "Name": "Market License",
                     "Displayname": "Market License",
-                    "Description": "The Ferngill Republic requires this license for all shop owners. To register your Building as a business, you must display this License on a Sign at all times. Any change made will take effect the next day.",
+                    "Description": "Display on a Sign inside a Farm Building to use it as a Store that can sell everything. Change take effect the next day. Buildings on Paradise Island are NOT required a License",
                     "Type": "Basic",
                     "Price": 7500,
 
@@ -34,7 +34,7 @@
                 "MT.Objects.RestaurantLicense": {
                     "Name": "Restaurant License",
                     "Displayname": "Restaurant License",
-                    "Description": "The Ferngill Republic issues this License to Restaurant owner to operate food service. To register your Building as a Restaurant, the License must be displayed on a Sign. Any change made will take effect the next day.",
+                    "Description": "Display on a Sign inside a Farm Building to use it as a Restaurant and sell food items. Change take effect the next day. Buildings on Paradise Island are NOT required a License",
                     "Type": "Basic",
                     "Price": 4000,
 
@@ -44,7 +44,7 @@
                 "MT.Objects.MuseumLicense": {
                     "Name": "Museum License",
                     "Displayname": "Museum License",
-                    "Description": "Display this on a Sign will register your Building as public Museum and visitors will visits. Any change made will take effect the next day.",
+                    "Description": "Display on a Sign inside a Farm Building to register it as a Museum where guests can visit. Change take effect the next day. Buildings on Paradise Island are NOT required a License",
                     "Type": "Basic",
                     "Price": 5000,
 
@@ -154,6 +154,21 @@
                     "ItemId": "(O)MT.Objects.MuseumLicense",
                     "Price": 10000,
                     "Condition": "PLAYER_HAS_MAIL any MT.MuseumLicense received"
+                }
+            }
+        },
+        {
+            "Action": "EditData",
+            "Target": "Data/Shops",
+            "TargetField": [ "Carpenter", "Items" ],
+            "Entries": {
+                "MT.Objects.RestaurantDecor": {
+                    "Id": "MT.Objects.RestaurantDecor",
+                    "ItemId": "(F)MT.Objects.RestaurantDecor",
+                    "Price": 5000,
+                    "TradeItemId": "(O)597",
+                    "TradeItemAmount": 5,
+                    "Condition": "PLAYER_HAS_MAIL any MT.RestaurantLicense received"
                 }
             }
         }

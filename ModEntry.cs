@@ -910,6 +910,18 @@ namespace MarketTown
         {
             Random random = new Random();
 
+            //foreach (var asd in Game1.player.currentLocation.furniture)
+            //{
+            //    if ( asd.heldObject.Value is Chest chest)
+            //    {
+            //        foreach (var asdasd in chest.Items)
+            //        {
+            //            if (asdasd != null) Game1.chatBox.addInfoMessage(asdasd.Name);
+            //            else Game1.chatBox.addInfoMessage("null");
+            //        }
+            //    }
+            //}
+
             // restock table item
             RestockTable();
 
@@ -1222,6 +1234,16 @@ namespace MarketTown
                     {
                         while (enumerator.MoveNext())
                         {
+
+                            //Remove food /// **************************************************************************************************************************************************************************
+                            if (enumerator.Current.boundingBox.Value != food.furniture.boundingBox.Value)
+                                continue;
+                            if (enumerator.Current.heldObject.Value is not Chest) enumerator.Current.heldObject.Value = null;
+                            else if (enumerator.Current.heldObject.Value is Chest chest) chest.Items[food.slot] = null;
+
+                            if (!RecentSoldTable.ContainsKey(enumerator)) RecentSoldTable.Add(enumerator, Game1.timeOfDay);
+                            else RecentSoldTable[enumerator] = Game1.timeOfDay;
+
                             int taste = 8;
                             try
                             {
@@ -1435,15 +1457,6 @@ namespace MarketTown
                             //Config Tip when nearby
                             if (Config.TipWhenNeaBy && Utility.isThereAFarmerWithinDistance(food.foodTile, 15, __instance.currentLocation) == null) { tip = 0; }
 
-                            //Remove food /// **************************************************************************************************************************************************************************
-                            if (enumerator.Current.boundingBox.Value != food.furniture.boundingBox.Value)
-                                continue;
-                            if (enumerator.Current.heldObject.Value is not Chest) enumerator.Current.heldObject.Value = null;
-                            else if (enumerator.Current.heldObject.Value is Chest chest) chest.Items[food.slot] = null;
-
-                            if (!RecentSoldTable.ContainsKey(enumerator)) RecentSoldTable.Add(enumerator, Game1.timeOfDay);
-                            else RecentSoldTable[enumerator] = Game1.timeOfDay;
-                            
                             //Money on/off farm
                             if (__instance.currentLocation is not FarmHouse && __instance.currentLocation is not Farm && !Config.DisableChatAll)
                             {
@@ -1693,7 +1706,7 @@ namespace MarketTown
 
             List<DataPlacedFood> foodList = new List<DataPlacedFood>();
             foodList.Clear();
-
+            // **************************************************************change way of check to validBuildingObjectPairs
             bool buildingIsFarm = false;
             bool buildingIsMuseum = false;
             bool buildingIsMarket = false;
@@ -1791,6 +1804,9 @@ namespace MarketTown
                         if ((Config.SignRange == 0 && !buildingIsFarm)
                               || (buildingIsFarm && buildingIsMarket)
                               || (buildingIsFarm && buildingIsRestaurant)) hasSignInRange = true;
+                        // ******************************************************************************************* fix sell item at framwork table outdoor
+                        
+                        Game1.chatBox.addInfoMessage(hasSignInRange.ToString());
 
                         if (buildingIsRestaurant && hasSignInRange && Vector2.Distance(fLocation, npc.Tile) < Config.MaxDistanceToFind )
                         { 
@@ -1802,6 +1818,11 @@ namespace MarketTown
                             var item = chest.Items.FirstOrDefault(item => item != null);
                             if (item != null) { foodList.Add(new DataPlacedFood(f, fLocation, new Object(item.ItemId, 1), chest.Items.IndexOf(item))); }
                         }
+                        //else if (hasSignInRange && Vector2.Distance(fLocation, npc.Tile) < Config.MaxDistanceToFind)
+                        //{
+                        //    var item = chest.Items.FirstOrDefault(item => item != null);
+                        //    if (item != null) { foodList.Add(new DataPlacedFood(f, fLocation, new Object(item.ItemId, 1), chest.Items.IndexOf(item))); }
+                        //}
                     }
                 }
             }
