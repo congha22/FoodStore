@@ -189,7 +189,7 @@ namespace MarketTown
             if ((__instanceLocation.Name == "Farm" || __instanceLocation.Name == "FarmHouse") && __instance.modData["hapyke.FoodStore/invited"] == "true" && __instance.modData["hapyke.FoodStore/inviteDate"] == (Game1.stats.DaysPlayed - 1).ToString()
                 && !__instance.isMoving() && __instance.controller == null && __instance.temporaryController == null && __instance.timerSinceLastMovement >= 3000)
             {
-                var randomTile = FarmOutside.getRandomOpenPointInFarm(__instance, __instanceLocation, true).ToVector2();
+                var randomTile = FarmOutside.getRandomOpenPointInFarm(__instance, __instanceLocation, false).ToVector2();
                 if (randomTile != Vector2.Zero)
                 {
                     FarmOutside.AddRandomSchedulePoint(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{__instanceLocation.NameOrUniqueName}",
@@ -300,13 +300,15 @@ namespace MarketTown
                     && !bool.Parse(__instance.modData["hapyke.FoodStore/gettingFood"]) && __instance.modData["hapyke.FoodStore/timeVisitShed"] != "0"
                     && (Int32.Parse(__instance.modData["hapyke.FoodStore/timeVisitShed"]) <= (Game1.timeOfDay - Config.TimeStay) || Game1.timeOfDay > Config.CloseHour || Game1.timeOfDay >= 2500))
                 {
+                    bool done = false;
                     ResetErrorNpc(__instance);
                     __instance.TryLoadSchedule();
 
                     var schedule = __instance.Schedule;
                     var lastLocation = __instance.DefaultMap;
-                    var lastPoint = __instance.DefaultPosition;
+                    var lastPoint = __instance.DefaultPosition / 64;
                     var lastDirection = __instance.DefaultFacingDirection;
+                    ResetErrorNpc(__instance);
 
                     // Get the tile location where NPC should be at the current time
                     if (schedule != null && schedule.Count > 0)
@@ -324,7 +326,11 @@ namespace MarketTown
                             lastDirection = description.facingDirection;
                         }
                     }
-                    else Game1.warpCharacter(__instance, lastLocation, lastPoint);
+                    else
+                    {
+                        Game1.warpCharacter(__instance, lastLocation, lastPoint);
+                        done = true;
+                    }
 
                     if (lastLocation != Game1.player.currentLocation.Name)
                     {
@@ -335,7 +341,7 @@ namespace MarketTown
                             ResetErrorNpc(__instance);
                             __instance.TryLoadSchedule();
                         }
-                        else if (__instance.modData["hapyke.FoodStore/shedEntry"] != "-1,-1" && __instance.modData["hapyke.FoodStore/shedEntry"] != null)        // Walk to Remove
+                        else if (__instance.modData["hapyke.FoodStore/shedEntry"] != null)        // Walk to Remove
                         {
                             ResetErrorNpc(__instance);
                             string[] coordinates = __instance.modData["hapyke.FoodStore/shedEntry"].Split(',');
@@ -349,8 +355,9 @@ namespace MarketTown
                                 (character, location) =>
                                 {
                                     Game1.warpCharacter(__instance, lastLocation, lastPoint);
-                                    __instance.faceDirection(lastDirection);
+
                                     ResetErrorNpc(__instance);
+                                    __instance.faceDirection(lastDirection);
                                     __instance.TryLoadSchedule();
                                 } );
                         }
@@ -362,20 +369,25 @@ namespace MarketTown
                             ResetErrorNpc(__instance);
                             __instance.TryLoadSchedule();
                         }
+
+                        done = true;
                     }
                     else ResetErrorNpc(__instance);
 
-                    // remove special order tile
-                    string[] specialOrderCoor = __instance.modData["hapyke.FoodStore/specialOrder"].Split(',');
-                    Vector2 specialOrderTile = new Vector2(int.Parse(specialOrderCoor[0]), int.Parse(specialOrderCoor[1]));
-
-                    if (RestaurantSpot.ContainsKey(__instanceLocation))
+                    // remove special order tile when NPC left
+                    if (done)
                     {
-                        var tileList = RestaurantSpot[__instanceLocation];
-                        if (tileList.Contains(specialOrderTile)) tileList.Remove(specialOrderTile); 
-                    }
+                        string[] specialOrderCoor = __instance.modData["hapyke.FoodStore/specialOrder"].Split(',');
+                        Vector2 specialOrderTile = new Vector2(int.Parse(specialOrderCoor[0]), int.Parse(specialOrderCoor[1]));
 
-                    __instance.modData["hapyke.FoodStore/specialOrder"] = "-1,-1";
+                        if (RestaurantSpot.ContainsKey(__instanceLocation))
+                        {
+                            var tileList = RestaurantSpot[__instanceLocation];
+                            if (tileList.Contains(specialOrderTile)) tileList.Remove(specialOrderTile);
+                        }
+
+                        __instance.modData["hapyke.FoodStore/specialOrder"] = "-1,-1";
+                    }
                 }
                 // else random move around
                 else if (__instanceLocation.GetParentLocation() != null && __instanceLocation.GetParentLocation().IsFarm 
@@ -383,7 +395,7 @@ namespace MarketTown
                     && !__instance.isMoving() && __instance.controller == null && __instance.temporaryController == null && __instance.timerSinceLastMovement >= 3000
                     && (Game1.player.friendshipData.ContainsKey(__instance.Name) && !Game1.player.friendshipData[__instance.Name].IsMarried() && !Game1.player.friendshipData[__instance.Name].IsRoommate() || !Game1.player.friendshipData.ContainsKey(__instance.Name)))
                 {
-                    var randomTile = FarmOutside.getRandomOpenPointInFarm(__instance, __instanceLocation, true, true).ToVector2();
+                    var randomTile = FarmOutside.getRandomOpenPointInFarm(__instance, __instanceLocation, false, true).ToVector2();
                     if (randomTile != Vector2.Zero)
                     {
                         //SMonitor.Log("Trying to add schedule. SpaceCore might show warning message but it should not cause issues", LogLevel.Debug);
@@ -529,26 +541,10 @@ namespace MarketTown
                 return;
 
             // ****************************************************************************************************************************
-            if ( __instance.currentLocation.Name != __instance.DefaultMap
-                && (__instance.Tile.X > __instanceLocation.Map.Layers[0].LayerWidth
-                || __instance.Tile.Y > __instanceLocation.Map.Layers[0].LayerHeight
-                || __instance.Tile.X < 0
-                || __instance.Tile.Y < 0)
-                )
+            if ((__instance.Tile.X > 300 || __instance.Tile.Y > 300 || __instance.Tile.X < -50 || __instance.Tile.Y < -50) && Game1.timeOfDay % 100 == 0)
             {
-                SMonitor.Log("NPC OFF MAP " + __instance.Name + __instance.Tile + __instanceLocation.Name, LogLevel.Warn);
-                //if (__instance.Tile.X > 150) Game1.currentLocation.ShowAnimalShopMenu();
-
-            }
-
-            foreach (var pair in validBuildingObjectPairs)
-            {
-                Building building = pair.Building;
-                string buildingType = pair.buildingType;
-
-                var museumCheck = Game1.getLocationFromName(building.GetIndoorsName());
-
-                if (museumCheck == __instanceLocation && buildingType == "museum") return;
+                SMonitor.Log($"Found NPC {__instance.Name} out of map border at {__instanceLocation} {__instance.Tile}.", LogLevel.Warn);
+                SMonitor.Log($"Optionally fix this by type command: 'markettown fix {__instance.Name}'", LogLevel.Warn);
             }
 
             DataPlacedFood food = GetClosestFood(__instance, __instanceLocation);

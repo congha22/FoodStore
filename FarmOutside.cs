@@ -407,7 +407,8 @@ namespace MarketTown
                         || location.NameOrUniqueName.Contains("Custom_MT_Island")
                         || location.GetParentLocation() != null && location.GetParentLocation().Name == "Custom_MT_Island") ) // ************ check shed name
                 {
-                    if (update) UpdateRandomLocationOpenTile(location);
+                    if (update || !ModEntry.RandomOpenSpot.ContainsKey(location) || ModEntry.RandomOpenSpot[location].Count() == 0) 
+                        UpdateRandomLocationOpenTile(location);
 
                     if (ModEntry.RandomOpenSpot.ContainsKey(location))
                        return ModEntry.RandomOpenSpot[location][Game1.random.Next(ModEntry.RandomOpenSpot[location].Count())].ToPoint();

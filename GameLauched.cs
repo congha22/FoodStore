@@ -81,6 +81,8 @@ namespace MarketTown
 
             helper.Events.Player.Warped += FarmOutside.PlayerWarp;
 
+            helper.ConsoleCommands.Add("markettown", "fix", this.HandleCommand);
+
             //
             Helper.Events.Input.ButtonPressed += this.OneButtonPressed;
 
@@ -167,6 +169,59 @@ namespace MarketTown
 
         }       // **** Config Handle ****
 
+        private void HandleCommand(string cmd, string[] args)
+        {
+            if (args.Length == 0 || args[0] != "fix")
+            {
+                return;
+            }
+
+            var npcName = args[1];
+            var npc = Game1.getCharacterFromName(npcName);
+
+            if (npc != null)
+            {
+                ResetErrorNpc(npc);
+                npc.TryLoadSchedule();
+                var schedule = npc.Schedule;
+                ResetErrorNpc(npc);
+
+
+                var lastLocation = npc.DefaultMap;
+                var lastPosition = npc.DefaultPosition / 64;
+                var lastFacing = npc.DefaultFacingDirection;
+
+                if (schedule == null) Game1.warpCharacter(npc, lastLocation, lastPosition);
+                else
+                {
+                    foreach (var piece in schedule)
+                    {
+                        if (piece.Key > Game1.timeOfDay)
+                        {
+                            Game1.warpCharacter(npc, lastLocation, lastPosition);
+                            npc.faceDirection(lastFacing);
+                            npc.TryLoadSchedule();
+
+                            Console.WriteLine($"Warped {npc.Name} to {lastLocation} at {lastPosition}");
+                            return;
+                        }
+
+                        lastLocation = piece.Value.targetLocationName;
+                        lastPosition = piece.Value.targetTile.ToVector2();
+                        lastFacing = piece.Value.facingDirection;
+                    }
+
+                    Game1.warpCharacter(npc, lastLocation, lastPosition);
+                    npc.faceDirection(lastFacing);
+                    npc.TryLoadSchedule();
+
+                    Console.WriteLine($"Warped {npc.Name} to {lastLocation} at {lastPosition}");
+                    return;
+                }
+            }
+            else Console.WriteLine("Cannot find NPC: " + npcName);
+        }
+
         private void OneButtonPressed(object sender, ButtonPressedEventArgs e)
         {
             if (!Context.IsWorldReady) return;
@@ -179,7 +234,7 @@ namespace MarketTown
             var player = Game1.player.Tile;
 
             if (tile.X > 65 && tile.X < 69 && tile.Y < 22 && tile.Y > 18 && player.X > 64 && player.X < 70 && player.Y > 17 && player.Y < 23)
-                OnActionButton(e);
+                OpenPlayerStore(e);
             if (tile.X > 52 && tile.X < 58 && tile.Y < 19 && tile.Y > 14 && player.X > 51 && player.X < 59 && player.Y > 13 && player.Y < 20
                 && Game1.timeOfDay >= Config.FestivalTimeStart && Game1.timeOfDay <= Config.FestivalTimeEnd)
             {
@@ -198,7 +253,7 @@ namespace MarketTown
             }
         }
 
-        internal void OnActionButton(ButtonPressedEventArgs e)
+        internal void OpenPlayerStore(ButtonPressedEventArgs e)
         {
             var location = Game1.getLocationFromName("Custom_MT_Island");
             var obj = location.getObjectAtTile(19309, 19309);
@@ -282,9 +337,6 @@ namespace MarketTown
 
         private void OnAssetRequested(object sender, AssetRequestedEventArgs e)
         {
-            if (e.NameWithoutLocale.IsEquivalentTo("Characters\\Farmer\\farmer_transparent"))
-                e.LoadFromModFile<Texture2D>("FrameworkClothes/assets/farmer_transparent.png", AssetLoadPriority.Exclusive);
-
             if (e.NameWithoutLocale.IsEquivalentTo("Data/Shops"))
             {
                 e.Edit(
@@ -1657,7 +1709,6 @@ namespace MarketTown
                         int x = 0, y = 0;
                         int dx = 0, dy = -1;
                         int max = range * 2 + 1;
-                        int halfMax = max / 2;
 
                         if (check && time != 9999) time = 0;
 
@@ -1686,40 +1737,30 @@ namespace MarketTown
                                         || obj.QualifiedItemId == "(BC)MT.Objects.MarketTownStorageSmall" && Math.Abs(x) <= 5 && Math.Abs(y) <= 5 && random.NextDouble() < Config.RestockChance / 2))
                                     {
                                         int tried = 5;
-                                        int nullCount = nullIndex.Count;
-                                        int currentIndexChest = 0;
-
-                                        while (tried > 0 && nullCount > 0) {
+                                        while (fChest.Items.Count(i => i == null) > 0 && tried > 0)
+                                        {
+                                            tried--;
                                             List<Item> filteredItems = chest.Items.Where(item => item.QualifiedItemId.StartsWith("(O)")).ToList();
                                             if (filteredItems.Count > 0)
                                             {
-                                                tried--;
                                                 int index = random.Next(filteredItems.Count);
 
                                                 var itemItem = filteredItems[index];
-                                                var itemToSell = itemItem.getOne();
 
-                                                if (itemToSell is Object itemObject)
-                                                {
-                                                    // *********************************************************************************restock framwork table
-                                                    //enumerator.Current.SetHeldObject(itemObject);
-                                                    fChest.Items[currentIndexChest] = itemItem;
-                                                    currentIndexChest++;
-                                                    nullCount--;
+                                                var fIndex = fChest.Items.IndexOf(fChest.Items.FirstOrDefault(i => i == null));
+                                                if (fIndex >= 0) fChest.Items[fIndex] = itemItem.getOne();
 
 
-                                                    var chestItem = chest.Items.Where(item => item == itemItem).FirstOrDefault();
-                                                    var chestIndex = chest.Items.IndexOf(chestItem);
+                                                var chestItem = chest.Items.Where(item => item == itemItem).FirstOrDefault();
+                                                var chestIndex = chest.Items.IndexOf(chestItem);
 
-                                                    if (chest.Items[chestIndex].Stack > 1) chest.Items[chestIndex].Stack -= 1;
-                                                    else chest.Items.Remove(chestItem);
+                                                if (chest.Items[chestIndex].Stack > 1) chest.Items[chestIndex].Stack -= 1;
+                                                else chest.Items.Remove(chestItem);
 
-                                                    nullCount--;
-
-                                                    RecentSoldTable[enumerator] = 9999;
-                                                    break;
-                                                }
+                                                RecentSoldTable[enumerator] = 9999;
+                                                continue;
                                             }
+                                            else break;
                                         }
                                     }
                                 }
