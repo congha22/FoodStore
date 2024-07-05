@@ -76,23 +76,26 @@ namespace MarketTown
                 }
             }
 
-            var isBusStop = e.OldLocation.Name.Contains("BusStop");
-
-            if (isBusStop)
+            if (e.OldLocation.Name == "BusStop")
             {
                 List<NPC> npcsToWarp = new List<NPC>();
-
-                foreach (NPC who in Game1.getLocationFromName("BusStop").characters.ToList())
-                {
-                    if (who.temporaryController != null)
-                    {
-                        npcsToWarp.Add(who);
-                    }
-                }
+                npcsToWarp = Game1.getLocationFromName("BusStop").characters.Where(who => who.temporaryController != null).ToList();
 
                 foreach (NPC npc in npcsToWarp)
                 {
-                    if (npc.temporaryController != null ) npc.temporaryController.endBehaviorFunction(npc, npc.currentLocation);
+                    npc.temporaryController?.endBehaviorFunction(npc, npc.currentLocation);
+                    npc.temporaryController = null;
+                }
+            }
+
+            if (e.OldLocation.Name == "Custom_MT_Island")
+            {
+                List<NPC> npcsToWarp = new List<NPC>();
+                npcsToWarp = Game1.getLocationFromName("Custom_MT_Island").characters.Where(who => who.temporaryController != null).ToList();
+
+                foreach (NPC npc in npcsToWarp)
+                {
+                    npc.temporaryController?.endBehaviorFunction(npc, npc.currentLocation);
                     npc.temporaryController = null;
                 }
             }

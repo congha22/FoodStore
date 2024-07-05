@@ -1736,11 +1736,13 @@ namespace MarketTown
                                         && (obj.QualifiedItemId == "(BC)MT.Objects.MarketTownStorageLarge" && random.NextDouble() < Config.RestockChance
                                         || obj.QualifiedItemId == "(BC)MT.Objects.MarketTownStorageSmall" && Math.Abs(x) <= 5 && Math.Abs(y) <= 5 && random.NextDouble() < Config.RestockChance / 2))
                                     {
+                                        List<int> categoryKeys = new List<int> { -81, -80, -79, -75, -74, -28, -27, -26, -23, -22, -21, -20, -19, -18, -17, -16, -15, -12, -8, -7, -6, -5, -4, -2 };
+
                                         int tried = 5;
                                         while (fChest.Items.Count(i => i == null) > 0 && tried > 0)
                                         {
                                             tried--;
-                                            List<Item> filteredItems = chest.Items.Where(item => item.QualifiedItemId.StartsWith("(O)")).ToList();
+                                            List<Item> filteredItems = chest.Items.Where(item => item.QualifiedItemId.StartsWith("(O)") && categoryKeys.Contains(item.Category) ).ToList();
                                             if (filteredItems.Count > 0)
                                             {
                                                 int index = random.Next(filteredItems.Count);
@@ -1793,7 +1795,9 @@ namespace MarketTown
                                     && (obj.QualifiedItemId == "(BC)MT.Objects.MarketTownStorageLarge" && random.NextDouble() < Config.RestockChance 
                                     || obj.QualifiedItemId == "(BC)MT.Objects.MarketTownStorageSmall" && Math.Abs(x) <= 5 && Math.Abs(y) <= 5 && random.NextDouble() < Config.RestockChance / 2))
                                 {
-                                    List<Item> filteredItems = chest.Items.Where(item => item.QualifiedItemId.StartsWith("(O)")).ToList();
+                                    List<int> categoryKeys = new List<int> { -81, -80, -79, -75, -74, -28, -27, -26, -23, -22, -21, -20, -19, -18, -17, -16, -15, -12, -8, -7, -6, -5, -4, -2 };
+
+                                    List<Item> filteredItems = chest.Items.Where(item => item.QualifiedItemId.StartsWith("(O)") && categoryKeys.Contains(item.Category) ).ToList();
                                     if (filteredItems.Count > 0)
                                     {
                                         int index = random.Next(filteredItems.Count);
@@ -1832,6 +1836,103 @@ namespace MarketTown
                 }
             }
             catch (Exception ex) { SMonitor.Log("Error while restock table" + ex.Message, LogLevel.Error); }
+        }
+
+        public static void InitFurniture ()
+        {
+            var town = Game1.getLocationFromName("Town");
+            var island = Game1.getLocationFromName("Custom_MT_Island");
+            var islandHouse = Game1.getLocationFromName("Custom_MT_Island_House");
+
+            List<Vector2> rugList = new List<Vector2> { new(16, 6), new(18, 6), new(22, 10), new(24, 10), new(28, 6), new(30, 6), new(34, 10), new(36, 10) };
+            List<Vector2> tableList = new List<Vector2> { new(17, 6), new(23, 10), new(29, 6), new(35, 10) };
+            List<Vector2> townList = new List<Vector2> { new(27, 66), new(28, 66), new(29, 66), new(30, 66), new(27, 67), new(29, 67), new(28, 64)};
+
+            foreach (var rug in rugList )
+            {
+                var obj = new Furniture("1742", rug);
+                islandHouse.furniture.Add(obj);
+            }
+            foreach (var table in tableList)
+            {
+                var obj = new Furniture("1138", table);
+                islandHouse.furniture.Add(obj);
+                obj.heldObject.Add(ItemRegistry.Create<Furniture>("MT.Objects.RestaurantDecor"));
+            }
+
+            bool flag = townList.All(tile => town.isTilePlaceable(tile));
+
+            if(flag)
+            {
+                int count = 0;
+                foreach (var tile in townList)
+                {
+                    switch (count)
+                    {
+                        case 0:
+                            var obj0 = new Furniture("1397", tile);
+                            town.furniture.Add(obj0);
+                            obj0.heldObject.Add(ItemRegistry.Create<Object>("393"));
+                            break;
+                        case 1:
+                            var obj1 = new Furniture("1397", tile);
+                            town.furniture.Add(obj1);
+                            obj1.heldObject.Add(ItemRegistry.Create<Object>("22"));
+                            break;
+                        case 2:
+                            var obj2 = new Furniture("1397", tile);
+                            town.furniture.Add(obj2);
+                            obj2.heldObject.Add(ItemRegistry.Create<Object>("340"));
+                            break;
+                        case 3:
+                            var obj3 = new Furniture("1397", tile);
+                            town.furniture.Add(obj3);
+                            obj3.heldObject.Add(ItemRegistry.Create<Object>("142"));
+                            break;
+                        case 4:
+                            var obj4 = new Furniture("724", tile);
+                            town.furniture.Add(obj4);
+                            obj4.heldObject.Add(ItemRegistry.Create<Object>("209"));
+                            break;
+                        case 5:
+                            var obj5 = new Furniture("724", tile);
+                            town.furniture.Add(obj5);
+                            obj5.heldObject.Add(ItemRegistry.Create<Object>("334"));
+                            break;
+                        case 6:
+                            var obj6 = new Chest(true, tile, "MT.Objects.MarketTownStorageSmall");
+                            town.setObjectAt(tile.X, tile.Y, obj6);
+
+                            var obj7 = new Furniture("2742", tile - new Vector2(2, -1));
+                            town.furniture.Add(obj7);
+
+                            var obj8 = new Sign(tile + new Vector2(1, 0), "TextSign");
+                            town.setObjectAt(tile.X + 1, tile.Y, obj8);
+                            obj8.signText.Set("Welcome To Market Town");
+
+                            var obj9 = new Furniture("FancyTree1", tile - new Vector2(2, 0));
+                            town.furniture.Add(obj9);
+                            var obj10 = new Furniture("FancyTree2", tile + new Vector2(2, 0));
+                            town.furniture.Add(obj10);
+
+                            while (count < 16)
+                            {
+                                obj6.Items.Add(ItemRegistry.Create<Item>("(O)472"));
+                                count++;
+                            }
+                            break;
+                    }
+
+                    count++;
+                }
+            }
+
+            MailData dataToSave = new MailData { InitTable = true };
+            if (Game1.IsMasterGame)
+            {
+                SHelper.Data.WriteSaveData("MT.MailLog", dataToSave);
+                new MailLoader(SHelper);
+            }
         }
     }
 }

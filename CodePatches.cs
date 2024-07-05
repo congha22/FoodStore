@@ -82,7 +82,8 @@ namespace MarketTown
             }
 
             // This will generate a random schedule for island visitor in the next Game time change 
-            if (__instanceLocation.Name != null && random.NextDouble() < Config.IslandWalkAround && Game1.timeOfDay > 620 && __instance.timerSinceLastMovement > 10000 && Game1.timeOfDay % 20 == 0
+            if (__instanceLocation.Name != null && __instance.timerSinceLastMovement > 10000 && Game1.timeOfDay > 620 && Game1.timeOfDay % 20 == 0
+                && ( random.NextDouble() < Config.IslandWalkAround || random.NextDouble() < Config.IslandWalkAround * 2 && Game1.timeOfDay > 2300 )
                 && ( __instance.temporaryController == null && __instance.controller == null && !__instance.isMoving() &&  __instance.TilePoint == __instance.previousEndPoint || __instance.timerSinceLastMovement > 20000 )
                 && ( __instanceLocation.Name.Contains("Custom_MT_Island") || __instanceLocation.GetParentLocation() != null && __instanceLocation.GetParentLocation().Name == "Custom_MT_Island")
                 && ( !IsFestivalToday || Game1.timeOfDay > Config.FestivalTimeEnd + 100 || Game1.timeOfDay < Config.FestivalTimeStart - 130)
@@ -101,16 +102,33 @@ namespace MarketTown
                 // if npc is on the island and not shop owner
                 if (__instanceLocation.Name == "Custom_MT_Island" && __instance.modData["hapyke.FoodStore/shopOwnerToday"] == "-1,-1")
                 {
-                    if (nextVisitChance < islandChance) // walk around on the island
+                    if (nextVisitChance < islandChance || Game1.timeOfDay > 2200) // walk around on the island
                     {
-                        var randomTile = FarmOutside.getRandomOpenPointInFarm(__instance, __instanceLocation, false).ToVector2();
-                        if (randomTile != Vector2.Zero)
+                        if (Game1.timeOfDay < 2300) {
+                            var randomTile = FarmOutside.getRandomOpenPointInFarm(__instance, __instanceLocation, false).ToVector2();
+                            if (randomTile != Vector2.Zero)
+                            {
+                                FarmOutside.AddRandomSchedulePoint(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{__instanceLocation.NameOrUniqueName}",
+                                    $"{randomTile.X}", $"{randomTile.Y}", $"{random.Next(0, 4)}");
+                            }
+                        }
+                        else if (Game1.timeOfDay > 2400)
                         {
-                            FarmOutside.AddRandomSchedulePoint(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{__instanceLocation.NameOrUniqueName}",
-                                $"{randomTile.X}", $"{randomTile.Y}", $"{random.Next(0, 4)}");
+                            if (Game1.player.currentLocation.Name != "Custom_MT_Island") Game1.warpCharacter(__instance, __instance.DefaultMap, __instance.DefaultPosition / 64);
+                            else
+                            {
+                                List<Point> pointToLeave = new List<Point> { new(15, 47), new(15, 48), new(5, 52), new(6, 52), new(14, 56), new(14, 57) };
+                                Game1.chatBox.addInfoMessage(__instance.Name);
+                                __instance.temporaryController = __instance.temporaryController = new PathFindController(__instance, __instanceLocation, pointToLeave[random.Next(6)], 0,
+                                    (character, location) =>
+                                    {
+                                        Game1.warpCharacter(__instance, __instance.DefaultMap, __instance.DefaultPosition / 64);
+                                        ResetErrorNpc(__instance);
+                                    });
+                            }
                         }
                     }
-                    else if (nextVisitChance < islandHouseChance && Game1.timeOfDay >= 700) // visit island house
+                    else if (nextVisitChance < islandHouseChance && Game1.timeOfDay >= 700 && Game1.timeOfDay <= 2200) // visit island house
                     {
                         var randomTile = FarmOutside.getRandomOpenPointInFarm(__instance, Game1.getLocationFromName("Custom_MT_Island_House"), false).ToVector2();
                         if (randomTile != Vector2.Zero)
@@ -119,7 +137,7 @@ namespace MarketTown
                                 $"{randomTile.X}", $"{randomTile.Y}", $"{random.Next(0, 4)}");
                         }
                     }
-                    else if (Game1.timeOfDay >= 700) // visit a selected building
+                    else if (Game1.timeOfDay >= 700 && Game1.timeOfDay <= 2200) // visit a selected building
                     {
                         var selectedBuilding = IslandValidBuilding[random.Next(IslandValidBuilding.Count)].buildingLocation;
                         if (selectedBuilding != null && selectedBuilding != "Custom_MT_Island_House")
@@ -136,7 +154,7 @@ namespace MarketTown
                 // if npc is inside island house
                 else if (__instanceLocation.Name == "Custom_MT_Island_House")
                 {
-                    if (nextVisitChance < 0.2)
+                    if (nextVisitChance < 0.2 || Game1.timeOfDay > 2200)
                     {
                         var randomTile = FarmOutside.getRandomOpenPointInFarm(__instance, Game1.getLocationFromName("Custom_MT_Island"), false).ToVector2();
                         if (randomTile != Vector2.Zero)
@@ -158,7 +176,7 @@ namespace MarketTown
                 // if npc is in a building
                 else if (__instanceLocation.parentLocationName.Value == "Custom_MT_Island")
                 {
-                    if (Game1.player.currentLocation != __instanceLocation && nextVisitChance < 0.2)
+                    if (Game1.player.currentLocation != __instanceLocation && ( nextVisitChance < 0.2 || Game1.timeOfDay > 2200) )
                     {
                         IslandBuildingProperties matchingBuilding = IslandValidBuilding.FirstOrDefault(building => building.buildingLocation == __instanceLocation.NameOrUniqueName);
                         if (matchingBuilding != null)

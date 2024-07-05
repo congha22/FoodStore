@@ -256,6 +256,11 @@ namespace MarketTown
                     islandWarp.Add(new Vector2(x, y));
                 }
             }
+
+            if (Context.IsWorldReady && (SHelper.Data.ReadSaveData<MailData>("MT.MailLog") == null || !SHelper.Data.ReadSaveData<MailData>("MT.MailLog").InitTable))
+            {
+                InitFurniture();
+            }
         }
 
         [EventPriority(EventPriority.Low-9999)]
