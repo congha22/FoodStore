@@ -152,9 +152,11 @@
             "X": 50,
             "Y": 26
           },
-          "Layer": "Buildings",
+          "Layer": "Back",
           "SetProperties": {
-            "Action": "Warp 66 22 Beach"
+            "TouchAction": "Warp Beach 66 22",
+            "NPCBarrier": "T",
+            "NoPath": "T"
           }
         },
         {
@@ -162,9 +164,11 @@
             "X": 51,
             "Y": 26
           },
-          "Layer": "Buildings",
+          "Layer": "Back",
           "SetProperties": {
-            "Action": "Warp 66 22 Beach"
+            "TouchAction": "Warp Beach 66 22",
+            "NPCBarrier": "T",
+            "NoPath": "T"
           }
         },
         {
@@ -172,9 +176,11 @@
             "X": 52,
             "Y": 26
           },
-          "Layer": "Buildings",
+          "Layer": "Back",
           "SetProperties": {
-            "Action": "Warp 66 22 Beach"
+            "TouchAction": "Warp Beach 66 22",
+            "NPCBarrier": "T",
+            "NoPath": "T"
           }
         },
         {
@@ -182,9 +188,11 @@
             "X": 50,
             "Y": 27
           },
-          "Layer": "Buildings",
+          "Layer": "Back",
           "SetProperties": {
-            "Action": "Warp 66 22 Beach"
+            "TouchAction": "Warp Beach 66 22",
+            "NPCBarrier": "T",
+            "NoPath": "T"
           }
         },
         {
@@ -192,9 +200,11 @@
             "X": 51,
             "Y": 27
           },
-          "Layer": "Buildings",
+          "Layer": "Back",
           "SetProperties": {
-            "Action": "Warp 66 22 Beach"
+            "TouchAction": "Warp Beach 66 22",
+            "NPCBarrier": "T",
+            "NoPath": "T"
           }
         },
         {
@@ -202,31 +212,13 @@
             "X": 52,
             "Y": 27
           },
-          "Layer": "Buildings",
+          "Layer": "Back",
           "SetProperties": {
-            "Action": "Warp 66 22 Beach"
+            "TouchAction": "Warp Beach 66 22",
+            "NPCBarrier": "T",
+            "NoPath": "T"
           }
         },
-        //{
-        //  "Position": {
-        //    "X": 73,
-        //    "Y": 16
-        //  },
-        //  "Layer": "Back",
-        //  "SetProperties": {
-        //    "TouchAction": "Warp Custom_MT_Island_House 8 32"
-        //  }
-        //},
-        //{
-        //  "Position": {
-        //    "X": 74,
-        //    "Y": 16
-        //  },
-        //  "Layer": "Back",
-        //  "SetProperties": {
-        //    "TouchAction": "Warp Custom_MT_Island_House 9 32"
-        //  }
-        //},
         {
           "Position": {
             "X": 21,
@@ -331,6 +323,36 @@
     },
     {
       "Action": "EditMap",
+      "Target": "Maps/Custom_Ridgeside_RSVCliff",
+      "FromFile": "Assets/Custom_MT_BeachRSV.tmx",
+      "ToArea": {
+        "X": 50,
+        "Y": 19,
+        "Width": 5,
+        "Height": 5
+      },
+      "PatchMode": "Overlay",
+      "When": {
+        "HasMod |contains=Rafseazz.RidgesideVillage": true
+        }
+      },
+    {
+      "Action": "EditMap",
+      "Target": "Maps/EastScarp_Village",
+      "FromFile": "Assets/Custom_MT_BeachES.tmx",
+      "ToArea": {
+        "X": 55,
+        "Y": 116,
+        "Width": 7,
+        "Height": 8
+      },
+      "PatchMode": "Overlay",
+      "When": {
+        "HasMod |contains=atravita.EastScarp": true
+      }
+    },
+    {
+      "Action": "EditMap",
       "Target": "Maps/Beach-NightMarket",
       "FromFile": "Assets/Custom_MT_BeachBoat.tmx",
       "ToArea": {
@@ -352,7 +374,7 @@
         "Height": 5
       },
       "PatchMode": "Overlay"
-    }, 
+    },
     {
       "Action": "EditMap",
       "Target": "Maps/Custom_MT_Island_House",
@@ -361,7 +383,7 @@
       "When": {
         "Weather": "Rain, Storm, GreenRain"
       }
-    }, 
+    },
     {
       "Action": "EditMap",
       "Target": "Maps/Custom_MT_Island_House",
@@ -1561,7 +1583,7 @@
               "QualityModifiers": null,
               "QualityModifierMode": "Stack",
               "PerItemCondition": null
-            }, 
+            },
             {
               "Chance": 0.8,
               "Season": null,

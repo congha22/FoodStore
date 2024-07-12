@@ -2,10 +2,12 @@
 using Netcode;
 using Newtonsoft.Json;
 using StardewValley;
+using StardewValley.Extensions;
 using StardewValley.Locations;
 using StardewValley.Objects;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Threading;
 using Object = StardewValley.Object;
@@ -14,13 +16,13 @@ namespace MarketTown
 {
     public partial class ModEntry
     {
-        private void UpdateOrders()
+        private void UpdateOrders(bool marketOrder = false)
         {
             foreach (var c in Game1.player.currentLocation.characters)
             {
-                if (c.IsVillager)
+                if (c.IsVillager && c.temporaryController == null)
                 {
-                    CheckOrder(c, Game1.player.currentLocation, false);
+                    CheckOrder(c, Game1.player.currentLocation, false, marketOrder);
                 }
                 else
                 {
@@ -29,11 +31,10 @@ namespace MarketTown
             }
         }
 
-        private void CheckOrder(NPC npc, GameLocation location, bool bypass)
+        private void CheckOrder(NPC npc, GameLocation location, bool bypass, bool marketOrder = false)
         {
             Random rand = new Random();
-            if (npc.modData.TryGetValue(orderKey, out string orderData) 
-                && (rand.NextDouble() < Config.OrderChance || rand.NextDouble() < Config.OrderChance * 2.5 && location.Name == "Custom_MT_Island_House" || bypass) )
+            if (npc.modData.TryGetValue(orderKey, out string orderData)  )
             {
                 //npc.modData.Remove(orderKey);
                 UpdateOrder(npc, JsonConvert.DeserializeObject<DataOrder>(orderData));
@@ -41,9 +42,11 @@ namespace MarketTown
             }
             if (!Game1.NPCGiftTastes.ContainsKey(npc.Name) || npcOrderNumbers.Value.TryGetValue(npc.Name, out int amount) && amount >= Config.MaxNPCOrdersPerNight)
                 return;
-            if (rand.NextDouble() < Config.OrderChance || rand.NextDouble() < Config.OrderChance * 2.5 && location.Name == "Custom_MT_Island_House" || bypass) 
+            if ( rand.NextDouble() < Config.OrderChance / 4
+                || rand.NextDouble() < Config.OrderChance && location.Name.Contains("Custom_MT_Island")
+                || bypass)
             {
-                StartOrder(npc, location);
+                StartOrder( npc, location, marketOrder );
             }
         }
 
@@ -55,90 +58,132 @@ namespace MarketTown
             }
         }
 
-        private void StartOrder(NPC npc, GameLocation location)
+        private void StartOrder(NPC npc, GameLocation location, bool marketOrder = false)
         {
             try
             {
-                List<int> loves = new();
+                List<string> loves = new();
                 foreach (var str in Game1.NPCGiftTastes["Universal_Love"].Split(' '))
                 {
                     if (Game1.objectData.ContainsKey(str) && CraftingRecipe.cookingRecipes.ContainsKey(Game1.objectData[str].Name))
                     {
-                        loves.Add(int.Parse(str));
+                        loves.Add(str);
                     }
                 }
                 foreach (var str in Game1.NPCGiftTastes[npc.Name].Split('/')[1].Split(' '))
                 {
                     if (Game1.objectData.ContainsKey(str) && CraftingRecipe.cookingRecipes.ContainsKey(Game1.objectData[str].Name))
                     {
-                        loves.Add(int.Parse(str));
+                        loves.Add(str);
                     }
                 }
 
-                List<int> likes = new();
+                List<string> likes = new();
                 foreach (var str in Game1.NPCGiftTastes["Universal_Like"].Split(' '))
                 {
                     if (Game1.objectData.ContainsKey(str) && CraftingRecipe.cookingRecipes.ContainsKey(Game1.objectData[str].Name))
                     {
-                        likes.Add(int.Parse(str));
+                        likes.Add(str);
                     }
                 }
                 foreach (var str in Game1.NPCGiftTastes[npc.Name].Split('/')[3].Split(' '))
                 {
                     if (Game1.objectData.ContainsKey(str) && CraftingRecipe.cookingRecipes.ContainsKey(Game1.objectData[str].Name))
                     {
-                        likes.Add(int.Parse(str));
+                        likes.Add(str);
                     }
                 }
 
-                List<int> neutral = new();
+                List<string> neutral = new();
                 foreach (var str in Game1.NPCGiftTastes["Universal_Neutral"].Split(' '))
                 {
                     if (Game1.objectData.ContainsKey(str) && CraftingRecipe.cookingRecipes.ContainsKey(Game1.objectData[str].Name))
                     {
-                        neutral.Add(int.Parse(str));
+                        neutral.Add(str);
                     }
                 }
                 foreach (var str in Game1.NPCGiftTastes[npc.Name].Split('/')[9].Split(' '))
                 {
                     if (Game1.objectData.ContainsKey(str) && CraftingRecipe.cookingRecipes.ContainsKey(Game1.objectData[str].Name))
                     {
-                        neutral.Add(int.Parse(str));
+                        neutral.Add(str);
+                    }
+                }
+                foreach ( var obj in GiftableObject)
+                {
+                    if (!loves.Contains(obj.ItemId) && !likes.Contains(obj.ItemId) && !neutral.Contains(obj.ItemId) 
+                        && CraftingRecipe.cookingRecipes.ContainsKey(obj.ItemId) 
+                        && !Game1.NPCGiftTastes["Universal_Hate"].Split(' ').Contains(obj.ItemId) 
+                        && npc.getGiftTasteForThisItem(obj) != 6 ) 
+                    {
+                        neutral.Add(obj.ItemId);
                     }
                 }
 
+
                 Random rand = new Random();
 
-                string loved = "neutral";
-                int dish = 216;
+                string taste = "like";
+                string dish = "240";
+                var name = "Farmer's Lunch";
+                int price = 150;
 
-                if (!loves.Any() && !likes.Any() && !neutral.Any())
-                    return;
-                if (!likes.Any() && !neutral.Any() && loved.Any() || loved.Any() && rand.NextDouble() < Config.LovedDishChance)
+                if (!marketOrder)
                 {
-                    loved = "love";
-                    dish = loves[rand.Next(loves.Count)];
-                }
-                else
-                {
-                    if (rand.NextDouble() < 0.0 && likes.Any())
+                    if (taste.Any() && (rand.NextDouble() < Config.LovedDishChance || !likes.Any() && !neutral.Any()))
                     {
-                        loved = "like";
+                        taste = "love";
+                        dish = loves[rand.Next(loves.Count)];
+                    }
+                    else if (likes.Any() && (rand.NextDouble() < (1 - Config.LovedDishChance) / 2 || !loves.Any() && !neutral.Any()))
+                    {
+                        taste = "like";
                         dish = likes[rand.Next(likes.Count)];
                     }
                     else if (neutral.Any())
                     {
-                        loved = "neutral";
+                        taste = "neutral";
                         dish = neutral[rand.Next(neutral.Count)];
                     }
+
+                    name = Game1.objectData[dish.ToString()].Name;
+                    price = Game1.objectData[dish.ToString()].Price;
                 }
-                var name = Game1.objectData[dish.ToString()].Name;
-                int price = 0;
-                price = (int)(Game1.objectData[dish.ToString()].Price);
+                else
+                {
+                    int tried = 0;
+                    while (tried < 5)
+                    {
+                        tried++;
 
+                        var selectItem = GiftableObject[rand.Next(GiftableObject.Count)];
 
-                npc.modData[orderKey] = JsonConvert.SerializeObject(new DataOrder(dish, name, price, loved));
-            } catch { }
+                        int tasteInt = npc.getGiftTasteForThisItem(selectItem);
+                        if (tasteInt == 6 || tasteInt == 4 && rand.NextBool()) continue;
+
+                        dish = selectItem.ItemId;
+                        name = selectItem.DisplayName;
+                        price = selectItem.Price;
+                        switch (tasteInt)
+                        {
+                            case 0:
+                                taste = "love";
+                                break;
+                            case 2:
+                                taste = "like";
+                                break;
+                            default:
+                                taste = "neutral";
+                                break;
+                        }
+                        break;
+                    }
+
+                }
+
+                npc.modData[orderKey] = JsonConvert.SerializeObject(new DataOrder(dish, name, price, taste));
+
+            } catch (Exception ex) { SMonitor.Log($"Error while adding special order for {npc.Name}: {ex.Message}"); }
         }
     }
 }

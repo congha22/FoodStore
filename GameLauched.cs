@@ -939,7 +939,7 @@ namespace MarketTown
             //init
             double decorPoint = 0;
 
-            //Furniture check
+            //Furniture bypass
             for (var y = foodLoc.Y - 9; y < foodLoc.Y + 9; y++)
             {
                 for (var x = foodLoc.X - 9; x < foodLoc.X + 9; x++)
@@ -958,7 +958,7 @@ namespace MarketTown
             }
 
             bool foundWater = false;
-            //Water nearby check
+            //Water nearby bypass
             for (var y = foodLoc.Y - 7; y < foodLoc.Y + 7; y++)
             {
                 for (var x = foodLoc.X - 7; x < foodLoc.X + 7; x++)
@@ -1478,6 +1478,8 @@ namespace MarketTown
         /// <summary>Write Save.</summary>
         public static void EndOfDaySave()
         {
+            bool isOnSaveCreate = Game1.stats.DaysPlayed == 0;
+
             int totalVisitorVisited = 0;
             int totalMoney = 0;
 
@@ -1589,6 +1591,8 @@ namespace MarketTown
 
             MailData dataToSave = new MailData
             {
+                InitTable = !isOnSaveCreate,
+
                 TotalVisitorVisited = totalVisitorVisited + TodayVisitorVisited,
                 TotalEarning = totalMoney + TodayMoney,
                 SellMoney = TodayMoney,
@@ -1691,7 +1695,7 @@ namespace MarketTown
         }
 
         /// <summary> Table try to restock from nearby Market Storage </summary>
-        public static void RestockTable (bool check = false)
+        public static void RestockTable (bool bypass = false)
         {
             Random random = new Random();
             try
@@ -1700,26 +1704,30 @@ namespace MarketTown
                 {
                     foreach (var kvp in RecentSoldTable)
                     {
-                        var enumerator = kvp.Key;
-                        var time = kvp.Value;
+                        bool flag = false;
 
+                        var table = kvp.Key;
+                        var timeOfSold = kvp.Value;
 
-                        var baseTile = enumerator.Current.TileLocation;
-                        int range = 10;
-                        int x = 0, y = 0;
-                        int dx = 0, dy = -1;
-                        int max = range * 2 + 1;
+                        var baseTile = table.TileLocation;
+                        int range = 10, x = 0, y = 0, dx = 0, dy = -1, max = range * 2 + 1;
 
-                        if (check && time != 9999) time = 0;
+                        if (bypass && timeOfSold != 9999) timeOfSold = 0;
 
-                        if (Game1.timeOfDay >= time + 20 && enumerator.Current.heldObject.Value is Chest fChest)
+                        if (Game1.timeOfDay < timeOfSold + 20 || table.heldObject.Value != null && table.heldObject.Value is not Chest)
                         {
-                            List<int> nullIndex = new List<int>();
+                            if (table.heldObject.Value != null && table.heldObject.Value is not Chest) RecentSoldTable.Remove(kvp);
+                            continue;
+                        }
+
+                        if (table.heldObject.Value is Chest fChest)
+                        {
+                            List<int> nullItem_Index = new List<int>();
                             int currentIndex = 0;
                             foreach (var i in fChest.Items)
                             {
-                                if (i == null) nullIndex.Add(currentIndex);
-                                currentIndex ++;
+                                if (i == null) nullItem_Index.Add(currentIndex);
+                                currentIndex++;
                             }
 
                             for (int i = 0; i < max * max; i++)
@@ -1732,7 +1740,7 @@ namespace MarketTown
                                     Vector2 currentTile = new Vector2(currentX, currentY);
                                     Object obj = Game1.currentLocation.getObjectAtTile(currentX, currentY);
 
-                                    if (obj != null && obj is Chest chest && chest.Items.Count > 0
+                                    if (obj != null && obj is Chest mtChest && mtChest.Items.Count > 0
                                         && (obj.QualifiedItemId == "(BC)MT.Objects.MarketTownStorageLarge" && random.NextDouble() < Config.RestockChance
                                         || obj.QualifiedItemId == "(BC)MT.Objects.MarketTownStorageSmall" && Math.Abs(x) <= 5 && Math.Abs(y) <= 5 && random.NextDouble() < Config.RestockChance / 2))
                                     {
@@ -1742,7 +1750,7 @@ namespace MarketTown
                                         while (fChest.Items.Count(i => i == null) > 0 && tried > 0)
                                         {
                                             tried--;
-                                            List<Item> filteredItems = chest.Items.Where(item => item.QualifiedItemId.StartsWith("(O)") && categoryKeys.Contains(item.Category) ).ToList();
+                                            List<Item> filteredItems = mtChest.Items.Where(item => item.QualifiedItemId.StartsWith("(O)") && categoryKeys.Contains(item.Category)).ToList();
                                             if (filteredItems.Count > 0)
                                             {
                                                 int index = random.Next(filteredItems.Count);
@@ -1752,17 +1760,73 @@ namespace MarketTown
                                                 var fIndex = fChest.Items.IndexOf(fChest.Items.FirstOrDefault(i => i == null));
                                                 if (fIndex >= 0) fChest.Items[fIndex] = itemItem.getOne();
 
+                                                var chestItem = mtChest.Items.Where(item => item == itemItem).FirstOrDefault();
+                                                var chestIndex = mtChest.Items.IndexOf(chestItem);
 
-                                                var chestItem = chest.Items.Where(item => item == itemItem).FirstOrDefault();
-                                                var chestIndex = chest.Items.IndexOf(chestItem);
+                                                if (mtChest.Items[chestIndex].Stack > 1) mtChest.Items[chestIndex].Stack -= 1;
+                                                else mtChest.Items.Remove(chestItem);
 
-                                                if (chest.Items[chestIndex].Stack > 1) chest.Items[chestIndex].Stack -= 1;
-                                                else chest.Items.Remove(chestItem);
-
-                                                RecentSoldTable[enumerator] = 9999;
+                                                RecentSoldTable[table] = 9999;
+                                                if (fChest.Items.Count(i => i == null) == 0) flag = true;
                                                 continue;
                                             }
                                             else break;
+                                        }
+
+                                        if (flag) break;
+                                    }
+                                }
+
+                                if (x == y || (x < 0 && x == -y) || (x > 0 && x == 1 - y))
+                                {
+                                    int temp = dx;
+                                    dx = -dy;
+                                    dy = temp;
+                                }
+
+                                x += dx;
+                                y += dy;
+                            }
+                        }
+                        else
+                        {
+                            for (int i = 0; i < max * max; i++)
+                            {
+                                int currentX = (int)baseTile.X + x;
+                                int currentY = (int)baseTile.Y + y;
+
+                                if (Math.Abs(x) <= range && Math.Abs(y) <= range)
+                                {
+                                    Vector2 currentTile = new Vector2(currentX, currentY);
+                                    Object obj = Game1.currentLocation.getObjectAtTile(currentX, currentY);
+
+                                    if (obj != null && obj is Chest mtChest && mtChest.Items.Count > 0
+                                        && (obj.QualifiedItemId == "(BC)MT.Objects.MarketTownStorageLarge" && random.NextDouble() < Config.RestockChance
+                                        || obj.QualifiedItemId == "(BC)MT.Objects.MarketTownStorageSmall" && Math.Abs(x) <= 5 && Math.Abs(y) <= 5 && random.NextDouble() < Config.RestockChance / 2))
+                                    {
+                                        List<int> categoryKeys = new List<int> { -81, -80, -79, -75, -74, -28, -27, -26, -23, -22, -21, -20, -19, -18, -17, -16, -15, -12, -8, -7, -6, -5, -4, -2 };
+
+                                        List<Item> filteredItems = mtChest.Items.Where(item => item.QualifiedItemId.StartsWith("(O)") && categoryKeys.Contains(item.Category)).ToList();
+                                        if (filteredItems.Count > 0)
+                                        {
+                                            int index = random.Next(filteredItems.Count);
+
+                                            var itemItem = filteredItems[index];
+                                            var itemToSell = itemItem.getOne();
+
+                                            if (itemToSell is Object itemObject)
+                                            {
+                                                table.SetHeldObject(itemObject);
+
+                                                var chestItem = mtChest.Items.Where(item => item == itemItem).FirstOrDefault();
+                                                var chestIndex = mtChest.Items.IndexOf(chestItem);
+
+                                                if (mtChest.Items[chestIndex].Stack > 1) mtChest.Items[chestIndex].Stack -= 1;
+                                                else mtChest.Items.Remove(chestItem);
+
+                                                RecentSoldTable[table] = 9999;
+                                                break;
+                                            }
                                         }
                                     }
                                 }
@@ -1778,60 +1842,6 @@ namespace MarketTown
                                 y += dy;
                             }
                         }
-
-                        if (Game1.timeOfDay < time + 20 || enumerator.Current.heldObject.Value != null) continue;
-
-                        for (int i = 0; i < max * max; i++)
-                        {
-                            int currentX = (int)baseTile.X + x;
-                            int currentY = (int)baseTile.Y + y;
-
-                            if (Math.Abs(x) <= range && Math.Abs(y) <= range)
-                            {
-                                Vector2 currentTile = new Vector2(currentX, currentY);
-                                Object obj = Game1.currentLocation.getObjectAtTile(currentX, currentY);
-
-                                if (obj != null && obj is Chest chest && chest.Items.Count > 0
-                                    && (obj.QualifiedItemId == "(BC)MT.Objects.MarketTownStorageLarge" && random.NextDouble() < Config.RestockChance 
-                                    || obj.QualifiedItemId == "(BC)MT.Objects.MarketTownStorageSmall" && Math.Abs(x) <= 5 && Math.Abs(y) <= 5 && random.NextDouble() < Config.RestockChance / 2))
-                                {
-                                    List<int> categoryKeys = new List<int> { -81, -80, -79, -75, -74, -28, -27, -26, -23, -22, -21, -20, -19, -18, -17, -16, -15, -12, -8, -7, -6, -5, -4, -2 };
-
-                                    List<Item> filteredItems = chest.Items.Where(item => item.QualifiedItemId.StartsWith("(O)") && categoryKeys.Contains(item.Category) ).ToList();
-                                    if (filteredItems.Count > 0)
-                                    {
-                                        int index = random.Next(filteredItems.Count);
-
-                                        var itemItem = filteredItems[index];
-                                        var itemToSell = itemItem.getOne();
-
-                                        if (itemToSell is Object itemObject)
-                                        {
-                                            enumerator.Current.SetHeldObject(itemObject);
-
-                                            var chestItem = chest.Items.Where(item => item == itemItem).FirstOrDefault();
-                                            var chestIndex = chest.Items.IndexOf(chestItem);
-
-                                            if (chest.Items[chestIndex].Stack > 1) chest.Items[chestIndex].Stack -= 1;
-                                            else chest.Items.Remove(chestItem);
-
-                                            RecentSoldTable[enumerator] = 9999;
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-
-                            if (x == y || (x < 0 && x == -y) || (x > 0 && x == 1 - y))
-                            {
-                                int temp = dx;
-                                dx = -dy;
-                                dy = temp;
-                            }
-
-                            x += dx;
-                            y += dy;
-                        }
                     }
                 }
             }
@@ -1840,6 +1850,8 @@ namespace MarketTown
 
         public static void InitFurniture ()
         {
+            if ( !Game1.IsMasterGame ) return;
+
             var town = Game1.getLocationFromName("Town");
             var island = Game1.getLocationFromName("Custom_MT_Island");
             var islandHouse = Game1.getLocationFromName("Custom_MT_Island_House");
@@ -1864,10 +1876,9 @@ namespace MarketTown
 
             if(flag)
             {
-                int count = 0;
                 foreach (var tile in townList)
                 {
-                    switch (count)
+                    switch (townList.IndexOf(tile))
                     {
                         case 0:
                             var obj0 = new Furniture("1397", tile);
@@ -1902,36 +1913,23 @@ namespace MarketTown
                         case 6:
                             var obj6 = new Chest(true, tile, "MT.Objects.MarketTownStorageSmall");
                             town.setObjectAt(tile.X, tile.Y, obj6);
+                            obj6.Items.Add(ItemRegistry.Create<Item>("(O)472", 10));
 
                             var obj7 = new Furniture("2742", tile - new Vector2(2, -1));
                             town.furniture.Add(obj7);
 
                             var obj8 = new Sign(tile + new Vector2(1, 0), "TextSign");
                             town.setObjectAt(tile.X + 1, tile.Y, obj8);
-                            obj8.signText.Set("Welcome To Market Town");
+                            obj8.signText.Set("Welcome To Market Town " + Game1.MasterPlayer.Name);
 
                             var obj9 = new Furniture("FancyTree1", tile - new Vector2(2, 0));
                             town.furniture.Add(obj9);
                             var obj10 = new Furniture("FancyTree2", tile + new Vector2(2, 0));
                             town.furniture.Add(obj10);
 
-                            while (count < 16)
-                            {
-                                obj6.Items.Add(ItemRegistry.Create<Item>("(O)472"));
-                                count++;
-                            }
                             break;
                     }
-
-                    count++;
                 }
-            }
-
-            MailData dataToSave = new MailData { InitTable = true };
-            if (Game1.IsMasterGame)
-            {
-                SHelper.Data.WriteSaveData("MT.MailLog", dataToSave);
-                new MailLoader(SHelper);
             }
         }
     }

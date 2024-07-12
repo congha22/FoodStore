@@ -80,7 +80,7 @@ namespace MarketTown
         internal static List<string> GlobalNPCList = new List<string>();
 
         /// <summary>List of blacklist villagers NPC that will not be used in most case.</summary>
-        internal static List<string> GlobalNPCBlackList = new List<string> { "Marlon", "Gunther", "Morris"};
+        internal static List<string> GlobalNPCBlackList = new List<string> { "Marlon", "Gunther", "Morris", "Krobus", "Sawyer", "???", "Goatherd", "Dwarf", "HankSVE", "Undreya", "Eyvinder", "ScarlettFake", "HighlandsDwarf" };
 
         /// <summary>List of kids NPC (age = 2).</summary>
         internal static List<string> GlobalKidList = new List<string>();
@@ -88,11 +88,14 @@ namespace MarketTown
         /// <summary>Dictionary of Location and its list of 'valid' tile for NPC schedule.</summary>
         public static IDictionary<GameLocation, List<Vector2>> RandomOpenSpot = new Dictionary<GameLocation, List<Vector2>>();
 
-        /// <summary>Dictionary of table that pending for restock from nearby storage</summary>
-        public static IDictionary<IEnumerator<Furniture>, int> RecentSoldTable = new Dictionary<IEnumerator<Furniture>, int>();
+        /// <summary>Dictionary of table and sold time that pending for restock from nearby storage</summary>
+        public static IDictionary<Furniture, int> RecentSoldTable = new Dictionary<Furniture, int>();
 
         /// <summary>Handle player typing interact</summary>
         private PlayerChat playerChatInstance;
+
+        /// <summary>List of all Object that giftable</summary>
+        public static List<Object> GiftableObject = new List<Object>();
 
 
         // ==============================================================================================
@@ -238,6 +241,8 @@ namespace MarketTown
                     __instance.modData["hapyke.FoodStore/festivalLastPurchase"] = "600";
                     __instance.modData["hapyke.FoodStore/specialOrder"] = "-1,-1";
                     __instance.modData["hapyke.FoodStore/shopOwnerToday"] = "-1,-1";
+                    __instance.modData["hapyke.FoodStore/islandSpecialOrderTile"] = "-1,-1";
+                    __instance.modData["hapyke.FoodStore/islandSpecialOrderTime"] = "0";
 
                     if (__instance.getMasterScheduleRawData() != null && !GlobalNPCBlackList.Contains(__instance.Name))
                     {
@@ -257,9 +262,19 @@ namespace MarketTown
                 }
             }
 
-            if (Context.IsWorldReady && (SHelper.Data.ReadSaveData<MailData>("MT.MailLog") == null || !SHelper.Data.ReadSaveData<MailData>("MT.MailLog").InitTable))
+            if (Context.IsWorldReady && Game1.IsMasterGame
+                && (SHelper.Data.ReadSaveData<MailData>("MT.MailLog") == null || !SHelper.Data.ReadSaveData<MailData>("MT.MailLog").InitTable))
             {
+                SMonitor.Log("Setting up starter furniture", LogLevel.Debug);
                 InitFurniture();
+            }
+
+            GiftableObject.Clear();
+            foreach (var id in Game1.objectData.Keys)
+            {
+                var item = ItemRegistry.Create(id);
+                if (item != null && item is Object obj && obj.canBeGivenAsGift() && obj.sellToStorePrice() > 10)
+                    GiftableObject.Add(obj);
             }
         }
 
@@ -309,11 +324,8 @@ namespace MarketTown
             RestaurantSpot.Clear();
             TilePropertyChanged.Clear();
 
-            var keys = new List<IEnumerator<Furniture>>(RecentSoldTable.Keys);
-            foreach (var key in keys)
-            {
-                RecentSoldTable[key] = 0;
-            }
+            Config.RestaurantLocations.Add("Custom_MT_Island");
+            Config.RestaurantLocations.Add("Custom_MT_Island_House");
 
             Random rand = new Random();
 
@@ -783,6 +795,8 @@ namespace MarketTown
 
         private void GameLoop_DayEnding(object sender, DayEndingEventArgs e)
         {
+            if ( Game1.stats.DaysPlayed == 0 ) return;
+
             // Wipe invitation
             try
             {
@@ -878,23 +892,8 @@ namespace MarketTown
                 {
                     playerChatInstance = new PlayerChat();
                 }
-                playerChatInstance.Validate();
+                playerChatInstance.Validate(); // ######################################################################### check if works
 
-                if (RecentSoldTable.Count > 0)
-                {
-                    foreach (var kvp in RecentSoldTable)
-                    {
-                        var enumerator = kvp.Key;
-                        if (enumerator != null)
-                        {
-                            var location = enumerator.Current.Location;
-                            var tile = enumerator.Current.TileLocation;
-
-                            if (location.getObjectAtTile((int)tile.X, (int)tile.Y) == null || location.getObjectAtTile((int)tile.X, (int)tile.Y).QualifiedItemId != enumerator.Current.QualifiedItemId) 
-                                RecentSoldTable.Remove(kvp);
-                        }
-                    }
-                }
             }
         }
 
@@ -905,9 +904,28 @@ namespace MarketTown
             Random random = new Random();
 
             if (Context.IsPlayerFree && Game1.player != null && Game1.player.currentLocation != null
-                && (Config.RestaurantLocations.Contains(Game1.player.currentLocation.Name) || Game1.player.currentLocation.GetParentLocation() == Game1.getLocationFromName("Custom_MT_Island")))
+                && (Config.RestaurantLocations.Contains(Game1.player.currentLocation.Name)) )
             {
-                UpdateOrders();
+                bool isMarket = false;
+                if (validBuildingObjectPairs.Any(i => i.Building.GetIndoorsName() == Game1.player.currentLocation.NameOrUniqueName && i.buildingType == "market")) 
+                    isMarket = true;
+                UpdateOrders(isMarket);
+            }
+
+            if (RecentSoldTable.Count > 0)
+            {
+                foreach (var kvp in RecentSoldTable)
+                {
+                    var table = kvp.Key;
+                    if (table != null)
+                    {
+                        var location = table.Location;
+                        var tile = table.TileLocation;
+
+                        if (location.getObjectAtTile((int)tile.X, (int)tile.Y) == null || location.getObjectAtTile((int)tile.X, (int)tile.Y).QualifiedItemId != table.QualifiedItemId)
+                            RecentSoldTable.Remove(kvp);
+                    }
+                }
             }
 
             NpcFestivalPurchase();
@@ -1167,11 +1185,12 @@ namespace MarketTown
 
                     }
 
+                    // If Location has table with Restaurant decor, NPC have chance to make special order
                     if (random.NextDouble() < Config.TableSit && buildingType != "museum")
                     {
                         Dictionary<Vector2, int> surroundingTiles = new Dictionary<Vector2, int>();
 
-                        foreach ( var table in Game1.getLocationFromName(building.GetIndoorsName()).furniture)
+                        foreach ( var table in Game1.getLocationFromName(building.GetIndoorsName()).furniture.Where(i => i.furniture_type.Value == 11))
                         {
                             if (table != null && table.heldObject.Value != null && table.heldObject.Value.QualifiedItemId == "(F)MT.Objects.RestaurantDecor")
                             {
@@ -1210,6 +1229,7 @@ namespace MarketTown
                             }
                         }
                     }
+                    // else move to a random spot
                     else
                     {
                         var randomTile = FarmOutside.getRandomOpenPointInFarm(visit, visit.currentLocation, true, true).ToVector2();
@@ -1242,14 +1262,14 @@ namespace MarketTown
                         while (enumerator.MoveNext())
                         {
 
-                            //Remove food /// **************************************************************************************************************************************************************************
+                            // Remove food object and add to pending restock list /// **************************************************************************************************************************************************************************
                             if (enumerator.Current.boundingBox.Value != food.furniture.boundingBox.Value)
                                 continue;
                             if (enumerator.Current.heldObject.Value is not Chest) enumerator.Current.heldObject.Value = null;
                             else if (enumerator.Current.heldObject.Value is Chest chest) chest.Items[food.slot] = null;
 
-                            if (!RecentSoldTable.ContainsKey(enumerator)) RecentSoldTable.Add(enumerator, Game1.timeOfDay);
-                            else RecentSoldTable[enumerator] = Game1.timeOfDay;
+                            if (!RecentSoldTable.ContainsKey(food.furniture)) RecentSoldTable.Add(food.furniture, Game1.timeOfDay);
+                            else RecentSoldTable[food.furniture] = Game1.timeOfDay;
 
                             int taste = 8;
                             try
@@ -1400,14 +1420,17 @@ namespace MarketTown
                                     case 4:
                                         reply = SHelper.Translation.Get("foodstore.nonfood." + food.foodObject.Quality.ToString() + "." + rand.Next(9));
                                         salePrice = (int)(salePrice * 3);
+                                        tip = (int)(salePrice * 0.15);
                                         break;
                                     case 2:
                                         reply = SHelper.Translation.Get("foodstore.nonfood." + food.foodObject.Quality.ToString() + "." + rand.Next(9));
                                         salePrice = (int)(salePrice * 2.5);
+                                        tip = (int)(salePrice * 0.10);
                                         break;
                                     case 1:
                                         reply = SHelper.Translation.Get("foodstore.nonfood." + food.foodObject.Quality.ToString() + "." + rand.Next(9));
                                         salePrice = (int)(salePrice * 2);
+                                        tip = (int)(salePrice * 0.05);
                                         break;
                                     default:
                                         reply = SHelper.Translation.Get("foodstore.nonfood." + food.foodObject.Quality.ToString() + "." + rand.Next(9));
@@ -1445,7 +1468,7 @@ namespace MarketTown
                                     int totalCustomerNoteYes = model.TotalCustomerNoteYes;
                                     int totalCustomerNoteNo = model.TotalCustomerNoteNo;
 
-                                    salePrice = (int)(salePrice * (1 + Math.Min(totalCustomerNoteYes / (totalCustomerNoteYes + totalCustomerNoteNo + 20) , 0.5)) );
+                                    salePrice = (int)(salePrice * (1 + 0.5 / IslandProgress()) );
                                 }
                             }
 
@@ -1612,12 +1635,15 @@ namespace MarketTown
                             {
                                 switch (food.foodObject.Quality)
                                 {
+                                    // silver
                                     case 1:
                                         __instance.modData["hapyke.FoodStore/LastFoodTaste"] = "8";
                                         break;
+                                    //gold
                                     case 2:
                                         __instance.modData["hapyke.FoodStore/LastFoodTaste"] = "2";
                                         break;
+                                    // iridium
                                     case 4:
                                         __instance.modData["hapyke.FoodStore/LastFoodTaste"] = "0";
                                         break;

@@ -57,16 +57,13 @@ namespace MarketTown
         public bool BusWalk { get; set; } = true;
 
         public SButton ModKey { get; set; } = SButton.LeftAlt;
-        public int MaxNPCOrdersPerNight { get; set; } = 3;
-        public float PriceMarkup { get; set; } = 3f;
+        public int MaxNPCOrdersPerNight { get; set; } = 4;
+        public float PriceMarkup { get; set; } = 4.0f;
         public float TableSit { get; set; } = 0.3f;
         public float OrderChance { get; set; } = 0.03f;
         public float LovedDishChance { get; set; } = 0.8f;
         public List<string> RestaurantLocations { get; set; } = new List<string>()
         {
-            "Shed",
-            "Big Shed",
-            "Custom_MT_Island_House"
         };
         public int NPCCheckTimer { get; set; } = 1;
         public float MuseumPriceMarkup { get; set; } = 1.0f;

@@ -13,6 +13,7 @@ using StardewValley.GameData.FruitTrees;
 using StardewValley.GameData.LocationContexts;
 using StardewValley.GameData.Shops;
 using StardewValley.GameData.SpecialOrders;
+using StardewValley.ItemTypeDefinitions;
 using StardewValley.Locations;
 using StardewValley.Menus;
 using StardewValley.Network;
@@ -23,6 +24,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
@@ -58,6 +60,9 @@ namespace MarketTown
             __instance.modData["hapyke.FoodStore/festivalLastPurchase"] = "600";
             __instance.modData["hapyke.FoodStore/specialOrder"] = "-1,-1";
             __instance.modData["hapyke.FoodStore/shopOwnerToday"] = "-1,-1";
+            __instance.modData["hapyke.FoodStore/islandSpecialOrderTile"] = "-1,-1";
+            __instance.modData["hapyke.FoodStore/islandSpecialOrderTime"] = "0";
+            __instance.modData.Remove(orderKey);
 
         }
 
@@ -102,7 +107,7 @@ namespace MarketTown
                 // if npc is on the island and not shop owner
                 if (__instanceLocation.Name == "Custom_MT_Island" && __instance.modData["hapyke.FoodStore/shopOwnerToday"] == "-1,-1")
                 {
-                    if (nextVisitChance < islandChance || Game1.timeOfDay > 2200) // walk around on the island
+                    if (nextVisitChance < islandChance || Game1.timeOfDay > 2200) // walk around on the island or try to go home
                     {
                         if (Game1.timeOfDay < 2300) {
                             var randomTile = FarmOutside.getRandomOpenPointInFarm(__instance, __instanceLocation, false).ToVector2();
@@ -112,20 +117,16 @@ namespace MarketTown
                                     $"{randomTile.X}", $"{randomTile.Y}", $"{random.Next(0, 4)}");
                             }
                         }
-                        else if (Game1.timeOfDay > 2400)
+                        else if (Game1.timeOfDay > 2330)
                         {
-                            if (Game1.player.currentLocation.Name != "Custom_MT_Island") Game1.warpCharacter(__instance, __instance.DefaultMap, __instance.DefaultPosition / 64);
-                            else
+                            if (!__instance.DefaultMap.Contains("HiddenWarp") && !__instance.DefaultMap.Contains("WarpRoom"))
                             {
-                                List<Point> pointToLeave = new List<Point> { new(15, 47), new(15, 48), new(5, 52), new(6, 52), new(14, 56), new(14, 57) };
-                                Game1.chatBox.addInfoMessage(__instance.Name);
-                                __instance.temporaryController = __instance.temporaryController = new PathFindController(__instance, __instanceLocation, pointToLeave[random.Next(6)], 0,
-                                    (character, location) =>
-                                    {
-                                        Game1.warpCharacter(__instance, __instance.DefaultMap, __instance.DefaultPosition / 64);
-                                        ResetErrorNpc(__instance);
-                                    });
+                                FarmOutside.AddRandomSchedulePoint(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{__instance.DefaultMap}",
+                                    $"{__instance.DefaultPosition.X / 64}", $"{__instance.DefaultPosition.Y / 64}", $"{__instance.DefaultFacingDirection}");
+
+                                __instance.modData.Remove(orderKey);
                             }
+
                         }
                     }
                     else if (nextVisitChance < islandHouseChance && Game1.timeOfDay >= 700 && Game1.timeOfDay <= 2200) // visit island house
@@ -135,6 +136,8 @@ namespace MarketTown
                         {
                             FarmOutside.AddRandomSchedulePoint(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{Game1.getLocationFromName("Custom_MT_Island_House").NameOrUniqueName}",
                                 $"{randomTile.X}", $"{randomTile.Y}", $"{random.Next(0, 4)}");
+
+                            __instance.modData.Remove(orderKey);
                         }
                     }
                     else if (Game1.timeOfDay >= 700 && Game1.timeOfDay <= 2200) // visit a selected building
@@ -147,6 +150,8 @@ namespace MarketTown
                             {
                                 FarmOutside.AddRandomSchedulePoint(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{Game1.getLocationFromName(selectedBuilding).NameOrUniqueName}",
                                     $"{randomTile.X}", $"{randomTile.Y}", $"{random.Next(0, 4)}");
+
+                                __instance.modData.Remove(orderKey);
                             }
                         }
                     }
@@ -154,22 +159,100 @@ namespace MarketTown
                 // if npc is inside island house
                 else if (__instanceLocation.Name == "Custom_MT_Island_House")
                 {
-                    if (nextVisitChance < 0.2 || Game1.timeOfDay > 2200)
+                    // go back to island
+                    if (nextVisitChance < 0.2 && Game1.timeOfDay > Int32.Parse(__instance.modData["hapyke.FoodStore/islandSpecialOrderTime"]) + 30 
+                        || Game1.timeOfDay > 2200)
                     {
                         var randomTile = FarmOutside.getRandomOpenPointInFarm(__instance, Game1.getLocationFromName("Custom_MT_Island"), false).ToVector2();
                         if (randomTile != Vector2.Zero)
                         {
                             FarmOutside.AddRandomSchedulePoint(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{Game1.getLocationFromName("Custom_MT_Island").NameOrUniqueName}",
                                 $"{randomTile.X}", $"{randomTile.Y}", $"{random.Next(0, 4)}");
+
+                            string[] specialOrderCoor = __instance.modData["hapyke.FoodStore/specialOrder"].Split(',');
+                            Vector2 specialOrderTile = new Vector2(int.Parse(specialOrderCoor[0]), int.Parse(specialOrderCoor[1]));
+
+                            if (RestaurantSpot.ContainsKey(__instanceLocation))
+                            {
+                                var tileList = RestaurantSpot[__instanceLocation];
+                                if (tileList.Contains(specialOrderTile)) tileList.Remove(specialOrderTile);
+                            }
+
+                            __instance.modData.Remove(orderKey);
                         }
                     }
-                    else
+                    // stay in the house
+                    else if (Game1.timeOfDay > Int32.Parse(__instance.modData["hapyke.FoodStore/islandSpecialOrderTime"]) + 130)
                     {
-                        var randomTile = FarmOutside.getRandomOpenPointInFarm(__instance, __instanceLocation, false).ToVector2();
-                        if (randomTile != Vector2.Zero)
+                        // make special order
+                        if (nextVisitChance < 0.5 && Game1.timeOfDay < 2100 && Game1.timeOfDay > Int32.Parse(__instance.modData["hapyke.FoodStore/islandSpecialOrderTime"]) + 300)
                         {
-                            FarmOutside.AddRandomSchedulePoint(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{__instanceLocation.NameOrUniqueName}",
-                                $"{randomTile.X}", $"{randomTile.Y}", $"{random.Next(0, 4)}");
+                            Dictionary<Vector2, int> surroundingTiles = new Dictionary<Vector2, int>();
+
+                            foreach (var table in __instanceLocation.furniture.Where(i => i.furniture_type.Value == 11))
+                            {
+                                if (table != null && table.heldObject.Value != null && table.heldObject.Value.QualifiedItemId == "(F)MT.Objects.RestaurantDecor")
+                                {
+                                    Vector2 topLeft = table.TileLocation;
+                                    int width = table.getTilesWide();
+                                    int height = table.getTilesHigh();
+
+                                    for (int x = 0; x < width; x++) surroundingTiles.Add(new Vector2(topLeft.X + x, topLeft.Y - 1), 2); // down
+                                    for (int x = 0; x < width; x++) surroundingTiles.Add(new Vector2(topLeft.X + x, topLeft.Y + height), 0); // up
+                                    for (int y = 0; y < height; y++) surroundingTiles.Add(new Vector2(topLeft.X - 1, topLeft.Y + y), 1); // right
+                                    for (int y = 0; y < height; y++) surroundingTiles.Add(new Vector2(topLeft.X + width, topLeft.Y + y), 3); // left
+                                }
+                            }
+
+                            int totalTile = surroundingTiles.Count;
+                            while (totalTile > 0 && totalTile > 0)
+                            {
+                                totalTile--;
+                                var randomPair = surroundingTiles.ElementAt(random.Next(surroundingTiles.Count));
+
+                                var randomTile = randomPair.Key;
+                                var randomDirection = randomPair.Value;
+
+
+                                if (__instance.currentLocation.CanSpawnCharacterHere(randomTile) && (!RestaurantSpot.ContainsKey(__instance.currentLocation) || !RestaurantSpot[__instance.currentLocation].Contains(randomTile)))
+                                {
+                                    FarmOutside.AddRandomSchedulePoint(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{__instance.currentLocation.NameOrUniqueName}", $"{randomTile.X}", $"{randomTile.Y}", $"{randomDirection}");
+                                    __instance.modData["hapyke.FoodStore/specialOrder"] = $"{randomTile.X},{randomTile.Y}";
+
+                                    if (!RestaurantSpot.ContainsKey(__instance.currentLocation)) RestaurantSpot[__instance.currentLocation] = new List<Vector2>();
+                                    RestaurantSpot[__instance.currentLocation].Add(randomTile);
+
+                                    __instance.modData.Remove(orderKey);
+
+                                    __instance.modData["hapyke.FoodStore/islandSpecialOrderTile"] = $"{randomTile.X},{randomTile.Y}";
+                                    __instance.modData["hapyke.FoodStore/islandSpecialOrderTime"] = Game1.timeOfDay.ToString();
+
+                                    Instance.CheckOrder(__instance, __instance.currentLocation, true);
+
+                                    break;
+                                }
+                            }
+                        }
+                        // walk around if no order
+                        else if (Game1.timeOfDay > Int32.Parse(__instance.modData["hapyke.FoodStore/islandSpecialOrderTime"]) + 30)
+                        {
+                            var randomTile = FarmOutside.getRandomOpenPointInFarm(__instance, __instanceLocation, false).ToVector2();
+                            if (randomTile != Vector2.Zero)
+                            {
+                                FarmOutside.AddRandomSchedulePoint(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{__instanceLocation.NameOrUniqueName}",
+                                    $"{randomTile.X}", $"{randomTile.Y}", $"{random.Next(0, 4)}");
+
+                                string[] specialOrderCoor = __instance.modData["hapyke.FoodStore/specialOrder"].Split(',');
+                                Vector2 specialOrderTile = new Vector2(int.Parse(specialOrderCoor[0]), int.Parse(specialOrderCoor[1]));
+
+                                if (RestaurantSpot.ContainsKey(__instanceLocation))
+                                {
+                                    var tileList = RestaurantSpot[__instanceLocation];
+                                    if (tileList.Contains(specialOrderTile)) tileList.Remove(specialOrderTile);
+                                }
+
+                                __instance.modData.Remove(orderKey);
+                            }
                         }
                     }
                 }
@@ -405,6 +488,7 @@ namespace MarketTown
                         }
 
                         __instance.modData["hapyke.FoodStore/specialOrder"] = "-1,-1";
+                        __instance.modData.Remove(orderKey); 
                     }
                 }
                 // else random move around
@@ -559,10 +643,17 @@ namespace MarketTown
                 return;
 
             // ****************************************************************************************************************************
-            if ((__instance.Tile.X > 300 || __instance.Tile.Y > 300 || __instance.Tile.X < -50 || __instance.Tile.Y < -50) && Game1.timeOfDay % 100 == 0)
+            if ((__instance.Tile.X > 250 || __instance.Tile.Y > 200 || __instance.Tile.X < -10 || __instance.Tile.Y < -10) && !__instanceLocation.NameOrUniqueName.Contains("WarpRoom") && Game1.timeOfDay % 100 == 0 )
             {
-                SMonitor.Log($"Found NPC {__instance.Name} out of map border at {__instanceLocation} {__instance.Tile}.", LogLevel.Warn);
+                SMonitor.Log($"Found NPC {__instance.Name} out of map border at {__instanceLocation.NameOrUniqueName} {__instance.Tile} {Game1.timeOfDay}.", LogLevel.Warn);
+                var asd = "";
+                foreach (var i in __instance.Schedule)
+                { 
+                    asd += i.Value.time.ToString() + " " + i.Value.targetLocationName + " " + i.Value.targetTile.ToString() + " /// ";
+                }
+                SMonitor.Log(asd, LogLevel.Warn);
                 SMonitor.Log($"Optionally fix this by type command: 'markettown fix {__instance.Name}'", LogLevel.Warn);
+                SMonitor.Log("", LogLevel.Warn);
             }
 
             DataPlacedFood food = GetClosestFood(__instance, __instanceLocation);
@@ -794,8 +885,13 @@ namespace MarketTown
                 }
                 else
                 {
-                    b.Draw(emoteSprite, emotePosition, new Microsoft.Xna.Framework.Rectangle?(new Microsoft.Xna.Framework.Rectangle(emoteIndex * 16 % Game1.emoteSpriteSheet.Width, emoteIndex * 16 / emoteSprite.Width * 16, 16, 16)), Color.White, 0f, Microsoft.Xna.Framework.Vector2.Zero, 4f, SpriteEffects.None, __instance.StandingPixel.Y / 10000f);
-                    b.Draw(Game1.objectSpriteSheet, emotePosition + new Microsoft.Xna.Framework.Vector2(16, 8), GameLocation.getSourceRectForObject(orderData.dish), Color.White, 0f, Microsoft.Xna.Framework.Vector2.Zero, 2f, SpriteEffects.None, (__instance.StandingPixel.Y + 1) / 10000f);
+                    ParsedItemData? i = ItemRegistry.GetData(orderData.dish);
+                    if (i != null)
+                    {
+                        b.Draw(emoteSprite, emotePosition, new Microsoft.Xna.Framework.Rectangle?(new Microsoft.Xna.Framework.Rectangle(emoteIndex * 16 % Game1.emoteSpriteSheet.Width, emoteIndex * 16 / emoteSprite.Width * 16, 16, 16)), Color.White, 0f, Microsoft.Xna.Framework.Vector2.Zero, 4f, SpriteEffects.None, __instance.StandingPixel.Y / 10000f);
+                        b.Draw(i.GetTexture(), emotePosition + new Vector2(16, 8), i.GetSourceRect(), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, (__instance.StandingPixel.Y + 1) / 10000f);
+                    }
+                    else return;
                 }
 
             }
@@ -832,7 +928,7 @@ namespace MarketTown
                 if (!Config.RestaurantLocations.Contains(__instance.currentLocation.Name) || !__instance.modData.TryGetValue(orderKey, out string data))
                     return true;
                 DataOrder orderData = JsonConvert.DeserializeObject<DataOrder>(data);
-                if (who.ActiveObject?.ParentSheetIndex == orderData.dish)
+                if (who.ActiveObject?.ItemId == orderData.dish)
                 {
                     if (!npcOrderNumbers.Value.ContainsKey(__instance.Name))
                     {
