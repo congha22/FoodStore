@@ -744,6 +744,10 @@ namespace MarketTown
                             moveToFoodChance = Config.MoveToFoodChance * 2;
                         else if (npc.currentLocation.Name == "Custom_MT_Island_House") moveToFoodChance = Config.MoveToFoodChance * 3;
                         else if (npc.currentLocation.GetParentLocation() is Farm) moveToFoodChance = Config.ShedMoveToFoodChance;
+
+                        if (Config.UltimateChallenge 
+                            || SHelper.Data.ReadSaveData<MailData>("MT.MailLog") != null && SHelper.Data.ReadSaveData<MailData>("MT.MailLog").LockedChallenge) 
+                            moveToFoodChance *= 2;
                     }
                     catch { }
 
@@ -758,7 +762,7 @@ namespace MarketTown
                         {
                             DataPlacedFood food = GetClosestFood(npc, __instance);
 
-                            foreach (var pair in validBuildingObjectPairs)
+                            foreach (var pair in ValidBuildingObjectPairs)
                             {
                                 Building building = pair.Building;
                                 string buildingType = pair.buildingType;
@@ -1347,6 +1351,22 @@ namespace MarketTown
                 Game1.exitActiveMenu();
             };
             Game1.warpFarmer(locationRequest, Game1.player.TilePoint.X, Game1.player.TilePoint.Y, Game1.player.FacingDirection);
+        }
+
+        public static void NewDayAfterFade_Postfix()
+        {
+            if (Config.UltimateChallenge
+                || SHelper.Data.ReadSaveData<MailData>("MT.MailLog") != null && SHelper.Data.ReadSaveData<MailData>("MT.MailLog").LockedChallenge)
+                IsCalculatingSellPrice = true;
+        }
+
+        public static void SellToStorePrice_Postfix(ref int __result)
+        {
+            if (IsCalculatingSellPrice)
+            {
+                SMonitor.Log("Challenge accepted. Changing shipping bin value for tonight!", LogLevel.Debug);
+                __result /= 2;
+            }
         }
     }
 }   

@@ -116,7 +116,7 @@ namespace MarketTown
                     else if (level > 250000) islandProgressLevel = "3";
 
                     GameLocation locat = Game1.getLocationFromName("Custom_MT_Island");
-                    var islandBrazier = locat.getObjectAtTile(22, 36);
+                    var islandBrazier = locat.getObjectAtTile(22, 36, true);
                     if (locat == null || islandBrazier == null || islandBrazier.ItemId == null || islandBrazier.ItemId != "MT.Objects.ParadiseIslandBrazier" || !islandBrazier.IsOn)
                         return new[] { "-1" };
 
@@ -164,12 +164,9 @@ namespace MarketTown
 
             configMenu.AddImage(mod: ModManifest, texture: () => resizedTexture, texturePixelArea: null, scale: 1);
 
-            configMenu.AddBoolOption(
-            mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.disablenonfoodonfarm"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.disablenonfoodonfarmText"),
-                getValue: () => Config.AllowRemoveNonFood,
-                setValue: value => Config.AllowRemoveNonFood = value
+            configMenu.AddSectionTitle(
+                mod: ModManifest,
+                text: () => SHelper.Translation.Get("foodstore.config.modgeneral")
             );
 
             configMenu.AddNumberOption(
@@ -223,6 +220,35 @@ namespace MarketTown
                 min: 0.0f,
                 max: 1.0f,
                 interval: 0.01f
+            );
+
+            configMenu.AddSectionTitle(
+                mod: ModManifest,
+                text: () => SHelper.Translation.Get("foodstore.config.modadvance")
+            );
+
+            configMenu.AddBoolOption(
+            mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.ultimatechallenge"),
+                tooltip: () => SHelper.Translation.Get("foodstore.config.ultimatechallengeText"),
+                getValue: () => Config.UltimateChallenge,
+                setValue: value => Config.UltimateChallenge = value
+            );
+
+            configMenu.AddBoolOption(
+            mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.lockultimatechallenge"),
+                tooltip: () => SHelper.Translation.Get("foodstore.config.lockultimatechallengeText"),
+                getValue: () => Config.LockChallenge,
+                setValue: value => Config.LockChallenge = value
+            );
+
+            configMenu.AddBoolOption(
+            mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.disablenonfoodonfarm"),
+                tooltip: () => SHelper.Translation.Get("foodstore.config.disablenonfoodonfarmText"),
+                getValue: () => Config.AllowRemoveNonFood,
+                setValue: value => Config.AllowRemoveNonFood = value
             );
 
             configMenu.AddBoolOption(

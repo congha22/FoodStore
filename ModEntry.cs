@@ -97,6 +97,9 @@ namespace MarketTown
         /// <summary>List of all Object that giftable</summary>
         public static List<Object> GiftableObject = new List<Object>();
 
+        /// <summary>Ultimate Challenge check. Will be True when day end and False when day start</summary>
+        private static bool IsCalculatingSellPrice = false;
+
 
         // ==============================================================================================
         // ==============================================================================================
@@ -120,7 +123,7 @@ namespace MarketTown
 
 
         /// <summary>List of Builings on Farm valid as store or museum.</summary>
-        public static List<BuildingObjectPair> validBuildingObjectPairs = new List<BuildingObjectPair>();
+        public static List<BuildingObjectPair> ValidBuildingObjectPairs = new List<BuildingObjectPair>();
 
 
         //***********************************************************************************************
@@ -283,6 +286,11 @@ namespace MarketTown
         {
             if (Config.AdvanceOutputItemId) OutputItemId();
 
+            if (SHelper.Data.ReadSaveData<MailData>("MT.MailLog") != null && SHelper.Data.ReadSaveData<MailData>("MT.MailLog").LockedChallenge)
+                SMonitor.Log("Ultimate Challenge is PERMANENT on this save file", LogLevel.Debug);
+
+            IsCalculatingSellPrice = false;
+
             TodayVisitorVisited = 0;
             TodaySell = "";
             TodayMoney = 0;
@@ -309,7 +317,7 @@ namespace MarketTown
             TodayMuseumVisitor = 0;
             TodayMuseumEarning = 0;
 
-            validBuildingObjectPairs.Clear();
+            ValidBuildingObjectPairs.Clear();
 
             IslandNPCList.Clear();
             IslandValidBuilding.Clear();
@@ -498,7 +506,7 @@ namespace MarketTown
                 }
 
                 // Check if Island open for visitor. Island is open when the Brazier is On, and it is not festival
-                var islandBrazier = locat.getObjectAtTile(22, 36);
+                var islandBrazier = locat.getObjectAtTile(22, 36, true);
                 if (locat != null && islandBrazier != null && islandBrazier.ItemId != null && islandBrazier.ItemId == "MT.Objects.ParadiseIslandBrazier" && islandBrazier.IsOn
                     && !( ( Game1.dayOfMonth == 15 || Game1.dayOfMonth == 16 || Game1.dayOfMonth == 17 ) && Game1.currentSeason == "winter" || Game1.isFestival() )  )
                 {
@@ -683,7 +691,7 @@ namespace MarketTown
                                 if (f.Name.Contains("Statue")) { museumPieces += 2; }
                             }
 
-                            validBuildingObjectPairs.Add(new BuildingObjectPair(building, obj, "museum", museumPieces));
+                            ValidBuildingObjectPairs.Add(new BuildingObjectPair(building, obj, "museum", museumPieces));
                             if (!Config.RestaurantLocations.Contains(Game1.getLocationFromName(building.GetIndoorsName()).Name)) 
                                 Config.RestaurantLocations.Add(Game1.getLocationFromName(building.GetIndoorsName()).Name);
                             isMuseumBuilding = true;
@@ -714,8 +722,8 @@ namespace MarketTown
                             {
                                 FarmOutside.UpdateRandomLocationOpenTile(Game1.getLocationFromName(building.GetIndoorsName()));
 
-                                if (sign1.displayItem.Value.Name == "Market License") validBuildingObjectPairs.Add(new BuildingObjectPair(building, obj, "market", 0));
-                                else validBuildingObjectPairs.Add(new BuildingObjectPair(building, obj, "restaurant", 0));
+                                if (sign1.displayItem.Value.Name == "Market License") ValidBuildingObjectPairs.Add(new BuildingObjectPair(building, obj, "market", 0));
+                                else ValidBuildingObjectPairs.Add(new BuildingObjectPair(building, obj, "restaurant", 0));
 
                                 if (!Config.RestaurantLocations.Contains(Game1.getLocationFromName(building.GetIndoorsName()).Name)) 
                                     Config.RestaurantLocations.Add(Game1.getLocationFromName(building.GetIndoorsName()).Name);
@@ -786,7 +794,7 @@ namespace MarketTown
             }
 
             // Update open tile list
-            foreach (var buildingLocation in validBuildingObjectPairs)
+            foreach (var buildingLocation in ValidBuildingObjectPairs)
             {
                 var buildingInstanceName = buildingLocation.Building.GetIndoorsName();
                 FarmOutside.UpdateRandomLocationOpenTile(Game1.getLocationFromName(buildingInstanceName));
@@ -818,7 +826,7 @@ namespace MarketTown
             try
             {
                 Config.RestaurantLocations.Clear();
-                validBuildingObjectPairs.Clear();
+                ValidBuildingObjectPairs.Clear();
 
                 var mailHistory = MailRepository.FindLetter("MT.SellLogMail");
                 var weeklyHistory = MailRepository.FindLetter("MT.WeeklyLogMail");
@@ -842,13 +850,14 @@ namespace MarketTown
 
             try
             {
-                locat.warps.Clear();
-                locat.updateWarps();
+                foreach (var warp in locat.warps)
+                    if (warp.TargetName != "Beach" && warp.TargetName != "Custom_MT_Island_House"
+                        && warp.TargetName != "Custom_Ridgeside_RSVCliff"
+                        && warp.TargetName != "EastScarp_Village") locat.warps.Remove(warp);
 
                 foreach (var warp in Game1.getLocationFromName("BusStop").warps)
-                {
                     if (warp.X == 19309 && warp.Y == 19309) Game1.getLocationFromName("BusStop").warps.Remove(warp);
-                }
+
             } catch { }
 
             foreach (var entry in TilePropertyChanged)
@@ -876,8 +885,7 @@ namespace MarketTown
             }
 
             // restock table item
-            RestockTable(true);
-            RecentSoldTable.Clear();
+            if (Game1.timeOfDay < 2550) RestockTable(true);
         }
 
         // ----------- End of Day -----------
@@ -907,25 +915,9 @@ namespace MarketTown
                 && (Config.RestaurantLocations.Contains(Game1.player.currentLocation.Name)) )
             {
                 bool isMarket = false;
-                if (validBuildingObjectPairs.Any(i => i.Building.GetIndoorsName() == Game1.player.currentLocation.NameOrUniqueName && i.buildingType == "market")) 
+                if (ValidBuildingObjectPairs.Any(i => i.Building.GetIndoorsName() == Game1.player.currentLocation.NameOrUniqueName && i.buildingType == "market")) 
                     isMarket = true;
                 UpdateOrders(isMarket);
-            }
-
-            if (RecentSoldTable.Count > 0)
-            {
-                foreach (var kvp in RecentSoldTable)
-                {
-                    var table = kvp.Key;
-                    if (table != null)
-                    {
-                        var location = table.Location;
-                        var tile = table.TileLocation;
-
-                        if (location.getObjectAtTile((int)tile.X, (int)tile.Y) == null || location.getObjectAtTile((int)tile.X, (int)tile.Y).QualifiedItemId != table.QualifiedItemId)
-                            RecentSoldTable.Remove(kvp);
-                    }
-                }
             }
 
             NpcFestivalPurchase();
@@ -936,8 +928,9 @@ namespace MarketTown
             Random random = new Random();
 
             // restock table item
-            RestockTable();
-
+            if (Game1.timeOfDay == 2550) RestockTable(true);
+            else RestockTable();
+            
             if ( Game1.timeOfDay % 200 == 0)
             {
                 var islandInstance = Game1.getLocationFromName("Custom_MT_Island");
@@ -952,7 +945,7 @@ namespace MarketTown
                     FarmOutside.UpdateRandomLocationOpenTile(Game1.getLocationFromName(buildingInstanceName));
                 }
 
-                foreach (var building in validBuildingObjectPairs)
+                foreach (var building in ValidBuildingObjectPairs)
                 {
                     var buildingInstanceName = Game1.getLocationFromName(building.Building.GetIndoorsName());
                     FarmOutside.UpdateRandomLocationOpenTile(buildingInstanceName);
@@ -1042,7 +1035,7 @@ namespace MarketTown
             // ******* Farm building visitors *******
             if (random.NextDouble() < Config.ShedVisitChance && Game1.timeOfDay <= Config.CloseHour && Game1.timeOfDay >= Config.OpenHour)
             {
-                foreach (var pair in validBuildingObjectPairs)
+                foreach (var pair in ValidBuildingObjectPairs)
                 {
                     Building building = pair.Building;
                     Object obj = pair.Object;
@@ -1249,6 +1242,8 @@ namespace MarketTown
 
         private static bool TryToEatFood(NPC __instance, DataPlacedFood food)
         {
+            if (Game1.timeOfDay >= 2530) return false;
+
             try
             {
                 if (food != null && __instance.IsVillager && !__instance.Name.Contains("derby") && food.furniture != null && Vector2.Distance(food.foodTile, __instance.Tile) < Config.MaxDistanceToEat && !__instance.Name.EndsWith("_DA") && !bool.Parse(__instance.modData["hapyke.FoodStore/gettingFood"]))
@@ -1727,7 +1722,7 @@ namespace MarketTown
         {
             var locationType = "default";
 
-            var pair = validBuildingObjectPairs.FirstOrDefault(i => i.Building.GetIndoorsName() == location.NameOrUniqueName);
+            var pair = ValidBuildingObjectPairs.FirstOrDefault(i => i.Building.GetIndoorsName() == location.NameOrUniqueName);
             if (pair != null) locationType = pair.buildingType;
 
             if (locationType == null || locationType == "museum") return null;

@@ -12,7 +12,12 @@ using StardewValley.Buildings;
 namespace MarketTown.Data;
 class MailData
 {
+    // perma change
     public bool InitTable { get; set; } = false;
+    public bool LockedChallenge { get; set; } = false;
+
+
+    // regular
     public int TotalVisitorVisited { get; set; } = 0;
 
     public int FestivalEarning { get; set; } = 0;

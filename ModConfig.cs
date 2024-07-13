@@ -61,10 +61,8 @@ namespace MarketTown
         public float PriceMarkup { get; set; } = 4.0f;
         public float TableSit { get; set; } = 0.3f;
         public float OrderChance { get; set; } = 0.03f;
-        public float LovedDishChance { get; set; } = 0.8f;
-        public List<string> RestaurantLocations { get; set; } = new List<string>()
-        {
-        };
+        public float LovedDishChance { get; set; } = 0.65f;
+        public List<string> RestaurantLocations { get; set; } = new List<string>();
         public int NPCCheckTimer { get; set; } = 1;
         public float MuseumPriceMarkup { get; set; } = 1.0f;
         public bool MultiplayerMode { get; set; } = false;
@@ -95,5 +93,9 @@ namespace MarketTown
 
         public float VisitChanceIslandHouse { get; set; } = 0.2f;
         public float VisitChanceIslandBuilding { get; set; } = 0.2f;
+
+
+        public bool UltimateChallenge { get; set; } = false;
+        public bool LockChallenge { get; set; } = false;
     }
 }

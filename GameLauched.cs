@@ -100,29 +100,27 @@ namespace MarketTown
                postfix: new HarmonyMethod(typeof(ModEntry), nameof(FarmHouse_updateEvenIfFarmerIsntHere_Postfix))
             );
 
-            //-------------------------------------------------------------------------------------------------
-
+            // Restaurant Decor
             harmony.Patch(
                 original: AccessTools.Method(typeof(Furniture), "drawAtNonTileSpot", new Type[] { typeof(SpriteBatch), typeof(Vector2), typeof(float), typeof(float) }),
                 prefix: new HarmonyMethod(typeof(ModEntry), nameof(DrawAtNonTileSpot_Prefix))
             );
-
             harmony.Patch(
                 original: AccessTools.Method(typeof(Furniture), "loadDescription"),
                 postfix: new HarmonyMethod(typeof(ModEntry), nameof(LoadDescription_Postfix))
             );
 
-
+            // Decor animal at Marnie animal shop Festival
             harmony.Patch(
                 original: AccessTools.Method(typeof(FarmAnimal), "getSellPrice"),
                 postfix: new HarmonyMethod(typeof(ModEntry), nameof(GetSellPrice_Postfix))
             );
-
             harmony.Patch(
                 original: AccessTools.Method(typeof(FarmAnimal), "GetCursorPetBoundingBox"),
                 postfix: new HarmonyMethod(typeof(ModEntry), nameof(GetCursorPetBoundingBox_Postfix))
             );
 
+            // Marnie animal shop at Festival
             harmony.Patch(
                 original: AccessTools.Method(typeof(PurchaseAnimalsMenu), "setUpForReturnToShopMenu"),
                 postfix: new HarmonyMethod(typeof(ModEntry), nameof(SetUpForReturnToIslandAfterLivestockPurchase))
@@ -130,7 +128,20 @@ namespace MarketTown
             harmony.Patch(
                original: AccessTools.Method(typeof(PurchaseAnimalsMenu), "setUpForReturnAfterPurchasingAnimal"),
                postfix: new HarmonyMethod(typeof(ModEntry), nameof(SetUpForReturnToIslandAfterLivestockPurchase))
-           );
+            );
+
+            // shipping bin value with Ultimate Challenge
+            harmony.Patch(
+                original: AccessTools.Method(typeof(Game1), "_newDayAfterFade"),
+                postfix: new HarmonyMethod(typeof(ModEntry), nameof(NewDayAfterFade_Postfix))
+            );
+            harmony.Patch(
+                original: AccessTools.Method(typeof(StardewValley.Object), "sellToStorePrice"),
+                postfix: new HarmonyMethod(typeof(ModEntry), nameof(SellToStorePrice_Postfix))
+            );
+
+
+            //##############################################################
             //harmony.Patch(original: AccessTools.Method(typeof(StardewValley.Objects.Furniture), nameof(StardewValley.Objects.Furniture.clicked)),
             //              prefix: new HarmonyMethod(typeof(FurniturePatches), nameof(FurniturePatches.clicked_Prefix)));
             //harmony.Patch(original: AccessTools.Method(typeof(StardewValley.Objects.Furniture), nameof(StardewValley.Objects.Furniture.performObjectDropInAction)),
@@ -762,6 +773,10 @@ namespace MarketTown
         {
             var farmers = Game1.getAllFarmers().Where(f => f.isActive()).ToList();
             var multiplayer = farmers.Count > 1;
+
+            if (Config.UltimateChallenge
+                || SHelper.Data.ReadSaveData<MailData>("MT.MailLog") != null && SHelper.Data.ReadSaveData<MailData>("MT.MailLog").LockedChallenge) 
+                salePrice *= 4;
 
             if (Game1.player.team.useSeparateWallets.Value && multiplayer)
             {
@@ -1479,6 +1494,7 @@ namespace MarketTown
         public static void EndOfDaySave()
         {
             bool isOnSaveCreate = Game1.stats.DaysPlayed == 0;
+            bool isPermaLock = Config.LockChallenge;
 
             int totalVisitorVisited = 0;
             int totalMoney = 0;
@@ -1529,6 +1545,8 @@ namespace MarketTown
 
             if (model != null)
             {
+                if (model.LockedChallenge) isPermaLock = true;
+
                 totalVisitorVisited = model.TotalVisitorVisited;
 
                 totalMoney = model.TotalEarning;
@@ -1592,6 +1610,7 @@ namespace MarketTown
             MailData dataToSave = new MailData
             {
                 InitTable = !isOnSaveCreate,
+                LockedChallenge = isPermaLock,
 
                 TotalVisitorVisited = totalVisitorVisited + TodayVisitorVisited,
                 TotalEarning = totalMoney + TodayMoney,
@@ -1695,6 +1714,7 @@ namespace MarketTown
         }
 
         /// <summary> Table try to restock from nearby Market Storage </summary>
+        /// <param name="bypass">Force restock ( dayEnd or sleep )</param>  
         public static void RestockTable (bool bypass = false)
         {
             Random random = new Random();
@@ -1708,15 +1728,21 @@ namespace MarketTown
 
                         var table = kvp.Key;
                         var timeOfSold = kvp.Value;
+                        var location = table.Location;
 
                         var baseTile = table.TileLocation;
                         int range = 10, x = 0, y = 0, dx = 0, dy = -1, max = range * 2 + 1;
 
                         if (bypass && timeOfSold != 9999) timeOfSold = 0;
 
-                        if (Game1.timeOfDay < timeOfSold + 20 || table.heldObject.Value != null && table.heldObject.Value is not Chest)
+                        if (Game1.timeOfDay < timeOfSold + 20
+                            || location.getObjectAtTile((int)baseTile.X, (int)baseTile.Y, true) == null
+                            || location.getObjectAtTile((int)baseTile.X, (int)baseTile.Y, true).QualifiedItemId != table.QualifiedItemId
+                            || table.heldObject.Value != null && table.heldObject.Value is not Chest)
                         {
-                            if (table.heldObject.Value != null && table.heldObject.Value is not Chest) RecentSoldTable.Remove(kvp);
+                            if (location.getObjectAtTile((int)baseTile.X, (int)baseTile.Y, true) == null
+                                || location.getObjectAtTile((int)baseTile.X, (int)baseTile.Y, true).QualifiedItemId != table.QualifiedItemId)
+                                RecentSoldTable.Remove(kvp);
                             continue;
                         }
 
@@ -1738,11 +1764,11 @@ namespace MarketTown
                                 if (Math.Abs(x) <= range && Math.Abs(y) <= range)
                                 {
                                     Vector2 currentTile = new Vector2(currentX, currentY);
-                                    Object obj = Game1.currentLocation.getObjectAtTile(currentX, currentY);
+                                    Object obj = Game1.currentLocation.getObjectAtTile(currentX, currentY, true);
 
                                     if (obj != null && obj is Chest mtChest && mtChest.Items.Count > 0
-                                        && (obj.QualifiedItemId == "(BC)MT.Objects.MarketTownStorageLarge" && random.NextDouble() < Config.RestockChance
-                                        || obj.QualifiedItemId == "(BC)MT.Objects.MarketTownStorageSmall" && Math.Abs(x) <= 5 && Math.Abs(y) <= 5 && random.NextDouble() < Config.RestockChance / 2))
+                                        && (obj.QualifiedItemId == "(BC)MT.Objects.MarketTownStorageLarge" && ( random.NextDouble() < Config.RestockChance || bypass )
+                                        || obj.QualifiedItemId == "(BC)MT.Objects.MarketTownStorageSmall" && Math.Abs(x) <= 5 && Math.Abs(y) <= 5 && ( random.NextDouble() < Config.RestockChance / 1.5 || bypass) ))
                                     {
                                         List<int> categoryKeys = new List<int> { -81, -80, -79, -75, -74, -28, -27, -26, -23, -22, -21, -20, -19, -18, -17, -16, -15, -12, -8, -7, -6, -5, -4, -2 };
 
@@ -1773,7 +1799,7 @@ namespace MarketTown
                                             else break;
                                         }
 
-                                        if (flag) break;
+                                        if (flag) RecentSoldTable.Remove(kvp);
                                     }
                                 }
 
@@ -1798,11 +1824,11 @@ namespace MarketTown
                                 if (Math.Abs(x) <= range && Math.Abs(y) <= range)
                                 {
                                     Vector2 currentTile = new Vector2(currentX, currentY);
-                                    Object obj = Game1.currentLocation.getObjectAtTile(currentX, currentY);
+                                    Object obj = Game1.currentLocation.getObjectAtTile(currentX, currentY, true);
 
                                     if (obj != null && obj is Chest mtChest && mtChest.Items.Count > 0
-                                        && (obj.QualifiedItemId == "(BC)MT.Objects.MarketTownStorageLarge" && random.NextDouble() < Config.RestockChance
-                                        || obj.QualifiedItemId == "(BC)MT.Objects.MarketTownStorageSmall" && Math.Abs(x) <= 5 && Math.Abs(y) <= 5 && random.NextDouble() < Config.RestockChance / 2))
+                                        && (obj.QualifiedItemId == "(BC)MT.Objects.MarketTownStorageLarge" && ( random.NextDouble() < Config.RestockChance || bypass )
+                                        || obj.QualifiedItemId == "(BC)MT.Objects.MarketTownStorageSmall" && Math.Abs(x) <= 5 && Math.Abs(y) <= 5 && ( random.NextDouble() < Config.RestockChance / 2 || bypass )))
                                     {
                                         List<int> categoryKeys = new List<int> { -81, -80, -79, -75, -74, -28, -27, -26, -23, -22, -21, -20, -19, -18, -17, -16, -15, -12, -8, -7, -6, -5, -4, -2 };
 
@@ -1824,7 +1850,7 @@ namespace MarketTown
                                                 if (mtChest.Items[chestIndex].Stack > 1) mtChest.Items[chestIndex].Stack -= 1;
                                                 else mtChest.Items.Remove(chestItem);
 
-                                                RecentSoldTable[table] = 9999;
+                                                RecentSoldTable.Remove(kvp);
                                                 break;
                                             }
                                         }
@@ -1844,6 +1870,8 @@ namespace MarketTown
                         }
                     }
                 }
+
+                if (bypass) RecentSoldTable.Clear();
             }
             catch (Exception ex) { SMonitor.Log("Error while restock table" + ex.Message, LogLevel.Error); }
         }

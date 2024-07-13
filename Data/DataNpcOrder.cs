@@ -42,8 +42,8 @@ namespace MarketTown
             }
             if (!Game1.NPCGiftTastes.ContainsKey(npc.Name) || npcOrderNumbers.Value.TryGetValue(npc.Name, out int amount) && amount >= Config.MaxNPCOrdersPerNight)
                 return;
-            if ( rand.NextDouble() < Config.OrderChance / 4
-                || rand.NextDouble() < Config.OrderChance && location.Name.Contains("Custom_MT_Island")
+            if ( rand.NextDouble() < Config.OrderChance / 5
+                || rand.NextDouble() < Config.OrderChance && !location.Name.Contains("Custom_MT_Island")
                 || bypass)
             {
                 StartOrder( npc, location, marketOrder );
@@ -135,7 +135,7 @@ namespace MarketTown
                         taste = "love";
                         dish = loves[rand.Next(loves.Count)];
                     }
-                    else if (likes.Any() && (rand.NextDouble() < (1 - Config.LovedDishChance) / 2 || !loves.Any() && !neutral.Any()))
+                    else if (likes.Any() && (rand.NextDouble() < Config.LovedDishChance || !loves.Any() && !neutral.Any()))
                     {
                         taste = "like";
                         dish = likes[rand.Next(likes.Count)];

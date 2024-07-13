@@ -46,7 +46,7 @@
   "foodstore.config.enabletip":                       "Enabled Tip Option?",
   "foodstore.config.enabletipText":                   "Tip value is a fraction of sale price. Default -1 for random tip",
   
-  "foodstore.config.enabletipclose":                  "Only Tip when running the store?",
+  "foodstore.config.enabletipclose":                  "Only Tip when nearby?",
   "foodstore.config.enabletipcloseText":              "When set to True, only receive Tip when player near the store",
   
   "foodstore.config.enabletipcloselove":              "Loved food tip value multiplier",
@@ -1376,7 +1376,16 @@
   "foodstore.config.islandvisitbuilding":             "Chance guest visit a Building",
   "foodstore.config.islandvisitbuildingText":         "Default 0.2. Chance a NPC will visit a random Building. Recommened under 0.4, and keep Island House chance + Building chance under 1.0",
 
-  "foodstore.config.islandplant":                     "Crops and trees"
+  "foodstore.config.islandplant":                     "Crops and trees",
+
+  "foodstore.config.modgeneral":                      "   General Setting",
+  "foodstore.config.modadvance":                      "   Extra",
+
+  "foodstore.config.ultimatechallenge":               "*** ULTIMATE CHALLENGE ***",
+  "foodstore.config.ultimatechallengeText":           "Default False. When True, money made from Shipping bins reduced by 50%. All money made by Market Town increased by 300%. NPC buy chance increase 100%.",
+
+  "foodstore.config.lockultimatechallenge":           "*** Permanent lock ***",
+  "foodstore.config.lockultimatechallengeText":       "*** WARNING: Once set to True and save the game (sleep), Ultimate Challenge will be PERMANENT on this save file. There is NO going back"
 
 
 }

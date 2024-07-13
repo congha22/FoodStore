@@ -9,7 +9,7 @@
   <property name="IsFarm" value="T"/>
   <property name="LocationContext" value="d5a1lamdtd.MarketTown.Custom_MT_Location_Context"/>
   <property name="LooserBuildRestrictions" value="T"/>
-  <property name="NPCWarp" value="73 17 Custom_MT_Island_House 8 31 74 17 Custom_MT_Island_House 9 31 15 48 Beach 63 20 7 52 Custom_Ridgeside_RSVCliff 51 24 14 57 EastScarp_Village 55 114"/>
+  <property name="NPCWarp" value="73 17 Custom_MT_Island_House 9 31 15 48 Beach 63 20 7 52 Custom_Ridgeside_RSVCliff 51 24 14 57 EastScarp_Village 55 114"/>
   <property name="Outdoors" value="T"/>
   <property name="Spring_Objects" value="T"/>
   <property name="Summer_Objects" value="T"/>
