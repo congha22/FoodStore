@@ -36,6 +36,9 @@ using StardewValley.Characters;
 using StardewValley.GameData.FarmAnimals;
 using StardewValley.Locations;
 using StardewValley.Inventories;
+using System.ComponentModel.DataAnnotations;
+using StardewValley.TerrainFeatures;
+using StardewValley.Extensions;
 
 namespace MarketTown
 {
@@ -343,7 +346,7 @@ namespace MarketTown
             chest.Items[position] = i;
 
             if (i != null) playerShop.ItemIds[position] = i.ItemId;
-            else playerShop.ItemIds[position] = null; 
+            else playerShop.ItemIds[position] = null;
         }
 
         private void OnAssetRequested(object sender, AssetRequestedEventArgs e)
@@ -630,7 +633,7 @@ namespace MarketTown
             {
 
                 GameLocation island = Game1.getLocationFromName("Custom_MT_Island");
-            
+
                 foreach (var tile in shopLocations)
                 {
                     for (int i = (int)tile.X; i <= (int)tile.X + 2; i++)
@@ -644,9 +647,10 @@ namespace MarketTown
 
                 if (!endDay) Game1.addHUDMessage(new HUDMessage(SHelper.Translation.Get("foodstore.festival.end")));
                 if (endDay) TodayShopInventory.Clear();
-            } catch { }
+            }
+            catch { }
 
-            foreach ( var islandVisitorName in IslandNPCList)
+            foreach (var islandVisitorName in IslandNPCList)
             {
                 NPC npc = Game1.getCharacterFromName(islandVisitorName);
                 if (npc != null) npc.modData["hapyke.FoodStore/shopOwnerToday"] = "-1,-1";
@@ -669,7 +673,7 @@ namespace MarketTown
 
             var randomGold = new Random().Next(1, 3);
 
-            if (Game1.random.NextDouble() > 0.15) 
+            if (Game1.random.NextDouble() > 0.15)
                 while (chest.Items.Count < randomGold) chest.Items.Add(ItemRegistry.Create<Item>("(O)GoldCoin"));
 
             MarketShopData shop = TodayShopInventory.FirstOrDefault(shop => shop.Name == name);
@@ -775,7 +779,7 @@ namespace MarketTown
             var multiplayer = farmers.Count > 1;
 
             if (Config.UltimateChallenge
-                || SHelper.Data.ReadSaveData<MailData>("MT.MailLog") != null && SHelper.Data.ReadSaveData<MailData>("MT.MailLog").LockedChallenge) 
+                || SHelper.Data.ReadSaveData<MailData>("MT.MailLog") != null && SHelper.Data.ReadSaveData<MailData>("MT.MailLog").LockedChallenge)
                 salePrice *= 4;
 
             if (Game1.player.team.useSeparateWallets.Value && multiplayer)
@@ -786,7 +790,7 @@ namespace MarketTown
                     {
                         Game1.player.team.AddIndividualMoney(farmer, (int)salePrice / farmers.Count);
                     }
-                    
+
                 }
                 catch { Game1.player.Money += salePrice; }
             }
@@ -880,7 +884,8 @@ namespace MarketTown
                 var stringValue = SHelper.Translation.Get("foodstore.festival.sold." + random.Next(20), new { itemName = displayName, shopName = result });
 
                 return stringValue;
-            } catch { return "Awesome!"; }
+            }
+            catch { return "Awesome!"; }
         }
 
         public void OnModMessageReceived(object sender, ModMessageReceivedEventArgs e)
@@ -916,7 +921,7 @@ namespace MarketTown
         }
 
         /// <summary>When NPC ready to show new message.</summary>
-        private static bool WantsToSay(NPC npc, int time)
+        public static bool WantsToSay(NPC npc, int time)
         {
             if (Config.DisableChatAll) { return false; }
             if (!npc.modData.ContainsKey("hapyke.FoodStore/LastSay") || npc.modData["hapyke.FoodStore/LastSay"].Length == 0)
@@ -966,7 +971,7 @@ namespace MarketTown
                         if (obj.getCategoryName() == "Furniture" || obj.getCategoryName() == "Decoration")
                         {
                             decorPoint += 0.75;
-                            if (obj is Furniture furniture && furniture.heldObject.Value != null) decorPoint += 0.25; 
+                            if (obj is Furniture furniture && furniture.heldObject.Value != null) decorPoint += 0.25;
                         }
                     }
                 }
@@ -1010,8 +1015,8 @@ namespace MarketTown
                 }
             }
 
-            if (gameLocation.Name.Contains("Custom_MT_Island") 
-                || gameLocation.GetParentLocation() != null && gameLocation.GetParentLocation().NameOrUniqueName == "Custom_MT_Island" )
+            if (gameLocation.Name.Contains("Custom_MT_Island")
+                || gameLocation.GetParentLocation() != null && gameLocation.GetParentLocation().NameOrUniqueName == "Custom_MT_Island")
                 decorPoint += 8;
 
             if (decorPoint > 58) return 0.5;
@@ -1170,6 +1175,9 @@ namespace MarketTown
 
         private static void NPCShowTextAboveHead(NPC npc, string message)
         {
+            if (!WantsToSay(npc, 20)) return;
+
+            npc.modData["hapyke.FoodStore/LastSay"] = Game1.timeOfDay.ToString();
             Task.Run(async delegate
             {
                 try
@@ -1288,7 +1296,7 @@ namespace MarketTown
             float totalNoteBase = 3 - (totalCustomerNote / 100);
             if (totalNoteBase < 1) totalNoteBase = 1;
 
-            float yesNoBase = ( totalCustomerNoteYes + totalCustomerNoteNo + 3 ) / ( totalCustomerNoteYes + 1 );
+            float yesNoBase = (totalCustomerNoteYes + totalCustomerNoteNo + 3) / (totalCustomerNoteYes + 1);
             float islandProgressValue = totalNoteBase * yesNoBase;
 
 
@@ -1477,7 +1485,7 @@ namespace MarketTown
         }
 
         /// <summary>Clear schedule, endpoint, controller, moving state.</summary>
-        public static void ResetErrorNpc (NPC __instance)
+        public static void ResetErrorNpc(NPC __instance)
         {
             __instance.Halt();
             __instance.ClearSchedule();
@@ -1486,7 +1494,7 @@ namespace MarketTown
             __instance.previousEndPoint = __instance.TilePoint;
             __instance.temporaryController = null;
             __instance.controller = null;
-            if( __instance.Sprite.CurrentFrame > 15 ) __instance.Sprite.CurrentFrame = 0;
+            if (__instance.Sprite.CurrentFrame > 15) __instance.Sprite.CurrentFrame = 0;
             __instance.Halt();
         }
 
@@ -1673,7 +1681,7 @@ namespace MarketTown
             GameLocation island = Game1.getLocationFromName("Custom_MT_Island");
             var thisNpc = Game1.getCharacterFromName("Marnie");
             if (!IslandNPCList.Contains("Marnie")) IslandNPCList.Add("Marnie");
-            
+
             thisNpc.modData["hapyke.FoodStore/shopOwnerToday"] = "57,18";
 
             TodayShopInventory.Add(new MarketShopData("z_marnie2", new(54, 18), new List<string>()));
@@ -1715,7 +1723,7 @@ namespace MarketTown
 
         /// <summary> Table try to restock from nearby Market Storage </summary>
         /// <param name="bypass">Force restock ( dayEnd or sleep )</param>  
-        public static void RestockTable (bool bypass = false)
+        public static void RestockTable(bool bypass = false, bool clean = false)
         {
             Random random = new Random();
             try
@@ -1733,7 +1741,7 @@ namespace MarketTown
                         var baseTile = table.TileLocation;
                         int range = 10, x = 0, y = 0, dx = 0, dy = -1, max = range * 2 + 1;
 
-                        if (bypass && timeOfSold != 9999) timeOfSold = 0;
+                        if (bypass) timeOfSold = 0;
 
                         if (Game1.timeOfDay < timeOfSold + 20
                             || location.getObjectAtTile((int)baseTile.X, (int)baseTile.Y, true) == null
@@ -1764,15 +1772,15 @@ namespace MarketTown
                                 if (Math.Abs(x) <= range && Math.Abs(y) <= range)
                                 {
                                     Vector2 currentTile = new Vector2(currentX, currentY);
-                                    Object obj = Game1.currentLocation.getObjectAtTile(currentX, currentY, true);
+                                    Object obj = location.getObjectAtTile(currentX, currentY, true);
 
                                     if (obj != null && obj is Chest mtChest && mtChest.Items.Count > 0
-                                        && (obj.QualifiedItemId == "(BC)MT.Objects.MarketTownStorageLarge" && ( random.NextDouble() < Config.RestockChance || bypass )
-                                        || obj.QualifiedItemId == "(BC)MT.Objects.MarketTownStorageSmall" && Math.Abs(x) <= 5 && Math.Abs(y) <= 5 && ( random.NextDouble() < Config.RestockChance / 1.5 || bypass) ))
+                                        && (obj.QualifiedItemId == "(BC)MT.Objects.MarketTownStorageLarge" && (random.NextDouble() < Config.RestockChance || bypass)
+                                        || obj.QualifiedItemId == "(BC)MT.Objects.MarketTownStorageSmall" && Math.Abs(x) <= 5 && Math.Abs(y) <= 5 && (random.NextDouble() < Config.RestockChance / 1.5 || bypass)))
                                     {
                                         List<int> categoryKeys = new List<int> { -81, -80, -79, -75, -74, -28, -27, -26, -23, -22, -21, -20, -19, -18, -17, -16, -15, -12, -8, -7, -6, -5, -4, -2 };
 
-                                        int tried = 5;
+                                        int tried = 10;
                                         while (fChest.Items.Count(i => i == null) > 0 && tried > 0)
                                         {
                                             tried--;
@@ -1792,7 +1800,6 @@ namespace MarketTown
                                                 if (mtChest.Items[chestIndex].Stack > 1) mtChest.Items[chestIndex].Stack -= 1;
                                                 else mtChest.Items.Remove(chestItem);
 
-                                                RecentSoldTable[table] = 9999;
                                                 if (fChest.Items.Count(i => i == null) == 0) flag = true;
                                                 continue;
                                             }
@@ -1814,7 +1821,7 @@ namespace MarketTown
                                 y += dy;
                             }
                         }
-                        else
+                        else if (table.heldObject.Value == null)
                         {
                             for (int i = 0; i < max * max; i++)
                             {
@@ -1824,11 +1831,11 @@ namespace MarketTown
                                 if (Math.Abs(x) <= range && Math.Abs(y) <= range)
                                 {
                                     Vector2 currentTile = new Vector2(currentX, currentY);
-                                    Object obj = Game1.currentLocation.getObjectAtTile(currentX, currentY, true);
+                                    Object obj = location.getObjectAtTile(currentX, currentY, true);
 
                                     if (obj != null && obj is Chest mtChest && mtChest.Items.Count > 0
-                                        && (obj.QualifiedItemId == "(BC)MT.Objects.MarketTownStorageLarge" && ( random.NextDouble() < Config.RestockChance || bypass )
-                                        || obj.QualifiedItemId == "(BC)MT.Objects.MarketTownStorageSmall" && Math.Abs(x) <= 5 && Math.Abs(y) <= 5 && ( random.NextDouble() < Config.RestockChance / 2 || bypass )))
+                                        && (obj.QualifiedItemId == "(BC)MT.Objects.MarketTownStorageLarge" && (random.NextDouble() < Config.RestockChance || bypass)
+                                        || obj.QualifiedItemId == "(BC)MT.Objects.MarketTownStorageSmall" && Math.Abs(x) <= 5 && Math.Abs(y) <= 5 && (random.NextDouble() < Config.RestockChance / 2 || bypass)))
                                     {
                                         List<int> categoryKeys = new List<int> { -81, -80, -79, -75, -74, -28, -27, -26, -23, -22, -21, -20, -19, -18, -17, -16, -15, -12, -8, -7, -6, -5, -4, -2 };
 
@@ -1868,17 +1875,19 @@ namespace MarketTown
                                 y += dy;
                             }
                         }
+                        else if (table.heldObject.Value != null)
+                            RecentSoldTable.Remove(kvp);
                     }
                 }
 
-                if (bypass) RecentSoldTable.Clear();
+                if (clean) RecentSoldTable.Clear();
             }
             catch (Exception ex) { SMonitor.Log("Error while restock table" + ex.Message, LogLevel.Error); }
         }
 
-        public static void InitFurniture ()
+        public static void InitFurniture()
         {
-            if ( !Game1.IsMasterGame ) return;
+            if (!Game1.IsMasterGame) return;
 
             var town = Game1.getLocationFromName("Town");
             var island = Game1.getLocationFromName("Custom_MT_Island");
@@ -1886,9 +1895,9 @@ namespace MarketTown
 
             List<Vector2> rugList = new List<Vector2> { new(16, 6), new(18, 6), new(22, 10), new(24, 10), new(28, 6), new(30, 6), new(34, 10), new(36, 10) };
             List<Vector2> tableList = new List<Vector2> { new(17, 6), new(23, 10), new(29, 6), new(35, 10) };
-            List<Vector2> townList = new List<Vector2> { new(27, 66), new(28, 66), new(29, 66), new(30, 66), new(27, 67), new(29, 67), new(28, 64)};
+            List<Vector2> townList = new List<Vector2> { new(27, 66), new(28, 66), new(29, 66), new(30, 66), new(27, 67), new(29, 67), new(28, 64) };
 
-            foreach (var rug in rugList )
+            foreach (var rug in rugList)
             {
                 var obj = new Furniture("1742", rug);
                 islandHouse.furniture.Add(obj);
@@ -1902,7 +1911,7 @@ namespace MarketTown
 
             bool flag = townList.All(tile => town.isTilePlaceable(tile));
 
-            if(flag)
+            if (flag)
             {
                 foreach (var tile in townList)
                 {
@@ -1956,6 +1965,128 @@ namespace MarketTown
                             town.furniture.Add(obj10);
 
                             break;
+                    }
+                }
+            }
+        }
+
+        public static void FindSomething(NPC npc)
+        {
+            // ####################### doing checking what is looking at
+            Random random = new Random();
+            var tile = npc.Tile;
+            var facing = npc.FacingDirection;
+            var location = npc.currentLocation;
+
+            int tried = 0;
+
+
+            List<Vector2> checkingTile = new List<Vector2>();
+
+
+            if (facing == 0)
+                for (var y = 0; y >= -4; y--)
+                {
+                    checkingTile.Add(tile + new Vector2(0, y));
+                    checkingTile.Add(tile + new Vector2(-1, y));
+                    checkingTile.Add(tile + new Vector2(1, y));
+                }
+            else if (facing == 1)
+                for (var x = 0; x <= 4; x++)
+                {
+                    checkingTile.Add(tile + new Vector2(x, 0));
+                    checkingTile.Add(tile + new Vector2(x, -1));
+                    checkingTile.Add(tile + new Vector2(x, 1));
+                }
+            else if (facing == 2)
+                for (var y = 0; y <= 4; y++)
+                {
+                    checkingTile.Add(tile + new Vector2(0, y));
+                    checkingTile.Add(tile + new Vector2(-1, y));
+                    checkingTile.Add(tile + new Vector2(1, y));
+                }
+            else if (facing == 3)
+                for (var x = 0; x >= -4; x--)
+                {
+                    checkingTile.Add(tile + new Vector2(x, 0));
+                    checkingTile.Add(tile + new Vector2(x, -1));
+                    checkingTile.Add(tile + new Vector2(x, 1));
+                }
+
+
+            //--------------
+
+
+            if ( random.NextDouble() < 0.5) {
+                while (tried < 10 && checkingTile.Any())
+                {
+                    tried++;
+                    var targetTile = checkingTile[random.Next(checkingTile.Count)];
+                    checkingTile.Remove(targetTile);
+
+                    location.terrainFeatures.TryGetValue(targetTile, out var value);
+                    var obj = location.getObjectAtTile((int)targetTile.X, (int)targetTile.Y, true);
+
+                    if (value != null && (random.NextBool() || obj == null))
+                    {
+                        if (value is FruitTree fTree)
+                        {
+                            // ###### buy fruit from tree
+                            NPCShowTextAboveHead(npc, SHelper.Translation.Get($"foodstore.viewchat.fruittree.{fTree.daysUntilMature.Value <= 0}.{fTree.fruit.Any()}.{random.Next(1, 16)}", 
+                                new {treeName = fTree.GetDisplayName(), playerName = Game1.player.Name}));
+                            return;
+                        }
+                        else if (value is Tree tree)
+                        {
+                            NPCShowTextAboveHead(npc, SHelper.Translation.Get($"foodstore.viewchat.wildtree.{tree.growthStage.Value >= 5}.{random.Next(1, 16)}",
+                                new {playerName = Game1.player.Name }));
+                            return;
+                        }
+                        else if (value is HoeDirt hoeDirt)
+                        {
+                            if (hoeDirt.crop != null)
+                            {
+                                // 5 : ready to harvest
+                                var id = hoeDirt.crop.indexOfHarvest.Value;
+                                var growth = hoeDirt.crop.currentPhase;
+                                var crop = ItemRegistry.GetData("(O)" + id);
+
+                                if (crop != null)
+                                {
+                                    NPCShowTextAboveHead(npc, SHelper.Translation.Get($"foodstore.viewchat.crop.{growth.Value >= 5}.{random.Next(1, 16)}",
+                                        new { playerName = Game1.player.Name, cropName = crop.DisplayName }));
+                                    return;
+                                }
+                            }
+                            else
+                            {
+                                NPCShowTextAboveHead(npc, SHelper.Translation.Get($"foodstore.viewchat.emptydirt.{random.Next(1, 6)}",
+                                        new { playerName = Game1.player.Name }));
+                                return;
+                            }
+                        }
+                    }
+                    else if (obj != null && obj is Furniture furniture)
+                    {
+                        List<int> validCategory = new List<int> { 0, 1, 2, 3, 4, 6, 8, 10, 14, 17};
+                        if (validCategory.Contains(furniture.furniture_type.Value))
+                        {
+                            NPCShowTextAboveHead(npc, SHelper.Translation.Get($"foodstore.viewchat.furniture.{furniture.furniture_type.Value}.{random.Next(1, 6)}",
+                                        new { playerName = Game1.player.Name, furniName = furniture.DisplayName }));
+                            return;
+                        }
+                    }
+                }
+            }
+            else if (random.NextDouble() < 0.75)
+            {
+                foreach (var animal in location.Animals.Values)
+                {
+                    if (checkingTile.Contains(animal.Tile))
+                    {
+                        NPCShowTextAboveHead(npc, SHelper.Translation.Get($"foodstore.viewchat.animal.{animal.age.Value >= animal.GetAnimalData().DaysToMature}.{random.Next(1, 15)}",
+                            new { playerName = Game1.player.Name, animalType = animal.displayType.ToLower(), animalName = animal.Name }));
+                        return;
                     }
                 }
             }

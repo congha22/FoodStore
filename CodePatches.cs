@@ -62,6 +62,7 @@ namespace MarketTown
             __instance.modData["hapyke.FoodStore/shopOwnerToday"] = "-1,-1";
             __instance.modData["hapyke.FoodStore/islandSpecialOrderTile"] = "-1,-1";
             __instance.modData["hapyke.FoodStore/islandSpecialOrderTime"] = "0";
+            __instance.modData["hapyke.FoodStore/lastStoreType"] = "";
             __instance.modData.Remove(orderKey);
 
         }
@@ -554,13 +555,13 @@ namespace MarketTown
 
             //Get taste and decoration score, call to SaySomething for __instance to send bubble text
             if (random.NextDouble() < 0.033 && !Game1.eventUp && __instanceLocation is not null && !WantsToEat(__instance)
-                && Microsoft.Xna.Framework.Vector2.Distance(__instance.Tile, Game1.player.Tile) < 15
+                && Microsoft.Xna.Framework.Vector2.Distance(__instance.Tile, Game1.player.Tile) < 15 
                 && __instance.modData["hapyke.FoodStore/LastFoodTaste"] != "-1" && Config.EnableDecor && !Config.DisableChatAll)
             {
                 int randomIndex = random.Next(8);
                 double shareIdea = random.NextDouble();
 
-                //Get Taste score, Decoration score
+                //Get Taste score, Decoration score, Store Category
                 int lastTaste;
                 if (__instance.modData.ContainsKey("hapyke.FoodStore/LastFoodTaste")) lastTaste = Int32.Parse(__instance.modData["hapyke.FoodStore/LastFoodTaste"]);
                 else lastTaste = 8;
@@ -568,6 +569,9 @@ namespace MarketTown
                 double lastDecor;
                 if (__instance.modData.ContainsKey("hapyke.FoodStore/LastFoodDecor")) lastDecor = Convert.ToDouble(__instance.modData["hapyke.FoodStore/LastFoodDecor"]);
                 else lastDecor = 0;
+
+                string storeType = "-19309";
+                if (__instance.modData.ContainsKey("hapyke.FoodStore/lastStoreType")) storeType = __instance.modData["hapyke.FoodStore/lastStoreType"];
 
                 double lastTasteRate; // Variable to store the result
                 switch (lastTaste)
@@ -609,29 +613,123 @@ namespace MarketTown
                         break;
                 }
 
+                string storeTypeName = "";
+                switch (storeType)
+                {
+                    case "-102":
+                        storeTypeName = SHelper.Translation.Get("foodstore.storetype.-102");
+                        break;
+                    case "-100":
+                        storeTypeName = SHelper.Translation.Get("foodstore.storetype.-100");
+                        break;
+                    case "-95":
+                        storeTypeName = SHelper.Translation.Get("foodstore.storetype.-95");
+                        break;
+                    case "-81":
+                        storeTypeName = SHelper.Translation.Get("foodstore.storetype.-81");
+                        break;
+                    case "-80":
+                        storeTypeName = SHelper.Translation.Get("foodstore.storetype.-80");
+                        break;
+                    case "-79":
+                        storeTypeName = SHelper.Translation.Get("foodstore.storetype.-79");
+                        break;
+                    case "-75":
+                        storeTypeName = SHelper.Translation.Get("foodstore.storetype.-75");
+                        break;
+                    case "-74":
+                        storeTypeName = SHelper.Translation.Get("foodstore.storetype.-74");
+                        break;
+                    case "-28":
+                        storeTypeName = SHelper.Translation.Get("foodstore.storetype.-28");
+                        break;
+                    case "-27":
+                        storeTypeName = SHelper.Translation.Get("foodstore.storetype.-27");
+                        break;
+                    case "-26":
+                        storeTypeName = SHelper.Translation.Get("foodstore.storetype.-26");
+                        break;
+                    case "-22":
+                        storeTypeName = SHelper.Translation.Get("foodstore.storetype.-22");
+                        break;
+                    case "-21":
+                        storeTypeName = SHelper.Translation.Get("foodstore.storetype.-21");
+                        break;
+                    case "-20":
+                        storeTypeName = SHelper.Translation.Get("foodstore.storetype.-20");
+                        break;
+                    case "-19":
+                        storeTypeName = SHelper.Translation.Get("foodstore.storetype.-19");
+                        break;
+                    case "-18":
+                        storeTypeName = SHelper.Translation.Get("foodstore.storetype.-18");
+                        break;
+                    case "-16":
+                        storeTypeName = SHelper.Translation.Get("foodstore.storetype.-16");
+                        break;
+                    case "-15":
+                        storeTypeName = SHelper.Translation.Get("foodstore.storetype.-15");
+                        break;
+                    case "-12":
+                        storeTypeName = SHelper.Translation.Get("foodstore.storetype.-12");
+                        break;
+                    case "-8":
+                        storeTypeName = SHelper.Translation.Get("foodstore.storetype.-8");
+                        break;
+                    case "-7":
+                        storeTypeName = SHelper.Translation.Get("foodstore.storetype.-7");
+                        break;
+                    case "-6":
+                        storeTypeName = SHelper.Translation.Get("foodstore.storetype.-6");
+                        break;
+                    case "-5":
+                        storeTypeName = SHelper.Translation.Get("foodstore.storetype.-5");
+                        break;
+                    case "-4":
+                        storeTypeName = SHelper.Translation.Get("foodstore.storetype.-4");
+                        break;
+                    case "-2":
+                        storeTypeName = SHelper.Translation.Get("foodstore.storetype.-2");
+                        break;
+                    default:
+                        storeTypeName = "";
+                        break;
+                }
+
+
                 if (lastTaste == 0) //love
                 {
-                    NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.love." + randomIndex));
-                    if (shareIdea < 0.3 + (lastDecor / 2)) SaySomething(__instance, __instanceLocation, lastTasteRate, lastDecorRate);
+                    if (storeTypeName != "") NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.loveWithType." + randomIndex, new { player = Game1.MasterPlayer.displayName, shopTypeName  = storeTypeName}));
+                    else NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.love." + randomIndex));
+                    
+                    if (shareIdea < 10.3 + (lastDecor / 2)) SaySomething(__instance, __instanceLocation, lastTasteRate, lastDecorRate);
                 }
                 else if (lastTaste == 2) //like
-                {
-                    NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.like." + randomIndex));
+                {   
+                    if (storeTypeName != "") NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.likeWithType." + randomIndex, new { player = Game1.MasterPlayer.displayName, shopTypeName = storeTypeName }));
+                    else NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.like." + randomIndex));
+                    
                     if (shareIdea < 0.15 + (lastDecor / 2)) SaySomething(__instance, __instanceLocation, lastTasteRate, lastDecorRate);
                 }
                 else if (lastTaste == 4) //dislike
                 {
-                    NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.dislike." + randomIndex));
+                    if (storeTypeName != "") NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.dislikeWithType." + randomIndex, new { player = Game1.MasterPlayer.displayName, shopTypeName = storeTypeName }));
+                    else NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.dislike." + randomIndex));
+                    
                     if (shareIdea < Math.Abs(-0.15 + (lastDecor / 2.5))) SaySomething(__instance, __instanceLocation, lastTasteRate, lastDecorRate);
                 }
                 else if (lastTaste == 6) //hate
                 {
-                    NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.hate." + randomIndex));
+                    if (storeTypeName != "") NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.hateWithType." + randomIndex, new { player = Game1.MasterPlayer.displayName, shopTypeName = storeTypeName }));
+                    else NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.hate." + randomIndex));
+                    
                     if (shareIdea < Math.Abs(-0.3 + (lastDecor / 2.5))) SaySomething(__instance, __instanceLocation, lastTasteRate, lastDecorRate);
                 }
                 else if (lastTaste == 8) //neutral
                 {
-                    NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.neutral." + randomIndex));
+                    if (storeTypeName != "") NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.neutralWithType." + randomIndex, new { player = Game1.MasterPlayer.displayName, shopTypeName = storeTypeName }));
+                    else NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.neutral." + randomIndex));
+                    
                     if (shareIdea < Math.Abs(lastDecor / 2.5)) SaySomething(__instance, __instanceLocation, lastTasteRate, lastDecorRate);
                 }
                 else { }
@@ -667,72 +765,69 @@ namespace MarketTown
             Random random = new Random();
             foreach (NPC npc in __instance.characters)
             {
-                double talkChance = 0.00002;
+                double talkChance = 0.001;
+
+                DataPlacedFood food = GetClosestFood(npc, __instance);
 
                 //Send bubble about decoration, dish of the week
                 if (npc.IsVillager && npc.getMasterScheduleRawData() != null && __instance == Game1.player.currentLocation
                     && random.NextDouble() < talkChance
-                    && WantsToSay(npc, 360)
-                    && Utility.isThereAFarmerWithinDistance(new Microsoft.Xna.Framework.Vector2(npc.Tile.X, npc.Tile.Y), 20, npc.currentLocation) != null
+                    && Utility.isThereAFarmerWithinDistance(new Vector2(npc.Tile.X, npc.Tile.Y), 20, npc.currentLocation) != null
                     && Config.EnableDecor
                     && !Config.DisableChatAll)
                 {
-                    DataPlacedFood tempFood = GetClosestFood(npc, npc.currentLocation);
-
-                    int localNpcCount = 2;
-                    if (Utility.isThereAFarmerOrCharacterWithinDistance(new Microsoft.Xna.Framework.Vector2(npc.Tile.X, npc.Tile.Y), 10, npc.currentLocation) != null) localNpcCount += 1;
+                    int localNpcCount = __instance.characters.Count();
 
                     int randomIndex = random.Next(5);
-                    if (tempFood != null)       //If have item for sale
-                    {
-                        var decorPointComment = GetDecorPoint(tempFood.foodTile, npc.currentLocation);
+                    double chance = random.NextDouble();
 
+                    if (chance < 0.04 && WantsToSay(npc, 360) && food != null)       //If have item for sale
+                    {
+                        var decorPointComment = GetDecorPoint(food.foodTile, npc.currentLocation);
 
                         //Send decorPoint message
-
                         if (decorPointComment >= 0.2)
                         {
                             NPCShowTextAboveHead(npc, SHelper.Translation.Get("foodstore.gooddecor." + randomIndex.ToString()));
-                            npc.modData["hapyke.FoodStore/LastSay"] = Game1.timeOfDay.ToString();
                             continue;
                         }
                         else if (decorPointComment <= 0)
                         {
                             NPCShowTextAboveHead(npc, SHelper.Translation.Get("foodstore.baddecor." + randomIndex.ToString()));
-                            npc.modData["hapyke.FoodStore/LastSay"] = Game1.timeOfDay.ToString();
                             continue;
                         }
                     }
-                    else if (tempFood == null && npc.currentLocation is FarmHouse)      //if in FarmHouse and have no item for sale
+                    else if (chance < 0.1 && WantsToSay(npc, 230)
+                        && (__instance is FarmHouse || __instance == Game1.getFarm() || __instance.Name.Contains("Custom_MT_Island")))      //if in FarmHouse and have no item for sale
                     {
                         var decorPointComment = GetDecorPoint(npc.Tile, npc.currentLocation);
 
-
                         //Send decorPoint message
-
                         if (decorPointComment >= 0.2)
                         {
                             NPCShowTextAboveHead(npc, SHelper.Translation.Get("foodstore.gooddecor." + randomIndex.ToString()));
-                            npc.modData["hapyke.FoodStore/LastSay"] = Game1.timeOfDay.ToString();
                             continue;
                         }
                         else if (decorPointComment <= 0)
                         {
                             NPCShowTextAboveHead(npc, SHelper.Translation.Get("foodstore.baddecor." + randomIndex.ToString()));
-                            npc.modData["hapyke.FoodStore/LastSay"] = Game1.timeOfDay.ToString();
                             continue;
                         }
                     }
-
-                    if (random.NextDouble() < (talkChance / localNpcCount / 2))            //Send Dish of Week message
+                    else if ((__instance is FarmHouse || __instance == Game1.getFarm() || __instance.Name.Contains("Custom_MT_Island")
+                            || __instance.GetParentLocation() != null && (__instance.GetParentLocation().Name.Contains("Custom_MT_Island") || __instance.GetParentLocation() == Game1.getFarm() && npc != Game1.player.getSpouse()) )
+                            && WantsToSay(npc, 130) )
+                    {
+                        FindSomething(npc);
+                    }
+                    else if (random.NextDouble() < (talkChance / localNpcCount) && WantsToSay(npc, 400) )            //Send Dish of Week message
                     {
                         NPCShowTextAboveHead(npc, SHelper.Translation.Get("foodstore.dishweek." + randomIndex.ToString(), new { dishWeek = DishPrefer.dishWeek }));
-                        npc.modData["hapyke.FoodStore/LastSay"] = Game1.timeOfDay.ToString();
                     }
                 }
 
 
-                //Control NPC walking to the food
+                // **************************** Control NPC walking to the food ****************************
                 string text = "";
                 if ( npc.IsVillager && npc.getMasterScheduleRawData() != null && npc.queuedSchedulePaths.Count == 0
                     && ( !npc.modData.ContainsKey("hapyke.FoodStore/shopOwnerToday") || npc.modData["hapyke.FoodStore/shopOwnerToday"] == "-1,-1" ) )
@@ -760,7 +855,6 @@ namespace MarketTown
                     {
                         if (npc != null && WantsToEat(npc) && Game1.random.NextDouble() < moveToFoodChance / 100f )
                         {
-                            DataPlacedFood food = GetClosestFood(npc, __instance);
 
                             foreach (var pair in ValidBuildingObjectPairs)
                             {

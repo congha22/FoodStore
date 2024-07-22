@@ -246,6 +246,7 @@ namespace MarketTown
                     __instance.modData["hapyke.FoodStore/shopOwnerToday"] = "-1,-1";
                     __instance.modData["hapyke.FoodStore/islandSpecialOrderTile"] = "-1,-1";
                     __instance.modData["hapyke.FoodStore/islandSpecialOrderTime"] = "0";
+                    __instance.modData["hapyke.FoodStore/lastStoreType"] = "";
 
                     if (__instance.getMasterScheduleRawData() != null && !GlobalNPCBlackList.Contains(__instance.Name))
                     {
@@ -284,10 +285,13 @@ namespace MarketTown
         [EventPriority(EventPriority.Low-9999)]
         private void GameLoop_DayStarted(object sender, StardewModdingAPI.Events.DayStartedEventArgs e)
         {
+            // ########## set no path in farm for visitor
             if (Config.AdvanceOutputItemId) OutputItemId();
 
             if (SHelper.Data.ReadSaveData<MailData>("MT.MailLog") != null && SHelper.Data.ReadSaveData<MailData>("MT.MailLog").LockedChallenge)
                 SMonitor.Log("Ultimate Challenge is PERMANENT on this save file", LogLevel.Debug);
+
+            RestockTable(true, true);
 
             IsCalculatingSellPrice = false;
 
@@ -928,7 +932,7 @@ namespace MarketTown
             Random random = new Random();
 
             // restock table item
-            if (Game1.timeOfDay == 2550) RestockTable(true);
+            if (Game1.timeOfDay == 2550 || Game1.timeOfDay == 2600) RestockTable(true);
             else RestockTable();
             
             if ( Game1.timeOfDay % 200 == 0)
@@ -1274,7 +1278,7 @@ namespace MarketTown
                             }
                             catch { }
                             string reply = "";
-                            int salePrice = food.foodObject.sellToStorePrice();
+                            int salePrice = (int)(food.foodObject.sellToStorePrice() * food.multiplier);
                             int tip = 0;
                             double decorPoint = GetDecorPoint(food.foodTile, __instance.currentLocation);
                             Random rand = new Random();
@@ -1653,6 +1657,12 @@ namespace MarketTown
                             __instance.modData["hapyke.FoodStore/LastFoodDecor"] = decorPoint.ToString();
                             __instance.modData["hapyke.FoodStore/gettingFood"] = "false";
 
+                            //################################################## check if works
+                            if (food.multiplier > 1f)
+                            {
+                                __instance.modData["hapyke.FoodStore/lastStoreType"] = food.foodObject.Category.ToString();
+                            }
+
                             return true;
                         }
                     }
@@ -1720,6 +1730,8 @@ namespace MarketTown
 
         private static DataPlacedFood GetClosestFood(NPC npc, GameLocation location)
         {
+            Random random = new Random();
+
             var locationType = "default";
 
             var pair = ValidBuildingObjectPairs.FirstOrDefault(i => i.Building.GetIndoorsName() == location.NameOrUniqueName);
@@ -1733,6 +1745,7 @@ namespace MarketTown
             bool isFarmBuilding = locationType != "default";
             bool isFarmMarket = locationType == "market";
             bool isFarmRestaurant = locationType == "restaurant";
+            bool isIslandBuilding = location.GetParentLocation() != null && location.GetParentLocation().Name == "Custom_MT_Island";
 
             if (!isFarmBuilding || isFarmMarket)
             {
@@ -1840,12 +1853,25 @@ namespace MarketTown
 
             if (!Config.RandomPurchase)         //Return the closest
             {
-                return foodList[0];
+                var selectItem = foodList[0];
+                if (isFarmMarket || isIslandBuilding)
+                {
+                    int categoryCount = foodList.Count(i => i.foodObject.Category == selectItem.foodObject.Category);
+                    if (categoryCount / foodList.Count > 0.9 && foodList.Count > 10) selectItem.multiplier = 1.4f;
+                    else if (categoryCount / foodList.Count > 0.6 && foodList.Count > 10) selectItem.multiplier = 1.15f;
+                }
+                return selectItem;
             }
             else                                //Return a random item
             {
-                Random random = new Random();
-                return foodList[random.Next(foodList.Count)];
+                var selectItem = foodList[random.Next(foodList.Count)];
+                if (isFarmMarket || isIslandBuilding)
+                {
+                    int categoryCount = foodList.Count(i => i.foodObject.Category == selectItem.foodObject.Category);
+                    if (categoryCount / foodList.Count > 0.9 && foodList.Count > 10) selectItem.multiplier = 1.4f;
+                    else if (categoryCount / foodList.Count > 0.6 && foodList.Count > 10) selectItem.multiplier = 1.15f;
+                }
+                return selectItem;
             }
         }
 

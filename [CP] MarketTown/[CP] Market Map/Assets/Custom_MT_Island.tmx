@@ -1552,7 +1552,7 @@
  <tileset firstgid="4265" source="untitled tile sheet2..tsx"/>
  <tileset firstgid="5545" source="zspring_outdoorsTileSheet2..tsx"/>
  <tileset firstgid="6665" source="untitled tile sheet..tsx"/>
- <tileset firstgid="8640" source="Paths..tsx"/>
+ <tileset firstgid="8640" source="paths..tsx"/>
  <tileset firstgid="8704" source="Island_Extras.tsx"/>
  <tileset firstgid="9197" source="Craftables.tsx"/>
  <tileset firstgid="9933" source="shadow.tsx"/>
