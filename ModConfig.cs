@@ -14,8 +14,8 @@ namespace MarketTown
         public bool DisableChat { get; set; } = false;
         public bool DisableChatAll { get; set; } = false;
 
-        public int MinutesToHungry { get; set; } = 240;
-        public float MoveToFoodChance { get; set; } = 0.005f;
+        public int MinutesToHungry { get; set; } = 120;
+        public float MoveToFoodChance { get; set; } = 0.02f;
         public float MaxDistanceToFind { get; set; } = 40;
         public float MaxDistanceToEat { get; set; } = 4f;
 
@@ -49,7 +49,7 @@ namespace MarketTown
         public int OpenHour { get; set; } = 800;
         public int CloseHour { get;set; } = 2200;
 
-        public float ShedMoveToFoodChance { get; set; } = 0.2f;
+        public float ShedMoveToFoodChance { get; set; } = 0.1f;
         public int ShedMinuteToHungry { get; set; } = 90;
 
         public float KidAskChance { get; set; } = 0.2f;
@@ -87,7 +87,7 @@ namespace MarketTown
 
         public int FestivalTimeStart { get; set; } = 800;
         public int FestivalTimeEnd { get; set; } = 1600;
-        public float FestivalMaxSellChance { get; set; } = 0.3f;
+        public float FestivalMaxSellChance { get; set; } = 0.4f;
 
         public float RestockChance { get; set; } = 0.66f;
 
@@ -97,5 +97,12 @@ namespace MarketTown
 
         public bool UltimateChallenge { get; set; } = false;
         public bool LockChallenge { get; set; } = false;
+        public bool GlobalPathUpdate { get; set; } = false;
+        
+        public bool ExtraMessage { get; set; } = false;
+
+        public bool AllowIndoorStore { get; set; } = false;
+
+        public bool SellFruitTree { get; set; } = true;
     }
 }

@@ -42,7 +42,7 @@ namespace MarketTown
             }
             if (!Game1.NPCGiftTastes.ContainsKey(npc.Name) || npcOrderNumbers.Value.TryGetValue(npc.Name, out int amount) && amount >= Config.MaxNPCOrdersPerNight)
                 return;
-            if ( rand.NextDouble() < Config.OrderChance / 5
+            if ( rand.NextDouble() < Config.OrderChance / 8
                 || rand.NextDouble() < Config.OrderChance && !location.Name.Contains("Custom_MT_Island")
                 || bypass)
             {

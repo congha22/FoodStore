@@ -25,6 +25,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Design;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
@@ -520,6 +521,9 @@ namespace MarketTown
                         Game1.DrawDialogue(new Dialogue(__instance, "key", SHelper.Translation.Get("foodstore.visitcome." + index)));
                         Game1.globalFadeToBlack();
 
+                        UpdateFurnitureTilePathProperties(Game1.getFarm());
+                        UpdateFurnitureTilePathProperties(Game1.getLocationFromName("FarmHouse"));
+
                         FarmOutside.UpdateRandomLocationOpenTile(Game1.getFarm());
                         FarmOutside.UpdateRandomLocationOpenTile(Game1.getLocationFromName("FarmHouse"));
 
@@ -758,192 +762,8 @@ namespace MarketTown
             TryToEatFood(__instance, food);
         }
 
-        private static void FarmHouse_updateEvenIfFarmerIsntHere_Postfix(GameLocation __instance)
-        {
-            if (!Game1.hasLoadedGame) return;
-
-            Random random = new Random();
-            foreach (NPC npc in __instance.characters)
-            {
-                double talkChance = 0.001;
-
-                DataPlacedFood food = GetClosestFood(npc, __instance);
-
-                //Send bubble about decoration, dish of the week
-                if (npc.IsVillager && npc.getMasterScheduleRawData() != null && __instance == Game1.player.currentLocation
-                    && random.NextDouble() < talkChance
-                    && Utility.isThereAFarmerWithinDistance(new Vector2(npc.Tile.X, npc.Tile.Y), 20, npc.currentLocation) != null
-                    && Config.EnableDecor
-                    && !Config.DisableChatAll)
-                {
-                    int localNpcCount = __instance.characters.Count();
-
-                    int randomIndex = random.Next(5);
-                    double chance = random.NextDouble();
-
-                    if (chance < 0.04 && WantsToSay(npc, 360) && food != null)       //If have item for sale
-                    {
-                        var decorPointComment = GetDecorPoint(food.foodTile, npc.currentLocation);
-
-                        //Send decorPoint message
-                        if (decorPointComment >= 0.2)
-                        {
-                            NPCShowTextAboveHead(npc, SHelper.Translation.Get("foodstore.gooddecor." + randomIndex.ToString()));
-                            continue;
-                        }
-                        else if (decorPointComment <= 0)
-                        {
-                            NPCShowTextAboveHead(npc, SHelper.Translation.Get("foodstore.baddecor." + randomIndex.ToString()));
-                            continue;
-                        }
-                    }
-                    else if (chance < 0.1 && WantsToSay(npc, 230)
-                        && (__instance is FarmHouse || __instance == Game1.getFarm() || __instance.Name.Contains("Custom_MT_Island")))      //if in FarmHouse and have no item for sale
-                    {
-                        var decorPointComment = GetDecorPoint(npc.Tile, npc.currentLocation);
-
-                        //Send decorPoint message
-                        if (decorPointComment >= 0.2)
-                        {
-                            NPCShowTextAboveHead(npc, SHelper.Translation.Get("foodstore.gooddecor." + randomIndex.ToString()));
-                            continue;
-                        }
-                        else if (decorPointComment <= 0)
-                        {
-                            NPCShowTextAboveHead(npc, SHelper.Translation.Get("foodstore.baddecor." + randomIndex.ToString()));
-                            continue;
-                        }
-                    }
-                    else if ((__instance is FarmHouse || __instance == Game1.getFarm() || __instance.Name.Contains("Custom_MT_Island")
-                            || __instance.GetParentLocation() != null && (__instance.GetParentLocation().Name.Contains("Custom_MT_Island") || __instance.GetParentLocation() == Game1.getFarm() && npc != Game1.player.getSpouse()) )
-                            && WantsToSay(npc, 130) )
-                    {
-                        FindSomething(npc);
-                    }
-                    else if (random.NextDouble() < (talkChance / localNpcCount) && WantsToSay(npc, 400) )            //Send Dish of Week message
-                    {
-                        NPCShowTextAboveHead(npc, SHelper.Translation.Get("foodstore.dishweek." + randomIndex.ToString(), new { dishWeek = DishPrefer.dishWeek }));
-                    }
-                }
-
-
-                // **************************** Control NPC walking to the food ****************************
-                string text = "";
-                if ( npc.IsVillager && npc.getMasterScheduleRawData() != null && npc.queuedSchedulePaths.Count == 0
-                    && ( !npc.modData.ContainsKey("hapyke.FoodStore/shopOwnerToday") || npc.modData["hapyke.FoodStore/shopOwnerToday"] == "-1,-1" ) )
-                {
-                    double moveToFoodChance = Config.MoveToFoodChance;
-                    try
-                    {
-                        if (npc.currentLocation.Name == "Custom_MT_Island" || npc.currentLocation.GetParentLocation() != null && npc.currentLocation.GetParentLocation().Name == "Custom_MT_Island")
-                            moveToFoodChance = Config.MoveToFoodChance * 2;
-                        else if (npc.currentLocation.Name == "Custom_MT_Island_House") moveToFoodChance = Config.MoveToFoodChance * 3;
-                        else if (npc.currentLocation.GetParentLocation() is Farm) moveToFoodChance = Config.ShedMoveToFoodChance;
-
-                        if (Config.UltimateChallenge 
-                            || SHelper.Data.ReadSaveData<MailData>("MT.MailLog") != null && SHelper.Data.ReadSaveData<MailData>("MT.MailLog").LockedChallenge) 
-                            moveToFoodChance *= 2;
-                    }
-                    catch { }
-
-                    if (Config.RushHour && ((800 < Game1.timeOfDay && Game1.timeOfDay < 930) || (1200 < Game1.timeOfDay && Game1.timeOfDay < 1300) || (1800 < Game1.timeOfDay && Game1.timeOfDay < 2000)))
-                    {
-                        moveToFoodChance = moveToFoodChance * 1.5;
-                    }
-
-                    try
-                    {
-                        if (npc != null && WantsToEat(npc) && Game1.random.NextDouble() < moveToFoodChance / 100f )
-                        {
-
-                            foreach (var pair in ValidBuildingObjectPairs)
-                            {
-                                Building building = pair.Building;
-                                string buildingType = pair.buildingType;
-
-                                var museumCheck = Game1.getLocationFromName(building.GetIndoorsName());
-
-                                if (museumCheck == npc.currentLocation && buildingType == "museum") return;
-                            }
-
-                            if (food == null || (!Config.AllowRemoveNonFood && food.foodObject.Edibility <= 0 && (npc.currentLocation is Farm || npc.currentLocation is FarmHouse)))
-                                return;
-                            if (TryToEatFood(npc, food))
-                            {
-                                return;
-                            }
-
-                            Microsoft.Xna.Framework.Vector2 possibleLocation;
-                            possibleLocation = food.foodTile;
-                            int tries = 0;
-                            int facingDirection = -3;
-
-
-                            while (tries < 3)
-                            {
-                                int xMove = Game1.random.Next(-1, 2);
-                                int yMove = Game1.random.Next(-1, 2);
-
-                                possibleLocation.X += xMove;
-                                if (xMove == 0)
-                                {
-                                    possibleLocation.Y += yMove;
-                                }
-                                if (xMove == -1)
-                                {
-                                    facingDirection = 1;
-                                }
-                                else if (xMove == 1)
-                                {
-                                    facingDirection = 3;
-                                }
-                                else if (yMove == -1)
-                                {
-                                    facingDirection = 2;
-                                }
-                                else if (yMove == 1)
-                                {
-                                    facingDirection = 0;
-                                }
-                                if (!__instance.IsTileBlockedBy(possibleLocation))
-                                {
-                                    break;
-                                }
-                                tries++;
-                            }
-                            if (tries < 3 && TimeDelayCheck(npc))
-                            {
-                                //Send message
-                                if (npc.currentLocation.Name != "Farm" && npc.currentLocation.Name != "FarmHouse" && !Config.DisableChat && !Config.DisableChatAll)
-                                {
-                                    int randomIndex = random.Next(15);
-                                    text = SHelper.Translation.Get("foodstore.coming." + randomIndex.ToString(), new { vName = npc.displayName });
-
-                                    Game1.chatBox.addInfoMessage(text);
-                                    MyMessage messageToSend = new MyMessage(text);
-                                    SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
-                                }
-
-                                npc.modData["hapyke.FoodStore/LastCheck"] = Game1.timeOfDay.ToString();
-                                npc.modData["hapyke.FoodStore/gettingFood"] = "true";
-
-                                //Villager control
-
-                                var npcWalk = FarmOutside.AddRandomSchedule(npc, ConvertToHour(Game1.timeOfDay + 10).ToString(), __instance.NameOrUniqueName, 
-                                    possibleLocation.X.ToString(), possibleLocation.Y.ToString(), facingDirection.ToString());
-
-                                npc.addedSpeed = 2;
-                            }
-                        }
-                    }
-                    catch { }
-                }
-            }
-        }
-
 
         // NPC order part 
-
         [HarmonyPatch(typeof(NPC), nameof(NPC.draw))]
         public class NPC_draw_Patch
         {
@@ -1233,8 +1053,8 @@ namespace MarketTown
             {
                 if (__instance != null && __instance.Location != null && __instance.Location.Name.Contains("Custom_MT_Island") && Config.IslandPlantBoost)
                 {
-                    if (!__instance.stump.Value && __instance.growthStage.Value >= 4 && __instance.fruit.Count < 8
-                        && (__instance.IsInSeasonHere() || __instance.Location.GetSeason().ToString() == "Summer"
+                    if (!__instance.stump.Value && __instance.daysUntilMature.Value <= 0 && __instance.fruit.Count < 8
+                        && (__instance.IsInSeasonHere() || __instance.Location.GetSeason().ToString() == "Spring"
                         || (__instance.struckByLightningCountdown.Value > 0 && !__instance.IsWinterTreeHere())))
                     {
                         Random random = new Random();

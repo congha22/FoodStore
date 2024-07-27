@@ -51,9 +51,33 @@
     },
     {
       "Action": "EditData",
+      "Target": "Data/Minecarts",
+      "TargetField": [
+        "Default",
+        "Destinations"
+      ],
+      "Entries": {
+        "Custom_MT_Island": {
+          "Id": "Custom_MT_Island",
+          "DisplayName": "Paradise Island",
+          "Condition": null,
+          "Price": 0,
+          "BuyTicketMessage": null,
+          "TargetLocation": "Custom_MT_Island",
+          "TargetTile": {
+            "X": 23,
+            "Y": 42
+          },
+          "TargetDirection": "down",
+          "CustomFields": null
+        }
+      }
+    },
+    {
+      "Action": "EditData",
       "Target": "Data/Events/Farm",
       "Entries": {
-        "1930900001": "continue/64 17/farmer 64 16 2 Lewis 64 18 0/pause 1500/speak Lewis \"Welcome to Market Town, @!!! Let's create a lively farmer's market and draw more visitors to our village!#$b#You can also use your Building as a Store, but you'll need a License. I'll send you the a requirements letter to keep your business on track.#$b#Oh, and good news!!!#$b#I fixed the boat by the Tide Pools. It can take you to Paradise Island northwest of Fern Islands.#$b#It's currently empty but stunning island. With your touch, it could become the ultimate resort ever.\"/pause 700/end"
+        "1930900001": "continue/64 17/farmer 64 16 2 Lewis 64 18 0/pause 1500/speak Lewis \"{{i18n:foodstore.event.1930900001.1}}#$b#{{i18n:foodstore.event.1930900001.2}}#$b#{{i18n:foodstore.event.1930900001.3}}#$b#{{i18n:foodstore.event.1930900001.4}}\"/pause 700/end"
       }
     },
     {
@@ -135,220 +159,55 @@
     {
       "Action": "EditMap",
       "Target": "Maps/Custom_MT_Island",
-      "MapTiles": [
-        {
-          "Position": {
-            "X": 45,
-            "Y": 19
-          },
-          "Layer": "Back",
-          "SetProperties": {
-            "NPCBarrier": "T",
-            "NoPath": "T"
-          }
-        },
-        {
-          "Position": {
-            "X": 50,
-            "Y": 26
-          },
-          "Layer": "Back",
-          "SetProperties": {
-            "TouchAction": "Warp Beach 66 22",
-            "NPCBarrier": "T",
-            "NoPath": "T"
-          }
-        },
-        {
-          "Position": {
-            "X": 51,
-            "Y": 26
-          },
-          "Layer": "Back",
-          "SetProperties": {
-            "TouchAction": "Warp Beach 66 22",
-            "NPCBarrier": "T",
-            "NoPath": "T"
-          }
-        },
-        {
-          "Position": {
-            "X": 52,
-            "Y": 26
-          },
-          "Layer": "Back",
-          "SetProperties": {
-            "TouchAction": "Warp Beach 66 22",
-            "NPCBarrier": "T",
-            "NoPath": "T"
-          }
-        },
-        {
-          "Position": {
-            "X": 50,
-            "Y": 27
-          },
-          "Layer": "Back",
-          "SetProperties": {
-            "TouchAction": "Warp Beach 66 22",
-            "NPCBarrier": "T",
-            "NoPath": "T"
-          }
-        },
-        {
-          "Position": {
-            "X": 51,
-            "Y": 27
-          },
-          "Layer": "Back",
-          "SetProperties": {
-            "TouchAction": "Warp Beach 66 22",
-            "NPCBarrier": "T",
-            "NoPath": "T"
-          }
-        },
-        {
-          "Position": {
-            "X": 52,
-            "Y": 27
-          },
-          "Layer": "Back",
-          "SetProperties": {
-            "TouchAction": "Warp Beach 66 22",
-            "NPCBarrier": "T",
-            "NoPath": "T"
-          }
-        },
-        {
-          "Position": {
-            "X": 21,
-            "Y": 36
-          },
-          "Layer": "Buildings",
-          "SetProperties": {
-            "Action": "MineSign Right here, the enchanting fire from Paradise Island brazier draws travelers from afar!"
-          }
-        },
-        {
-          "Position": {
-            "X": 21,
-            "Y": 37
-          },
-          "Layer": "Buildings",
-          "SetProperties": {
-            "Action": "MineSign Right here, the enchanting fire from Paradise Island brazier draws travelers from afar!"
-          }
-        },
-        {
-          "Position": {
-            "X": 13,
-            "Y": 51
-          },
-          "Layer": "Buildings",
-          "SetProperties": {
-            "Action": "MineSign No Fishing"
-          }
-        },
-        {
-          "Position": {
-            "X": 13,
-            "Y": 53
-          },
-          "Layer": "Buildings",
-          "SetProperties": {
-            "Action": "MineSign No Fishing"
-          }
-        },
-        {
-          "Position": {
-            "X": 70,
-            "Y": 16
-          },
-          "Layer": "Buildings",
-          "SetProperties": {
-            "Action": "MineSign {{d5a1lamdtd.MarketTown/IslandSign}}"
-          }
-        },
-        {
-          "Position": {
-            "X": 71,
-            "Y": 16
-          },
-          "Layer": "Buildings",
-          "SetProperties": {
-            "Action": "MineSign {{d5a1lamdtd.MarketTown/IslandSign}}"
-          }
-        },
-        {
-          "Position": {
-            "X": 72,
-            "Y": 16
-          },
-          "Layer": "Buildings",
-          "SetProperties": {
-            "Action": "MineSign {{d5a1lamdtd.MarketTown/IslandSign}}"
-          }
-        },
-        {
-          "Position": {
-            "X": 70,
-            "Y": 17
-          },
-          "Layer": "Buildings",
-          "SetProperties": {
-            "Action": "MineSign {{d5a1lamdtd.MarketTown/IslandSign}}"
-          }
-        },
-        {
-          "Position": {
-            "X": 71,
-            "Y": 17
-          },
-          "Layer": "Buildings",
-          "SetProperties": {
-            "Action": "MineSign {{d5a1lamdtd.MarketTown/IslandSign}}"
-          }
-        },
-        {
-          "Position": {
-            "X": 72,
-            "Y": 17
-          },
-          "Layer": "Buildings",
-          "SetProperties": {
-            "Action": "MineSign {{d5a1lamdtd.MarketTown/IslandSign}}"
-          }
-        }
-      ]
+      "Addwarps": [
+        "7 52 Custom_Ridgeside_RSVCliff 50 24"
+      ],
+      "When": {
+        "HasMod |contains=Rafseazz.RidgesideVillage": true,
+        "HasFlag": "beachBridgeFixed"
+      }
+    },
+    {
+      "Action": "EditMap",
+      "Target": "Maps/Custom_MT_Island",
+      "Addwarps": [
+        "14 57 EastScarp_Village 55 114"
+      ],
+      "When": {
+        "HasMod |contains=atravita.EastScarp": true,
+        "HasFlag": "beachBridgeFixed"
+      }
     },
     {
       "Action": "EditMap",
       "Target": "Maps/Custom_Ridgeside_RSVCliff",
       "FromFile": "Assets/Custom_MT_BeachRSV.tmx",
       "ToArea": {
-        "X": 50,
-        "Y": 19,
-        "Width": 5,
-        "Height": 5
+        "X": 49,
+        "Y": 13,
+        "Width": 6,
+        "Height": 11
       },
       "PatchMode": "Overlay",
       "When": {
-        "HasMod |contains=Rafseazz.RidgesideVillage": true
-        }
-      },
+        "HasMod |contains=Rafseazz.RidgesideVillage": true,
+        "HasFlag": "beachBridgeFixed"
+      }
+    },
     {
       "Action": "EditMap",
       "Target": "Maps/EastScarp_Village",
       "FromFile": "Assets/Custom_MT_BeachES.tmx",
       "ToArea": {
         "X": 55,
-        "Y": 116,
+        "Y": 115,
         "Width": 7,
-        "Height": 8
+        "Height": 9
       },
       "PatchMode": "Overlay",
       "When": {
-        "HasMod |contains=atravita.EastScarp": true
+        "HasMod |contains=atravita.EastScarp": true,
+        "HasFlag": "beachBridgeFixed"
       }
     },
     {
@@ -356,9 +215,9 @@
       "Target": "Maps/Beach-NightMarket",
       "FromFile": "Assets/Custom_MT_BeachBoat.tmx",
       "ToArea": {
-        "X": 64,
-        "Y": 17,
-        "Width": 5,
+        "X": 59,
+        "Y": 16,
+        "Width": 7,
         "Height": 5
       },
       "PatchMode": "Overlay"
@@ -368,9 +227,9 @@
       "Target": "Maps/Beach",
       "FromFile": "Assets/Custom_MT_BeachBoat.tmx",
       "ToArea": {
-        "X": 64,
-        "Y": 17,
-        "Width": 5,
+        "X": 59,
+        "Y": 16,
+        "Width": 7,
         "Height": 5
       },
       "PatchMode": "Overlay"
@@ -392,147 +251,6 @@
       "When": {
         "HasReadLetter": "MT.IslandBedroom"
       }
-    },
-    {
-      "Action": "EditMap",
-      "Target": "Maps/Custom_MT_Island_House",
-      "FromFile": "Assets/Custom_MT_Island_House_Rain.tmx",
-      "PatchMode": "Overlay",
-      "When": {
-        "Weather": "Rain, Storm, GreenRain"
-      }
-    },
-    {
-      "Action": "EditMap",
-      "Target": "Maps/Beach",
-      "MapTiles": [
-        {
-          "Position": {
-            "X": 64,
-            "Y": 20
-          },
-          "Layer": "Buildings",
-          "SetProperties": {
-            "Action": "Warp 53 28 Custom_MT_Island"
-          }
-        },
-        {
-          "Position": {
-            "X": 65,
-            "Y": 20
-          },
-          "Layer": "Buildings",
-          "SetProperties": {
-            "Action": "Warp 53 28 Custom_MT_Island"
-          }
-        },
-        {
-          "Position": {
-            "X": 66,
-            "Y": 20
-          },
-          "Layer": "Buildings",
-          "SetProperties": {
-            "Action": "Warp 53 28 Custom_MT_Island"
-          }
-        },
-        {
-          "Position": {
-            "X": 64,
-            "Y": 21
-          },
-          "Layer": "Buildings",
-          "SetProperties": {
-            "Action": "Warp 53 28 Custom_MT_Island"
-          }
-        },
-        {
-          "Position": {
-            "X": 65,
-            "Y": 21
-          },
-          "Layer": "Buildings",
-          "SetProperties": {
-            "Action": "Warp 53 28 Custom_MT_Island"
-          }
-        },
-        {
-          "Position": {
-            "X": 66,
-            "Y": 21
-          },
-          "Layer": "Buildings",
-          "SetProperties": {
-            "Action": "Warp 53 28 Custom_MT_Island"
-          }
-        }
-      ]
-    },
-    {
-      "Action": "EditMap",
-      "Target": "Maps/Beach-NightMarket",
-      "MapTiles": [
-        {
-          "Position": {
-            "X": 64,
-            "Y": 20
-          },
-          "Layer": "Buildings",
-          "SetProperties": {
-            "Action": "Warp 53 28 Custom_MT_Island"
-          }
-        },
-        {
-          "Position": {
-            "X": 65,
-            "Y": 20
-          },
-          "Layer": "Buildings",
-          "SetProperties": {
-            "Action": "Warp 53 28 Custom_MT_Island"
-          }
-        },
-        {
-          "Position": {
-            "X": 66,
-            "Y": 20
-          },
-          "Layer": "Buildings",
-          "SetProperties": {
-            "Action": "Warp 53 28 Custom_MT_Island"
-          }
-        },
-        {
-          "Position": {
-            "X": 64,
-            "Y": 21
-          },
-          "Layer": "Buildings",
-          "SetProperties": {
-            "Action": "Warp 53 28 Custom_MT_Island"
-          }
-        },
-        {
-          "Position": {
-            "X": 65,
-            "Y": 21
-          },
-          "Layer": "Buildings",
-          "SetProperties": {
-            "Action": "Warp 53 28 Custom_MT_Island"
-          }
-        },
-        {
-          "Position": {
-            "X": 66,
-            "Y": 21
-          },
-          "Layer": "Buildings",
-          "SetProperties": {
-            "Action": "Warp 53 28 Custom_MT_Island"
-          }
-        }
-      ]
     },
     {
       "Action": "EditData",
@@ -559,8 +277,8 @@
           "MusicDefault": "ocean",
           "MusicContext": "Default",
           "DefaultArrivalTile": {
-            "X": 53,
-            "Y": 28
+            "X": 22,
+            "Y": 37
           },
           "ArtifactSpots": [
             {

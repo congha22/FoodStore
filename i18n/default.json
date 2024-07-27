@@ -20,10 +20,10 @@
   "foodstore.help.4":                                 "To set up your first store, simply place donw a table at a busy location, and then put a dish on it!!!",
   
   "foodstore.config.minutetohungry":                  "Minutes To Buy",
-  "foodstore.config.minutetohungryText":              "Minutes since last purchase of each NPC. Default 240. Setting too low might cause weird path finding. Recommended above 60",
+  "foodstore.config.minutetohungryText":              "Minutes since last purchase of each NPC. Default 120. Setting too low might cause weird path finding. Recommended above 60",
   
   "foodstore.config.movetofoodchange":                "Move To Item % Chance.",
-  "foodstore.config.movetofoodchangeText":            "Percent chance per tick to decide to buy. Default 0.005. Setting higher cause significantly lag and weird path finding. Greatly recommended under 0.05",
+  "foodstore.config.movetofoodchangeText":            "Default 0.02. Chance a NPC decide to buy something every 1 second . Setting higher cause significantly lag and weird path finding. Greatly recommended under 0.1",
   
   "foodstore.config.maxdistancetofindfood":           "Max Distance to find",
   "foodstore.config.maxdistancetofindfoodText":       "Max distance in tiles from item that NPCs can find it. Default 40",
@@ -724,7 +724,7 @@
   "foodstore.config.doorentryText":                   "Default True: Visitor will spawn near door. Set to False for NPC to spawn near License Sign. Only apply for business Building",
 
   "foodstore.config.shedvisitchance":                 "Chance for new visitor",
-  "foodstore.config.shedvisitchanceText":             "Default 0.2. Chance for new visitor in Building every 10 minutes. Recommened below 0.5!",
+  "foodstore.config.shedvisitchanceText":             "Default 0.1. Chance for new visitor in Building every 10 minutes. Recommened below 0.5!",
 
   "foodstore.config.maxshedcapacity":                 "Maximum visitors in Building",
   "foodstore.config.maxshedcapacityText":             "Default 5. Max capacity in one Building.",
@@ -826,12 +826,12 @@
 
   "foodstore.island.building":                        "Flames are dancing and visitors are coming. Building on Paradise Island is halted",
 
-  "foodstore.islandtravel.sun":                       "It was quite a distance on the boat. You feel a little tired!",
+  "foodstore.islandtravel.sun":                       "It was quite a distance traveling. You feel a little tired!",
   "foodstore.islandtravel.rain":                      "The rain made the journey more difficult. You feel exhausted.",
   "foodstore.islandtravel.wind":                      "The wind sometimes pushes you forward, but other times it goes against your direction.",
   "foodstore.islandtravel.storm":                     "The stormy weather was relentless. You feel drained from the journey.",
   "foodstore.islandtravel.greenrain":                 "The unusual green rain was disorienting. You feel weakened.",
-  "foodstore.islandtravel.snow":                      "Trudging through the snow was exhausting. You feel your energy draining away.",
+  "foodstore.islandtravel.snow":                      "Trudging through the snow was exhausting. You need to take some rest.",
 
   "foodstore.customernote.yes.0":                     "Your food and style were fantastic! I had a great experience.",
   "foodstore.customernote.yes.1":                     "I'm definitely saying yes to your food! It was incredibly tasty.",
@@ -1491,6 +1491,17 @@
   "foodstore.viewchat.fruittree.true.false.14":       "{{playerName}} must have spent a lot of time tending this {{treeName}} tree",
   "foodstore.viewchat.fruittree.true.false.15":       "Can I build a tree house on this {{treeName}} tree.",
 
+  "foodstore.viewchat.fruittreebuy.1":                "Wow, {{playerName}}, those {{fruitName}}s look amazing! Can I buy some?",
+  "foodstore.viewchat.fruittreebuy.2":                "{{playerName}}, your {{fruitName}} tree is so fruitful! I'd love to purchase some.",
+  "foodstore.viewchat.fruittreebuy.3":                "Those {{fruitName}}s look delicious, {{playerName}}. Could I buy a few?",
+  "foodstore.viewchat.fruittreebuy.4":                "You've got quite the bounty of {{fruitName}}s, {{playerName}}! Can I take some off your hands?",
+  "foodstore.viewchat.fruittreebuy.5":                "I can't resist those {{fruitName}}s, {{playerName}}",
+  "foodstore.viewchat.fruittreebuy.6":                "{{playerName}}, your {{fruitName}}s are incredible! I'd love to buy a few.",
+  "foodstore.viewchat.fruittreebuy.7":                "Those {{fruitName}}s look perfect, {{playerName}}. May I get some?",
+  "foodstore.viewchat.fruittreebuy.8":                "I'd love to purchase some of your {{fruitName}}s, {{playerName}}. They look delicious!",
+  "foodstore.viewchat.fruittreebuy.9":                "Your {{fruitName}} tree is bursting with fruit, {{playerName}}!!!",
+  "foodstore.viewchat.fruittreebuy.10":               "{{playerName}}, those {{fruitName}}s are too tempting!",
+
   "foodstore.viewchat.fruittree.false.false.1":       "This little {{treeName}} has a lot of growing to do.",
   "foodstore.viewchat.fruittree.false.false.2":       "I wonder what kind of fruit this tree will bear one day.",
   "foodstore.viewchat.fruittree.false.false.3":       "{{playerName}} has planted a new {{treeName}} tree. It’s still a baby.",
@@ -1667,16 +1678,85 @@
   "foodstore.viewchat.furniture.17.2":                "What a lovely sconce, {{playerName}}.",
   "foodstore.viewchat.furniture.17.3":                "The {{furniName}} brightens up the place nicely.",
   "foodstore.viewchat.furniture.17.4":                "I love how this {{furniName}} looks on the wall.",
-  "foodstore.viewchat.furniture.17.5":                "Such a stylish {{furniName}}!"
+  "foodstore.viewchat.furniture.17.5":                "Such a stylish {{furniName}}!",
+
+  "foodstore.config.globalpathupdate":                "Avoid NPC walk through?",
+  "foodstore.config.globalpathupdateText":            "Default False. When set to True, NPC will try to walk around things in their path instead of ghost through it. NOTE: if the path is totally blocked (e.g you placed a table blocked their door), NPC might walk out of the screen",
+
+  "foodstore.brazierspot":                            "Right here, the enchanting fire from Paradise Island Brazier draws travelers from afar!",
+
+  "foodstore.config.extramessage":                    "Show extra message?",
+
+  "foodstore.config.allowindoorstore":                "Allow indoor sell?",
+  "foodstore.config.allowindoorstoreText":            "Defalt False. When set to True, item can be sell when indoor ( e.g inside Lewis bedroom ). NOTE: Will cause lag on heavy modded game!",
+
+  "foodstore.config.allowsellfruittree":              "Allow sell fruits on tree?",
+  "foodstore.config.allowsellfruittreeText":          "Allow visitors to buy fruits when tree having lots of fruits!",
+
   
-  
-  
-  
-  
-  
-  
-  
-  
+  "foodstore.generalgooddecor.0":                     "Wow, {{playerName}}, this place looks fantastic! You have a real talent for decoration.",
+  "foodstore.generalgooddecor.1":                     "I love what you've done here, {{playerName}}! Everything is so beautifully arranged.",
+  "foodstore.generalgooddecor.2":                     "This area looks amazing, {{playerName}}! Your decoration skills are truly impressive.",
+  "foodstore.generalgooddecor.3":                     "{{playerName}}, you've really outdone yourself with the decor. It's so lovely!",
+  "foodstore.generalgooddecor.4":                     "What a beautiful setup, {{playerName}}! The decorations are just perfect.",
+  "foodstore.generalgooddecor.5":                     "You've done a wonderful job decorating, {{playerName}}. It's so pleasing to the eye.",
+  "foodstore.generalgooddecor.6":                     "Everything looks so nice, {{playerName}}! You have a great sense of style.",
+  "foodstore.generalgooddecor.7":                     "This place is so well-decorated, {{playerName}}. I'm really impressed!",
+  "foodstore.generalgooddecor.8":                     "I can't get over how lovely this area looks, {{playerName}}. Great job!",
+  "foodstore.generalgooddecor.9":                     "You've created such a welcoming atmosphere here, {{playerName}}. It's fantastic!",
+  "foodstore.generalgooddecor.10":                    "The decorations are wonderful, {{playerName}}. You've really brought this place to life.",
+  "foodstore.generalgooddecor.11":                    "What a charming place, {{playerName}}! Your decorations are delightful.",
+  "foodstore.generalgooddecor.12":                    "You've transformed this area beautifully, {{playerName}}. It's so inviting!",
+  "foodstore.generalgooddecor.13":                    "Everything looks perfect, {{playerName}}. You have a real knack for decorating.",
+  "foodstore.generalgooddecor.14":                    "The decor here is so nice, {{playerName}}. You've done a great job!",
+  "foodstore.generalgooddecor.15":                    "I love how you've decorated this place, {{playerName}}. It's wonderful!",
+  "foodstore.generalgooddecor.16":                    "You've really enhanced this area with your decorations, {{playerName}}. It's fantastic!",
+  "foodstore.generalgooddecor.17":                    "This place looks so well-kept and decorated, {{playerName}}. I'm impressed!",
+  "foodstore.generalgooddecor.18":                    "You've made this area look so lovely, {{playerName}}. Great decorating skills!",
+  "foodstore.generalgooddecor.19":                    "The decorations here are top-notch, {{playerName}}. You've done an amazing job!",
+
+  "foodstore.generalnormaldecor.0":                   "This place looks nice, {{playerName}}, but a few more paintings would really brighten it up.",
+  "foodstore.generalnormaldecor.1":                   "You've got a good start here, {{playerName}}. Maybe add some more lighting?",
+  "foodstore.generalnormaldecor.2":                   "I like what you've done, {{playerName}}, but a couple of flower pots would add a nice touch.",
+  "foodstore.generalnormaldecor.3":                   "This area is coming along, {{playerName}}. How about adding a table or two?",
+  "foodstore.generalnormaldecor.4":                   "Nice job so far, {{playerName}}. A few more chairs would make it cozier.",
+  "foodstore.generalnormaldecor.5":                   "You've got some good decor here, {{playerName}}. Maybe consider adding a rug?",
+  "foodstore.generalnormaldecor.6":                   "I see you've started decorating, {{playerName}}. Some wall hangings would look great.",
+  "foodstore.generalnormaldecor.7":                   "This place looks good, {{playerName}}, but a fireplace would make it even better.",
+  "foodstore.generalnormaldecor.8":                   "You're off to a nice start, {{playerName}}. A few more plants would be lovely.",
+  "foodstore.generalnormaldecor.9":                   "The decor is nice, {{playerName}}. How about some more decorative lamps?",
+  "foodstore.generalnormaldecor.10":                  "You've got a nice base here, {{playerName}}. Some cozy cushions could add more comfort.",
+  "foodstore.generalnormaldecor.11":                  "I like your style, {{playerName}}. Maybe add a few more bookcases?",
+  "foodstore.generalnormaldecor.12":                  "This place looks great, {{playerName}}. A bit more art on the walls would be fantastic.",
+  "foodstore.generalnormaldecor.13":                  "You've done well, {{playerName}}. Some additional decor would really complete the look.",
+  "foodstore.generalnormaldecor.14":                  "Good work so far, {{playerName}}. A nice lamp would add a warm touch.",
+  "foodstore.generalnormaldecor.15":                  "The decor here is nice, {{playerName}}. Maybe some more chairs for seating?",
+  "foodstore.generalnormaldecor.16":                  "You've got a good foundation, {{playerName}}. Some more flower pots would look nice.",
+  "foodstore.generalnormaldecor.17":                  "This area looks good, {{playerName}}. A few more paintings would be lovely.",
+  "foodstore.generalnormaldecor.18":                  "Nice job decorating, {{playerName}}. How about some more lighting options?",
+  "foodstore.generalnormaldecor.19":                  "The place is looking nice, {{playerName}}. A couple more tables would be useful.",
+
+  "foodstore.generalbaddecor.0":                      "This place feels a bit empty, {{playerName}}. Maybe some more furniture would help.",
+  "foodstore.generalbaddecor.1":                      "It could use more color here, {{playerName}}. How about adding some flowers?",
+  "foodstore.generalbaddecor.2":                      "This area looks a bit plain, {{playerName}}. A few paintings would really brighten it up.",
+  "foodstore.generalbaddecor.3":                      "Looks like this place needs some love, {{playerName}}. More decorations would be great.",
+  "foodstore.generalbaddecor.4":                      "Could use a bit more here, {{playerName}}. Maybe some nice crops or plants?",
+  "foodstore.generalbaddecor.5":                      "This place feels a bit sparse, {{playerName}}. A few more pieces of furniture would help.",
+  "foodstore.generalbaddecor.6":                      "It looks a bit bare here, {{playerName}}. How about adding some decorations?",
+  "foodstore.generalbaddecor.7":                      "A bit more decor could really help this area, {{playerName}}. Maybe some paintings or flowers?",
+  "foodstore.generalbaddecor.8":                      "This place needs a bit more personality, {{playerName}}. Some furniture would do the trick.",
+  "foodstore.generalbaddecor.9":                      "Feels a bit empty, {{playerName}}. Adding some plants or flowers might help.",
+  "foodstore.generalbaddecor.10":                     "You could really liven this place up with more decorations, {{playerName}}.",
+  "foodstore.generalbaddecor.11":                     "It’s a bit plain here, {{playerName}}. Some nice paintings or furniture could help.",
+  "foodstore.generalbaddecor.12":                     "A few more decorations would make this place look much better, {{playerName}}.",
+  "foodstore.generalbaddecor.13":                     "This place feels a bit too empty, {{playerName}}. Maybe add some more decor?",
+  "foodstore.generalbaddecor.14":                     "It could use more decorations here, {{playerName}}. Some furniture or flowers?",
+  "foodstore.generalbaddecor.15":                     "Feels a bit sparse, {{playerName}}. A few more paintings or plants would help.",
+  "foodstore.generalbaddecor.16":                     "This area could use some more personality, {{playerName}}. Maybe add some decor.",
+  "foodstore.generalbaddecor.17":                     "You could really improve this place with more decorations, {{playerName}}.",
+  "foodstore.generalbaddecor.18":                     "It looks a bit bare here, {{playerName}}. Some more plants or furniture would help.",
+  "foodstore.generalbaddecor.19":                     "A bit more decor would do wonders here, {{playerName}}. Maybe add some flowers or paintings."
+
   
   
   

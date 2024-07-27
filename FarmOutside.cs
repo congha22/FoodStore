@@ -26,8 +26,8 @@ namespace MarketTown
         {
             Random random = new Random();
 
-            if (e.NewLocation.Name.Contains("Custom_MT_Island") && (e.OldLocation is Beach || e.OldLocation is BeachNightMarket )
-                || e.OldLocation.Name.Contains("Custom_MT_Island") && (e.NewLocation is Beach || e.NewLocation is BeachNightMarket))
+            if ( (e.NewLocation.Name.Contains("Custom_MT_Island") && (e.OldLocation is Beach || e.OldLocation is BeachNightMarket || e.OldLocation.Name == "Custom_Ridgeside_RSVCliff" || e.OldLocation.Name == "EastScarp_Village"))
+                || ( e.OldLocation.Name.Contains("Custom_MT_Island") && (e.NewLocation is Beach || e.NewLocation is BeachNightMarket || e.NewLocation.Name == "Custom_Ridgeside_RSVCliff" || e.NewLocation.Name == "EastScarp_Village")) )
             {
                 var letterTexture = ModEntry.Instance.Helper.ModContent.Load<Texture2D>("Assets/LtBG.png");
                 MailRepository.SaveLetter(
@@ -148,6 +148,8 @@ namespace MarketTown
                         Game1.warpCharacter(visit, name, door);
 
                         visit.faceDirection(2);
+
+                        ModEntry.ResetErrorNpc(visit);
 
                         door.X--;
                         visit.controller = new PathFindController(visit, Game1.getFarm(), door, 2);

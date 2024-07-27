@@ -184,7 +184,7 @@ namespace MarketTown
                 getValue: () => Config.MoveToFoodChance,
                 setValue: value => Config.MoveToFoodChance = value,
                 min: 0.0f,
-                max: 0.33f,
+                max: 0.4f,
                 interval: 0.0025f
             );
 
@@ -275,6 +275,13 @@ namespace MarketTown
                 setValue: value => Config.TipWhenNeaBy = value
             );
 
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.globalpathupdate"),
+                tooltip: () => SHelper.Translation.Get("foodstore.config.globalpathupdateText"),
+                getValue: () => Config.GlobalPathUpdate,
+                setValue: value => Config.GlobalPathUpdate = value
+            );
             configMenu.AddPageLink(mod: ModManifest, "island", () => SHelper.Translation.Get("foodstore.config.island"));
             configMenu.AddPageLink(mod: ModManifest, "shed", () => SHelper.Translation.Get("foodstore.config.shed"));
             configMenu.AddPageLink(mod: ModManifest, "dialogue", () => SHelper.Translation.Get("foodstore.config.dialogue"));
@@ -352,6 +359,13 @@ namespace MarketTown
                 min: 0.0f,
                 max: 1.0f,
                 interval: 0.01f
+            );
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.allowsellfruittree"),
+                tooltip: () => SHelper.Translation.Get("foodstore.config.allowsellfruittreeText"),
+                getValue: () => Config.SellFruitTree,
+                setValue: value => Config.SellFruitTree = value
             );
 
             configMenu.AddSectionTitle(
@@ -594,6 +608,12 @@ namespace MarketTown
             );
             configMenu.AddBoolOption(
                 mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.extramessage"),
+                getValue: () => Config.ExtraMessage,
+                setValue: value => Config.ExtraMessage = value
+            );
+            configMenu.AddBoolOption(
+                mod: ModManifest,
                 name: () => SHelper.Translation.Get("foodstore.config.chat"),
                 getValue: () => Config.DisableChat,
                 setValue: value => Config.DisableChat = value
@@ -738,6 +758,15 @@ namespace MarketTown
 
             // Advance page
             configMenu.AddPage(mod: ModManifest, "advance", () => SHelper.Translation.Get("foodstore.config.advance"));
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.allowindoorstore"),
+                tooltip: () => SHelper.Translation.Get("foodstore.config.allowindoorstoreText"),
+                getValue: () => Config.AllowIndoorStore,
+                setValue: value => Config.AllowIndoorStore = value
+            );
+
             configMenu.AddTextOption(
                 mod: ModManifest,
                 name: () => SHelper.Translation.Get("foodstore.config.signrange"),

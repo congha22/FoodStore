@@ -364,7 +364,7 @@ namespace MarketTown
 
         public static void NPCShowTextAboveHead(NPC npc, string message)
         {
-            if (!WantsToSay(npc, 20)) return;
+            if (!WantsToSay(npc, 0)) return;
 
             npc.modData["hapyke.FoodStore/LastSay"] = Game1.timeOfDay.ToString();
             Task.Run(async delegate
