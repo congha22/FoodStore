@@ -10,7 +10,7 @@
   <property name="IsFarm" value="T"/>
   <property name="LocationContext" value="d5a1lamdtd.MarketTown.Custom_MT_Location_Context"/>
   <property name="LooserBuildRestrictions" value="T"/>
-  <property name="NPCWarp" value="73 16 Custom_MT_Island_House 6 23"/>
+  <property name="NPCWarp" value="83 26 Custom_MT_Island_House 6 23"/>
   <property name="Outdoors" value="T"/>
   <property name="Spring_Objects" value="T"/>
   <property name="Summer_Objects" value="T"/>
@@ -1557,7 +1557,7 @@
  <tileset firstgid="9197" source="Craftables.tsx"/>
  <tileset firstgid="9933" source="shadow.tsx"/>
  <tileset firstgid="9948" name="Festivals" tilewidth="16" tileheight="16" tilecount="1024" columns="32">
-  <image source="D:/SteamLibrary/steamapps/common/Stardew Valley/Content (unpacked)/Maps/Festivals.png" width="512" height="512"/>
+  <image source="../../../../Content (unpacked)/Maps/Festivals.png" width="512" height="512"/>
  </tileset>
  <layer id="19" name="Back-1" width="90" height="75">
   <data encoding="csv">

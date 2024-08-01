@@ -167,7 +167,7 @@ namespace MarketTown
                 else if (askFood)       // Ask dish of the day
                 {
                     int randomIndex = random.Next(10);
-                    NPCShowTextAboveHead(npc, SHelper.Translation.Get("foodstore.dishday." + randomIndex.ToString(), new { dishToday = DishPrefer.dishDay }));
+                    NPCShowTextAboveHead(npc, SHelper.Translation.Get("foodstore.dishday." + randomIndex.ToString(), new { dishToday = ItemRegistry.Create<Object>(DailyFeatureDish, allowNull: true)?.DisplayName ?? "" }));
                 }
                 else if (askTaste)       // Ask taste of the last dish
                 {

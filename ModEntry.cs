@@ -55,6 +55,9 @@ using static StardewValley.Pathfinding.PathFindController;
 using System.Xml.Linq;
 using static StardewValley.Minigames.CraneGame;
 using StardewValley.ItemTypeDefinitions;
+using StardewValley.GameData.Objects;
+using MailFrameworkMod.ContentPack;
+using StardewValley.Internal;
 
 namespace MarketTown
 {
@@ -100,7 +103,14 @@ namespace MarketTown
         /// <summary>Ultimate Challenge check. Will be True when day end and False when day start</summary>
         private static bool IsCalculatingSellPrice = false;
 
+        /// <summary>Save data sync over to farmhand when connected</summary>
+        private static MailData FarmhandSyncData;
 
+        /// <summary>List of npc out of map border </summary>
+        public static List<NPC> OutOfMapNpc = new List<NPC>();
+
+        public static string DailyFeatureDish = "240";
+        public static string WeeklyFeatureDish = "240";
         // ==============================================================================================
         // ==============================================================================================
 
@@ -179,7 +189,7 @@ namespace MarketTown
 
 
         internal static MailData mailData = new MailData();
-        public static string TodaySell = "";
+        public static List<string> TodaySell = new List<string>();
         public static int TodayCustomerInteraction = 0;
         public static int TodayCustomerNote = 0;
         public static int TodayCustomerNoteYes = 0;
@@ -202,6 +212,7 @@ namespace MarketTown
         public static int TodayCookingSold = 0;
         public static int TodayFishSold = 0;
         public static int TodayGemSold = 0;
+        public static int TodayClothesSold = 0;
         public static int TodayMuseumVisitor = 0;
         public static int TodayMuseumEarning = 0;
 
@@ -261,9 +272,9 @@ namespace MarketTown
 
             // Set up tile where visitor spawn
             islandWarp.Clear();
-            for (int x = 14; x <= 29; x++)
+            for (int x = 24; x <= 39; x++)
             {
-                for (int y = 51; y <= 53; y++)
+                for (int y = 61; y <= 63; y++)
                 {
                     islandWarp.Add(new Vector2(x, y));
                 }
@@ -290,15 +301,12 @@ namespace MarketTown
         {
             if (Config.AdvanceOutputItemId) OutputItemId();
 
-            if (SHelper.Data.ReadSaveData<MailData>("MT.MailLog") != null && SHelper.Data.ReadSaveData<MailData>("MT.MailLog").LockedChallenge)
-                SMonitor.Log("Ultimate Challenge is PERMANENT on this save file", LogLevel.Debug);
-
             RestockTable(true, true);
 
             IsCalculatingSellPrice = false;
 
             TodayVisitorVisited = 0;
-            TodaySell = "";
+            TodaySell.Clear();
             TodayMoney = 0;
             TodayCustomerInteraction = 0;
             TodayCustomerNote = 0;
@@ -320,6 +328,7 @@ namespace MarketTown
             TodayCookingSold = 0;
             TodayFishSold = 0;
             TodayGemSold = 0;
+            TodayClothesSold = 0;
             TodayMuseumVisitor = 0;
             TodayMuseumEarning = 0;
 
@@ -338,6 +347,8 @@ namespace MarketTown
             npcOrderNumbers.Value.Clear();
             RestaurantSpot.Clear();
 
+            OutOfMapNpc.Clear();
+
             Config.RestaurantLocations.Add("Custom_MT_Island");
             Config.RestaurantLocations.Add("Custom_MT_Island_House");
 
@@ -345,12 +356,18 @@ namespace MarketTown
 
             if (Game1.IsMasterGame)             // Generate Dish of the week
             {
-                DishPrefer.dishDay = GetRandomDish();
+                DailyFeatureDish = GetRandomDish();
+
+                MailData model = null;
+                if (Game1.IsMasterGame) model = SHelper.Data.ReadSaveData<MailData>("MT.MailLog");
+                else model = SHelper.Data.ReadJsonFile<MailData>("markettowndata.json") ?? new MailData();
+                if (model != null) WeeklyFeatureDish = model.WeeklyDish;
+
+                SHelper.Multiplayer.SendMessage($"{DailyFeatureDish}///{WeeklyFeatureDish}", "UpdateSpecialDish");
+
 
                 if (Game1.dayOfMonth == 1 || Game1.dayOfMonth == 8 || Game1.dayOfMonth == 15 || Game1.dayOfMonth == 22)
                 {
-                    DishPrefer.dishWeek = GetRandomDish();      //Get dish of the week
-
                     if (!Config.DisableChatAll && !Config.DisableChat)
                     {
                         MyMessage messageToSend = new MyMessage("");
@@ -366,222 +383,227 @@ namespace MarketTown
             }
 
             // Island logic
+            //   ########### if not , random 1 2 stranger visitor
             try
             {
-                float islandCount = 0f;
-                int tried = GlobalNPCList.Count;
-                IslandValidBuilding.Add(new IslandBuildingProperties("Custom_MT_Island_House", new Vector2(9, 31), new Vector2(73, 18)));
-
-                GameLocation locat = Game1.getLocationFromName("Custom_MT_Island");
-                GameLocation locatHouse = Game1.getLocationFromName("Custom_MT_Island_House");
-                GameLocation locatHouseGarden = Game1.getLocationFromName("Custom_MT_Island_House_Garden");
-
-                // Set properties for island tile
-                UpdateFurnitureTilePathProperties(locat);
-                for (int i = 70; i <= 72; i ++)
+                if (Game1.IsMasterGame)
                 {
-                    for (int j = 16; j <= 17; j++)
+                    float islandCount = 0f;
+                    int tried = GlobalNPCList.Count;
+                    IslandValidBuilding.Add(new IslandBuildingProperties("Custom_MT_Island_House", new Vector2(9, 31), new Vector2(83, 28)));
+
+                    GameLocation locat = Game1.getLocationFromName("Custom_MT_Island");
+                    GameLocation locatHouse = Game1.getLocationFromName("Custom_MT_Island_House");
+                    GameLocation locatHouseGarden = Game1.getLocationFromName("Custom_MT_Island_House_Garden");
+
+                    // Set properties for island tile
+                    UpdateFurnitureTilePathProperties(locat);
+                    for (int i = 80; i <= 82; i++)
                     {
-                        locat.removeTileProperty(i, j, "Buildings", "Action");
-                        int visitorTotal = 0;
-                        if (SHelper.Data.ReadSaveData<MailData>("MT.MailLog") != null) visitorTotal = SHelper.Data.ReadSaveData<MailData>("MT.MailLog").TotalVisitorVisited;
-                        locat.setTileProperty(i, j, "Buildings", "Action", $"MineSign {SHelper.Translation.Get("foodstore.islandsign", new { season = locat.GetSeason().ToString(), visitor = visitorTotal })}");
-                    }
-                }
-
-                locat.removeTileProperty(21, 37, "Buildings", "Action");
-                locat.setTileProperty(21, 37, "Buildings", "Action", $"MineSign {SHelper.Translation.Get("foodstore.brazierspot")}");
-
-                foreach (var x in locat._activeTerrainFeatures)
-                {
-                    if (x is Tree tree) tree.GetData().GrowthChance = 0.3f;
-                    if (x is FruitTree ftree && ftree.daysUntilMature.Value > 1 && rand.NextDouble() < 0.3) ftree.daysUntilMature.Add(-1);
-                }
-
-                if (locat.Map.Properties.ContainsKey("skipWeedGrowth")) locat.Map.Properties.Remove("skipWeedGrowth"); // Only spawn on Spring 1
-
-
-                // Set properties for island house tile
-                UpdateFurnitureTilePathProperties(locatHouse);
-
-                // Set properties for island garden
-                foreach (var x in locatHouseGarden._activeTerrainFeatures)
-                {
-                    if (x is Tree tree) tree.GetData().GrowthChance = 0.3f;
-                    if (x is FruitTree ftree && ftree.daysUntilMature.Value > 1 && rand.NextDouble() < 0.3) ftree.daysUntilMature.Add(-1);
-                }
-
-                // Set island is greenhouse in Spring
-                if (Config.IslandPlantBoost && locat.GetSeason().ToString() == "Spring")
-                {
-                    locat.IsGreenhouse = true;
-                    locatHouseGarden.IsGreenhouse = true;
-                }
-                else
-                {
-                    locat.IsGreenhouse = false;
-                    locatHouseGarden.IsGreenhouse = false;
-                }
-
-                // Check if Island open for visitor. Island is open when the Brazier is On, and it is not festival
-                var islandBrazier = locat.getObjectAtTile(22, 36, true);
-                if (locat != null && islandBrazier != null && islandBrazier.ItemId != null && islandBrazier.ItemId == "MT.Objects.ParadiseIslandBrazier" && islandBrazier.IsOn
-                    && !( ( Game1.dayOfMonth == 15 || Game1.dayOfMonth == 16 || Game1.dayOfMonth == 17 ) && Game1.currentSeason == "winter" || Game1.isFestival() )  )
-                {
-                    // Set island is not build-able
-                    locat.isAlwaysActive.Value = false;
-
-                    int dayOfWeek = Game1.dayOfMonth % 7;
-                    bool festivalDay = false;
-
-                    switch (dayOfWeek)
-                    {
-                        case 0:
-                            festivalDay = Config.FestivalSun;
-                            break;
-                        case 1:
-                            festivalDay = Config.FestivalMon;
-                            break;
-                        case 2:
-                            festivalDay = Config.FestivalTue;
-                            break;
-                        case 3:
-                            festivalDay = Config.FestivalWed;
-                            break;
-                        case 4:
-                            festivalDay = Config.FestivalThu;
-                            break;
-                        case 5:
-                            festivalDay = Config.FestivalFri;
-                            break;
-                        case 6:
-                            festivalDay = Config.FestivalSat;
-                            break;
-                        default:
-                            break;
-                    }
-
-                    FarmOutside.UpdateRandomLocationOpenTile(locat);
-                    FarmOutside.UpdateRandomLocationOpenTile(locatHouse);
-
-
-                    foreach (var buildingLocation in locat.buildings)
-                    {
-                        var buildingInstanceName = buildingLocation.GetIndoorsName();
-                        FarmOutside.UpdateRandomLocationOpenTile(Game1.getLocationFromName(buildingInstanceName));
-                    }
-
-                    while ( islandCount < Config.ParadiseIslandNPC / IslandProgress() && islandCount <= GlobalNPCList.Count && tried > 0) // Get Visitor List
-                    {
-                        var tempNPC = GlobalNPCList[rand.Next(GlobalNPCList.Count)];
-                        tried--;
-                        if (tempNPC == null || Game1.getCharacterFromName(tempNPC) == null || Game1.getCharacterFromName(tempNPC).getMasterScheduleRawData() == null) continue;
-                        bool available = false;
-
-                        if (!IslandNPCList.Contains(tempNPC))  available = true;
-
-                        // more people in sunny, less in rainny
-                        if (available)
+                        for (int j = 26; j <= 27; j++)
                         {
-                            IslandNPCList.Add(tempNPC);
-                            if (festivalDay) islandCount += 0.5f;
-                            else if (locat.IsGreenRainingHere()) islandCount += 2f;
-                            else if (locat.IsLightningHere()) islandCount += 1.6f;
-                            else if (locat.IsRainingHere()) islandCount += 1.3f;
-                            else islandCount += 1f;
+                            locat.removeTileProperty(i, j, "Buildings", "Action");
+                            int visitorTotal = 0;
+                            if (SHelper.Data.ReadSaveData<MailData>("MT.MailLog") != null) visitorTotal = SHelper.Data.ReadSaveData<MailData>("MT.MailLog").TotalVisitorVisited;
+                            locat.setTileProperty(i, j, "Buildings", "Action", $"MineSign {SHelper.Translation.Get("foodstore.islandsign", new { season = locat.GetSeason().ToString(), visitor = visitorTotal })}");
                         }
                     }
 
-                    foreach (Building building in locat.buildings)      // Get available building, creat building warp point
-                    {
-                        if (building != null && building.GetIndoorsName() != null)
-                        {
-                            Vector2 outdoorTile = new Vector2(building.humanDoor.X + building.tileX.Value, building.humanDoor.Y + building.tileY.Value + 2);
+                    locat.removeTileProperty(31, 47, "Buildings", "Action");
+                    locat.setTileProperty(31, 47, "Buildings", "Action", $"MineSign {SHelper.Translation.Get("foodstore.brazierspot")}");
 
-                            Vector2 indoorTile = new Vector2(0, 0);
-                            if (Game1.getLocationFromName(building.GetIndoorsName()) != null)
+                    foreach (var x in locat._activeTerrainFeatures)
+                    {
+                        if (x is Tree tree) tree.GetData().GrowthChance = 0.3f;
+                        if (x is FruitTree ftree && ftree.daysUntilMature.Value > 1 && rand.NextDouble() < 0.3) ftree.daysUntilMature.Add(-1);
+                    }
+
+                    if (locat.Map.Properties.ContainsKey("skipWeedGrowth")) locat.Map.Properties.Remove("skipWeedGrowth"); // Only spawn on Spring 1
+
+
+                    // Set properties for island house tile
+                    UpdateFurnitureTilePathProperties(locatHouse);
+
+                    // Set properties for island garden
+                    foreach (var x in locatHouseGarden._activeTerrainFeatures)
+                    {
+                        if (x is Tree tree) tree.GetData().GrowthChance = 0.3f;
+                        if (x is FruitTree ftree && ftree.daysUntilMature.Value > 1 && rand.NextDouble() < 0.3) ftree.daysUntilMature.Add(-1);
+                    }
+
+                    // Set island is greenhouse in Spring
+                    if (Config.IslandPlantBoost && locat.GetSeason().ToString() == "Spring")
+                    {
+                        locat.IsGreenhouse = true;
+                        locatHouseGarden.IsGreenhouse = true;
+                    }
+                    else
+                    {
+                        locat.IsGreenhouse = false;
+                        locatHouseGarden.IsGreenhouse = false;
+                    }
+
+                    // Check if Island open for visitor. Island is open when the Brazier is On, and it is not festival
+                    var islandBrazier = locat.getObjectAtTile(32, 46, true);
+                    if (locat != null && islandBrazier != null && islandBrazier.ItemId != null && islandBrazier.ItemId == "MT.Objects.ParadiseIslandBrazier" && islandBrazier.IsOn
+                        && !((Game1.dayOfMonth == 15 || Game1.dayOfMonth == 16 || Game1.dayOfMonth == 17) && Game1.currentSeason == "winter" || Game1.isFestival()))
+                    {
+                        // Set island is not build-able
+                        locat.isAlwaysActive.Value = false;
+
+                        int dayOfWeek = Game1.dayOfMonth % 7;
+                        bool festivalDay = false;
+
+                        switch (dayOfWeek)
+                        {
+                            case 0:
+                                festivalDay = Config.FestivalSun;
+                                break;
+                            case 1:
+                                festivalDay = Config.FestivalMon;
+                                break;
+                            case 2:
+                                festivalDay = Config.FestivalTue;
+                                break;
+                            case 3:
+                                festivalDay = Config.FestivalWed;
+                                break;
+                            case 4:
+                                festivalDay = Config.FestivalThu;
+                                break;
+                            case 5:
+                                festivalDay = Config.FestivalFri;
+                                break;
+                            case 6:
+                                festivalDay = Config.FestivalSat;
+                                break;
+                            default:
+                                break;
+                        }
+
+                        FarmOutside.UpdateRandomLocationOpenTile(locat);
+                        FarmOutside.UpdateRandomLocationOpenTile(locatHouse);
+
+
+                        foreach (var buildingLocation in locat.buildings)
+                        {
+                            var buildingInstanceName = buildingLocation.GetIndoorsName();
+                            FarmOutside.UpdateRandomLocationOpenTile(Game1.getLocationFromName(buildingInstanceName));
+                        }
+
+                        while (islandCount < Config.ParadiseIslandNPC / IslandProgress() && islandCount <= GlobalNPCList.Count && tried > 0) // Get Visitor List
+                        {
+                            var tempNPC = GlobalNPCList[rand.Next(GlobalNPCList.Count)];
+                            tried--;
+                            if (tempNPC == null || Game1.getCharacterFromName(tempNPC) == null || Game1.getCharacterFromName(tempNPC).getMasterScheduleRawData() == null) continue;
+                            bool available = false;
+
+                            if (!IslandNPCList.Contains(tempNPC)) available = true;
+
+                            // more people in sunny, less in rainny
+                            if (available)
                             {
-                                foreach (var warp in Game1.getLocationFromName(building.GetIndoorsName()).warps)
+                                IslandNPCList.Add(tempNPC);
+                                if (festivalDay) islandCount += 0.5f;
+                                else if (locat.IsGreenRainingHere()) islandCount += 2f;
+                                else if (locat.IsLightningHere()) islandCount += 1.6f;
+                                else if (locat.IsRainingHere()) islandCount += 1.3f;
+                                else islandCount += 1f;
+                            }
+                        }
+
+                        foreach (Building building in locat.buildings)      // Get available building, creat building warp point
+                        {
+                            if (building != null && building.GetIndoorsName() != null)
+                            {
+                                Vector2 outdoorTile = new Vector2(building.humanDoor.X + building.tileX.Value, building.humanDoor.Y + building.tileY.Value + 2);
+
+                                Vector2 indoorTile = new Vector2(0, 0);
+                                if (Game1.getLocationFromName(building.GetIndoorsName()) != null)
                                 {
-                                    if (warp.TargetName == "Custom_MT_Island") indoorTile = new(warp.X, warp.Y - 3);
-                                    break;
+                                    foreach (var warp in Game1.getLocationFromName(building.GetIndoorsName()).warps)
+                                    {
+                                        if (warp.TargetName == "Custom_MT_Island") indoorTile = new(warp.X, warp.Y - 3);
+                                        break;
+                                    }
                                 }
+
+                                IslandValidBuilding.Add(new IslandBuildingProperties(building.GetIndoorsName(), indoorTile, outdoorTile));
+
+                                var newInWarp = new Warp((int)outdoorTile.X, (int)outdoorTile.Y - 1, building.GetIndoorsName(), (int)indoorTile.X, (int)indoorTile.Y, false, true);
+                                if (!locat.warps.Contains(newInWarp)) locat.warps.Add(newInWarp);
+
+                                UpdateFurnitureTilePathProperties(Game1.getLocationFromName(building.GetIndoorsName()));
                             }
-
-                            IslandValidBuilding.Add(new IslandBuildingProperties(building.GetIndoorsName(), indoorTile, outdoorTile));
-
-                            var newInWarp = new Warp((int)outdoorTile.X, (int)outdoorTile.Y - 1, building.GetIndoorsName(), (int)indoorTile.X, (int)indoorTile.Y, false, true);
-                            if ( !locat.warps.Contains(newInWarp) ) locat.warps.Add( newInWarp );
-
-                            UpdateFurnitureTilePathProperties(Game1.getLocationFromName(building.GetIndoorsName()));
-                        }
-                    }
-
-                    // If today is Festival day, init chest, sign and visitor schedule
-                    if (festivalDay)
-                    {
-                        IsFestivalToday = true;
-
-                        var chest = new Chest(true);
-                        var sign = new Sign(new Vector2(69, 21), "37");
-
-                        chest.destroyOvernight = true;
-                        chest.Fragility = 2;
-                        while (chest.Items.Count < 3) chest.Items.Add(ItemRegistry.Create<Item>("MT.Objects.CustomerNote"));
-
-                        sign.destroyOvernight = true;
-                        sign.Fragility = 2;
-
-                        locat.setObjectAt(69, 19, chest);
-                        locat.setObjectAt(69, 21, sign);
-
-                        // create Player shop
-                        var displayChest = new Chest(true);
-                        displayChest.destroyOvernight = true;
-                        while (displayChest.Items.Count < 9) displayChest.Items.Add(null);
-                        locat.setObjectAt(19309, 19309, displayChest);
-
-                        List<string> displayChestItem = new List<string>();
-                        foreach (var item in displayChest.Items)
-                        {
-                            displayChestItem.Add(null);
                         }
 
-                        TodayShopInventory.Add(new MarketShopData("PlayerShop", new Vector2(66, 21), displayChestItem));
-
-                        SetupShop(true);
-                    }
-
-
-                    // *** Warp Visitors, clear schedule and init a new schedule
-                    foreach (var islandVisitorName in IslandNPCList)
-                    {
-                        NPC islandVisitor = Game1.getCharacterFromName(islandVisitorName);
-                        if (islandVisitor != null)
+                        // If today is Festival day, init chest, sign and visitor schedule
+                        if (festivalDay)
                         {
-                            Vector2 defautlIslandWarp = islandWarp[rand.Next(islandWarp.Count)];
-                            int initFaceDirection = rand.Next(0, 4);
+                            IsFestivalToday = true;
 
-                            Game1.warpCharacter(islandVisitor, locat, defautlIslandWarp);
-                            islandVisitor.faceDirection(initFaceDirection);
+                            var chest = new Chest(true);
+                            var sign = new Sign(new Vector2(79, 31), "37");
 
-                            TodayVisitorVisited++;
+                            chest.destroyOvernight = true;
+                            chest.Fragility = 2;
+                            while (chest.Items.Count < 3) chest.Items.Add(ItemRegistry.Create<Item>("MT.Objects.CustomerNote"));
 
-                            ResetErrorNpc(islandVisitor);
-                            islandVisitor.TryLoadSchedule("default", $"600 Custom_MT_Island {defautlIslandWarp.X} {defautlIslandWarp.Y} {initFaceDirection}/");
+                            sign.destroyOvernight = true;
+                            sign.Fragility = 2;
 
-                            var randomTile = FarmOutside.getRandomOpenPointInFarm(islandVisitor, islandVisitor.currentLocation, false).ToVector2();
-                            if (randomTile != Vector2.Zero)
+                            locat.setObjectAt(79, 29, chest);
+                            locat.setObjectAt(79, 31, sign);
+
+                            // create Player shop
+                            var displayChest = new Chest(true);
+                            displayChest.destroyOvernight = true;
+                            while (displayChest.Items.Count < 9) displayChest.Items.Add(null);
+                            locat.setObjectAt(19309, 19309, displayChest);
+
+                            List<string> displayChestItem = new List<string>();
+                            foreach (var item in displayChest.Items)
                             {
-                                FarmOutside.AddRandomSchedulePoint(islandVisitor, $"610", $"{islandVisitor.currentLocation.NameOrUniqueName}",
-                                    $"{randomTile.X}", $"{randomTile.Y}", $"{Game1.random.Next(0, 4)}");
+                                displayChestItem.Add(null);
                             }
 
-                            if (IsFestivalToday) SetVisitorSchedule(islandVisitor);
+                            TodayShopInventory.Add(new MarketShopData("PlayerShop", new Vector2(76, 31), displayChestItem));
+
+                            SetupShop(true);
+                        }
+
+
+                        // *** Warp Visitors, clear schedule and init a new schedule
+                        foreach (var islandVisitorName in IslandNPCList)
+                        {
+                            NPC islandVisitor = Game1.getCharacterFromName(islandVisitorName);
+                            if (islandVisitor != null)
+                            {
+                                Vector2 defautlIslandWarp = islandWarp[rand.Next(islandWarp.Count)];
+                                int initFaceDirection = rand.Next(0, 4);
+
+                                Game1.warpCharacter(islandVisitor, locat, defautlIslandWarp);
+                                islandVisitor.faceDirection(initFaceDirection);
+
+                                TodayVisitorVisited++;
+
+                                CleanNpc(islandVisitor);
+                                islandVisitor.DefaultMap = "Custom_MT_Island";
+                                islandVisitor.TryLoadSchedule("default", $"600 Custom_MT_Island {defautlIslandWarp.X} {defautlIslandWarp.Y} {initFaceDirection}/");
+
+                                var randomTile = FarmOutside.getRandomOpenPointInLocation(islandVisitor, islandVisitor.currentLocation, false).ToVector2();
+                                if (randomTile != Vector2.Zero)
+                                {
+                                    FarmOutside.AddNextMoveSchedulePoint(islandVisitor, $"610", $"{islandVisitor.currentLocation.NameOrUniqueName}",
+                                        $"{randomTile.X}", $"{randomTile.Y}", $"{Game1.random.Next(0, 4)}");
+                                }
+
+                                if (IsFestivalToday) SetVisitorSchedule(islandVisitor);
+                            }
                         }
                     }
+                    else locat.isAlwaysActive.Value = true;         // If Fire is off, location is build-able
                 }
-                else locat.isAlwaysActive.Value = true;         // If Fire is off, location is build-able
             } catch { }
 
             // Check store and museum
@@ -697,6 +719,8 @@ namespace MarketTown
                         __instance.modData["hapyke.FoodStore/invited"] = "false";
                         __instance.modData["hapyke.FoodStore/inviteDate"] = "-99";
                     }
+
+                    __instance.reloadDefaultLocation();
                 }
             }
             catch { }
@@ -772,7 +796,7 @@ namespace MarketTown
             }
 
             // restock table item
-            if (Game1.timeOfDay < 2550) RestockTable(true);
+            RestockTable(true);
         }
 
         // ----------- End of Day -----------
@@ -816,10 +840,9 @@ namespace MarketTown
         {
             Random random = new Random();
 
-            // restock table item
-            if (Game1.timeOfDay == 2550 || Game1.timeOfDay == 2600) RestockTable(true);
-            else RestockTable();
-            
+            RestockTable();
+
+            // update island tile
             if ( Game1.timeOfDay % 200 == 0)
             {
                 var islandInstance = Game1.getLocationFromName("Custom_MT_Island");
@@ -841,6 +864,33 @@ namespace MarketTown
                 }
             }
 
+            if (Game1.timeOfDay % 100 == 0)
+            {
+                OutOfMapNpc.Clear();
+                string err = "";
+                foreach (NPC npc in Utility.getAllVillagers())
+                {
+                    if ((npc.Tile.X > 250 || npc.Tile.Y > 200 || npc.Tile.X < -10 || npc.Tile.Y < -10)
+                        && !npc.currentLocation.NameOrUniqueName.Contains("WarpRoom") && Game1.timeOfDay % 100 == 0 && npc.Schedule != null)
+                    {
+                        OutOfMapNpc.Add(npc);
+                        err += $"{npc.Name}, ";
+                    }
+                }
+                if (err != "")
+                {
+                    SMonitor.Log($"Found NPC {err} out of map border at {Game1.timeOfDay}.", LogLevel.Warn);
+
+                    if(Config.AdvanceAutoFixNpc)
+                    {
+                        SMonitor.Log("Auto fix enabled. Trying to fix all found error NPC", LogLevel.Warn);
+                        foreach (var i in OutOfMapNpc) ResetNpcSchedule(i);
+                    }
+                    SMonitor.Log("To fix, type 'help markettown'\n", LogLevel.Warn);
+
+                }
+            }
+
             // Island Festival manager
             if (e.NewTime == Config.FestivalTimeEnd && IsFestivalToday) CloseShop(false);
             if ( (e.NewTime - Config.FestivalTimeStart) % 300 == 0 && IsFestivalIsCurrent) SetupShop(false);
@@ -851,8 +901,8 @@ namespace MarketTown
             if (Game1.timeOfDay == 900 && !Config.DisableChatAll && Game1.IsMasterGame)
             {
                 int randomIndex = random.Next(10);
-                Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.dishday." + randomIndex.ToString(), new { dishToday = DishPrefer.dishDay }));
-                MyMessage messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.dishday." + randomIndex.ToString(), new { dishToday = DishPrefer.dishDay }));
+                Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.dishday." + randomIndex.ToString(), new { dishToday = ItemRegistry.Create<Object>(DailyFeatureDish, allowNull: true)?.DisplayName ?? "" }));
+                MyMessage messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.dishday." + randomIndex.ToString(), new { dishToday = ItemRegistry.Create<Object>(DailyFeatureDish, allowNull: true)?.DisplayName ?? "" }));
                 SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
             }
 
@@ -952,8 +1002,8 @@ namespace MarketTown
                     {
                         if (visit != null)
                         {
-                            blockedNPC = visit.currentLocation.IsFarm
-                                || (visit.currentLocation.GetParentLocation() != null && visit.currentLocation.GetParentLocation().IsFarm)
+                            blockedNPC = visit.currentLocation == Game1.getFarm()
+                                || (visit.currentLocation.GetParentLocation() != null && visit.currentLocation.GetParentLocation() == Game1.getFarm())
                                 || visit.currentLocation == Game1.player.currentLocation
                                 || (Game1.player.friendshipData.ContainsKey(randomNPCName) 
                                     && ( Game1.player.friendshipData[randomNPCName].IsMarried() || Game1.player.friendshipData[randomNPCName].IsRoommate()) )
@@ -966,7 +1016,7 @@ namespace MarketTown
                     catch { }
 
                     if (visit == null || blockedNPC) return;
-                    ResetErrorNpc(visit);
+                    CleanNpc(visit);
 
                     List<Vector2> clearTiles = new List<Vector2>();
                     if (Config.DoorEntry)          // Alow warp at door
@@ -983,30 +1033,13 @@ namespace MarketTown
                         if (clearTiles.Count > 0)
                         {
                             Vector2 randomClearTile = clearTiles[Game1.random.Next(clearTiles.Count)];
-
-                            if (Game1.player.currentLocation.Name == "BusStop" && Config.BusWalk && Game1.MasterPlayer.mailReceived.Contains("ccVault"))
-                            {
-                                Game1.warpCharacter(visit, "BusStop", new Point(24, 11));
-                                visit.isCharging = true;
-                                visit.addedSpeed = 1;
-                                visit.temporaryController = new PathFindController(visit, visit.currentLocation, new Point(13, 24), 3,
-                                (character, location) => Game1.warpCharacter(visit, building.GetIndoorsName(), randomClearTile));
-                            }
-                            else Game1.warpCharacter(visit, building.GetIndoorsName(), randomClearTile);
+                            Game1.warpCharacter(visit, building.GetIndoorsName(), randomClearTile);
 
                             visit.modData["hapyke.FoodStore/shedEntry"] = $"{randomClearTile.X},{randomClearTile.Y}";
                         }
                         else
                         {
-                            if (Game1.player.currentLocation.Name == "BusStop" && Config.BusWalk && Game1.MasterPlayer.mailReceived.Contains("ccVault"))
-                            {
-                                Game1.warpCharacter(visit, "BusStop", new Point(24, 11));
-                                visit.isCharging = true;
-                                visit.addedSpeed = 1;
-                                visit.temporaryController = new PathFindController(visit, visit.currentLocation, new Point(13, 24), 3,
-                                (character, location) => Game1.warpCharacter(visit, building.GetIndoorsName(), doorTile));
-                            }
-                            else Game1.warpCharacter(visit, building.GetIndoorsName(), doorTile);
+                            Game1.warpCharacter(visit, building.GetIndoorsName(), doorTile);
 
                             visit.modData["hapyke.FoodStore/shedEntry"] = doorTile.X.ToString() + doorTile.Y.ToString();
                         }
@@ -1028,42 +1061,27 @@ namespace MarketTown
                         {
                             Vector2 randomClearTile = clearTiles[Game1.random.Next(clearTiles.Count)];
 
-                            if (Game1.player.currentLocation.Name == "BusStop" && Config.BusWalk && Game1.MasterPlayer.mailReceived.Contains("ccVault"))
-                            {
-                                Game1.warpCharacter(visit, "BusStop", new Point(24, 11));
-                                visit.isCharging = true;
-                                visit.addedSpeed = 1;
-                                visit.temporaryController = new PathFindController(visit, visit.currentLocation, new Point(13, 24), 3,
-                                (character, location) => Game1.warpCharacter(visit, building.GetIndoorsName(), randomClearTile));
-                            }
-                            else Game1.warpCharacter(visit, building.GetIndoorsName(), randomClearTile);
+                            Game1.warpCharacter(visit, building.GetIndoorsName(), randomClearTile);
 
                             visit.modData["hapyke.FoodStore/shedEntry"] = $"{randomClearTile.X},{randomClearTile.Y}";
                         }
                         else
                         {
-                            if (Game1.player.currentLocation.Name == "BusStop" && Config.BusWalk && Game1.MasterPlayer.mailReceived.Contains("ccVault"))
-                            {
-                                Game1.warpCharacter(visit, "BusStop", new Point(24, 11));
-                                visit.isCharging = true;
-                                visit.addedSpeed = 1;
-                                visit.temporaryController = new PathFindController(visit, visit.currentLocation, new Point(13, 24), 3,
-                                (character, location) => Game1.warpCharacter(visit, building.GetIndoorsName(), new Vector2(obj.TileLocation.X, obj.TileLocation.Y)));
-                            }
-                            else Game1.warpCharacter(visit, building.GetIndoorsName(), new Vector2(obj.TileLocation.X, obj.TileLocation.Y));
-
+                            Game1.warpCharacter(visit, building.GetIndoorsName(), new Vector2(obj.TileLocation.X, obj.TileLocation.Y));
 
                             visit.modData["hapyke.FoodStore/shedEntry"] = (obj.TileLocation.X).ToString() + "," + (obj.TileLocation.Y).ToString();
                         }
                         clearTiles.Clear();
                     }
+                    // ***** Handle SpaceCore warning
+                    visit.DefaultMap = visit.currentLocation.NameOrUniqueName;
 
                     // Try add museum ticket money, or do special order table sit
                     if (buildingType == "museum")
                     {
                         TodayMuseumVisitor++;
 
-                        AddToPlayerFunds((int)(10 * ticketValue * Config.MuseumPriceMarkup));
+                        if (Game1.IsMasterGame) AddToPlayerFunds((int)(10 * ticketValue * Config.MuseumPriceMarkup));
                         TodayMuseumEarning += (int)(10 * ticketValue * Config.MuseumPriceMarkup);
 
                     }
@@ -1100,7 +1118,7 @@ namespace MarketTown
 
                             if (visit.currentLocation.CanSpawnCharacterHere(randomTile) && (!RestaurantSpot.ContainsKey(visit.currentLocation) || !RestaurantSpot[visit.currentLocation].Contains(randomTile)) )
                             {
-                                FarmOutside.AddRandomSchedulePoint(visit, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{visit.currentLocation.NameOrUniqueName}", $"{randomTile.X}", $"{randomTile.Y}", $"{randomDirection}");
+                                FarmOutside.AddNextMoveSchedulePoint(visit, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{visit.currentLocation.NameOrUniqueName}", $"{randomTile.X}", $"{randomTile.Y}", $"{randomDirection}");
                                 visit.modData["hapyke.FoodStore/specialOrder"] = $"{randomTile.X},{randomTile.Y}";
 
                                 if (!RestaurantSpot.ContainsKey(visit.currentLocation)) RestaurantSpot[visit.currentLocation] = new List<Vector2>();
@@ -1115,10 +1133,10 @@ namespace MarketTown
                     // else move to a random spot
                     else
                     {
-                        var randomTile = FarmOutside.getRandomOpenPointInFarm(visit, visit.currentLocation, true, true).ToVector2();
+                        var randomTile = FarmOutside.getRandomOpenPointInLocation(visit, visit.currentLocation, true, true).ToVector2();
                         if (randomTile != Vector2.Zero)
                         {
-                            FarmOutside.AddRandomSchedulePoint(visit, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{visit.currentLocation.NameOrUniqueName}",
+                            FarmOutside.AddNextMoveSchedulePoint(visit, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{visit.currentLocation.NameOrUniqueName}",
                                 $"{randomTile.X}", $"{randomTile.Y}", $"{random.Next(0, 4)}");
                         }
                     }
@@ -1133,6 +1151,9 @@ namespace MarketTown
         private static bool TryToEatFood(NPC __instance, DataPlacedFood food)
         {
             if (Game1.timeOfDay >= 2530) return false;
+
+            int challengeMultiplier = 1;
+            if (Config.UltimateChallenge) challengeMultiplier = 4;
 
             try
             {
@@ -1328,8 +1349,8 @@ namespace MarketTown
                             if (Config.EnableDecor) salePrice = (int)(salePrice * (1 + decorPoint));
 
                             //Feature dish
-                            if (food.foodObject.Name == DishPrefer.dishDay) { salePrice = (int)(salePrice * 1.5); }
-                            if (food.foodObject.Name == DishPrefer.dishWeek) { salePrice = (int)(salePrice * 1.3); }
+                            if (food.foodObject.ItemId == DailyFeatureDish) { salePrice = (int)(salePrice * 1.5); }
+                            if (food.foodObject.ItemId == WeeklyFeatureDish) { salePrice = (int)(salePrice * 1.3); }
 
                             //Config Rush hours Price
                             if (Config.RushHour && tip != 0
@@ -1369,32 +1390,38 @@ namespace MarketTown
                             }
                             catch (Exception) { }
 
+                            string tipLog = "";
+                            if (tip > 0) tipLog = $"+ {tip}G";
+
                             //Config Tip when nearby
                             if (Config.TipWhenNeaBy && Utility.isThereAFarmerWithinDistance(food.foodTile, 15, __instance.currentLocation) == null) { tip = 0; }
 
                             //Money on/off farm
-                            if (__instance.currentLocation is not FarmHouse && __instance.currentLocation is not Farm && !Config.DisableChatAll)
+                            if (__instance.currentLocation is not FarmHouse && __instance.currentLocation is not Farm && !Config.DisableChatAll && Game1.IsMasterGame)
                             {
                                 //Generate chat box
                                 if (tip != 0)
-                                    NPCShowTextAboveHead(__instance, reply + SHelper.Translation.Get("foodstore.tip", new { tipValue = tip }));
+                                    NPCShowTextAboveHead(__instance, reply + SHelper.Translation.Get("foodstore.tip", new { tipValue = tip * challengeMultiplier }));
                                 else
                                     NPCShowTextAboveHead(__instance, reply);
 
                                 //Generate chat box
                                 if (Game1.IsMultiplayer)
                                 {
-                                    Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.sold", new { foodObjName = itemName, locationint = __instance.currentLocation.DisplayName, saleint = salePrice }));
-                                    MyMessage messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.sold", new { foodObjName = itemName, locationint = __instance.currentLocation.DisplayName, saleint = salePrice }));
+                                    Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.sold", new { foodObjName = itemName, locationint = __instance.currentLocation.DisplayName, saleint = salePrice * challengeMultiplier, tipint = tipLog }));
+                                    MyMessage messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.sold", new { foodObjName = itemName, locationint = __instance.currentLocation.DisplayName, saleint = salePrice * challengeMultiplier, tipint = tipLog }));
                                     SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
 
                                     if (!Config.DisableChat && Config.ExtraMessage)
                                     {
                                         if (tip != 0)
                                         {
-                                            Game1.chatBox.addInfoMessage($"   {__instance.displayName}: " + reply + SHelper.Translation.Get("foodstore.tip", new { tipValue = tip }));
-                                            messageToSend = new MyMessage($"   {__instance.displayName}: " + reply + SHelper.Translation.Get("foodstore.tip", new { tipValue = tip }));
+                                            Game1.chatBox.addInfoMessage($"   {__instance.displayName}: " + reply + SHelper.Translation.Get("foodstore.tip", new { tipValue = tip * challengeMultiplier }));
+                                            messageToSend = new MyMessage($"   {__instance.displayName}: " + reply + SHelper.Translation.Get("foodstore.tip", new { tipValue = tip * challengeMultiplier }));
                                             SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
+
+                                            var farmhandNpcBubbleMessage = new MyMessage($"{__instance.Name}///{reply + SHelper.Translation.Get("foodstore.tip", new { tipValue = tip * challengeMultiplier })}");
+                                            SHelper.Multiplayer.SendMessage(farmhandNpcBubbleMessage, "NpcShowText");
                                         }
                                         else
                                         {
@@ -1406,11 +1433,11 @@ namespace MarketTown
                                 }
                                 else
                                 {
-                                    Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.sold", new { foodObjName = itemName, locationint = __instance.currentLocation.DisplayName, saleint = salePrice }));
+                                    Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.sold", new { foodObjName = itemName, locationint = __instance.currentLocation.DisplayName, saleint = salePrice * challengeMultiplier, tipint = tipLog }));
                                     if (!Config.DisableChat && Config.ExtraMessage)
                                     {
                                         if (tip != 0)
-                                            Game1.chatBox.addInfoMessage($"   {__instance.displayName}: " + reply + SHelper.Translation.Get("foodstore.tip", new { tipValue = tip }));
+                                            Game1.chatBox.addInfoMessage($"   {__instance.displayName}: " + reply + SHelper.Translation.Get("foodstore.tip", new { tipValue = tip * challengeMultiplier }));
                                         else
                                             Game1.chatBox.addInfoMessage($"   {__instance.displayName}: " + reply);
                                     }
@@ -1497,71 +1524,77 @@ namespace MarketTown
                                 Random random = new Random();
                                 int randomNumber = random.Next(12);
                                 salePrice = tip = 0;
-                                if (!Config.DisableChatAll && food.foodObject.Edibility > 0) NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.visitoreat." + randomNumber));
-                                else if (!Config.DisableChatAll && food.foodObject.Edibility <= 0) NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.visitorpickup." + randomNumber));
+                                tipLog = " ";
+                                if (!Config.DisableChatAll && food.foodObject.Edibility > 0 && Game1.IsMasterGame) NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.visitoreat." + randomNumber));
+                                else if (!Config.DisableChatAll && food.foodObject.Edibility <= 0 && Game1.IsMasterGame) NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.visitorpickup." + randomNumber));
                             }           //Food in farmhouse
-
-
-
-                            TodaySell += SHelper.Translation.Get("foodstore.sold", new { foodObjName = itemName, locationint = __instance.currentLocation.DisplayName, saleint = salePrice }) + "^";
-                            TodayMoney += salePrice + tip;
 
                             UpdateCount(food.foodObject.Category);
 
-                            AddToPlayerFunds(salePrice + tip);
-
-
-                            __instance.modData["hapyke.FoodStore/LastFood"] = Game1.timeOfDay.ToString();
-                            if (food.foodObject.Category == -7)
+                            string sellLog = SHelper.Translation.Get("foodstore.sold", new { foodObjName = itemName, locationint = __instance.currentLocation.DisplayName, saleint = salePrice * challengeMultiplier, tipint = tipLog });
+                            if (Game1.IsMasterGame)
                             {
-                                __instance.modData["hapyke.FoodStore/LastFoodTaste"] = taste.ToString();
-                            }
-                            else if (food.foodObject.Quality >= 1)
-                            {
-                                switch (food.foodObject.Quality)
+                                TodaySell.Add(sellLog);
+                                var messageToSend = new MyMessage(sellLog);
+                                SHelper.Multiplayer.SendMessage(messageToSend, "UpdateLog");
+
+                                TodayMoney += salePrice * challengeMultiplier + tip * challengeMultiplier;
+                                messageToSend = new MyMessage(TodayMoney.ToString());
+                                SHelper.Multiplayer.SendMessage(messageToSend, "UpdateTodayMoney");
+
+                                AddToPlayerFunds(salePrice + tip);
+
+                                __instance.modData["hapyke.FoodStore/LastFood"] = Game1.timeOfDay.ToString();
+                                if (food.foodObject.Category == -7)
                                 {
-                                    // silver
-                                    case 1:
-                                        __instance.modData["hapyke.FoodStore/LastFoodTaste"] = "8";
-                                        break;
-                                    //gold
-                                    case 2:
-                                        __instance.modData["hapyke.FoodStore/LastFoodTaste"] = "2";
-                                        break;
-                                    // iridium
-                                    case 4:
-                                        __instance.modData["hapyke.FoodStore/LastFoodTaste"] = "0";
-                                        break;
-                                    default:
-                                        break;
+                                    __instance.modData["hapyke.FoodStore/LastFoodTaste"] = taste.ToString();
                                 }
-                            }
-                            else
-                            {
-                                __instance.modData["hapyke.FoodStore/LastFoodTaste"] = "-1";
-                            }
-                            __instance.modData["hapyke.FoodStore/LastFoodDecor"] = decorPoint.ToString();
-                            __instance.modData["hapyke.FoodStore/gettingFood"] = "false";
-
-                            if (food.multiplier > 1f)
-                            {
-                                __instance.modData["hapyke.FoodStore/lastStoreType"] = food.foodObject.Category.ToString();
-                            }
-
-                            if (__instance.currentLocation.Name.Contains("Custom_MT_Island") && __instance.modData["hapyke.FoodStore/shopOwnerToday"] == "-1,-1" 
-                                || __instance.currentLocation.GetParentLocation() != null && (__instance.currentLocation.GetParentLocation().Name.Contains("Custom_MT_Island") || __instance.currentLocation.GetParentLocation() == Game1.getFarm()) )
-                            {
-                                if (Game1.timeOfDay < 2130) // walk around
+                                else if (food.foodObject.Quality >= 1)
                                 {
-                                    var randomTile = FarmOutside.getRandomOpenPointInFarm(__instance, __instance.currentLocation, false).ToVector2();
-                                    if (randomTile != Vector2.Zero)
+                                    switch (food.foodObject.Quality)
                                     {
-                                        FarmOutside.AddRandomSchedulePoint(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{__instance.currentLocation.NameOrUniqueName}",
-                                            $"{randomTile.X}", $"{randomTile.Y}", $"{rand.Next(0, 4)}");
+                                        // silver
+                                        case 1:
+                                            __instance.modData["hapyke.FoodStore/LastFoodTaste"] = "8";
+                                            break;
+                                        //gold
+                                        case 2:
+                                            __instance.modData["hapyke.FoodStore/LastFoodTaste"] = "2";
+                                            break;
+                                        // iridium
+                                        case 4:
+                                            __instance.modData["hapyke.FoodStore/LastFoodTaste"] = "0";
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+                                else
+                                {
+                                    __instance.modData["hapyke.FoodStore/LastFoodTaste"] = "-1";
+                                }
+                                __instance.modData["hapyke.FoodStore/LastFoodDecor"] = decorPoint.ToString();
+                                __instance.modData["hapyke.FoodStore/gettingFood"] = "false";
+
+                                if (food.multiplier > 1f)
+                                {
+                                    __instance.modData["hapyke.FoodStore/lastStoreType"] = food.foodObject.Category.ToString();
+                                }
+
+                                if (__instance.currentLocation.Name.Contains("Custom_MT_Island") && __instance.modData["hapyke.FoodStore/shopOwnerToday"] == "-1,-1"
+                                    || __instance.currentLocation.GetParentLocation() != null && (__instance.currentLocation.GetParentLocation().Name.Contains("Custom_MT_Island") || __instance.currentLocation.GetParentLocation() == Game1.getFarm()))
+                                {
+                                    if (Game1.timeOfDay < 2130) // walk around
+                                    {
+                                        var randomTile = FarmOutside.getRandomOpenPointInLocation(__instance, __instance.currentLocation, false).ToVector2();
+                                        if (randomTile != Vector2.Zero)
+                                        {
+                                            FarmOutside.AddNextMoveSchedulePoint(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{__instance.currentLocation.NameOrUniqueName}",
+                                                $"{randomTile.X}", $"{randomTile.Y}", $"{rand.Next(0, 4)}");
+                                        }
                                     }
                                 }
                             }
-
                             return true;
                         }
                     }
@@ -1575,6 +1608,7 @@ namespace MarketTown
                             Object currentObject = enumerator.Current;
                             Random rand = new Random();
                             int salePrice = 0;
+                            int count = 0;
 
                             if (enumerator.Current.boundingBox.Value != food.obj.boundingBox.Value)
                                 continue;
@@ -1585,36 +1619,43 @@ namespace MarketTown
                                 {
                                     salePrice += rand.Next(1100, 1600);
                                     man.hat.Value = null;
+                                    count++;
                                 }
                                 if (man.shirt.Value != null)
                                 {
                                     salePrice += rand.Next(1300, 1800);
                                     man.shirt.Value = null;
+                                    count++;
                                 }
                                 if (man.pants.Value != null)
                                 {
                                     salePrice += rand.Next(1400, 1900);
                                     man.pants.Value = null;
+                                    count++;
                                 }
                                 if (man.boots.Value != null)
                                 {
                                     salePrice += (int)(man.boots.Value.salePrice() * 4);
                                     man.boots.Value = null;
+                                    count++;
                                 }
                             }
 
-                            if (!Config.DisableChatAll && !Config.DisableChat) Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.soldclothes", new { locationint = __instance.currentLocation.DisplayName, saleint = salePrice }));
-                            MyMessage messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.soldclothes", new { locationint = __instance.currentLocation.DisplayName, saleint = salePrice }));
-                            SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
+                            UpdateCount(-100, count);
+                            if (Game1.IsMasterGame)
+                            {
+                                if (!Config.DisableChatAll && !Config.DisableChat) Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.soldclothes", new { locationint = __instance.currentLocation.DisplayName, saleint = salePrice * challengeMultiplier }));
+                                MyMessage messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.soldclothes", new { locationint = __instance.currentLocation.DisplayName, saleint = salePrice * challengeMultiplier }));
+                                SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
 
-                            if (!Config.DisableChatAll) NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.soldclothesText." + rand.Next(7).ToString()));
-          
-                            AddToPlayerFunds(salePrice);
+                                if (!Config.DisableChatAll) NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.soldclothesText." + rand.Next(7).ToString()));
 
-                            __instance.modData["hapyke.FoodStore/LastFood"] = Game1.timeOfDay.ToString();
-                            __instance.modData["hapyke.FoodStore/LastFoodTaste"] = "-1";
-                            __instance.modData["hapyke.FoodStore/gettingFood"] = "false";
+                                AddToPlayerFunds(salePrice);
 
+                                __instance.modData["hapyke.FoodStore/LastFood"] = Game1.timeOfDay.ToString();
+                                __instance.modData["hapyke.FoodStore/LastFoodTaste"] = "-1";
+                                __instance.modData["hapyke.FoodStore/gettingFood"] = "false";
+                            }
                             return true;
 
                         }
@@ -1706,17 +1747,17 @@ namespace MarketTown
                     if (isFarmRestaurant && hasSignInRange && Vector2.Distance(fLocation, npc.Tile) < Config.MaxDistanceToFind)
                     {
                         var item = chest.Items.FirstOrDefault(item => item != null && item.Category == -7);
-                        if (item != null) { foodList.Add(new DataPlacedFood(f, fLocation, new Object(item.ItemId, 1), chest.Items.IndexOf(item))); }
+                        if (item != null && item is Object obj && obj != null) foodList.Add(new DataPlacedFood(f, fLocation, obj, chest.Items.IndexOf(item)));
                     }
                     else if (isFarmMarket && hasSignInRange && Vector2.Distance(fLocation, npc.Tile) < Config.MaxDistanceToFind)
                     {
                         var item = chest.Items.FirstOrDefault(item => item != null);
-                        if (item != null) { foodList.Add(new DataPlacedFood(f, fLocation, new Object(item.ItemId, 1), chest.Items.IndexOf(item))); }
+                        if (item != null && item is Object obj1 && obj1 != null) foodList.Add(new DataPlacedFood(f, fLocation, obj1, chest.Items.IndexOf(item)));
                     }
                     else if (!isFarmBuilding && Vector2.Distance(fLocation, npc.Tile) < Config.MaxDistanceToFind)
                     {
                         var item = chest.Items.FirstOrDefault(item => item != null);
-                        if (item != null) { foodList.Add(new DataPlacedFood(f, fLocation, new Object(item.ItemId, 1), chest.Items.IndexOf(item))); }
+                        if (item != null && item is Object obj2 && obj2 != null) foodList.Add(new DataPlacedFood(f, fLocation, obj2, chest.Items.IndexOf(item)));
                     }
                 }
             }

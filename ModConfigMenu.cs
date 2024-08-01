@@ -46,7 +46,7 @@ namespace MarketTown
         {
             api.RegisterToken(ModManifest, "IslandSign", () =>
             {
-                if (Context.IsWorldReady && SHelper.Data.ReadSaveData<MailData>("MT.MailLog") != null && SHelper.Data.ReadSaveData<MailData>("MT.MailLog").TotalVisitorVisited != 0)
+                if (Game1.IsMasterGame && Context.IsWorldReady && SHelper.Data.ReadSaveData<MailData>("MT.MailLog") != null && SHelper.Data.ReadSaveData<MailData>("MT.MailLog").TotalVisitorVisited != 0)
                 {
                     var totalVisitor = SHelper.Data.ReadSaveData<MailData>("MT.MailLog").TotalVisitorVisited;
 
@@ -54,7 +54,7 @@ namespace MarketTown
                     string returnValue = SHelper.Translation.Get("foodstore.islandsign", new { season = locat.GetSeason().ToString(), visitor = totalVisitor.ToString() });
                     return new[] { returnValue };
                 }
-                else if (Context.IsWorldReady && SHelper.Data.ReadSaveData<MailData>("MT.MailLog") == null)
+                else if (Game1.IsMasterGame && Context.IsWorldReady && SHelper.Data.ReadSaveData<MailData>("MT.MailLog") == null)
                 {
                     GameLocation locat = Game1.getLocationFromName("Custom_MT_Island");
                     string returnValue = SHelper.Translation.Get("foodstore.islandsign", new { season = locat.GetSeason().ToString(), visitor = "0" });
@@ -65,7 +65,7 @@ namespace MarketTown
 
             api.RegisterToken(ModManifest, "IslandFestivalDay", () =>
             {
-                if (Context.IsWorldReady)
+                if (Context.IsWorldReady && Game1.IsMasterGame)
                 {
                     int dayOfWeek = Game1.dayOfMonth % 7;
                     bool festivalDay = false;
@@ -116,7 +116,7 @@ namespace MarketTown
                     else if (level > 250000) islandProgressLevel = "3";
 
                     GameLocation locat = Game1.getLocationFromName("Custom_MT_Island");
-                    var islandBrazier = locat.getObjectAtTile(22, 36, true);
+                    var islandBrazier = locat.getObjectAtTile(32, 46, true);
                     if (locat == null || islandBrazier == null || islandBrazier.ItemId == null || islandBrazier.ItemId != "MT.Objects.ParadiseIslandBrazier" || !islandBrazier.IsOn)
                         return new[] { "-1" };
 
@@ -233,14 +233,6 @@ namespace MarketTown
                 tooltip: () => SHelper.Translation.Get("foodstore.config.ultimatechallengeText"),
                 getValue: () => Config.UltimateChallenge,
                 setValue: value => Config.UltimateChallenge = value
-            );
-
-            configMenu.AddBoolOption(
-            mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.lockultimatechallenge"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.lockultimatechallengeText"),
-                getValue: () => Config.LockChallenge,
-                setValue: value => Config.LockChallenge = value
             );
 
             configMenu.AddBoolOption(
@@ -497,13 +489,6 @@ namespace MarketTown
                 tooltip: () => SHelper.Translation.Get("foodstore.config.doorentryText"),
                 getValue: () => Config.DoorEntry,
                 setValue: value => Config.DoorEntry = value
-            );
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.buswalk"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.buswalkText"),
-                getValue: () => Config.BusWalk,
-                setValue: value => Config.BusWalk = value
             );
 
             configMenu.AddTextOption(
@@ -797,6 +782,45 @@ namespace MarketTown
                 tooltip: () => SHelper.Translation.Get("foodstore.config.advanceoutputitemidText"),
                 getValue: () => Config.AdvanceOutputItemId,
                 setValue: value => Config.AdvanceOutputItemId = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => "Auto fix stuck/error NPC",
+                getValue: () => Config.AdvanceAutoFixNpc,
+                setValue: value => Config.AdvanceAutoFixNpc = value
+            );
+
+            configMenu.AddTextOption(
+                mod: ModManifest,
+                name: () => "Log Menu Offset X",
+                getValue: () => "" + Config.AdvanceMenuOffsetX,
+                setValue: delegate (string value) { try { Config.AdvanceMenuOffsetX = int.Parse(value, CultureInfo.InvariantCulture); } catch { } }
+            ); configMenu.AddTextOption(
+                mod: ModManifest,
+                name: () => "Log Menu Offset Y",
+                getValue: () => "" + Config.AdvanceMenuOffsetY,
+                setValue: delegate (string value) { try { Config.AdvanceMenuOffsetY = int.Parse(value, CultureInfo.InvariantCulture); } catch { } }
+            ); configMenu.AddTextOption(
+                mod: ModManifest,
+                name: () => "Log Menu Width",
+                getValue: () => "" + Config.AdvanceMenuWidth,
+                setValue: delegate (string value) { try { Config.AdvanceMenuWidth = int.Parse(value, CultureInfo.InvariantCulture); } catch { } }
+            ); configMenu.AddTextOption(
+                mod: ModManifest,
+                name: () => "Log Menu Height",
+                getValue: () => "" + Config.AdvanceMenuHeight,
+                setValue: delegate (string value) { try { Config.AdvanceMenuHeight = int.Parse(value, CultureInfo.InvariantCulture); } catch { } }
+            ); configMenu.AddTextOption(
+                mod: ModManifest,
+                name: () => "Number of Row",
+                getValue: () => "" + Config.AdvanceMenuRow,
+                setValue: delegate (string value) { try { Config.AdvanceMenuRow = int.Parse(value, CultureInfo.InvariantCulture); } catch { } }
+            ); configMenu.AddTextOption(
+                mod: ModManifest,
+                name: () => "Line space",
+                getValue: () => "" + Config.AdvanceMenuSpace,
+                setValue: delegate (string value) { try { Config.AdvanceMenuSpace = int.Parse(value, CultureInfo.InvariantCulture); } catch { } }
             );
         }
 

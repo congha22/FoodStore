@@ -65,7 +65,7 @@
  <objectgroup id="7" name="Buildings">
   <object id="59" name="TileData" x="0" y="48" width="48" height="32">
    <properties>
-    <property name="Action" value="Warp 15 50 Custom_MT_Island"/>
+    <property name="Action" value="Warp 25 60 Custom_MT_Island"/>
    </properties>
   </object>
  </objectgroup>

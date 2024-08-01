@@ -177,7 +177,7 @@
   "foodstore.haterep.19":                             "I despise this dish; it's a culinary catastrophe.",
   
   "foodstore.tip":                                    ". Here is your {{tipValue}}G tip",
-  "foodstore.sold":                                   "   Sold {{foodObjName}} at {{locationint}} for {{saleint}}G",
+  "foodstore.sold":                                   "{{locationint}} - {{foodObjName}}: {{saleint}}G {{tipint}}",
   
   "foodstore.randomchat.love.0":                      "Feeling immense love for this place!",
   "foodstore.randomchat.love.1":                      "In love with their incredible dishes!",

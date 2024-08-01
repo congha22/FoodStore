@@ -65,8 +65,8 @@
           "BuyTicketMessage": null,
           "TargetLocation": "Custom_MT_Island",
           "TargetTile": {
-            "X": 23,
-            "Y": 42
+            "X": 33,
+            "Y": 52
           },
           "TargetDirection": "down",
           "CustomFields": null
@@ -160,7 +160,7 @@
       "Action": "EditMap",
       "Target": "Maps/Custom_MT_Island",
       "Addwarps": [
-        "7 52 Custom_Ridgeside_RSVCliff 50 24"
+        "17 62 Custom_Ridgeside_RSVCliff 50 24"
       ],
       "When": {
         "HasMod |contains=Rafseazz.RidgesideVillage": true,
@@ -171,7 +171,7 @@
       "Action": "EditMap",
       "Target": "Maps/Custom_MT_Island",
       "Addwarps": [
-        "14 57 EastScarp_Village 55 114"
+        "24 67 EastScarp_Village 55 114"
       ],
       "When": {
         "HasMod |contains=atravita.EastScarp": true,
@@ -277,8 +277,8 @@
           "MusicDefault": "ocean",
           "MusicContext": "Default",
           "DefaultArrivalTile": {
-            "X": 22,
-            "Y": 37
+            "X": 32,
+            "Y": 47
           },
           "ArtifactSpots": [
             {
@@ -1461,7 +1461,7 @@
           "SeasonOverride": null,
           "DefaultMusic": "IslandMusic",
           "DefaultMusicCondition": null,
-          "DefaultMusicDelayOneScreen": true,
+          "DefaultMusicDelayOneScreen": false,
           "Music": [
             {
               "Id": "spring1",
@@ -1524,7 +1524,7 @@
               "Condition": "SEASON Winter"
             }
           ],
-          "DayAmbience": null,
+          "DayAmbience": "tropical_island_day_ambient",
           "NightAmbience": null,
           "PlayRandomAmbientSounds": true,
           "AllowRainTotem": true,
@@ -1585,16 +1585,26 @@
           "ReviveLocations": [
             {
               "Id": "Default",
-              "Condition": null,
-              "Location": "Custom_MT_Island",
+              "Condition": "PLAYER_HAS_MAIL Any MT.IslandBedroom",
+              "Location": "Custom_MT_Island_House_Floor",
               "Position": {
-                "X": 53,
-                "Y": 27
+                "X": 6,
+                "Y": 4
               }
             }
           ],
-          "MaxPassOutCost": 3000,
-          "PassOutLocations": null,
+          "MaxPassOutCost": 500,
+          "PassOutLocations": [
+            {
+              "Id": "Default",
+              "Condition": "PLAYER_HAS_MAIL Any MT.IslandBedroom",
+              "Location": "Custom_MT_Island_House_Floor",
+              "Position": {
+                "X": 6,
+                "Y": 4
+              }
+            }
+          ],
           "CustomFields": null
         }
       }

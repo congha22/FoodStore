@@ -76,18 +76,6 @@ namespace MarketTown
                 }
             }
 
-            if (e.OldLocation.Name == "BusStop")
-            {
-                List<NPC> npcsToWarp = new List<NPC>();
-                npcsToWarp = Game1.getLocationFromName("BusStop").characters.Where(who => who.temporaryController != null).ToList();
-
-                foreach (NPC npc in npcsToWarp)
-                {
-                    npc.temporaryController?.endBehaviorFunction(npc, npc.currentLocation);
-                    npc.temporaryController = null;
-                }
-            }
-
             if (e.OldLocation.Name == "Custom_MT_Island")
             {
                 List<NPC> npcsToWarp = new List<NPC>();
@@ -149,7 +137,7 @@ namespace MarketTown
 
                         visit.faceDirection(2);
 
-                        ModEntry.ResetErrorNpc(visit);
+                        ModEntry.CleanNpc(visit);
 
                         door.X--;
                         visit.controller = new PathFindController(visit, Game1.getFarm(), door, 2);
@@ -159,14 +147,14 @@ namespace MarketTown
             }
         }
 
-        // UNUSED. Can be use to add dynamic movement for npc, but cause many issue. Use AddRandomSchedule
+        // UNUSED. Can be use to add dynamic movement for npc, but cause many issue. Use AddNewPointToSchedule
         internal static void WalkAround(string who, bool update = false)
         {
 
             var c = Game1.getCharacterFromName(who);
             if (c == null || !c.IsVillager) return;
 
-            var newspot = getRandomOpenPointInFarm(c, c.currentLocation, update);
+            var newspot = getRandomOpenPointInLocation(c, c.currentLocation, update);
 
             try
             {
@@ -184,7 +172,7 @@ namespace MarketTown
         }
 
         /// <summary>
-        /// Add schedule to the middle of a schedule and retain the structure.
+        /// Add a new stop to the middle of a schedule and retain the structure.
         /// Might not work all the time, and does not work if NPC has queued schedule.
         /// </summary>
         /// <param name="npc">The NPC to which the schedule will be added.</param>
@@ -193,9 +181,9 @@ namespace MarketTown
         /// <param name="addEndX">The X coordinate of the end tile.</param>
         /// <param name="addEndY">The Y coordinate of the end tile.</param>
         /// <param name="addEndDirection">The direction the NPC will face at the end location.</param>
-        internal static bool AddRandomSchedule(NPC npc, string addTime, string addEndLocation, string addEndX, string addEndY, string addEndDirection)
+        internal static bool AddNewPointToSchedule(NPC npc, string addTime, string addEndLocation, string addEndX, string addEndY, string addEndDirection)
         {
-            if (npc.queuedSchedulePaths.Count != 0)  return false; 
+            if (npc.queuedSchedulePaths.Count != 0 || !Game1.IsMasterGame)  return false; 
 
             try 
             {
@@ -318,7 +306,7 @@ namespace MarketTown
 
                 if (initSche == null || initSche == "") return false;
 
-                ModEntry.ResetErrorNpc(npc);
+                ModEntry.CleanNpc(npc);
                 npc.TryLoadSchedule("default", initSche);
                 return true;
             }
@@ -331,12 +319,13 @@ namespace MarketTown
 
 
         /// <summary>Add a random Tile to the Schedule at the next time change (10 minutes).</summary>
-        internal static void AddRandomSchedulePoint(NPC npc, string addTime, string addEndLocation, string addEndX, string addEndY, string addEndDirection)
+        internal static void AddNextMoveSchedulePoint(NPC npc, string addTime, string addEndLocation, string addEndX, string addEndY, string addEndDirection)
         {
+            if (!Game1.IsMasterGame) return;
             // initSche is the last of the current schedule, then added the new piece
             // if schedule is null, initSche will be the current position of NPC
             var initSche = "";
-            ModEntry.ResetErrorNpc(npc);
+            ModEntry.CleanNpc(npc);
             Dictionary<int, SchedulePathDescription> schedule = npc.Schedule;
 
             if (schedule != null)
@@ -369,11 +358,8 @@ namespace MarketTown
         /// <summary>Update the list of 'valid' tile in a location, which can then be selected for NPC schedule.</summary>
         internal static void UpdateRandomLocationOpenTile(GameLocation location)
         {
-            List<Vector2> TileBlackList = new List<Vector2> { new Vector2(8, 31), new Vector2(9, 31), new Vector2(8, 32), new Vector2(9, 32), new Vector2(8, 33), new Vector2(9, 33) };
             try
             {
-                if (location != null && location.Name == "Custom_MT_Island" && location.isAlwaysActive.Value) return;
-
                 Random r = new Random();
                 var map = location.Map;
 
@@ -384,11 +370,13 @@ namespace MarketTown
                 else ModEntry.RandomOpenSpot[location].Clear();
 
                 int count = 0;
-                while (count < 150 && count < possibleWidth * possibleHeight / 1.5
-                        && (count < location.characters.Count * 2 || count < 20 || count < 60 && location.NameOrUniqueName.Contains("Custom_MT_Island")) )
+                int tried = 0;
+                while (tried < 250 && count < 150 && count < possibleWidth * possibleHeight / 1.5
+                        && (count < location.characters.Count * 3 || count < 20 || count < 60 && location.NameOrUniqueName.Contains("Custom_MT_Island")) )
                 {
+                    tried++;
                     Vector2 tile = new Vector2(r.Next(1, possibleWidth), r.Next(7, possibleHeight));
-                    if (location.CanItemBePlacedHere(tile) && !TileBlackList.Contains(tile) )
+                    if (location.CanItemBePlacedHere(tile))
                     {
                         ModEntry.RandomOpenSpot[location].Add(tile);
                         count++;
@@ -401,13 +389,13 @@ namespace MarketTown
         }
 
 
-        /// <summary>Get a 'valid' tile from this Location.</summary>
-        internal static Point getRandomOpenPointInFarm(NPC who, GameLocation location, bool update, bool bypass = false)
+        /// <summary>Get a 'valid' tile for NPC schedule from this Location.</summary>
+        internal static Point getRandomOpenPointInLocation(NPC who, GameLocation location, bool update, bool bypass = false)
         {
             try
             {
                 if (bypass || who != null && who.IsVillager && location != null
-                    && ( ((who.currentLocation.IsFarm || who.currentLocation.Name == "FarmHouse") && who.modData["hapyke.FoodStore/invited"] == "true")
+                    && ( ((who.currentLocation == Game1.getFarm() || who.currentLocation.Name == "FarmHouse") && who.modData["hapyke.FoodStore/invited"] == "true")
                         || (who.Name.Contains("MT.Guest_") && !who.currentLocation.Name.Contains("BusStop"))
                         || location.NameOrUniqueName.Contains("Custom_MT_Island")
                         || location.GetParentLocation() != null && location.GetParentLocation().Name == "Custom_MT_Island") ) // ************ check shed name

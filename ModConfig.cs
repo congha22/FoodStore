@@ -54,7 +54,6 @@ namespace MarketTown
 
         public float KidAskChance { get; set; } = 0.2f;
 
-        public bool BusWalk { get; set; } = true;
 
         public SButton ModKey { get; set; } = SButton.LeftAlt;
         public int MaxNPCOrdersPerNight { get; set; } = 4;
@@ -96,7 +95,6 @@ namespace MarketTown
 
 
         public bool UltimateChallenge { get; set; } = false;
-        public bool LockChallenge { get; set; } = false;
         public bool GlobalPathUpdate { get; set; } = false;
         
         public bool ExtraMessage { get; set; } = false;
@@ -104,5 +102,14 @@ namespace MarketTown
         public bool AllowIndoorStore { get; set; } = false;
 
         public bool SellFruitTree { get; set; } = true;
+
+        public int AdvanceMenuOffsetX { get; set; } = 1000;
+        public int AdvanceMenuOffsetY { get; set; } = 865;
+        public int AdvanceMenuWidth { get; set; } = 1000;
+        public int AdvanceMenuHeight{ get; set; } = 865;
+        public int AdvanceMenuRow { get; set; } = 21;
+        public int AdvanceMenuSpace { get; set; } = 33;
+
+        public bool AdvanceAutoFixNpc { get; set; } = false;
     }
 }

@@ -66,7 +66,7 @@ namespace MarketTown
                 {"MarketTown.evelynShop",   "Evelyn"  },
                 {"MarketTown.fairhavenShop","Andy"  },
                 {"MarketTown.fishShop",     "Willy"  },
-                {"MarketTown.guntherShop",  "Gunther"  },
+                {"MarketTown.guntherShop",  "GuntherSilvian"  },
                 {"MarketTown.haleyShop",    "Haley"  },
                 {"MarketTown.harveyShop",   "Harvey"  },
                 {"MarketTown.hatsShop",     ""  },
@@ -85,7 +85,7 @@ namespace MarketTown
                 {"MarketTown.saloonShop",   "Gus"  },
                 {"MarketTown.serrupShop",   ""  },
                 {"MarketTown.teaShop",      "Caroline"  },
-                {"MarketTown.weaponsShop",  "Marlon"  }    
+                {"MarketTown.weaponsShop",  "MarlonFay"  }    
             };
             
             // Set shop owner tile
@@ -97,11 +97,6 @@ namespace MarketTown
                 {
                     thisNPC = Game1.getCharacterFromName(owner);
                     if (!IslandNPCList.Contains(owner)) IslandNPCList.Add(owner);
-                }
-                else if (Game1.getCharacterFromName("MT.Guest_" + owner) != null)
-                {
-                    thisNPC = Game1.getCharacterFromName("MT.Guest_" + owner);
-                    if (!IslandNPCList.Contains("MT.Guest_" + owner) ) IslandNPCList.Add("MT.Guest_" + owner);
                 }
 
                 thisNPC.modData["hapyke.FoodStore/shopOwnerToday"] = $"{(tile + new Vector2(3, -1)).X}, {(tile + new Vector2(3, -1)).Y}";
@@ -227,31 +222,30 @@ namespace MarketTown
                             continue;
                         }
 
-                        salePrice = realItem.sellToStorePrice();
-                        if (0 < salePrice && salePrice < 10) salePrice *= 15;
-                        else if (10 <= salePrice && salePrice < 20) salePrice *= 10;
+                        salePrice = realItem.salePrice();
+                        if (0 < salePrice && salePrice < 50) salePrice *= 2;
                         else if (salePrice <= 0)
                         {
-                            salePrice = realItem.salePrice();
-                            if (0 < salePrice && salePrice < 10) salePrice *= 10;
-                            else if (10 <= salePrice && salePrice < 20) salePrice *= 7;
+                            salePrice = realItem.sellToStorePrice();
+                            if (0 < salePrice && salePrice < 10) salePrice *= 15;
+                            else if (10 <= salePrice && salePrice < 20) salePrice *= 12;
                             else if (salePrice <= 0) salePrice = Game1.random.Next(200, 1000);
                         }
 
                         if (randomItemId.StartsWith("(W)"))
                         {
                             if (salePrice >= 800) salePrice = (int)(salePrice * 1.1);
-                            salePrice = salePrice * salePrice / 20;
+                            salePrice = salePrice * salePrice / 25;
                         }
 
                         if (randomItemId.StartsWith("(H)"))
                         {
-                            salePrice = Game1.random.Next(500, 1000);
+                            salePrice = Game1.random.Next(500, 700);
                         }
 
                         if (randomItemId.StartsWith("(S)") || randomItemId.StartsWith("(P)"))
                         {
-                            salePrice = Game1.random.Next(1000, 1500);
+                            salePrice = Game1.random.Next(700, 1200);
                         }
 
                         if (randomItemId.StartsWith("(F)") && !randomItemId.ToLower().Contains("catalogue"))
@@ -271,7 +265,7 @@ namespace MarketTown
 
                         ShopItemData newItem = new ShopItemData { AvailableStock = 1, IsRecipe = false, AvoidRepeat = true,
                             ItemId = randomItemId,
-                            Price = (int)(salePrice * ( 1 + Game1.random.NextDouble()) ),
+                            Price = (int)(salePrice * ( 2 + Game1.random.NextDouble()) ),
                         };
 
                         if (!initShopStockList.Contains(randomItemId) )

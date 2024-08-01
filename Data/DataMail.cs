@@ -14,17 +14,18 @@ class MailData
 {
     // perma change
     public bool InitTable { get; set; } = false;
-    public bool LockedChallenge { get; set; } = false;
 
 
     // regular
+    public string WeeklyDish = "240";
+
     public int TotalVisitorVisited { get; set; } = 0;
 
     public int FestivalEarning { get; set; } = 0;
 
     public int TotalEarning { get; set; }
     public int SellMoney { get; set; } = 0;
-    public string SellList { get; set; } = "";
+    public List<string> YesterdaySellLog { get; set; } = new List<string>();
 
     public int TodayCustomerInteraction = 0;
 
@@ -34,21 +35,22 @@ class MailData
 
     public int TodayMuseumVisitor { get; set; } = 0;
     public int TodayMuseumEarning { get; set; } = 0;
-    public int ForageSold { get; set; } = 0;
-    public int FlowerSold { get; set; } = 0;
-    public int FruitSold { get; set; } = 0;
-    public int VegetableSold { get; set; } = 0;
-    public int SeedSold { get; set; } = 0;
-    public int MonsterLootSold { get; set; } = 0;
-    public int SyrupSold { get; set; } = 0;
-    public int ArtisanGoodSold { get; set; } = 0;
-    public int AnimalProductSold { get; set; } = 0;
-    public int ResourceMetalSold { get; set; } = 0;
-    public int MineralSold { get; set; } = 0;
-    public int CraftingSold { get; set; } = 0;
-    public int CookingSold { get; set; } = 0;
-    public int FishSold { get; set; } = 0;
-    public int GemSold { get; set; } = 0;
+    //public int ForageSold { get; set; } = 0;
+    //public int FlowerSold { get; set; } = 0;
+    //public int FruitSold { get; set; } = 0;
+    //public int VegetableSold { get; set; } = 0;
+    //public int SeedSold { get; set; } = 0;
+    //public int MonsterLootSold { get; set; } = 0;
+    //public int SyrupSold { get; set; } = 0;
+    //public int ArtisanGoodSold { get; set; } = 0;
+    //public int AnimalProductSold { get; set; } = 0;
+    //public int ResourceMetalSold { get; set; } = 0;
+    //public int MineralSold { get; set; } = 0;
+    //public int CraftingSold { get; set; } = 0;
+    //public int CookingSold { get; set; } = 0;
+    //public int FishSold { get; set; } = 0;
+    //public int GemSold { get; set; } = 0;
+    //public int ClothesSole { get; set; } = 0;
 
 
     public int TotalForageSold { get; set; } = 0;
@@ -66,6 +68,7 @@ class MailData
     public int TotalCookingSold { get; set; } = 0;
     public int TotalFishSold { get; set; } = 0;
     public int TotalGemSold { get; set; } = 0;
+    public int TotalClothesSold { get; set; } = 0;
 }
 
 internal class MailLoader
@@ -185,33 +188,20 @@ internal class MailLoader
 
 
         // Dynamic Letter --------------------------------------------------------------
-        string categoryCountsString = GetCategoryCountsString(model, modHelper);
-
 
         // Daily Log letter
-        MailRepository.SaveLetter(
-            new Letter(
-                "MT.SellLogMail",
-                modHelper.Translation.Get("foodstore.mailtotal",
-                new { totalEarning = model.TotalEarning, sellMoney = model.SellMoney, todayCustomerInteraction = model.TodayCustomerInteraction })
-                                    + modHelper.Translation.Get("foodstore.todaymuseumvisitor", new { todayMMuseumVisitor = model.TodayMuseumVisitor, todayMuseumEarning = model.TodayMuseumEarning })
-                                    + model.SellList,
-                (l) => model.SellMoney != 0 || model.TodayMuseumVisitor != 0)
-            {
-                LetterTexture = letterTexture
-            }
-        );
-
-        // Weekly Log letter
-        MailRepository.SaveLetter(
-            new Letter(
-                "MT.WeeklyLogMail",
-                categoryCountsString,
-                (l) => Game1.dayOfMonth == 1 || Game1.dayOfMonth == 8 || Game1.dayOfMonth == 15 || Game1.dayOfMonth == 22)
-            {
-                LetterTexture = letterTexture
-            }
-        );
+        //MailRepository.SaveLetter(
+        //    new Letter(
+        //        "MT.SellLogMail",
+        //        modHelper.Translation.Get("foodstore.mailtotal",
+        //        new { totalEarning = model.TotalEarning, sellMoney = model.SellMoney, todayCustomerInteraction = model.TodayCustomerInteraction })
+        //                            + modHelper.Translation.Get("foodstore.todaymuseumvisitor", new { todayMMuseumVisitor = model.TodayMuseumVisitor, todayMuseumEarning = model.TodayMuseumEarning })
+        //                            + model.YesterdaySellLog,
+        //        (l) => model.SellMoney != 0 || model.TodayMuseumVisitor != 0)
+        //    {
+        //        LetterTexture = letterTexture
+        //    }
+        //);
     }
 
     public string GetCategoryCountsString(MailData model, IModHelper modHelper)
@@ -239,21 +229,21 @@ internal class MailLoader
 
         stringBuilder.Append($"------------------------------------------^");
 
-        stringBuilder.Append(modHelper.Translation.Get("foodstore.lastweek.forage", new { LastweekForageSold = model.ForageSold }));
-        stringBuilder.Append(modHelper.Translation.Get("foodstore.lastweek.flower", new { LastweekFlowerSold = model.FlowerSold }));
-        stringBuilder.Append(modHelper.Translation.Get("foodstore.lastweek.fruit", new { LastweekFruitSold = model.FruitSold }));
-        stringBuilder.Append(modHelper.Translation.Get("foodstore.lastweek.vegetable", new { LastweekVegetableSold = model.VegetableSold }));
-        stringBuilder.Append(modHelper.Translation.Get("foodstore.lastweek.seed", new { LastweekSeedSold = model.SeedSold }));
-        stringBuilder.Append(modHelper.Translation.Get("foodstore.lastweek.monsterloot", new { LastweekMonsterLootSold = model.MonsterLootSold }));
-        stringBuilder.Append(modHelper.Translation.Get("foodstore.lastweek.syrup", new { LastweekSyrupSold = model.SyrupSold }));
-        stringBuilder.Append(modHelper.Translation.Get("foodstore.lastweek.artisangood", new { LastweekArtisanGoodSold = model.ArtisanGoodSold }));
-        stringBuilder.Append(modHelper.Translation.Get("foodstore.lastweek.animalproduct", new { LastweekAnimalProductSold = model.AnimalProductSold }));
-        stringBuilder.Append(modHelper.Translation.Get("foodstore.lastweek.resourcemetal", new { LastweekResourceMetalSold = model.ResourceMetalSold }));
-        stringBuilder.Append(modHelper.Translation.Get("foodstore.lastweek.mineral", new { LastweekMineralSold = model.MineralSold }));
-        stringBuilder.Append(modHelper.Translation.Get("foodstore.lastweek.crafting", new { LastweekCraftingSold = model.CraftingSold }));
-        stringBuilder.Append(modHelper.Translation.Get("foodstore.lastweek.cooking", new { LastweekCookingSold = model.CookingSold }));
-        stringBuilder.Append(modHelper.Translation.Get("foodstore.lastweek.fish", new { LastweekFishSold = model.FishSold }));
-        stringBuilder.Append(modHelper.Translation.Get("foodstore.lastweek.gem", new { LastweekGemSold = model.GemSold }));
+        //stringBuilder.Append(modHelper.Translation.Get("foodstore.lastweek.forage", new { LastweekForageSold = model.ForageSold }));
+        //stringBuilder.Append(modHelper.Translation.Get("foodstore.lastweek.flower", new { LastweekFlowerSold = model.FlowerSold }));
+        //stringBuilder.Append(modHelper.Translation.Get("foodstore.lastweek.fruit", new { LastweekFruitSold = model.FruitSold }));
+        //stringBuilder.Append(modHelper.Translation.Get("foodstore.lastweek.vegetable", new { LastweekVegetableSold = model.VegetableSold }));
+        //stringBuilder.Append(modHelper.Translation.Get("foodstore.lastweek.seed", new { LastweekSeedSold = model.SeedSold }));
+        //stringBuilder.Append(modHelper.Translation.Get("foodstore.lastweek.monsterloot", new { LastweekMonsterLootSold = model.MonsterLootSold }));
+        //stringBuilder.Append(modHelper.Translation.Get("foodstore.lastweek.syrup", new { LastweekSyrupSold = model.SyrupSold }));
+        //stringBuilder.Append(modHelper.Translation.Get("foodstore.lastweek.artisangood", new { LastweekArtisanGoodSold = model.ArtisanGoodSold }));
+        //stringBuilder.Append(modHelper.Translation.Get("foodstore.lastweek.animalproduct", new { LastweekAnimalProductSold = model.AnimalProductSold }));
+        //stringBuilder.Append(modHelper.Translation.Get("foodstore.lastweek.resourcemetal", new { LastweekResourceMetalSold = model.ResourceMetalSold }));
+        //stringBuilder.Append(modHelper.Translation.Get("foodstore.lastweek.mineral", new { LastweekMineralSold = model.MineralSold }));
+        //stringBuilder.Append(modHelper.Translation.Get("foodstore.lastweek.crafting", new { LastweekCraftingSold = model.CraftingSold }));
+        //stringBuilder.Append(modHelper.Translation.Get("foodstore.lastweek.cooking", new { LastweekCookingSold = model.CookingSold }));
+        //stringBuilder.Append(modHelper.Translation.Get("foodstore.lastweek.fish", new { LastweekFishSold = model.FishSold }));
+        //stringBuilder.Append(modHelper.Translation.Get("foodstore.lastweek.gem", new { LastweekGemSold = model.GemSold }));
 
 
 

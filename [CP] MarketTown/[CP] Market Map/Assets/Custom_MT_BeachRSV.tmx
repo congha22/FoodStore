@@ -114,7 +114,7 @@
  <objectgroup id="7" name="Buildings">
   <object id="59" name="TileData" x="16" y="128" width="48" height="32">
    <properties>
-    <property name="Action" value="Warp 10 52 Custom_MT_Island"/>
+    <property name="Action" value="Warp 20 62 Custom_MT_Island"/>
    </properties>
   </object>
  </objectgroup>

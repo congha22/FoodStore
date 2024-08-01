@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
@@ -96,206 +97,17 @@ namespace MarketTown
                 && ( !IsFestivalToday || Game1.timeOfDay > Config.FestivalTimeEnd + 100 || Game1.timeOfDay < Config.FestivalTimeStart - 130)
                  )
             {
-                // Reset stuck NPC
-                if (__instance.temporaryController != null || __instance.controller != null || __instance.isMoving() 
-                    || __instance.TilePoint != __instance.previousEndPoint || __instance.queuedSchedulePaths != null || __instance.queuedSchedulePaths.Count > 0)  
-                    ResetErrorNpc(__instance);
-                
-                double nextVisitChance = random.NextDouble();
-
-                float islandChance = 1 - Config.VisitChanceIslandHouse - Config.VisitChanceIslandBuilding;
-                float islandHouseChance = 1 - Config.VisitChanceIslandBuilding;
-
-                // if npc is on the island and not shop owner
-                if (__instanceLocation.Name == "Custom_MT_Island" && __instance.modData["hapyke.FoodStore/shopOwnerToday"] == "-1,-1")
-                {
-                    if (nextVisitChance < islandChance || Game1.timeOfDay > 2200) // walk around on the island or try to go home
-                    {
-                        if (Game1.timeOfDay < 2300) {
-                            var randomTile = FarmOutside.getRandomOpenPointInFarm(__instance, __instanceLocation, false).ToVector2();
-                            if (randomTile != Vector2.Zero)
-                            {
-                                FarmOutside.AddRandomSchedulePoint(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{__instanceLocation.NameOrUniqueName}",
-                                    $"{randomTile.X}", $"{randomTile.Y}", $"{random.Next(0, 4)}");
-                            }
-                        }
-                        else if (Game1.timeOfDay > 2330)
-                        {
-                            if (!__instance.DefaultMap.Contains("HiddenWarp") && !__instance.DefaultMap.Contains("WarpRoom"))
-                            {
-                                FarmOutside.AddRandomSchedulePoint(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{__instance.DefaultMap}",
-                                    $"{__instance.DefaultPosition.X / 64}", $"{__instance.DefaultPosition.Y / 64}", $"{__instance.DefaultFacingDirection}");
-
-                                __instance.modData.Remove(orderKey);
-                            }
-
-                        }
-                    }
-                    else if (nextVisitChance < islandHouseChance && Game1.timeOfDay >= 700 && Game1.timeOfDay <= 2200) // visit island house
-                    {
-                        var randomTile = FarmOutside.getRandomOpenPointInFarm(__instance, Game1.getLocationFromName("Custom_MT_Island_House"), false).ToVector2();
-                        if (randomTile != Vector2.Zero)
-                        {
-                            FarmOutside.AddRandomSchedulePoint(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{Game1.getLocationFromName("Custom_MT_Island_House").NameOrUniqueName}",
-                                $"{randomTile.X}", $"{randomTile.Y}", $"{random.Next(0, 4)}");
-
-                            __instance.modData.Remove(orderKey);
-                        }
-                    }
-                    else if (Game1.timeOfDay >= 700 && Game1.timeOfDay <= 2200) // visit a selected building
-                    {
-                        var selectedBuilding = IslandValidBuilding[random.Next(IslandValidBuilding.Count)].buildingLocation;
-                        if (selectedBuilding != null && selectedBuilding != "Custom_MT_Island_House")
-                        {
-                            var randomTile = FarmOutside.getRandomOpenPointInFarm(__instance, Game1.getLocationFromName(selectedBuilding), false).ToVector2();
-                            if (randomTile != Vector2.Zero)
-                            {
-                                FarmOutside.AddRandomSchedulePoint(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{Game1.getLocationFromName(selectedBuilding).NameOrUniqueName}",
-                                    $"{randomTile.X}", $"{randomTile.Y}", $"{random.Next(0, 4)}");
-
-                                __instance.modData.Remove(orderKey);
-                            }
-                        }
-                    }
-                }
-                // if npc is inside island house
-                else if (__instanceLocation.Name == "Custom_MT_Island_House")
-                {
-                    // go back to island
-                    if (nextVisitChance < 0.2 && Game1.timeOfDay > Int32.Parse(__instance.modData["hapyke.FoodStore/islandSpecialOrderTime"]) + 30 
-                        || Game1.timeOfDay > 2200)
-                    {
-                        var randomTile = FarmOutside.getRandomOpenPointInFarm(__instance, Game1.getLocationFromName("Custom_MT_Island"), false).ToVector2();
-                        if (randomTile != Vector2.Zero)
-                        {
-                            FarmOutside.AddRandomSchedulePoint(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{Game1.getLocationFromName("Custom_MT_Island").NameOrUniqueName}",
-                                $"{randomTile.X}", $"{randomTile.Y}", $"{random.Next(0, 4)}");
-
-                            string[] specialOrderCoor = __instance.modData["hapyke.FoodStore/specialOrder"].Split(',');
-                            Vector2 specialOrderTile = new Vector2(int.Parse(specialOrderCoor[0]), int.Parse(specialOrderCoor[1]));
-
-                            if (RestaurantSpot.ContainsKey(__instanceLocation))
-                            {
-                                var tileList = RestaurantSpot[__instanceLocation];
-                                if (tileList.Contains(specialOrderTile)) tileList.Remove(specialOrderTile);
-                            }
-
-                            __instance.modData.Remove(orderKey);
-                        }
-                    }
-                    // stay in the house
-                    else if (Game1.timeOfDay > Int32.Parse(__instance.modData["hapyke.FoodStore/islandSpecialOrderTime"]) + 130)
-                    {
-                        // make special order
-                        if (nextVisitChance < 0.5 && Game1.timeOfDay < 2100 && Game1.timeOfDay > Int32.Parse(__instance.modData["hapyke.FoodStore/islandSpecialOrderTime"]) + 300)
-                        {
-                            Dictionary<Vector2, int> surroundingTiles = new Dictionary<Vector2, int>();
-
-                            foreach (var table in __instanceLocation.furniture.Where(i => i.furniture_type.Value == 11))
-                            {
-                                if (table != null && table.heldObject.Value != null && table.heldObject.Value.QualifiedItemId == "(F)MT.Objects.RestaurantDecor")
-                                {
-                                    Vector2 topLeft = table.TileLocation;
-                                    int width = table.getTilesWide();
-                                    int height = table.getTilesHigh();
-
-                                    for (int x = 0; x < width; x++) surroundingTiles.Add(new Vector2(topLeft.X + x, topLeft.Y - 1), 2); // down
-                                    for (int x = 0; x < width; x++) surroundingTiles.Add(new Vector2(topLeft.X + x, topLeft.Y + height), 0); // up
-                                    for (int y = 0; y < height; y++) surroundingTiles.Add(new Vector2(topLeft.X - 1, topLeft.Y + y), 1); // right
-                                    for (int y = 0; y < height; y++) surroundingTiles.Add(new Vector2(topLeft.X + width, topLeft.Y + y), 3); // left
-                                }
-                            }
-
-                            int totalTile = surroundingTiles.Count;
-                            while (totalTile > 0 && totalTile > 0)
-                            {
-                                totalTile--;
-                                var randomPair = surroundingTiles.ElementAt(random.Next(surroundingTiles.Count));
-
-                                var randomTile = randomPair.Key;
-                                var randomDirection = randomPair.Value;
-
-
-                                if (__instance.currentLocation.CanSpawnCharacterHere(randomTile) && (!RestaurantSpot.ContainsKey(__instance.currentLocation) || !RestaurantSpot[__instance.currentLocation].Contains(randomTile)))
-                                {
-                                    FarmOutside.AddRandomSchedulePoint(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{__instance.currentLocation.NameOrUniqueName}", $"{randomTile.X}", $"{randomTile.Y}", $"{randomDirection}");
-                                    __instance.modData["hapyke.FoodStore/specialOrder"] = $"{randomTile.X},{randomTile.Y}";
-
-                                    if (!RestaurantSpot.ContainsKey(__instance.currentLocation)) RestaurantSpot[__instance.currentLocation] = new List<Vector2>();
-                                    RestaurantSpot[__instance.currentLocation].Add(randomTile);
-
-                                    __instance.modData.Remove(orderKey);
-
-                                    __instance.modData["hapyke.FoodStore/islandSpecialOrderTile"] = $"{randomTile.X},{randomTile.Y}";
-                                    __instance.modData["hapyke.FoodStore/islandSpecialOrderTime"] = Game1.timeOfDay.ToString();
-
-                                    Instance.CheckOrder(__instance, __instance.currentLocation, true);
-
-                                    break;
-                                }
-                            }
-                        }
-                        // walk around if no order
-                        else if (Game1.timeOfDay > Int32.Parse(__instance.modData["hapyke.FoodStore/islandSpecialOrderTime"]) + 30)
-                        {
-                            var randomTile = FarmOutside.getRandomOpenPointInFarm(__instance, __instanceLocation, false).ToVector2();
-                            if (randomTile != Vector2.Zero)
-                            {
-                                FarmOutside.AddRandomSchedulePoint(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{__instanceLocation.NameOrUniqueName}",
-                                    $"{randomTile.X}", $"{randomTile.Y}", $"{random.Next(0, 4)}");
-
-                                string[] specialOrderCoor = __instance.modData["hapyke.FoodStore/specialOrder"].Split(',');
-                                Vector2 specialOrderTile = new Vector2(int.Parse(specialOrderCoor[0]), int.Parse(specialOrderCoor[1]));
-
-                                if (RestaurantSpot.ContainsKey(__instanceLocation))
-                                {
-                                    var tileList = RestaurantSpot[__instanceLocation];
-                                    if (tileList.Contains(specialOrderTile)) tileList.Remove(specialOrderTile);
-                                }
-
-                                __instance.modData.Remove(orderKey);
-                            }
-                        }
-                    }
-                }
-                // if npc is in a building
-                else if (__instanceLocation.parentLocationName.Value == "Custom_MT_Island")
-                {
-                    if (Game1.player.currentLocation != __instanceLocation && ( nextVisitChance < 0.2 || Game1.timeOfDay > 2200) )
-                    {
-                        IslandBuildingProperties matchingBuilding = IslandValidBuilding.FirstOrDefault(building => building.buildingLocation == __instanceLocation.NameOrUniqueName);
-                        if (matchingBuilding != null)
-                        {
-                            Game1.warpCharacter(__instance, Game1.getLocationFromName("Custom_MT_Island"), matchingBuilding.outdoorDoor);
-                            ResetErrorNpc(__instance);
-                            var randomTile = FarmOutside.getRandomOpenPointInFarm(__instance, Game1.getLocationFromName("Custom_MT_Island"), false).ToVector2();
-                            if (randomTile != Vector2.Zero)
-                            {
-                                FarmOutside.AddRandomSchedulePoint(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{Game1.getLocationFromName("Custom_MT_Island").NameOrUniqueName}",
-                                    $"{randomTile.X}", $"{randomTile.Y}", $"{random.Next(0, 4)}");
-                            }
-                        }
-                    }
-                    else if ( Game1.player.currentLocation == __instanceLocation)
-                    {
-                        var randomTile = FarmOutside.getRandomOpenPointInFarm(__instance, __instanceLocation, false).ToVector2();
-                        if (randomTile != Vector2.Zero)
-                        {
-                            FarmOutside.AddRandomSchedulePoint(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{__instanceLocation.NameOrUniqueName}",
-                                $"{randomTile.X}", $"{randomTile.Y}", $"{random.Next(0, 4)}");
-                        }
-                    }
-                }
+                TenMinuteUpdateIslandNpc(__instance, __instanceLocation);
             }
 
             // for invited visitor
             if ((__instanceLocation.Name == "Farm" || __instanceLocation.Name == "FarmHouse") && __instance.modData["hapyke.FoodStore/invited"] == "true" && __instance.modData["hapyke.FoodStore/inviteDate"] == (Game1.stats.DaysPlayed - 1).ToString()
                 && !__instance.isMoving() && __instance.controller == null && __instance.temporaryController == null && __instance.timerSinceLastMovement >= 3000)
             {
-                var randomTile = FarmOutside.getRandomOpenPointInFarm(__instance, __instanceLocation, false).ToVector2();
+                var randomTile = FarmOutside.getRandomOpenPointInLocation(__instance, __instanceLocation, false).ToVector2();
                 if (randomTile != Vector2.Zero)
                 {
-                    FarmOutside.AddRandomSchedulePoint(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{__instanceLocation.NameOrUniqueName}",
+                    FarmOutside.AddNextMoveSchedulePoint(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{__instanceLocation.NameOrUniqueName}",
                         $"{randomTile.X}", $"{randomTile.Y}", $"{random.Next(0, 4)}");
                 }
             }
@@ -399,29 +211,26 @@ namespace MarketTown
             try
             {
                 // leave the NPC when time up
-                if (__instance.currentLocation.GetParentLocation() != null && __instance.currentLocation.GetParentLocation().IsFarm 
+                if (__instance.currentLocation.GetParentLocation() != null && __instance.currentLocation.GetParentLocation() == Game1.getFarm() 
                     && !bool.Parse(__instance.modData["hapyke.FoodStore/gettingFood"]) && __instance.modData["hapyke.FoodStore/timeVisitShed"] != "0"
                     && (Int32.Parse(__instance.modData["hapyke.FoodStore/timeVisitShed"]) <= (Game1.timeOfDay - Config.TimeStay) || Game1.timeOfDay > Config.CloseHour || Game1.timeOfDay >= 2500))
                 {
-                    bool done = false;
-                    ResetErrorNpc(__instance);
+                    CleanNpc(__instance);
                     __instance.TryLoadSchedule();
+                    __instance.reloadDefaultLocation();
 
                     var schedule = __instance.Schedule;
                     var lastLocation = __instance.DefaultMap;
                     var lastPoint = __instance.DefaultPosition / 64;
                     var lastDirection = __instance.DefaultFacingDirection;
-                    ResetErrorNpc(__instance);
+                    CleanNpc(__instance);
 
                     // Get the tile location where NPC should be at the current time
                     if (schedule != null && schedule.Count > 0)
                     {
                         foreach (var piece in schedule)
                         {
-                            if (piece.Key > Game1.timeOfDay)
-                            {
-                                break;
-                            }
+                            if (piece.Key > Game1.timeOfDay) break;
 
                             SchedulePathDescription description = piece.Value;
                             lastLocation = description.targetLocationName;
@@ -429,81 +238,67 @@ namespace MarketTown
                             lastDirection = description.facingDirection;
                         }
                     }
+                    else Game1.warpCharacter(__instance, lastLocation, lastPoint);
+
+                    if (Int32.Parse(__instance.modData["hapyke.FoodStore/timeVisitShed"]) <= (Game1.timeOfDay - Config.TimeStay * 2) || Game1.timeOfDay - 100 >= Config.CloseHour)                 // Force Remove
+                    {
+                        Game1.warpCharacter(__instance, lastLocation, lastPoint);
+                        __instance.faceDirection(lastDirection);
+                        CleanNpc(__instance);
+                        __instance.TryLoadSchedule();
+                    }
+                    else if (__instance.modData["hapyke.FoodStore/shedEntry"] != null)        // Walk to Remove
+                    {
+                        CleanNpc(__instance);
+                        string[] coordinates = __instance.modData["hapyke.FoodStore/shedEntry"].Split(',');
+
+                        var shedEntryPoint = Point.Zero;
+                        if (coordinates.Length == 2 && int.TryParse(coordinates[0], out int x) && int.TryParse(coordinates[1], out int y))
+                        {
+                            shedEntryPoint = new Point(x, y);
+                        }
+                        __instance.temporaryController = new PathFindController(__instance, __instanceLocation, shedEntryPoint, 0,
+                            (character, location) =>
+                            {
+                                Game1.warpCharacter(__instance, lastLocation, lastPoint);
+
+                                CleanNpc(__instance);
+                                __instance.faceDirection(lastDirection);
+                                __instance.TryLoadSchedule();
+                            } );
+                    }
                     else
                     {
                         Game1.warpCharacter(__instance, lastLocation, lastPoint);
-                        done = true;
+
+                        __instance.faceDirection(lastDirection);
+                        CleanNpc(__instance);
+                        __instance.TryLoadSchedule();
                     }
 
-                    if (lastLocation != Game1.player.currentLocation.Name)
+                    string[] specialOrderCoor = __instance.modData["hapyke.FoodStore/specialOrder"].Split(',');
+                    Vector2 specialOrderTile = new Vector2(int.Parse(specialOrderCoor[0]), int.Parse(specialOrderCoor[1]));
+
+                    if (RestaurantSpot.ContainsKey(__instanceLocation))
                     {
-                        if (Int32.Parse(__instance.modData["hapyke.FoodStore/timeVisitShed"]) <= (Game1.timeOfDay - Config.TimeStay * 2) || Game1.timeOfDay - 100 >= Config.CloseHour)                 // Force Remove
-                        {
-                            Game1.warpCharacter(__instance, lastLocation, lastPoint);
-                            __instance.faceDirection(lastDirection);
-                            ResetErrorNpc(__instance);
-                            __instance.TryLoadSchedule();
-                        }
-                        else if (__instance.modData["hapyke.FoodStore/shedEntry"] != null)        // Walk to Remove
-                        {
-                            ResetErrorNpc(__instance);
-                            string[] coordinates = __instance.modData["hapyke.FoodStore/shedEntry"].Split(',');
-
-                            var shedEntryPoint = Point.Zero;
-                            if (coordinates.Length == 2 && int.TryParse(coordinates[0], out int x) && int.TryParse(coordinates[1], out int y))
-                            {
-                                shedEntryPoint = new Point(x, y);
-                            }
-                            __instance.temporaryController = new PathFindController(__instance, __instanceLocation, shedEntryPoint, 0,
-                                (character, location) =>
-                                {
-                                    Game1.warpCharacter(__instance, lastLocation, lastPoint);
-
-                                    ResetErrorNpc(__instance);
-                                    __instance.faceDirection(lastDirection);
-                                    __instance.TryLoadSchedule();
-                                } );
-                        }
-                        else
-                        {
-                            Game1.warpCharacter(__instance, lastLocation, lastPoint);
-
-                            __instance.faceDirection(lastDirection);
-                            ResetErrorNpc(__instance);
-                            __instance.TryLoadSchedule();
-                        }
-
-                        done = true;
+                        var tileList = RestaurantSpot[__instanceLocation];
+                        if (tileList.Contains(specialOrderTile)) tileList.Remove(specialOrderTile);
                     }
-                    else ResetErrorNpc(__instance);
 
-                    // remove special order tile when NPC left
-                    if (done)
-                    {
-                        string[] specialOrderCoor = __instance.modData["hapyke.FoodStore/specialOrder"].Split(',');
-                        Vector2 specialOrderTile = new Vector2(int.Parse(specialOrderCoor[0]), int.Parse(specialOrderCoor[1]));
-
-                        if (RestaurantSpot.ContainsKey(__instanceLocation))
-                        {
-                            var tileList = RestaurantSpot[__instanceLocation];
-                            if (tileList.Contains(specialOrderTile)) tileList.Remove(specialOrderTile);
-                        }
-
-                        __instance.modData["hapyke.FoodStore/specialOrder"] = "-1,-1";
-                        __instance.modData.Remove(orderKey); 
-                    }
+                    __instance.modData["hapyke.FoodStore/specialOrder"] = "-1,-1";
+                    __instance.modData.Remove(orderKey);
                 }
                 // else random move around
-                else if (__instanceLocation.GetParentLocation() != null && __instanceLocation.GetParentLocation().IsFarm 
+                else if (__instanceLocation.GetParentLocation() != null && __instanceLocation.GetParentLocation() == Game1.getFarm()
                     && __instance.modData["hapyke.FoodStore/specialOrder"] == "-1,-1" && __instance.modData["hapyke.FoodStore/invited"] == "false"
                     && !__instance.isMoving() && __instance.controller == null && __instance.temporaryController == null && __instance.timerSinceLastMovement >= 3000
                     && (Game1.player.friendshipData.ContainsKey(__instance.Name) && !Game1.player.friendshipData[__instance.Name].IsMarried() && !Game1.player.friendshipData[__instance.Name].IsRoommate() || !Game1.player.friendshipData.ContainsKey(__instance.Name)))
                 {
-                    var randomTile = FarmOutside.getRandomOpenPointInFarm(__instance, __instanceLocation, false, true).ToVector2();
+                    var randomTile = FarmOutside.getRandomOpenPointInLocation(__instance, __instanceLocation, false, true).ToVector2();
                     if (randomTile != Vector2.Zero)
                     {
                         //SMonitor.Log("Trying to add schedule. SpaceCore might show warning message but it should not cause issues", LogLevel.Debug);
-                        FarmOutside.AddRandomSchedulePoint(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{__instanceLocation.NameOrUniqueName}",
+                        FarmOutside.AddNextMoveSchedulePoint(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{__instanceLocation.NameOrUniqueName}",
                             $"{randomTile.X}", $"{randomTile.Y}", $"{random.Next(0, 4)}");
                     }
                 }
@@ -533,7 +328,7 @@ namespace MarketTown
                         var name = "Farm";
 
                         Game1.warpCharacter(__instance, name, door);
-                        ResetErrorNpc(__instance);
+                        CleanNpc(__instance);
 
                         __instance.faceDirection(2);
 
@@ -549,9 +344,9 @@ namespace MarketTown
                         Game1.globalFadeToBlack();
 
                         __instance.modData["hapyke.FoodStore/invited"] = "false";
-                        ResetErrorNpc(__instance);
+                        CleanNpc(__instance);
                         Game1.warpCharacter(__instance, __instance.DefaultMap, __instance.DefaultPosition / 64);
-                        ResetErrorNpc(__instance);
+                        CleanNpc(__instance);
                     }
                 }
             }
@@ -744,19 +539,6 @@ namespace MarketTown
             if (Game1.eventUp || __instance is null || __instanceLocation is null || !__instance.IsVillager || !WantsToEat(__instance))
                 return;
 
-            // ****************************************************************************************************************************
-            if ((__instance.Tile.X > 250 || __instance.Tile.Y > 200 || __instance.Tile.X < -10 || __instance.Tile.Y < -10) && !__instanceLocation.NameOrUniqueName.Contains("WarpRoom") && Game1.timeOfDay % 100 == 0 )
-            {
-                SMonitor.Log($"Found NPC {__instance.Name} out of map border at {__instanceLocation.NameOrUniqueName} {__instance.Tile} {Game1.timeOfDay}.", LogLevel.Warn);
-                var asd = "";
-                foreach (var i in __instance.Schedule)
-                { 
-                    asd += i.Value.time.ToString() + " " + i.Value.targetLocationName + " " + i.Value.targetTile.ToString() + " /// ";
-                }
-                SMonitor.Log(asd, LogLevel.Warn);
-                SMonitor.Log($"Optionally fix this by type command: 'markettown fix {__instance.Name}'", LogLevel.Warn);
-                SMonitor.Log("", LogLevel.Warn);
-            }
 
             DataPlacedFood food = GetClosestFood(__instance, __instanceLocation);
             TryToEatFood(__instance, food);
@@ -1005,7 +787,7 @@ namespace MarketTown
 
                 if (!TodayCustomerNoteName.Contains(__instance.Name) && (lastTasteRate == 0.3 && lastDecorRate > 0 || lastTasteRate > 0.3 && lastDecorRate >= 0))          // Normal food, good decor or like food, normal decor
                 {
-                    NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.customernote.yes." + random.Next(7).ToString()));
+                    NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.customernote.yes." + random.Next(7).ToString()), true);
 
                     TodayCustomerNoteName.Add(__instance.Name);
                     TodayCustomerNoteYes++;
@@ -1014,7 +796,7 @@ namespace MarketTown
                 }
                 else if (!TodayCustomerNoteName.Contains(__instance.Name) && (lastTasteRate <= 0.25 || lastTasteRate == 0.3 && lastDecorRate < 0))     // Dishlike food, or neutral food and bad decor
                 {
-                    NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.customernote.no." + random.Next(7).ToString()));
+                    NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.customernote.no." + random.Next(7).ToString()),true);
                     TodayCustomerNoteName.Add(__instance.Name);
                     TodayCustomerNoteNo++;
                     TodayCustomerNote++;
@@ -1022,7 +804,7 @@ namespace MarketTown
                 }
                 else if (!TodayCustomerNoteName.Contains(__instance.Name))          // Other case
                 {
-                    NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.neutral." + random.Next(8)));
+                    NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.neutral." + random.Next(8)),true);
                     TodayCustomerNoteName.Add(__instance.Name);
                     TodayCustomerNoteNone++;
                     TodayCustomerNote++;
@@ -1120,7 +902,7 @@ namespace MarketTown
             public static void Postfix(Chest __instance, SpriteBatch spriteBatch, int x, int y)
             {
                 if (TodayShopInventory.Count == 0) return;
-                if (__instance.Location.Name != "Custom_MT_Island" || __instance.TileLocation != new Vector2(63, 22)) return;
+                if (__instance.Location.Name != "Custom_MT_Island" || __instance.TileLocation != new Vector2(73, 32)) return;
                 foreach (var shop in TodayShopInventory)
                 {
                     var tileLocation = shop.Tile;
@@ -1224,6 +1006,10 @@ namespace MarketTown
             {
                 __result = "Customers would love to sit at the table that has this lovely decoration!";
             }
+            if (__instance != null && __instance.QualifiedItemId == "(F)MT.Objects.MarketLog")
+            {
+                __result = "A log book for you to track your selling";
+            }
         }
 
         public static void GetSellPrice_Postfix(ref int __result, FarmAnimal __instance)
@@ -1269,8 +1055,7 @@ namespace MarketTown
 
         public static void NewDayAfterFade_Postfix()
         {
-            if (Config.UltimateChallenge
-                || SHelper.Data.ReadSaveData<MailData>("MT.MailLog") != null && SHelper.Data.ReadSaveData<MailData>("MT.MailLog").LockedChallenge)
+            if (Config.UltimateChallenge)
                 IsCalculatingSellPrice = true;
         }
 
