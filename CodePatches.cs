@@ -71,7 +71,7 @@ namespace MarketTown
 
         private static void NPC_performTenMinuteUpdate_Postfix(NPC __instance)
         {
-            if (!Game1.hasLoadedGame || __instance == null || !__instance.IsVillager || __instance.currentLocation == null || __instance.getMasterScheduleRawData() == null )
+            if (!Game1.hasLoadedGame || __instance == null || !__instance.IsVillager || !GlobalNPCList.Contains(__instance.Name) || __instance.currentLocation == null || __instance.getMasterScheduleRawData() == null )
                 return;
             Random random = new Random();
 
@@ -85,8 +85,8 @@ namespace MarketTown
                 || __instanceLocation.GetParentLocation() != null && __instanceLocation.GetParentLocation().Name == "Custom_MT_Island" ) )
             {
                 if (__instance.Age == 0) __instance.addedSpeed = random.Next(0, 2);
-                else if (__instance.Age == 1) __instance.addedSpeed = random.Next(1, 3);
-                else if (__instance.Age == 2) __instance.addedSpeed = random.Next(1, 4);
+                else if (__instance.Age == 1) __instance.addedSpeed = random.Next(0, 3);
+                else if (__instance.Age == 2) __instance.addedSpeed = random.Next(1, 3);
             }
 
             // This will generate a random schedule for island visitor in the next Game time change 
@@ -101,8 +101,8 @@ namespace MarketTown
             }
 
             // for invited visitor
-            if ((__instanceLocation.Name == "Farm" || __instanceLocation.Name == "FarmHouse") && __instance.modData["hapyke.FoodStore/invited"] == "true" && __instance.modData["hapyke.FoodStore/inviteDate"] == (Game1.stats.DaysPlayed - 1).ToString()
-                && !__instance.isMoving() && __instance.controller == null && __instance.temporaryController == null && __instance.timerSinceLastMovement >= 3000)
+            if ((__instanceLocation.Name == "Farm" || __instanceLocation.Name == "FarmHouse") && __instance.modData["hapyke.FoodStore/invited"] == "true" && __instance.modData["hapyke.FoodStore/inviteDate"] == (Game1.stats.DaysPlayed - 1).ToString() 
+                && !__instance.isMoving() && __instance.controller == null && __instance.temporaryController == null && __instance.timerSinceLastMovement >= 3000 && Game1.timeOfDay % 20 == 0)
             {
                 var randomTile = FarmOutside.getRandomOpenPointInLocation(__instance, __instanceLocation, false).ToVector2();
                 if (randomTile != Vector2.Zero)
@@ -297,7 +297,6 @@ namespace MarketTown
                     var randomTile = FarmOutside.getRandomOpenPointInLocation(__instance, __instanceLocation, false, true).ToVector2();
                     if (randomTile != Vector2.Zero)
                     {
-                        //SMonitor.Log("Trying to add schedule. SpaceCore might show warning message but it should not cause issues", LogLevel.Debug);
                         FarmOutside.AddNextMoveSchedulePoint(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{__instanceLocation.NameOrUniqueName}",
                             $"{randomTile.X}", $"{randomTile.Y}", $"{random.Next(0, 4)}");
                     }
@@ -311,10 +310,13 @@ namespace MarketTown
                 {
                     Random rand = new Random();
                     int index = rand.Next(7);
-                    if (__instance.modData["hapyke.FoodStore/invited"] == "true" && Game1.timeOfDay == Config.InviteComeTime && __instanceLocation.Name != "Farm" && __instanceLocation.Name != "FarmHouse")
+                    if (__instance.modData["hapyke.FoodStore/invited"] == "true" && Game1.timeOfDay == Config.InviteComeTime && __instanceLocation.Name != "Farm" && __instanceLocation.Name != "FarmHouse" && !IslandNPCList.Contains(__instance.Name))
                     {
-                        Game1.DrawDialogue(new Dialogue(__instance, "key", SHelper.Translation.Get("foodstore.visitcome." + index)));
-                        Game1.globalFadeToBlack();
+                        if (Game1.player.currentLocation == Game1.getFarm() || Game1.player.currentLocation == Game1.getLocationFromName("FarmHouse"))
+                        {
+                            Game1.DrawDialogue(new Dialogue(__instance, "key", SHelper.Translation.Get("foodstore.visitcome." + index)));
+                            Game1.globalFadeToBlack();
+                        }
 
                         UpdateFurnitureTilePathProperties(Game1.getFarm());
                         UpdateFurnitureTilePathProperties(Game1.getLocationFromName("FarmHouse"));
@@ -333,16 +335,17 @@ namespace MarketTown
                         __instance.faceDirection(2);
 
                         door.X--;
-                        __instance.controller = new PathFindController(__instance, Game1.getFarm(), door, 2);
-
+                        TodayFriendVisited++;
                     }
 
                     if (__instance.modData["hapyke.FoodStore/invited"] == "true" && (__instanceLocation.Name == "Farm" || __instanceLocation.Name == "FarmHouse")
                         && (Game1.timeOfDay == Config.InviteLeaveTime || Game1.timeOfDay == Config.InviteLeaveTime + 30 || Game1.timeOfDay == Config.InviteLeaveTime + 100 || Game1.timeOfDay == Config.InviteLeaveTime + 130))
                     {
-                        Game1.DrawDialogue(new Dialogue(__instance, "key", SHelper.Translation.Get("foodstore.visitleave." + index)));
-                        Game1.globalFadeToBlack();
-
+                        if (Game1.player.currentLocation == Game1.getFarm() || Game1.player.currentLocation == Game1.getLocationFromName("FarmHouse"))
+                        {
+                            Game1.DrawDialogue(new Dialogue(__instance, "key", SHelper.Translation.Get("foodstore.visitleave." + index)));
+                            Game1.globalFadeToBlack();
+                        }
                         __instance.modData["hapyke.FoodStore/invited"] = "false";
                         CleanNpc(__instance);
                         Game1.warpCharacter(__instance, __instance.DefaultMap, __instance.DefaultPosition / 64);
@@ -411,6 +414,8 @@ namespace MarketTown
                         lastDecorRate = 0.2;
                         break;
                 }
+
+                if (!Config.EnableDecor) lastDecorRate = 0.2;
 
                 string storeTypeName = "";
                 switch (storeType)
@@ -498,45 +503,55 @@ namespace MarketTown
 
                 if (lastTaste == 0) //love
                 {
-                    if (storeTypeName != "") NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.loveWithType." + randomIndex, new { player = Game1.MasterPlayer.displayName, shopTypeName  = storeTypeName}));
-                    else NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.love." + randomIndex));
-                    
-                    if (shareIdea < 10.3 + (lastDecor / 2)) SaySomething(__instance, __instanceLocation, lastTasteRate, lastDecorRate);
+                    if (shareIdea < 0.3 + (lastDecor / 2)) SaySomething(__instance, __instanceLocation, lastTasteRate, lastDecorRate);
+                    else
+                    {
+                        if (storeTypeName != "") NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.loveWithType." + randomIndex, new { player = Game1.MasterPlayer.displayName, shopTypeName = storeTypeName }));
+                        else NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.love." + randomIndex));
+                    }
                 }
                 else if (lastTaste == 2) //like
-                {   
-                    if (storeTypeName != "") NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.likeWithType." + randomIndex, new { player = Game1.MasterPlayer.displayName, shopTypeName = storeTypeName }));
-                    else NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.like." + randomIndex));
-                    
+                {
                     if (shareIdea < 0.15 + (lastDecor / 2)) SaySomething(__instance, __instanceLocation, lastTasteRate, lastDecorRate);
+                    else
+                    {
+                        if (storeTypeName != "") NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.likeWithType." + randomIndex, new { player = Game1.MasterPlayer.displayName, shopTypeName = storeTypeName }));
+                        else NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.like." + randomIndex));
+                    }
                 }
                 else if (lastTaste == 4) //dislike
                 {
-                    if (storeTypeName != "") NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.dislikeWithType." + randomIndex, new { player = Game1.MasterPlayer.displayName, shopTypeName = storeTypeName }));
-                    else NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.dislike." + randomIndex));
-                    
                     if (shareIdea < Math.Abs(-0.15 + (lastDecor / 2.5))) SaySomething(__instance, __instanceLocation, lastTasteRate, lastDecorRate);
+                    else
+                    {
+                        if (storeTypeName != "") NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.dislikeWithType." + randomIndex, new { player = Game1.MasterPlayer.displayName, shopTypeName = storeTypeName }));
+                        else NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.dislike." + randomIndex));
+                    }
                 }
                 else if (lastTaste == 6) //hate
                 {
-                    if (storeTypeName != "") NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.hateWithType." + randomIndex, new { player = Game1.MasterPlayer.displayName, shopTypeName = storeTypeName }));
-                    else NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.hate." + randomIndex));
-                    
                     if (shareIdea < Math.Abs(-0.3 + (lastDecor / 2.5))) SaySomething(__instance, __instanceLocation, lastTasteRate, lastDecorRate);
+                    else
+                    {
+                        if (storeTypeName != "") NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.hateWithType." + randomIndex, new { player = Game1.MasterPlayer.displayName, shopTypeName = storeTypeName }));
+                        else NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.hate." + randomIndex));
+                    }
                 }
                 else if (lastTaste == 8) //neutral
                 {
-                    if (storeTypeName != "") NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.neutralWithType." + randomIndex, new { player = Game1.MasterPlayer.displayName, shopTypeName = storeTypeName }));
-                    else NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.neutral." + randomIndex));
-                    
                     if (shareIdea < Math.Abs(lastDecor / 2.5)) SaySomething(__instance, __instanceLocation, lastTasteRate, lastDecorRate);
+                    else
+                    {
+                        if (storeTypeName != "") NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.neutralWithType." + randomIndex, new { player = Game1.MasterPlayer.displayName, shopTypeName = storeTypeName }));
+                        else NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.neutral." + randomIndex));
+                    }
                 }
                 else { }
             }
 
 
             //Fix position, do eating food
-            if (Game1.eventUp || __instance is null || __instanceLocation is null || !__instance.IsVillager || !WantsToEat(__instance))
+            if (Game1.eventUp || __instance is null || __instanceLocation is null || !__instance.IsVillager || !GlobalNPCList.Contains(__instance.Name) || !WantsToEat(__instance))
                 return;
 
 
@@ -678,7 +693,7 @@ namespace MarketTown
                     if (Config.PriceMarkup > 0)
                     {
                         int price = (int)Math.Round(who.ActiveObject.Price * Config.PriceMarkup);
-                        AddToPlayerFunds(price);
+                        AddToPlayerFunds((int)(price * Config.MoneyModifier * (Config.UltimateChallenge ? 4 : 1)));
                     }
 
                     who.reduceActiveItemByOne();
@@ -785,6 +800,8 @@ namespace MarketTown
                         break;
                 }
 
+                if (!Config.EnableDecor) lastDecorRate = 0.2;
+
                 if (!TodayCustomerNoteName.Contains(__instance.Name) && (lastTasteRate == 0.3 && lastDecorRate > 0 || lastTasteRate > 0.3 && lastDecorRate >= 0))          // Normal food, good decor or like food, normal decor
                 {
                     NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.customernote.yes." + random.Next(7).ToString()), true);
@@ -835,7 +852,7 @@ namespace MarketTown
             {
                 if (__instance != null && __instance.Location != null && __instance.Location.Name.Contains("Custom_MT_Island") && Config.IslandPlantBoost)
                 {
-                    if (!__instance.stump.Value && __instance.daysUntilMature.Value <= 0 && __instance.fruit.Count < 8
+                    if (!__instance.stump.Value && __instance.daysUntilMature.Value <= 0 && __instance.fruit.Count < 9
                         && (__instance.IsInSeasonHere() || __instance.Location.GetSeason().ToString() == "Spring"
                         || (__instance.struckByLightningCountdown.Value > 0 && !__instance.IsWinterTreeHere())))
                     {
@@ -873,6 +890,37 @@ namespace MarketTown
             {
                 MethodInfo method = typeof(FruitTree).GetMethod("TryCreateFruit", BindingFlags.NonPublic | BindingFlags.Instance);
                 return (Item)method.Invoke(tree, new object[] { drop });
+            }
+        }
+
+        [HarmonyPatch(typeof(FruitTree), nameof(FruitTree.draw))]
+        public class FruitTree_Draw_Patch
+        {
+            static void Postfix(FruitTree __instance, SpriteBatch spriteBatch)
+            {
+                var tileLocation = __instance.Tile;
+                List<Vector2> tileOffset = new List<Vector2> {new(0,0), new(0,0), new(0,0), new(-55, -135), new(-20, -245), new(10, -230), new(75, -155), new(0, -195), new(50, -195), new(-30, -180), new(50, -180), new(50, -180), new(50, -180), new(50, -180), new(50, -180) };
+                if (__instance != null && __instance.fruit.Count > 3)
+                {
+                    for (int i = 3; i < __instance.fruit.Count; i++)
+                    {
+                        SpriteEffects flip = SpriteEffects.None;
+                        if(i % 2 == 0) flip = SpriteEffects.FlipHorizontally;
+
+                        Vector2 fruitPosition = tileLocation * 64f + tileOffset[i];
+                        spriteBatch.Draw(
+                            Game1.objectSpriteSheet,
+                            Game1.GlobalToLocal(Game1.viewport, fruitPosition),
+                            Game1.getSourceRectForStandardTileSheet(Game1.objectSpriteSheet, __instance.fruit[i].ParentSheetIndex, 16, 16),
+                            Color.White,
+                            0f,
+                            Vector2.Zero,
+                            4f,
+                            flip,
+                            (float)((tileLocation.Y + 1.0) * 64.0 / 10000.0 + 0.001)
+                        );
+                    }
+                }
             }
         }
 

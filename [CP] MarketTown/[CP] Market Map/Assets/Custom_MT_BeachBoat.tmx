@@ -1,28 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="7" height="5" tilewidth="16" tileheight="16" infinite="0" nextlayerid="19" nextobjectid="60">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="7" height="5" tilewidth="16" tileheight="16" infinite="0" nextlayerid="20" nextobjectid="65">
  <properties>
-  <property name="AllowGiantCrops" value="T"/>
-  <property name="CanBuildHere" value="T"/>
-  <property name="EnableGrassSpread" value="T"/>
-  <property name="Fall_Objects" value="T"/>
-  <property name="FarmFishLocationOverride" value="Mountain 0.5"/>
-  <property name="ForceAllowTreePlanting" value="T"/>
-  <property name="IsFarm" value="T"/>
-  <property name="LocationContext" value="Default"/>
-  <property name="LooserBuildRestrictions" value="T"/>
   <property name="Outdoors" value="T"/>
-  <property name="Spring_Objects" value="T"/>
-  <property name="Summer_Objects" value="T"/>
-  <property name="Winter_Objects" value="T"/>
  </properties>
  <tileset firstgid="1" source="z_ModTile.tsx"/>
- <layer id="1" name="Back" width="7" height="5">
+ <tileset firstgid="817" name="spring_beach" tilewidth="16" tileheight="16" tilecount="527" columns="17">
+  <image source="spring_beach.png" width="272" height="496"/>
+  <tile id="107">
+   <properties>
+    <property name="Water" value="T"/>
+   </properties>
+  </tile>
+ </tileset>
+ <layer id="19" name="Back" width="7" height="5">
   <data encoding="csv">
 0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,
-0,0,0,0,0,0,0
+0,0,0,924,0,0,0
 </data>
  </layer>
  <layer id="2" name="Buildings" width="7" height="5">
@@ -61,14 +57,14 @@
 0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup id="6" name="Back"/>
- <objectgroup id="7" name="Buildings">
-  <object id="59" name="TileData" x="0" y="48" width="48" height="32">
+ <objectgroup id="6" name="Back">
+  <object id="64" name="TileData" x="48" y="64" width="16" height="16">
    <properties>
-    <property name="Action" value="Warp 25 60 Custom_MT_Island"/>
+    <property name="TouchAction" value="Warp Custom_MT_Island  25 60"/>
    </properties>
   </object>
  </objectgroup>
+ <objectgroup id="7" name="Buildings"/>
  <objectgroup id="8" name="Front"/>
  <objectgroup id="9" name="AlwaysFront"/>
  <objectgroup id="10" name="Paths"/>

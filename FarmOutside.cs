@@ -17,6 +17,7 @@ using xTile;
 using System.Xml.Linq;
 using System.Threading;
 using System.Timers;
+using StardewValley.Minigames;
 
 namespace MarketTown
 {
@@ -76,15 +77,19 @@ namespace MarketTown
                 }
             }
 
-            if (e.OldLocation.Name == "Custom_MT_Island")
+            if (e.NewLocation.Name == "Custom_MT_Island")
             {
-                List<NPC> npcsToWarp = new List<NPC>();
-                npcsToWarp = Game1.getLocationFromName("Custom_MT_Island").characters.Where(who => who.temporaryController != null).ToList();
+                if (e.OldLocation.Name == "Beach" || e.OldLocation.Name == "EastScarp_Village") Game1.currentMinigame = new ParadiseBoat();
+                else if (e.OldLocation.Name == "Custom_Ridgeside_RSVCliff") Game1.currentMinigame = new ParadiseBalloon();
 
-                foreach (NPC npc in npcsToWarp)
+                foreach (var i in ModEntry.IslandNPCList)
                 {
-                    npc.temporaryController?.endBehaviorFunction(npc, npc.currentLocation);
-                    npc.temporaryController = null;
+                    var islandVisitor = Game1.getCharacterFromName(i);
+                    if (islandVisitor != null)
+                    {
+                        islandVisitor.TryLoadSprites("Characters/" + islandVisitor.getTextureName() + "_Beach", out var error);
+                        islandVisitor.TryLoadPortraits("Portraits/" + islandVisitor.getTextureName() + "_Beach", out var error1);
+                    }
                 }
             }
 
@@ -122,7 +127,9 @@ namespace MarketTown
                 name = home.Name;
             }
 
-            foreach (NPC visit in Utility.getAllVillagers())
+            List<NPC> oldLocationNpc = e.OldLocation.characters.ToList();
+
+            foreach (NPC visit in oldLocationNpc)
             {
                 try
                 {
@@ -140,7 +147,6 @@ namespace MarketTown
                         ModEntry.CleanNpc(visit);
 
                         door.X--;
-                        visit.controller = new PathFindController(visit, Game1.getFarm(), door, 2);
                     }
                 }
                 catch { }
@@ -376,7 +382,7 @@ namespace MarketTown
                 {
                     tried++;
                     Vector2 tile = new Vector2(r.Next(1, possibleWidth), r.Next(7, possibleHeight));
-                    if (location.CanItemBePlacedHere(tile))
+                    if (location.CanItemBePlacedHere(tile) && !location.warps.Any(i => i.X == tile.X && i.Y == tile.Y))
                     {
                         ModEntry.RandomOpenSpot[location].Add(tile);
                         count++;

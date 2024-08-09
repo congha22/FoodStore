@@ -65,7 +65,7 @@ namespace MarketTown
 
             api.RegisterToken(ModManifest, "IslandFestivalDay", () =>
             {
-                if (Context.IsWorldReady && Game1.IsMasterGame)
+                if (Context.IsWorldReady)
                 {
                     int dayOfWeek = Game1.dayOfMonth % 7;
                     bool festivalDay = false;
@@ -105,9 +105,14 @@ namespace MarketTown
 
             api.RegisterToken(ModManifest, "IslandProgressLevel", () =>
             {
-                if (Context.IsWorldReady && Game1.IsMasterGame && Helper.Data.ReadSaveData<MailData>("MT.MailLog") != null)
+                if (Context.IsWorldReady)
                 {
-                    MailData model = Helper.Data.ReadSaveData<MailData>("MT.MailLog");
+                    var model = new MailData();
+                    if (Game1.IsMasterGame) model = Helper.Data.ReadSaveData<MailData>("MT.MailLog");
+                    else model = SHelper.Data.ReadJsonFile<MailData>("markettowndata.json") ?? new MailData();
+                    
+                    if (model == null) return null;
+
                     int level = model.FestivalEarning;
                     string islandProgressLevel = "0";
 
@@ -227,21 +232,6 @@ namespace MarketTown
                 text: () => SHelper.Translation.Get("foodstore.config.modadvance")
             );
 
-            configMenu.AddBoolOption(
-            mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.ultimatechallenge"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.ultimatechallengeText"),
-                getValue: () => Config.UltimateChallenge,
-                setValue: value => Config.UltimateChallenge = value
-            );
-
-            configMenu.AddBoolOption(
-            mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.disablenonfoodonfarm"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.disablenonfoodonfarmText"),
-                getValue: () => Config.AllowRemoveNonFood,
-                setValue: value => Config.AllowRemoveNonFood = value
-            );
 
             configMenu.AddBoolOption(
                 mod: ModManifest,
@@ -273,6 +263,21 @@ namespace MarketTown
                 tooltip: () => SHelper.Translation.Get("foodstore.config.globalpathupdateText"),
                 getValue: () => Config.GlobalPathUpdate,
                 setValue: value => Config.GlobalPathUpdate = value
+            );
+            configMenu.AddBoolOption(
+            mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.disablenonfoodonfarm"),
+                tooltip: () => SHelper.Translation.Get("foodstore.config.disablenonfoodonfarmText"),
+                getValue: () => Config.AllowRemoveNonFood,
+                setValue: value => Config.AllowRemoveNonFood = value
+            );
+
+            configMenu.AddBoolOption(
+            mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.ultimatechallenge"),
+                tooltip: () => SHelper.Translation.Get("foodstore.config.ultimatechallengeText"),
+                getValue: () => Config.UltimateChallenge,
+                setValue: value => Config.UltimateChallenge = value
             );
             configMenu.AddPageLink(mod: ModManifest, "island", () => SHelper.Translation.Get("foodstore.config.island"));
             configMenu.AddPageLink(mod: ModManifest, "shed", () => SHelper.Translation.Get("foodstore.config.shed"));
@@ -433,6 +438,13 @@ namespace MarketTown
                 name: () => SHelper.Translation.Get("foodstore.config.festivalsun"),
                 getValue: () => Config.FestivalSun,
                 setValue: value => Config.FestivalSun = value
+            );
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.grangeprogress"),
+                tooltip: () => SHelper.Translation.Get("foodstore.config.grangeprogressText"),
+                getValue: () => Config.GrangeSellProgress,
+                setValue: value => Config.GrangeSellProgress = value
             );
 
             // Shed setting
@@ -655,92 +667,34 @@ namespace MarketTown
             //sell multiplier
 
             configMenu.AddPage(mod: ModManifest, "salePrice", () => SHelper.Translation.Get("foodstore.config.saleprice"));
-            configMenu.AddBoolOption(
+            //configMenu.AddBoolOption(
+            //    mod: ModManifest,
+            //    name: () => SHelper.Translation.Get("foodstore.config.multiplayermode"),
+            //    tooltip: () => SHelper.Translation.Get("foodstore.config.multiplayermodeText"),
+            //    getValue: () => Config.MultiplayerMode,
+            //    setValue: value => Config.MultiplayerMode = value
+            //);
+            configMenu.AddNumberOption(
                 mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.multiplayermode"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.multiplayermodeText"),
-                getValue: () => Config.MultiplayerMode,
-                setValue: value => Config.MultiplayerMode = value
+                name: () => SHelper.Translation.Get("foodstore.config.islandmoneymodifier"),
+                tooltip: () => SHelper.Translation.Get("foodstore.config.islandmoneymodifierText"),
+                getValue: () => Config.IslandMoneyModifier,
+                setValue: value => Config.IslandMoneyModifier = (float)value,
+                min: 0f,
+                max: 5f,
+                interval: 0.01f
             );
-
-            configMenu.AddBoolOption(
+            configMenu.AddNumberOption(
                 mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.enableprice"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.enablepriceText"),
-                getValue: () => Config.EnablePrice,
-                setValue: value => Config.EnablePrice = value
+                name: () => SHelper.Translation.Get("foodstore.config.moneymodifier"),
+                tooltip: () => SHelper.Translation.Get("foodstore.config.moneymodifierText"),
+                getValue: () => Config.MoneyModifier,
+                setValue: value => Config.MoneyModifier = (float)value,
+                min: 0f,
+                max: 5f,
+                interval: 0.01f
             );
-
-            configMenu.AddTextOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.pricelovemulti"),
-                getValue: () => "" + Config.LoveMultiplier,
-                setValue: delegate (string value) { try { Config.LoveMultiplier = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
-            );
-            configMenu.AddTextOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.pricelikemulti"),
-                getValue: () => "" + Config.LikeMultiplier,
-                setValue: delegate (string value) { try { Config.LikeMultiplier = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
-            );
-            configMenu.AddTextOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.priceneutralmulti"),
-                getValue: () => "" + Config.NeutralMultiplier,
-                setValue: delegate (string value) { try { Config.NeutralMultiplier = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
-            );
-            configMenu.AddTextOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.pricedislikemulti"),
-                getValue: () => "" + Config.DislikeMultiplier,
-                setValue: delegate (string value) { try { Config.DislikeMultiplier = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
-            );
-            configMenu.AddTextOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.pricehatemulti"),
-                getValue: () => "" + Config.HateMultiplier,
-                setValue: delegate (string value) { try { Config.HateMultiplier = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
-            );
-
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.enabletip"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.enabletipText"),
-                getValue: () => Config.EnableTip,
-                setValue: value => Config.EnableTip = value
-            );
-
-            configMenu.AddTextOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.enabletipcloselove"),
-                getValue: () => "" + Config.TipLove,
-                setValue: delegate (string value) { try { Config.TipLove = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
-            );
-            configMenu.AddTextOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.enabletipcloselike"),
-                getValue: () => "" + Config.TipLike,
-                setValue: delegate (string value) { try { Config.TipLike = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
-            );
-            configMenu.AddTextOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.enabletipcloseneutral"),
-                getValue: () => "" + Config.TipNeutral,
-                setValue: delegate (string value) { try { Config.TipNeutral = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
-            );
-            configMenu.AddTextOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.enabletipclosedislike"),
-                getValue: () => "" + Config.TipDislike,
-                setValue: delegate (string value) { try { Config.TipDislike = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
-            );
-            configMenu.AddTextOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.enabletipclosehate"),
-                getValue: () => "" + Config.TipHate,
-                setValue: delegate (string value) { try { Config.TipHate = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
-            );
-
+            
             // Advance page
             configMenu.AddPage(mod: ModManifest, "advance", () => SHelper.Translation.Get("foodstore.config.advance"));
 
@@ -759,36 +713,27 @@ namespace MarketTown
                 getValue: () => "" + Config.SignRange,
                 setValue: delegate (string value) { try { Config.SignRange = int.Parse(value, CultureInfo.InvariantCulture); } catch { } }
             );
-            //configMenu.AddNumberOption(
-            //    mod: ModManifest,
-            //    name: () => SHelper.Translation.Get("foodstore.config.pathcheck"),
-            //    tooltip: () => SHelper.Translation.Get("foodstore.config.pathcheckText"),
-            //    getValue: () => Config.NPCCheckTimer,
-            //    setValue: value => Config.NPCCheckTimer = (int)value,
-            //    min: 0,
-            //    max: 7,
-            //    interval: 1
-            //);
-            //configMenu.AddBoolOption(
-            //    mod: ModManifest,
-            //    name: () => SHelper.Translation.Get("foodstore.config.advancenpcfix"),
-            //    tooltip: () => SHelper.Translation.Get("foodstore.config.advancenpcfixText"),
-            //    getValue: () => Config.AdvanceNpcFix,
-            //    setValue: value => Config.AdvanceNpcFix = value
-            //);
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => SHelper.Translation.Get("foodstore.config.advanceoutputitemid"),
-                tooltip: () => SHelper.Translation.Get("foodstore.config.advanceoutputitemidText"),
-                getValue: () => Config.AdvanceOutputItemId,
-                setValue: value => Config.AdvanceOutputItemId = value
-            );
 
             configMenu.AddBoolOption(
                 mod: ModManifest,
                 name: () => "Auto fix stuck/error NPC",
                 getValue: () => Config.AdvanceAutoFixNpc,
                 setValue: value => Config.AdvanceAutoFixNpc = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => "DEBUG",
+                getValue: () => Config.AdvanceDebug,
+                setValue: value => Config.AdvanceDebug = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => SHelper.Translation.Get("foodstore.config.advanceoutputitemid"),
+                tooltip: () => SHelper.Translation.Get("foodstore.config.advanceoutputitemidText"),
+                getValue: () => Config.AdvanceOutputItemId,
+                setValue: value => Config.AdvanceOutputItemId = value
             );
 
             configMenu.AddTextOption(

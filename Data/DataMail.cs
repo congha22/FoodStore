@@ -35,22 +35,10 @@ class MailData
 
     public int TodayMuseumVisitor { get; set; } = 0;
     public int TodayMuseumEarning { get; set; } = 0;
-    //public int ForageSold { get; set; } = 0;
-    //public int FlowerSold { get; set; } = 0;
-    //public int FruitSold { get; set; } = 0;
-    //public int VegetableSold { get; set; } = 0;
-    //public int SeedSold { get; set; } = 0;
-    //public int MonsterLootSold { get; set; } = 0;
-    //public int SyrupSold { get; set; } = 0;
-    //public int ArtisanGoodSold { get; set; } = 0;
-    //public int AnimalProductSold { get; set; } = 0;
-    //public int ResourceMetalSold { get; set; } = 0;
-    //public int MineralSold { get; set; } = 0;
-    //public int CraftingSold { get; set; } = 0;
-    //public int CookingSold { get; set; } = 0;
-    //public int FishSold { get; set; } = 0;
-    //public int GemSold { get; set; } = 0;
-    //public int ClothesSole { get; set; } = 0;
+
+    public int TotalFriendVisited { get; set; } = 0;
+
+    public int TotalFestivalIncome { get; set; } = 0;
 
 
     public int TotalForageSold { get; set; } = 0;
@@ -69,6 +57,9 @@ class MailData
     public int TotalFishSold { get; set; } = 0;
     public int TotalGemSold { get; set; } = 0;
     public int TotalClothesSold { get; set; } = 0;
+
+    public float TotalPointTaste {  get; set; } = 0f;
+    public float TotalPointDecor {  get; set; } = 0f;
 }
 
 internal class MailLoader

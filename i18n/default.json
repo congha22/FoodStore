@@ -772,8 +772,8 @@
   "foodstore.mailtotal":                              "Total Market earning: {{totalEarning}}G^  Yesterday earning: {{sellMoney}}G^  Yesterday customer interaction:{{todayCustomerInteraction}}^",
 
   "foodstore.letter.mtwelcome":                       "  Welcome to Market Town @. Here you can run your own store and sell goods to villagers!!^^  Let's start by choosing a good place, place down a table and start selling any item you prefer.^^  To use any of your Building as a museum, a restaurant, a convenience store, you need to obtain either a Museum License from Adventurer Guild, a Restaurant License from Saloon, or a Market Town License from Desert Trader.   ( continue > )^ -Requirement for Museum License: Donated 30 items to the local Museum.^^ -Requirement for Restaurant License: Market Town earning more than 10000, and has sold to villagers at least 20 Cooking.^^ -Requirement for Market Town License: Market Town earning more than 30000, and has sold 30 of each Forage, Vegetable, Artisan Good, Animal Product, Cooking, Fish, and Mineral.   ( continue > )^^   This Mod is highly configurable to fit the gameplay of most players. Please review the details in Config before reporting any issues.^^   Found bugs? Report it to Mod page together with SMAPI log, or contact me via Discord: hapyke",
-  "foodstore.letter.mtrestaurantlicense":             "   Dear @.^^As you have meet the requirement to hold a Restaurant License, you can drop by the Saloon whenever you are free to purchase the license.^Restaurant License allowing you to operate any of your Farm Building as a restaurant.^^I will drop by for some meal sometime^-Gus",
-  "foodstore.letter.mtmarkettownlicense":             "   Dear @.^^You are doing great with your business. Now you can obtain a Market Town License from Desert Trader.^Market Town License let you to sell anything you want!^^-Lewis",
+  "foodstore.letter.mtrestaurantlicense":             "   Dear @.^^   As you have meet the requirement to hold a Restaurant License, you can drop by the Saloon whenever you are free to purchase the license.^   Restaurant License allowing you to operate any of your Farm Building as a restaurant.^^   I will drop by for some meal sometime^     - Gus",
+  "foodstore.letter.mtmarkettownlicense":             "   Dear @.^^   You are doing great with your business. Now you can obtain a Market Town License from Desert Trader.^   Market Town License let you to sell anything you want!^^     - Lewis",
   
   "foodstore.weeklytotallog":                         "Total Market earning: {{totalEarning}}G^",
   "foodstore.forage":                                 "   Total Forage Sold: {{TotalForageSold}}^",
@@ -863,7 +863,7 @@
   "foodstore.config.maxislandNPCText":                "Default 40. Max number of visitors when reaching max progress. Setting to high might cause lag",
 
   "foodstore.config.islandprogress":                  "Paradise Island progress",
-  "foodstore.config.islandprogressText":              "Default True. Set to False to skip (max visitor, max sell price,...). Island Progress is depend on the total number of Customer Note given, and the amount of possitive feedback received. However negative feedback decrease the progress.",
+  "foodstore.config.islandprogressText":              "Default True. Set to False to skip (max visitor, max sell price,...). Island Progress is depend on the earning through Festival Grange sell (see below)",
 
   "foodstore.config.islandwalkaround":                "NPC moving chance",
   "foodstore.config.islandwalkaroundText":            "Default 0.2. Chance NPC will randomly move to a new position every 10 minutes. Setting to high will cause lag when clock change.",
@@ -878,8 +878,8 @@
 
   "foodstore.islandsign":                             "It is currently {{season}} season in Paradise Island^Total visitors attracted: {{visitor}}",
 
-  "foodstore.letter.islandinfo":                      "   Hey @.^^   It has been a while since you started working on Paradise Island, but have you realized that the special weather of the island helps crops from any season to grow in Spring?^   And not only that, fruit trees also seem to grow better and yield more fruit, especially in Summer.^^     -Lewis",
-  "foodstore.letter.islandinit":                      "   Oh, there is something about Paradise Island that I forgot to let you know earlier.^^   The geographical location of this island is very special, so there are only Spring, Summer, and Fall. It also has its own weather system.^   There you can grow crops and trees, and Robin can help you build farm buildings, but you have to close the Island to visitors, though.^^     - Lewis",
+  "foodstore.letter.islandinfo":                      "   Hey @.^^   It has been a while since you started working on Paradise Island, but have you realized that the special weather of the island helps crops from any season to grow in Spring, and also fruits tree can yield much more fruits?^^     -Lewis",
+  "foodstore.letter.islandinit":                      "   Oh, there is something about Paradise Island that I forgot to let you know earlier.^^   The geographical location of this island is very special, so there are only Spring, Summer, and Fall. It also has its own weather system.^   There you can grow crops and trees, and Robin can help you build farm buildings there. Once you have Paradise Island brazier in hand, you can open the island to visitors^     - Lewis",
 
   "foodstore.letter.islandbedroom":                   "^   @.^^   Going back and forth to Paradise Island is a tired trip. I will build a bedroom on the second floor so you can have a place to rest your back.^   It will be available tomorrow.^^     - Robin",
 
@@ -1755,7 +1755,16 @@
   "foodstore.generalbaddecor.16":                     "This area could use some more personality, {{playerName}}. Maybe add some decor.",
   "foodstore.generalbaddecor.17":                     "You could really improve this place with more decorations, {{playerName}}.",
   "foodstore.generalbaddecor.18":                     "It looks a bit bare here, {{playerName}}. Some more plants or furniture would help.",
-  "foodstore.generalbaddecor.19":                     "A bit more decor would do wonders here, {{playerName}}. Maybe add some flowers or paintings."
+  "foodstore.generalbaddecor.19":                     "A bit more decor would do wonders here, {{playerName}}. Maybe add some flowers or paintings.",
+
+  "foodstore.config.moneymodifier":                   "Income modifier general?",
+  "foodstore.config.moneymodifierText":               "This apply to all Market Town income, except festival grange.",
+  
+  "foodstore.config.islandmoneymodifier":             "Income modifier for Festival?",
+  "foodstore.config.islandmoneymodifierText":         "This apply to sell in Paradise Island festival grange.",
+
+  "foodstore.config.grangeprogress":                  "Paradise Island progress mark?",
+  "foodstore.config.grangeprogressText":              "Default 2000000. Amount of earning though Festival grange sell that determine your progress score"
 
   
   

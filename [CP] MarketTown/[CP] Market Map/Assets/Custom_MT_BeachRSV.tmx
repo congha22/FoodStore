@@ -1,19 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="6" height="11" tilewidth="16" tileheight="16" infinite="0" nextlayerid="20" nextobjectid="60">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="6" height="11" tilewidth="16" tileheight="16" infinite="0" nextlayerid="20" nextobjectid="61">
  <properties>
-  <property name="AllowGiantCrops" value="T"/>
-  <property name="CanBuildHere" value="T"/>
-  <property name="EnableGrassSpread" value="T"/>
-  <property name="Fall_Objects" value="T"/>
-  <property name="FarmFishLocationOverride" value="Mountain 0.5"/>
-  <property name="ForceAllowTreePlanting" value="T"/>
-  <property name="IsFarm" value="T"/>
-  <property name="LocationContext" value="Default"/>
-  <property name="LooserBuildRestrictions" value="T"/>
   <property name="Outdoors" value="T"/>
-  <property name="Spring_Objects" value="T"/>
-  <property name="Summer_Objects" value="T"/>
-  <property name="Winter_Objects" value="T"/>
  </properties>
  <tileset firstgid="1" source="z_ModTile.tsx"/>
  <tileset firstgid="817" source="zspring_outdoorsTileSheet2..tsx"/>
@@ -110,14 +98,14 @@
 0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup id="6" name="Back"/>
- <objectgroup id="7" name="Buildings">
-  <object id="59" name="TileData" x="16" y="128" width="48" height="32">
+ <objectgroup id="6" name="Back">
+  <object id="60" name="TileData" x="32" y="144" width="16" height="16">
    <properties>
-    <property name="Action" value="Warp 20 62 Custom_MT_Island"/>
+    <property name="TouchAction" value="Warp Custom_MT_Island 20 62"/>
    </properties>
   </object>
  </objectgroup>
+ <objectgroup id="7" name="Buildings"/>
  <objectgroup id="8" name="Front"/>
  <objectgroup id="9" name="AlwaysFront"/>
  <objectgroup id="10" name="Paths"/>

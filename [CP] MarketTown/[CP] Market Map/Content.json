@@ -16,6 +16,42 @@
     {
       "Name": "Custom_MT_Island_House_Garden",
       "FromMapFile": "assets/Custom_MT_Island_House_Garden.tmx"
+    },
+    {
+      "Name": "Custom_MT_Clone0",
+      "FromMapFile": "assets/Custom_MT_Clone.tmx"
+    },
+    {
+      "Name": "Custom_MT_Clone1",
+      "FromMapFile": "assets/Custom_MT_Clone.tmx"
+    },
+    {
+      "Name": "Custom_MT_Clone2",
+      "FromMapFile": "assets/Custom_MT_Clone.tmx"
+    },
+    {
+      "Name": "Custom_MT_Clone3",
+      "FromMapFile": "assets/Custom_MT_Clone.tmx"
+    },
+    {
+      "Name": "Custom_MT_Clone4",
+      "FromMapFile": "assets/Custom_MT_Clone.tmx"
+    },
+    {
+      "Name": "Custom_MT_Clone5",
+      "FromMapFile": "assets/Custom_MT_Clone.tmx"
+    },
+    {
+      "Name": "Custom_MT_Clone6",
+      "FromMapFile": "assets/Custom_MT_Clone.tmx"
+    },
+    {
+      "Name": "Custom_MT_Clone7",
+      "FromMapFile": "assets/Custom_MT_Clone.tmx"
+    },
+    {
+      "Name": "Custom_MT_Clone8",
+      "FromMapFile": "assets/Custom_MT_Clone.tmx"
     }
   ],
   "Changes": [
@@ -160,7 +196,7 @@
       "Action": "EditMap",
       "Target": "Maps/Custom_MT_Island",
       "Addwarps": [
-        "17 62 Custom_Ridgeside_RSVCliff 50 24"
+        "15 61 Custom_Ridgeside_RSVCliff 50 24"
       ],
       "When": {
         "HasMod |contains=Rafseazz.RidgesideVillage": true,
@@ -1608,6 +1644,156 @@
           "CustomFields": null
         }
       }
+    },
+    {
+      "Action": "EditMap",
+      "Target": "Maps/Beach",
+      "TextOperations": [
+        {
+          "Operation": "Append",
+          "Target": [
+            "MapProperties",
+            "NPCWarp"
+          ],
+          "Value": "10 10 Custom_MT_Clone0 1 1",
+          "Delimiter": " "
+        }
+      ],
+      "When": {
+        "HasFlag": "beachBridgeFixed"
+      }
+    },
+    {
+      "Action": "EditMap",
+      "Target": "Maps/Custom_MT_Clone0",
+      "Addwarps": [
+        "3 3 Custom_MT_Clone1 1 1"
+      ],
+      "When": {
+        "HasFlag": "beachBridgeFixed"
+      }
+    },
+    {
+      "Action": "EditMap",
+      "Target": "Maps/Custom_MT_Clone1",
+      "Addwarps": [
+        "3 3 Custom_MT_Clone2 1 1"
+      ],
+      "When": {
+        "HasFlag": "beachBridgeFixed"
+      }
+    },
+    {
+      "Action": "EditMap",
+      "Target": "Maps/Custom_MT_Clone2",
+      "Addwarps": [
+        "3 3 Custom_MT_Clone3 1 1"
+      ],
+      "When": {
+        "HasFlag": "beachBridgeFixed"
+      }
+    },
+    {
+      "Action": "EditMap",
+      "Target": "Maps/Custom_MT_Clone3",
+      "Addwarps": [
+        "3 3 Custom_MT_Clone4 1 1"
+      ],
+      "When": {
+        "HasFlag": "beachBridgeFixed"
+      }
+    },
+    {
+      "Action": "EditMap",
+      "Target": "Maps/Custom_MT_Clone4",
+      "Addwarps": [
+        "3 3 Custom_MT_Clone5 1 1"
+      ],
+      "When": {
+        "HasFlag": "beachBridgeFixed"
+      }
+    },
+    {
+      "Action": "EditMap",
+      "Target": "Maps/Custom_MT_Clone5",
+      "Addwarps": [
+        "3 3 Custom_MT_Clone6 1 1"
+      ],
+      "When": {
+        "HasFlag": "beachBridgeFixed"
+      }
+    },
+    {
+      "Action": "EditMap",
+      "Target": "Maps/Custom_MT_Clone6",
+      "Addwarps": [
+        "3 3 Custom_MT_Clone7 1 1"
+      ],
+      "When": {
+        "HasFlag": "beachBridgeFixed"
+      }
+    },
+    {
+      "Action": "EditMap",
+      "Target": "Maps/Custom_MT_Clone7",
+      "Addwarps": [
+        "3 3 Custom_MT_Clone8 1 1"
+      ],
+      "When": {
+        "HasFlag": "beachBridgeFixed"
+      }
+    },
+    {
+      "Action": "EditMap",
+      "Target": "Maps/Custom_MT_Clone8",
+      "Addwarps": [
+        "3 3 Custom_MT_Island 25 60"
+      ],
+      "When": {
+        "HasFlag": "beachBridgeFixed"
+      }
+    },
+    {
+      "Action": "Load",
+      "Target": "Mods/d5a1lamdtd.MarketTown.Custom_MT_Location/ParadiseBoat_spring",
+      "FromFile": "assets/ParadiseBoat_spring.png"
+    },
+    {
+      "Action": "Load",
+      "Target": "Mods/d5a1lamdtd.MarketTown.Custom_MT_Location/ParadiseBoat_summer",
+      "FromFile": "assets/ParadiseBoat_summer.png"
+    },
+    {
+      "Action": "Load",
+      "Target": "Mods/d5a1lamdtd.MarketTown.Custom_MT_Location/ParadiseBoat_fall",
+      "FromFile": "assets/ParadiseBoat_fall.png"
+    },
+    {
+      "Action": "Load",
+      "Target": "Mods/d5a1lamdtd.MarketTown.Custom_MT_Location/ParadiseBoat_winter",
+      "FromFile": "assets/ParadiseBoat_winter.png"
+    },
+
+
+    {
+      "Action": "Load",
+      "Target": "Mods/d5a1lamdtd.MarketTown.Custom_MT_Location/ParadiseBalloon_spring",
+      "FromFile": "assets/ParadiseBalloon_spring.png"                     
+    },                                                                 
+    {                                                                  
+      "Action": "Load",                                                
+      "Target": "Mods/d5a1lamdtd.MarketTown.Custom_MT_Location/ParadiseBalloon_summer",
+      "FromFile": "assets/ParadiseBalloon_summer.png"                     
+    },                                                                 
+    {                                                                  
+      "Action": "Load",                                                
+      "Target": "Mods/d5a1lamdtd.MarketTown.Custom_MT_Location/ParadiseBalloon_fall",
+      "FromFile": "assets/ParadiseBalloon_fall.png"                       
+    },                                                                 
+    {                                                                  
+      "Action": "Load",                                                
+      "Target": "Mods/d5a1lamdtd.MarketTown.Custom_MT_Location/ParadiseBalloon_winter",
+      "FromFile": "assets/ParadiseBalloon_winter.png"
     }
   ]
 }
