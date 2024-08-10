@@ -1052,11 +1052,11 @@ namespace MarketTown
         {
             if (__instance != null && __instance.QualifiedItemId == "(F)MT.Objects.RestaurantDecor")
             {
-                __result = "Customers would love to sit at the table that has this lovely decoration!";
+                __result = SHelper.Translation.Get("foodstore.items.RestaurantDecor");
             }
             if (__instance != null && __instance.QualifiedItemId == "(F)MT.Objects.MarketLog")
             {
-                __result = "A log book for you to track your selling";
+                __result = SHelper.Translation.Get("foodstore.items.MarketLog");
             }
         }
 

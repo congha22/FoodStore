@@ -1,7 +1,7 @@
 ﻿{
   "Name": "Market Town",
   "Author": "d5a1lamdtd",
-  "Version": "6.0.0-alpha9-build1",
+  "Version": "6.0.0",
   "Description": "MarketTown",
   "UniqueID": "d5a1lamdtd.MarketTown",
   "EntryDll": "MarketTown.dll",

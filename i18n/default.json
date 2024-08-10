@@ -1,16 +1,16 @@
 {
-  "foodstore.note":                                   "Exciting News! The upcoming major update will unveil a spectacular 'Market Town' complete with a charming Restaurant, captivating Museum, delightful Flower Shop, and more! Your voice matters! Participate in the Town Layout Vote - Beach Map, Serene Island, Enchanting Jungle, or something else? Share your imaginative ideas on the FORUM located on the Mod page. Let's shape this town together!",
+  "foodstore.note":                                   "",
 
-  "foodstore.hidden.0":                               "And weekly tip: Villager more likely to promote when ate loved food, and more criticise when are hated food.",
-  "foodstore.hidden.1":                               "And weekly tip: The lower sale price can be 32% of the base price, while the highest is 520%.",
+  "foodstore.hidden.0":                               "And weekly tip: Customer may share their praised to nearby villagers when purchased great items",
+  "foodstore.hidden.1":                               "And weekly tip: Item selling on Paradise Island has higher price.",
   "foodstore.hidden.2":                               "And weekly tip: Well-decorated store boost your sell price",
   "foodstore.hidden.3":                               "And weekly tip: You can only get information about Dish of the Week from villager chat.",
-  "foodstore.hidden.4":                               "And weekly tip: Gus only rate your dish as neutral dish at the best. He graciously paid the full price without expressing his dissatisfaction and he chose to keep his opinion about the taste to himself.",
+  "foodstore.hidden.4":                               "And weekly tip: Gus only rate your dish as 'average' dish at the best. He graciously paid the full price without expressing his dissatisfaction and he chose to keep his opinion about the taste to himself.",
   "foodstore.hidden.5":                               "And weekly tip: Not every visitor may find the food appealing; some quickly turn away, perhaps perceiving it as less enticing and not up to their standards.",
   "foodstore.hidden.6":                               "And weekly tip: There is no tip for a hated dish because it is hated!!!",
   "foodstore.hidden.7":                               "And weekly tip: Sell food to customers based on their request have better price",
-  "foodstore.hidden.8":                               "And weekly tip: Talk with customer will increase the price they pay for the dish. You can now talk with them unlimited time.",
-  "foodstore.hidden.9":                               "And weekly tip: Villager can answer some of your questions. Stand close by one of them and type 'help' to show available options.",
+  "foodstore.hidden.8":                               "And weekly tip: Talk with customer will increase the price they pay for the dish.",
+  "foodstore.hidden.9":                               "And weekly tip: After customer purchased, give them Customer Note to see how they feel about your selling.",
   "foodstore.hidden.10":                              "And weekly tip: The better the location, the higher the price (close by decoration, water, or the pink tree)",
   
   "foodstore.help.0":                                 "Interact with villager by stand close to them, and type in your message. Some special question required to have the keyword in the message!!",
@@ -1309,7 +1309,7 @@
   "foodstore.general.teens.rude.neutral.6.6":         "Hey there. Any exciting plans or adventures lined up for the weekend?",
   "foodstore.general.teens.rude.neutral.7.6":         "Been working on any cool personal projects or goals lately?",
                                            
-  "foodstore.general.child.rude.neutral.1.6":         " Wanna go on an epic quest to uncover hidden treasures together?",  
+  "foodstore.general.child.rude.neutral.1.6":         "Wanna go on an epic quest to uncover hidden treasures together?",  
   "foodstore.general.child.rude.neutral.2.6":         "What's up? Spotted any cool bugs or critters during your adventures?",
   "foodstore.general.child.rude.neutral.3.6":         "Hi. How about we team up to build something super awesome?",
   "foodstore.general.child.rude.neutral.4.6":         "Any fun games or activities you've been enjoying lately?",
@@ -1764,7 +1764,10 @@
   "foodstore.config.islandmoneymodifierText":         "This apply to sell in Paradise Island festival grange.",
 
   "foodstore.config.grangeprogress":                  "Paradise Island progress mark?",
-  "foodstore.config.grangeprogressText":              "Default 2000000. Amount of earning though Festival grange sell that determine your progress score"
+  "foodstore.config.grangeprogressText":              "Default 2000000. Amount of earning though Festival grange sell that determine your progress score",
+
+  "foodstore.items.RestaurantDecor":                  "Customers would love to sit at the table that has this lovely decoration!",
+  "foodstore.items.MarketLog":                        "A log book for you to track your selling"
 
   
   
