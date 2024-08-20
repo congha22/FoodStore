@@ -241,6 +241,7 @@ namespace MarketTown
                     __instance.modData["hapyke.FoodStore/islandSpecialOrderTile"] = "-1,-1";
                     __instance.modData["hapyke.FoodStore/islandSpecialOrderTime"] = "0";
                     __instance.modData["hapyke.FoodStore/lastStoreType"] = "";
+                    __instance.modData["hapyke.FoodStore/LastPurchase"] = "item";
                 }
             }
 
@@ -736,8 +737,6 @@ namespace MarketTown
                         __instance.modData["hapyke.FoodStore/invited"] = "false";
                         __instance.modData["hapyke.FoodStore/inviteDate"] = "-99";
                     }
-
-                    __instance.reloadDefaultLocation();
                 }
             }
             catch { }
@@ -884,7 +883,7 @@ namespace MarketTown
                 FarmOutside.UpdateRandomLocationOpenTile(islandInstance);
                 FarmOutside.UpdateRandomLocationOpenTile(islandHouseInstance);
 
-                foreach (var buildingLocation in islandInstance.buildings)
+                foreach (var buildingLocation in islandInstance.buildings.Where(i => i.indoors.Value != null))
                 {
                     var buildingInstanceName = buildingLocation.GetIndoorsName();
                     FarmOutside.UpdateRandomLocationOpenTile(Game1.getLocationFromName(buildingInstanceName));
@@ -1133,10 +1132,26 @@ namespace MarketTown
                                 int width = table.getTilesWide();
                                 int height = table.getTilesHigh();
 
-                                for (int x = 0; x < width; x++) surroundingTiles.Add(new Vector2(topLeft.X + x, topLeft.Y - 1), 2); // down
-                                for (int x = 0; x < width; x++) surroundingTiles.Add(new Vector2(topLeft.X + x, topLeft.Y + height), 0); // up
-                                for (int y = 0; y < height; y++) surroundingTiles.Add(new Vector2(topLeft.X - 1, topLeft.Y + y), 1); // right
-                                for (int y = 0; y < height; y++) surroundingTiles.Add(new Vector2(topLeft.X + width, topLeft.Y + y), 3); // left
+                                for (int x = 0; x < width; x++) // down
+                                {
+                                    var t = new Vector2(topLeft.X + x, topLeft.Y - 1);
+                                    if (!surroundingTiles.ContainsKey(t))surroundingTiles.Add(t, 2);
+                                }
+                                for (int x = 0; x < width; x++) // up
+                                {
+                                    var t = new Vector2(topLeft.X + x, topLeft.Y + height);
+                                    if (!surroundingTiles.ContainsKey(t)) surroundingTiles.Add(t, 0); // down
+                                }
+                                for (int y = 0; y < height; y++) // right
+                                {
+                                    var t = new Vector2(topLeft.X - 1, topLeft.Y + y);
+                                    if (!surroundingTiles.ContainsKey(t)) surroundingTiles.Add(t, 1); // down
+                                }
+                                for (int y = 0; y < height; y++) // left
+                                {
+                                    var t = new Vector2(topLeft.X + width, topLeft.Y + y);
+                                    if (!surroundingTiles.ContainsKey(t)) surroundingTiles.Add(t, 3); // down
+                                }
                             }
                         }
 
@@ -1494,6 +1509,7 @@ namespace MarketTown
                                 AddToPlayerFunds(salePrice + tip);
                                 
                                 __instance.modData["hapyke.FoodStore/LastFood"] = Game1.timeOfDay.ToString();
+                                __instance.modData["hapyke.FoodStore/LastPurchase"] = food.foodObject.DisplayName;
                                 if (food.foodObject.Category == -7)
                                 {
                                     __instance.modData["hapyke.FoodStore/LastFoodTaste"] = taste.ToString();
@@ -1645,6 +1661,7 @@ namespace MarketTown
                                 AddToPlayerFunds(salePrice);
 
                                 __instance.modData["hapyke.FoodStore/LastFood"] = Game1.timeOfDay.ToString();
+                                __instance.modData["hapyke.FoodStore/LastPurchase"] = "outfit";
                                 __instance.modData["hapyke.FoodStore/LastFoodTaste"] = "-1";
                                 __instance.modData["hapyke.FoodStore/gettingFood"] = "false";
 

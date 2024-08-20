@@ -34,6 +34,7 @@ using System.Reflection;
 using System.Reflection.Metadata.Ecma335;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 using xTile.Dimensions;
 using xTile.Layers;
 using xTile.Tiles;
@@ -65,6 +66,7 @@ namespace MarketTown
             __instance.modData["hapyke.FoodStore/islandSpecialOrderTile"] = "-1,-1";
             __instance.modData["hapyke.FoodStore/islandSpecialOrderTime"] = "0";
             __instance.modData["hapyke.FoodStore/lastStoreType"] = "";
+            __instance.modData["hapyke.FoodStore/LastPurchase"] = "item";
             __instance.modData.Remove(orderKey);
 
         }
@@ -134,70 +136,12 @@ namespace MarketTown
                     int heartLevel = 0;
                     if (Game1.player.friendshipData.ContainsKey(__instance.Name)) heartLevel = (int)Game1.player.friendshipData[__instance.Name].Points / 250;
 
-                    switch (age)
-                    {
-                        case 0:
-                            __instanceAge = "adult.";
-                            break;
-                        case 1:
-                            __instanceAge = "teens.";
-                            break;
-                        case 2:
-                            __instanceAge = "child.";
-                            break;
-                        default:
-                            __instanceAge = "adult.";
-                            break;
-                    }
-                    switch (manner)
-                    {
-                        case 0:
-                            __instanceManner = "neutral.";
-                            break;
-                        case 1:
-                            __instanceManner = "polite.";
-                            break;
-                        case 2:
-                            __instanceManner = "rude.";
-                            break;
-                        default:
-                            __instanceManner = "neutral.";
-                            break;
-                    }
-                    switch (social)
-                    {
-                        case 0:
-                            __instanceSocial = "outgoing.";
-                            break;
-                        case 1:
-                            __instanceSocial = "shy.";
-                            break;
-                        case 2:
-                            __instanceSocial = "neutral.";
-                            break;
-                        default:
-                            __instanceSocial = "neutral.";
-                            break;
-                    }
-                    switch (heartLevel)
-                    {
-                        case 0:
-                        case 1:
-                        case 2:
-                            __instanceHeartLevel = ".0";
-                            break;
-                        case 3:
-                        case 4:
-                        case 5:
-                            __instanceHeartLevel = ".3";
-                            break;
-                        default:
-                            __instanceHeartLevel = ".6";
-                            break;
-                    }
+                    __instanceAge = age == 0 ? "adult." : age == 1 ? "teens." : age == 2 ? "child." : "adult.";
+                    __instanceManner = manner == 0 ? "neutral." : manner == 1 ? "polite." : manner == 2 ? "rude." : "neutral.";
+                    __instanceSocial = social == 0 ? "outgoing." : social == 1 ? "shy." : social == 2 ? "neutral." : "neutral.";
+                    __instanceHeartLevel = heartLevel <= 2 ? ".0" : heartLevel <= 5 ? ".3" : ".6";
 
-                    if (__instance.Name.Contains("MT.Guest_") || !Game1.player.friendshipData[__instance.Name].IsMarried() && !Config.DisableChatAll && Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) < 2
-                       )
+                    if (__instance.Name.Contains("MT.Guest_") || !Game1.player.friendshipData[__instance.Name].IsMarried() && !Config.DisableChatAll && Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) < 2)
                     {
                         __instance.CurrentDialogue.Push(new Dialogue(__instance, "key", SHelper.Translation.Get("foodstore.general." + __instanceAge + __instanceManner + __instanceSocial + randomIndex.ToString() + __instanceHeartLevel)));
                         __instance.modData["hapyke.FoodStore/TotalCustomerResponse"] = (Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) + 1).ToString();
@@ -216,8 +160,8 @@ namespace MarketTown
                     && (Int32.Parse(__instance.modData["hapyke.FoodStore/timeVisitShed"]) <= (Game1.timeOfDay - Config.TimeStay) || Game1.timeOfDay > Config.CloseHour || Game1.timeOfDay >= 2500))
                 {
                     CleanNpc(__instance);
-                    __instance.TryLoadSchedule();
                     __instance.reloadDefaultLocation();
+                    __instance.TryLoadSchedule();
 
                     var schedule = __instance.Schedule;
                     var lastLocation = __instance.DefaultMap;
@@ -761,72 +705,101 @@ namespace MarketTown
                     return true;
                 }
                 double lastTasteRate; // get the taste point
-                switch (lastTaste)
-                {
-                    case 0:
-                        lastTasteRate = 0.4;
-                        break;
-
-                    case 2:
-                        lastTasteRate = 0.35;
-                        break;
-
-                    case 4:
-                        lastTasteRate = 0.25;
-                        break;
-
-                    case 6:
-                        lastTasteRate = 0.2;
-                        break;
-
-                    default:
-                        lastTasteRate = 0.3;
-                        break;
-                }
+                lastTasteRate = lastTaste == 0 ? 0.4 : lastTaste == 2 ? 0.35 : lastTaste == 4 ? 0.25 : lastTaste == 6 ? 0.2 : 0.3;
 
                 double lastDecorRate; // get the decor point
-                switch (lastDecor)
-                {
-                    case double n when n >= -0.2 && n < 0:
-                        lastDecorRate = -0.2;
-                        break;
+                lastDecorRate = lastDecor >= -0.2 && lastDecor < 0 ? -0.2 : lastDecor >= 0 && lastDecor < 0.2 ? 0 : 0.2;
 
-                    case double n when n >= 0 && n < 0.2:
-                        lastDecorRate = 0;
-                        break;
-
-                    default:
-                        lastDecorRate = 0.2;
-                        break;
-                }
 
                 if (!Config.EnableDecor) lastDecorRate = 0.2;
 
-                if (!TodayCustomerNoteName.Contains(__instance.Name) && (lastTasteRate == 0.3 && lastDecorRate > 0 || lastTasteRate > 0.3 && lastDecorRate >= 0))          // Normal food, good decor or like food, normal decor
+                if (!TodayCustomerNoteName.Contains(__instance.Name) && (lastTasteRate >= 0.3 && lastDecorRate > 0 || lastTasteRate > 0.3 && lastDecorRate >= 0))          // Normal food, good decor or like food, normal decor
                 {
-                    NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.customernote.yes." + random.Next(7).ToString()), true);
+                    if (Config.AdvanceAiContent)
+                    {
+                        int wordCount = 20;
+                        List<string> contextChoice = new List<string> { "amazing.", "the best ever.", "loved.", "absolute amazing." };
+                        if (lastTasteRate > 0.3 && lastDecorRate > 0)
+                        {
+                            contextChoice = new List<string> { "great quality and nicely decoration.", "premium quality with a refined stylish.", "outstanding quality and visually appealing.", "first-rate quality and an attractive style." };
+                            wordCount = 23;
+                        }
+                        string ageCategory = __instance.Age == 0 ? "adult" : __instance.Age == 1 ? "teens" : "child";
+                        string manner = __instance.Manners == 0 ? "friendly." : __instance.Manners == 1 ? "polite." : __instance.Manners == 2 ? "rude." : "friendly.";
+                        Task.Run(() => SendMessageToAssistant(
+                                        npc: __instance,
+                                        userMessage: $"What you think about the {__instance.modData["hapyke.FoodStore/LastPurchase"]} you purchased?",
+                                        systemMessage: $"As NPC {__instance.Name} ({ageCategory}, {manner}) in Stardew Valley, you will reply the user with a text only message under {wordCount} words that your feeling with the {__instance.modData["hapyke.FoodStore/LastPurchase"]} is {contextChoice[random.Next(contextChoice.Count)]}")
+                                    );
+                        TodayCustomerNoteName.Add(__instance.Name);
+                        TodayCustomerNoteYes++;
+                        TodayCustomerNote++;
+                        return true;
+                    }
+                    else
+                    {
+                        NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.customernote.yes." + random.Next(7).ToString()), true);
 
-                    TodayCustomerNoteName.Add(__instance.Name);
-                    TodayCustomerNoteYes++;
-                    TodayCustomerNote++;
-                    return true;
+                        TodayCustomerNoteName.Add(__instance.Name);
+                        TodayCustomerNoteYes++;
+                        TodayCustomerNote++;
+                        return true;
+                    }
                 }
                 else if (!TodayCustomerNoteName.Contains(__instance.Name) && (lastTasteRate <= 0.25 || lastTasteRate == 0.3 && lastDecorRate < 0))     // Dishlike food, or neutral food and bad decor
                 {
-                    NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.customernote.no." + random.Next(7).ToString()),true);
-                    TodayCustomerNoteName.Add(__instance.Name);
-                    TodayCustomerNoteNo++;
-                    TodayCustomerNote++;
-                    return true;
+                    if (Config.AdvanceAiContent)
+                    {
+                        List<string> contextChoice = new List<string> { "much disappointed", "never again", "disgusting", "absolute terrible" };
+                        if (lastTasteRate <= 0.25 && lastDecorRate == -0.2) 
+                            contextChoice = new List<string> { "poorly made and unappealing", "shoddy quality and a lack of style", "dull decoration and lack of quality"};
+
+                        string ageCategory = __instance.Age == 0 ? "adult" : __instance.Age == 1 ? "teens" : "child";
+                        string manner = __instance.Manners == 0 ? "friendly." : __instance.Manners == 1 ? "polite." : __instance.Manners == 2 ? "rude." : "friendly.";
+                        Task.Run(() => SendMessageToAssistant(
+                                        npc: __instance,
+                                        userMessage: $"What you think about the {__instance.modData["hapyke.FoodStore/LastPurchase"]} you purchased?",
+                                        systemMessage: $"As NPC {__instance.Name} ({ageCategory}, {manner}) in Stardew Valley, you will reply the user with a text only message under 20 words that your feeling with the {__instance.modData["hapyke.FoodStore/LastPurchase"]} is {contextChoice[random.Next(contextChoice.Count)]}")
+                                    );
+                        TodayCustomerNoteName.Add(__instance.Name);
+                        TodayCustomerNoteYes++;
+                        TodayCustomerNote++;
+                        return true;
+                    }
+                    else
+                    {
+                        NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.customernote.no." + random.Next(7).ToString()), true);
+                        TodayCustomerNoteName.Add(__instance.Name);
+                        TodayCustomerNoteNo++;
+                        TodayCustomerNote++;
+                        return true;
+                    }
                 }
                 else if (!TodayCustomerNoteName.Contains(__instance.Name))          // Other case
                 {
-                    NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.neutral." + random.Next(8)),true);
-                    TodayCustomerNoteName.Add(__instance.Name);
-                    TodayCustomerNoteNone++;
-                    TodayCustomerNote++;
-                    return true;
-
+                    if (Config.AdvanceAiContent)
+                    {
+                        List<string> contextChoice = new List<string> { "normal", "fine", "middle class", "just meet the expectation" };
+                        string ageCategory = __instance.Age == 0 ? "adult" : __instance.Age == 1 ? "teens" : "child";
+                        string manner = __instance.Manners == 0 ? "friendly." : __instance.Manners == 1 ? "polite." : __instance.Manners == 2 ? "rude." : "friendly.";
+                        Task.Run(() => SendMessageToAssistant(
+                                        npc: __instance,
+                                        userMessage: $"What you think about the {__instance.modData["hapyke.FoodStore/LastPurchase"]} you purchased?",
+                                        systemMessage: $"You are NPC {__instance.Name} ({ageCategory}, {manner}) in Stardew Valley, you will reply the user with a text only message under 20 words that your feeling with the {__instance.modData["hapyke.FoodStore/LastPurchase"]} is {contextChoice[random.Next(contextChoice.Count)]}")
+                                    );
+                        TodayCustomerNoteName.Add(__instance.Name);
+                        TodayCustomerNoteYes++;
+                        TodayCustomerNote++;
+                        return true;
+                    }
+                    else
+                    {
+                        NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.neutral." + random.Next(8)), true);
+                        TodayCustomerNoteName.Add(__instance.Name);
+                        TodayCustomerNoteNone++;
+                        TodayCustomerNote++;
+                        return true;
+                    }
                 }
                 return false;
             }

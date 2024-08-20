@@ -22,7 +22,9 @@ using StardewValley.TerrainFeatures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using xTile.Dimensions;
@@ -64,6 +66,7 @@ namespace MarketTown
             helper.Events.GameLoop.UpdateTicked += GameLoop_UpdateTicked;
             Helper.Events.GameLoop.OneSecondUpdateTicked += GameLoop_OneSecondUpdateTicked;
             helper.Events.GameLoop.TimeChanged += this.OnTimeChange;
+            //helper.Events.GameLoop.TimeChanged += this.timechangetest;
 
             helper.Events.Multiplayer.PeerConnected += OnPeerConnected;
 
@@ -2982,8 +2985,8 @@ namespace MarketTown
             if (npc == null) return;
 
             CleanNpc(npc);
-            npc.TryLoadSchedule();
             npc.reloadDefaultLocation();
+            npc.TryLoadSchedule();
             var schedule = npc.Schedule;
             CleanNpc(npc);
 
@@ -3134,10 +3137,29 @@ namespace MarketTown
                                 int width = table.getTilesWide();
                                 int height = table.getTilesHigh();
 
-                                for (int x = 0; x < width; x++) surroundingTiles.Add(new Vector2(topLeft.X + x, topLeft.Y - 1), 2); // down
-                                for (int x = 0; x < width; x++) surroundingTiles.Add(new Vector2(topLeft.X + x, topLeft.Y + height), 0); // up
-                                for (int y = 0; y < height; y++) surroundingTiles.Add(new Vector2(topLeft.X - 1, topLeft.Y + y), 1); // right
-                                for (int y = 0; y < height; y++) surroundingTiles.Add(new Vector2(topLeft.X + width, topLeft.Y + y), 3); // left
+                                for (int x = 0; x < width; x++)
+                                {
+                                    var tile = new Vector2(topLeft.X + x, topLeft.Y - 1); // down
+                                    _ = surroundingTiles.ContainsKey(tile) ? false : surroundingTiles.TryAdd(tile, 2);
+                                }
+
+                                for (int x = 0; x < width; x++)
+                                {
+                                    var tile = new Vector2(topLeft.X + x, topLeft.Y + height); // up
+                                    _ = surroundingTiles.ContainsKey(tile) ? false : surroundingTiles.TryAdd(tile, 0);
+                                }
+
+                                for (int y = 0; y < height; y++)
+                                {
+                                    var tile = new Vector2(topLeft.X - 1, topLeft.Y + y); // right
+                                    _ = surroundingTiles.ContainsKey(tile) ? false : surroundingTiles.TryAdd(tile, 1);
+                                }
+
+                                for (int y = 0; y < height; y++)
+                                {
+                                    var tile = new Vector2(topLeft.X + width, topLeft.Y + y); // left
+                                    _ = surroundingTiles.ContainsKey(tile) ? false : surroundingTiles.TryAdd(tile, 3);
+                                }
                             }
                         }
 

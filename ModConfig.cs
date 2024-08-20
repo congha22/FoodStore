@@ -104,5 +104,7 @@ namespace MarketTown
         public float IslandMoneyModifier { get; set; } = 1f;
 
         public int GrangeSellProgress = 2000000;
+
+        public bool AdvanceAiContent = true;
     }
 }

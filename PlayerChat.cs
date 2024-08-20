@@ -210,67 +210,11 @@ namespace MarketTown
                 int heartLevel = 0;
                 if (Game1.player.friendshipData.ContainsKey(npc.Name)) heartLevel = (int)Game1.player.friendshipData[npc.Name].Points / 250;
 
-                switch (age)
-                {
-                    case 0:
-                        npcAge = "adult.";
-                        break;
-                    case 1:
-                        npcAge = "teens.";
-                        break;
-                    case 2:
-                        npcAge = "child.";
-                        break;
-                    default:
-                        npcAge = "adult.";
-                        break;
-                }
-                switch (manner)
-                {
-                    case 0:
-                        npcManner = "neutral.";
-                        break;
-                    case 1:
-                        npcManner = "polite.";
-                        break;
-                    case 2:
-                        npcManner = "rude.";
-                        break;
-                    default:
-                        npcManner = "neutral.";
-                        break;
-                }
-                switch (social)
-                {
-                    case 0:
-                        npcSocial = "outgoing.";
-                        break;
-                    case 1:
-                        npcSocial = "shy.";
-                        break;
-                    case 2:
-                        npcSocial = "neutral.";
-                        break;
-                    default:
-                        npcSocial = "neutral";
-                        break;
-                }
-                switch (heartLevel)
-                {
-                    case 0:
-                    case 1:
-                    case 2:
-                        npcHeartLevel = ".0";
-                        break;
-                    case 3:
-                    case 4:
-                    case 5:
-                        npcHeartLevel = ".3";
-                        break;
-                    default:
-                        npcHeartLevel = ".6";
-                        break;
-                }
+                npcAge = age == 0 ? "adult." : age == 1 ? "teens." : age == 2 ? "child." : "adult.";
+                npcManner = manner == 0 ? "neutral." : manner == 1 ? "polite." : manner == 2 ? "rude." : "neutral.";
+                npcSocial = social == 0 ? "outgoing." : social == 1 ? "shy." : social == 2 ? "neutral." : "neutral.";
+                npcHeartLevel = heartLevel <= 2 ? ".0" : heartLevel <= 5 ? ".3" : ".6";
+
                 string text = SHelper.Translation.Get("foodstore.general." + npcAge + npcManner + npcSocial + randomIndex.ToString() + npcHeartLevel);
                 //SHelper.Events.Input.ButtonPressed += (sender, args) => { Game1.chatBox.addInfoMessage(args.Button.ToString()); };
                 NPCShowTextAboveHead(npc, text);
