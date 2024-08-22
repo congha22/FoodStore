@@ -9,6 +9,7 @@ using StardewValley;
 using StardewValley.BellsAndWhistles;
 using StardewValley.Buildings;
 using StardewValley.Extensions;
+using StardewValley.GameData.Characters;
 using StardewValley.GameData.FruitTrees;
 using StardewValley.GameData.LocationContexts;
 using StardewValley.GameData.Shops;
@@ -143,7 +144,32 @@ namespace MarketTown
 
                     if (__instance.Name.Contains("MT.Guest_") || !Game1.player.friendshipData[__instance.Name].IsMarried() && !Config.DisableChatAll && Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) < 2)
                     {
-                        __instance.CurrentDialogue.Push(new Dialogue(__instance, "key", SHelper.Translation.Get("foodstore.general." + __instanceAge + __instanceManner + __instanceSocial + randomIndex.ToString() + __instanceHeartLevel)));
+                        if (Config.AdvanceAiContent && AILimitCount < AILimitBlock)
+                        {
+                            string relation = heartLevel <= 2 ? "stranger" : heartLevel <= 5 ? "acquaintance" : "best friend";
+                            string bestFriend = "";
+                            foreach (var f in Game1.player.friendshipData)
+                                foreach (var f2 in f.Where(f2 => f2.Value.Points >= 750).OrderByDescending(f2 => f2.Value.Points).Take(3))
+                                    bestFriend += $"{f2.Key}, ";
+
+                            string data = $"Current location: {Game1.currentLocation.Name}; Current time: {Game1.timeOfDay}; Weather:{Game1.currentLocation.GetWeather().Weather}; Day of months: {Game1.dayOfMonth}; Current season: {Game1.currentLocation.GetSeason()};";
+
+                            if (bestFriend != "") data += $"Player's closet friends: {bestFriend}; ";
+
+                            conversationSummaries.TryGetValue(__instance.Name, out string history);
+                            if (history != "") data += $"Previous user message: {history}";
+
+                            Task.Run(() => ModEntry.SendMessageToAssistant(
+                                npc: __instance,
+                                userMessage: "",
+                                systemMessage: $"As NPC {__instance.Name} ({__instanceAge}, {__instanceManner} manner, {__instanceSocial} social anxiety, and in {relation} relationship with player {Game1.player.Name}), you will start a new conversation in context of Stardew Valley game. You can use this information if relevant: {data}. Limit to under 30 words",
+                                isConversation: true,
+                                isForBubbleMessage: false)
+                            );
+
+                        }
+                        else
+                            __instance.CurrentDialogue.Push(new Dialogue(__instance, "key", SHelper.Translation.Get("foodstore.general." + __instanceAge + __instanceManner + __instanceSocial + randomIndex.ToString() + __instanceHeartLevel)));
                         __instance.modData["hapyke.FoodStore/TotalCustomerResponse"] = (Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) + 1).ToString();
                     }
                 }
@@ -451,7 +477,22 @@ namespace MarketTown
                     else
                     {
                         if (storeTypeName != "") NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.loveWithType." + randomIndex, new { player = Game1.MasterPlayer.displayName, shopTypeName = storeTypeName }));
-                        else NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.love." + randomIndex));
+                        else
+                        {
+                            if(Config.AdvanceAiContent && AILimitCount < AILimitBlock)
+                            {
+                                List<string> contextChoice = new List<string> { "love shopping there", "always has the best choice", "high-quality merchandise", "personalized shopping experience" };
+                                string ageCategory = __instance.Age == 0 ? "adult" : __instance.Age == 1 ? "teens" : "child";
+                                string manner = __instance.Manners == 0 ? "friendly." : __instance.Manners == 1 ? "polite." : __instance.Manners == 2 ? "rude." : "friendly.";
+                                Task.Run(() => SendMessageToAssistant(
+                                                npc: __instance,
+                                                userMessage: $"How do you feel about my {Game1.MasterPlayer.Name}'s store?",
+                                                systemMessage: $"As NPC {__instance.Name} ({ageCategory}, {manner}) in Stardew Valley, you will reply the user with a text only message under 25 words that your feeling with the {Game1.MasterPlayer.Name} store is that {contextChoice[random.Next(contextChoice.Count)]}")
+                                            );
+                            }
+                            else 
+                                NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.love." + randomIndex));
+                        }
                     }
                 }
                 else if (lastTaste == 2) //like
@@ -460,7 +501,22 @@ namespace MarketTown
                     else
                     {
                         if (storeTypeName != "") NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.likeWithType." + randomIndex, new { player = Game1.MasterPlayer.displayName, shopTypeName = storeTypeName }));
-                        else NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.like." + randomIndex));
+                        else
+                        {
+                            if (Config.AdvanceAiContent && AILimitCount < AILimitBlock)
+                            {
+                                List<string> contextChoice = new List<string> { "kinda like shopping here", "decent selection of products", "pleasant shopping experience", "solid range of option" };
+                                string ageCategory = __instance.Age == 0 ? "adult" : __instance.Age == 1 ? "teens" : "child";
+                                string manner = __instance.Manners == 0 ? "friendly." : __instance.Manners == 1 ? "polite." : __instance.Manners == 2 ? "rude." : "friendly.";
+                                Task.Run(() => SendMessageToAssistant(
+                                                npc: __instance,
+                                                userMessage: $"How do you feel about my {Game1.MasterPlayer.Name}'s store?",
+                                                systemMessage: $"As NPC {__instance.Name} ({ageCategory}, {manner}) in Stardew Valley, you will reply the user with a text only message under 20 words that your feeling with the {Game1.MasterPlayer.Name} store is that {contextChoice[random.Next(contextChoice.Count)]}")
+                                            );
+                            }
+                            else
+                                NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.like." + randomIndex));
+                        }
                     }
                 }
                 else if (lastTaste == 4) //dislike
@@ -469,7 +525,22 @@ namespace MarketTown
                     else
                     {
                         if (storeTypeName != "") NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.dislikeWithType." + randomIndex, new { player = Game1.MasterPlayer.displayName, shopTypeName = storeTypeName }));
-                        else NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.dislike." + randomIndex));
+                        else
+                        {
+                            if (Config.AdvanceAiContent && AILimitCount < AILimitBlock)
+                            {
+                                List<string> contextChoice = new List<string> { "not my first choice", "not very inviting atmosphere", "prices seem high for the quality", "not even that good" };
+                                string ageCategory = __instance.Age == 0 ? "adult" : __instance.Age == 1 ? "teens" : "child";
+                                string manner = __instance.Manners == 0 ? "friendly." : __instance.Manners == 1 ? "polite." : __instance.Manners == 2 ? "rude." : "friendly.";
+                                Task.Run(() => SendMessageToAssistant(
+                                                npc: __instance,
+                                                userMessage: $"How do you feel about my {Game1.MasterPlayer.Name}'s store?",
+                                                systemMessage: $"As NPC {__instance.Name} ({ageCategory}, {manner}) in Stardew Valley, you will reply the user with a text only message under 20 words that your feeling with the {Game1.MasterPlayer.Name} store is that {contextChoice[random.Next(contextChoice.Count)]}")
+                                            );
+                            }
+                            else
+                                NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.dislike." + randomIndex));
+                        }
                     }
                 }
                 else if (lastTaste == 6) //hate
@@ -478,7 +549,22 @@ namespace MarketTown
                     else
                     {
                         if (storeTypeName != "") NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.hateWithType." + randomIndex, new { player = Game1.MasterPlayer.displayName, shopTypeName = storeTypeName }));
-                        else NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.hate." + randomIndex));
+                        else
+                        {
+                            if (Config.AdvanceAiContent && AILimitCount < AILimitBlock)
+                            {
+                                List<string> contextChoice = new List<string> { "ultra low-quality items", "way to overpriced for the quality", "consistently bad experiences", "very disappointing overall" };
+                                string ageCategory = __instance.Age == 0 ? "adult" : __instance.Age == 1 ? "teens" : "child";
+                                string manner = __instance.Manners == 0 ? "friendly." : __instance.Manners == 1 ? "polite." : __instance.Manners == 2 ? "rude." : "friendly.";
+                                Task.Run(() => SendMessageToAssistant(
+                                                npc: __instance,
+                                                userMessage: $"How do you feel about my {Game1.MasterPlayer.Name}'s store?",
+                                                systemMessage: $"As NPC {__instance.Name} ({ageCategory}, {manner}) in Stardew Valley, you will reply the user with a text only message under 20 words that your feeling with the {Game1.MasterPlayer.Name} store is that {contextChoice[random.Next(contextChoice.Count)]}")
+                                            );
+                            }
+                            else
+                                NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.hate." + randomIndex));
+                        }
                     }
                 }
                 else if (lastTaste == 8) //neutral
@@ -487,7 +573,22 @@ namespace MarketTown
                     else
                     {
                         if (storeTypeName != "") NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.neutralWithType." + randomIndex, new { player = Game1.MasterPlayer.displayName, shopTypeName = storeTypeName }));
-                        else NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.neutral." + randomIndex));
+                        else
+                        {
+                            if (Config.AdvanceAiContent && AILimitCount < AILimitBlock)
+                            {
+                                List<string> contextChoice = new List<string> { "just minimum service and quality", "just meets expectations", "nothing exceptional", "just typical items" };
+                                string ageCategory = __instance.Age == 0 ? "adult" : __instance.Age == 1 ? "teens" : "child";
+                                string manner = __instance.Manners == 0 ? "friendly." : __instance.Manners == 1 ? "polite." : __instance.Manners == 2 ? "rude." : "friendly.";
+                                Task.Run(() => SendMessageToAssistant(
+                                                npc: __instance,
+                                                userMessage: $"How do you feel about my {Game1.MasterPlayer.Name}'s store?",
+                                                systemMessage: $"As NPC {__instance.Name} ({ageCategory}, {manner}) in Stardew Valley, you will reply the user with a text only message under 20 words that your feeling with the {Game1.MasterPlayer.Name} store is that {contextChoice[random.Next(contextChoice.Count)]}")
+                                            );
+                            }
+                            else
+                                NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.neutral." + randomIndex));
+                        }
                     }
                 }
                 else { }
@@ -715,7 +816,7 @@ namespace MarketTown
 
                 if (!TodayCustomerNoteName.Contains(__instance.Name) && (lastTasteRate >= 0.3 && lastDecorRate > 0 || lastTasteRate > 0.3 && lastDecorRate >= 0))          // Normal food, good decor or like food, normal decor
                 {
-                    if (Config.AdvanceAiContent)
+                    if (Config.AdvanceAiContent && AILimitCount < AILimitBlock)
                     {
                         int wordCount = 20;
                         List<string> contextChoice = new List<string> { "amazing.", "the best ever.", "loved.", "absolute amazing." };
@@ -748,7 +849,7 @@ namespace MarketTown
                 }
                 else if (!TodayCustomerNoteName.Contains(__instance.Name) && (lastTasteRate <= 0.25 || lastTasteRate == 0.3 && lastDecorRate < 0))     // Dishlike food, or neutral food and bad decor
                 {
-                    if (Config.AdvanceAiContent)
+                    if (Config.AdvanceAiContent && AILimitCount < AILimitBlock)
                     {
                         List<string> contextChoice = new List<string> { "much disappointed", "never again", "disgusting", "absolute terrible" };
                         if (lastTasteRate <= 0.25 && lastDecorRate == -0.2) 
@@ -777,7 +878,7 @@ namespace MarketTown
                 }
                 else if (!TodayCustomerNoteName.Contains(__instance.Name))          // Other case
                 {
-                    if (Config.AdvanceAiContent)
+                    if (Config.AdvanceAiContent && AILimitCount < AILimitBlock)
                     {
                         List<string> contextChoice = new List<string> { "normal", "fine", "middle class", "just meet the expectation" };
                         string ageCategory = __instance.Age == 0 ? "adult" : __instance.Age == 1 ? "teens" : "child";
@@ -821,6 +922,11 @@ namespace MarketTown
         [HarmonyPatch(typeof(FruitTree), nameof(FruitTree.TryAddFruit))]    // Set Fruit tree fruit
         public class FruitTree_TryAddFruit_Patch
         {
+            public static bool Prepare()
+            {
+                return !SHelper.ModRegistry.IsLoaded("chiccen.FruitTreeTweaks");
+            }
+
             static bool Prefix(FruitTree __instance, ref bool __result)
             {
                 if (__instance != null && __instance.Location != null && __instance.Location.Name.Contains("Custom_MT_Island") && Config.IslandPlantBoost)
@@ -869,6 +975,11 @@ namespace MarketTown
         [HarmonyPatch(typeof(FruitTree), nameof(FruitTree.draw))]
         public class FruitTree_Draw_Patch
         {
+            public static bool Prepare()
+            {
+                return !SHelper.ModRegistry.IsLoaded("chiccen.FruitTreeTweaks");
+            }
+
             static void Postfix(FruitTree __instance, SpriteBatch spriteBatch)
             {
                 var tileLocation = __instance.Tile;

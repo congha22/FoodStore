@@ -60,6 +60,8 @@ class MailData
 
     public float TotalPointTaste {  get; set; } = 0f;
     public float TotalPointDecor {  get; set; } = 0f;
+
+    public IDictionary<string, string> npcConversation {  get; set; } = new Dictionary<string, string>();
 }
 
 internal class MailLoader

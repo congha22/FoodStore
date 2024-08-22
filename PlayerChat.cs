@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using Microsoft.Xna.Framework;
+using Netcode;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Characters;
@@ -7,6 +8,7 @@ using StardewValley.GameData;
 using StardewValley.Locations;
 using StardewValley.Menus;
 using StardewValley.Minigames;
+using StardewValley.Network;
 using StardewValley.Objects;
 using StardewValley.SDKs;
 using System;
@@ -215,9 +217,34 @@ namespace MarketTown
                 npcSocial = social == 0 ? "outgoing." : social == 1 ? "shy." : social == 2 ? "neutral." : "neutral.";
                 npcHeartLevel = heartLevel <= 2 ? ".0" : heartLevel <= 5 ? ".3" : ".6";
 
-                string text = SHelper.Translation.Get("foodstore.general." + npcAge + npcManner + npcSocial + randomIndex.ToString() + npcHeartLevel);
-                //SHelper.Events.Input.ButtonPressed += (sender, args) => { Game1.chatBox.addInfoMessage(args.Button.ToString()); };
-                NPCShowTextAboveHead(npc, text);
+                string relation = heartLevel <= 2 ? "stranger" : heartLevel <= 5 ? "acquaintance" : "best friend";
+                string bestFriend = "";
+                foreach (var f in Game1.player.friendshipData)
+                    foreach (var f2 in f.Where(f2 => f2.Value.Points >= 750).OrderByDescending(f2 => f2.Value.Points).Take(3))
+                        bestFriend += $"{f2.Key}, ";
+                    
+                string data = $"Current location: {Game1.currentLocation.Name}; Current time: {Game1.timeOfDay}; Weather:{Game1.currentLocation.GetWeather().Weather}; Day of months: {Game1.dayOfMonth}; Current season: {Game1.currentLocation.GetSeason()};";
+                
+                if (bestFriend != "") data += $"Player's closet friends: {bestFriend}; ";
+
+                conversationSummaries.TryGetValue(npc.Name, out string history);
+                if (history != "") data += $"Previous user message: {history}";
+
+                if (Config.AdvanceAiContent && AILimitCount < AILimitBlock)
+                {
+                    Task.Run(() => ModEntry.SendMessageToAssistant(
+                        npc: npc,
+                        userMessage: textInput,
+                        systemMessage: $"As NPC {npc.Name} ({npcAge}, {npcManner} manner, {npcSocial} social anxiety, and in {relation} relationship with player {Game1.player.Name}), you will reply the user message if they ask question, or start a new conversation in context of Stardew Valley game. You can use this information if relevant: {data}. Limit to under 30 words",
+                        isConversation: true)
+                    );
+                }
+                else
+                {
+                    string text = SHelper.Translation.Get("foodstore.general." + npcAge + npcManner + npcSocial + randomIndex.ToString() + npcHeartLevel);
+                    //SHelper.Events.Input.ButtonPressed += (sender, args) => { Game1.chatBox.addInfoMessage(args.Button.ToString()); };
+                    NPCShowTextAboveHead(npc, text);
+                }
             }
             ActionList.Clear();
         }

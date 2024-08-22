@@ -21,6 +21,7 @@ using StardewValley.Minigames;
 using xTile.Dimensions;
 using System.Threading.Tasks;
 using xTile.Layers;
+using StardewValley.Extensions;
 
 namespace MarketTown
 {
@@ -46,7 +47,7 @@ namespace MarketTown
         internal static List<string> GlobalNPCList = new List<string>();
 
         /// <summary>List of blacklist villagers NPC that will not be used in most case.</summary>
-        internal static List<string> GlobalNPCBlackList = new List<string> { "Marlon", "Gunther", "Morris", "Krobus", "Sawyer", "???", "Goatherd", "Dwarf", "HankSVE", "Undreya", "Eyvinder", "ScarlettFake", "HighlandsDwarf", "???" };
+        internal static List<string> GlobalNPCBlackList = new List<string> { "Marlon", "Gunther", "Morris", "Krobus", "Leo", "Sawyer", "???", "Goatherd", "Dwarf", "HankSVE", "Undreya", "Eyvinder", "ScarlettFake", "HighlandsDwarf" };
 
         /// <summary>List of kids NPC (age = 2).</summary>
         internal static List<string> GlobalKidList = new List<string>();
@@ -80,6 +81,15 @@ namespace MarketTown
 
         // ####
         public static int FestivalItemIndexGenerator = 0;
+
+        /// <summary>Count of AI request</summary>
+        public static int AILimitCount = 0;
+
+        /// <summary>Limit of AI request per ingame hour</summary>
+        public static int AILimitBlock = 10;
+
+        /// <summary>Conversation history with each NPC</summary>
+        public static  IDictionary<string, string> conversationSummaries = new Dictionary<string, string>();
 
 
         // ==============================================================================================
@@ -269,6 +279,11 @@ namespace MarketTown
                 if (item != null && item is Object obj && obj.canBeGivenAsGift() && obj.sellToStorePrice() > 10)
                     GiftableObject.Add(obj);
             }
+
+            MailData model = null;
+            if (Game1.IsMasterGame) model = SHelper.Data.ReadSaveData<MailData>("MT.MailLog");
+            else model = SHelper.Data.ReadJsonFile<MailData>("markettowndata.json") ?? new MailData();
+            if (model != null) conversationSummaries = model.npcConversation;
         }
 
         [EventPriority(EventPriority.Low-9999)]
@@ -278,7 +293,7 @@ namespace MarketTown
             GlobalNPCList.Clear();
             foreach (NPC __instance in Utility.getAllVillagers())
             {
-                if (__instance != null && __instance.IsVillager && __instance.getMasterScheduleRawData() != null && !GlobalNPCBlackList.Contains(__instance.Name) && __instance.currentLocation.Name == __instance.DefaultMap)
+                if (__instance != null && __instance.IsVillager && __instance.getMasterScheduleRawData() != null && !GlobalNPCBlackList.Contains(__instance.Name) && __instance.currentLocation.Name == __instance.DefaultMap && __instance != Game1.player.getSpouse())
                 {
                     GlobalNPCList.Add(__instance.Name);
                     if (__instance.Age == 2) GlobalKidList.Add(__instance.Name);
@@ -348,6 +363,8 @@ namespace MarketTown
             PossibleMarketLocation.Clear();
 
             Random rand = new Random();
+
+            foreach ( var conversation in conversationSummaries) if(rand.NextBool()) conversationSummaries.Remove(conversation);
 
             if (Game1.IsMasterGame)             // Generate Dish of the week
             {
@@ -813,6 +830,12 @@ namespace MarketTown
 
             // restock table item
             RestockTable(true);
+
+            foreach (var name in GlobalNPCList)
+            {
+                NPC n = Game1.getCharacterFromName(name);
+                n?.reloadDefaultLocation();
+            }
         }
 
         // ----------- End of Day -----------
@@ -856,7 +879,9 @@ namespace MarketTown
         {
             Random random = new Random();
 
-            if(Game1.IsMasterGame && IsFestivalIsCurrent) SyncMultiplayerData();
+            if (Game1.timeOfDay % 100 == 0)AILimitCount = 0;
+
+            if (Game1.IsMasterGame && IsFestivalIsCurrent) SyncMultiplayerData();
 
             if (Game1.timeOfDay == 610)
             {
@@ -1241,12 +1266,16 @@ namespace MarketTown
                             string itemName = (food == null || food.foodObject == null || food.foodObject.DisplayName == null)
                                 ? "Item" : food.foodObject.displayName;
 
+                            List<string> tasteCase = new List<string>();
                             if (food.foodObject.Category == -7)
                             {
                                 // Get Reply, Sale Price, Tip for each taste
                                 if (taste == 0)         //Love
                                 {
                                     reply = SHelper.Translation.Get("foodstore.loverep." + rand.Next(20).ToString());
+                                    tasteCase = new List<string> { "absolute amazing experience", "love the great quality", "flavorful joy in every bite", "culinary delight", "rich perfection", "symphony of flavors", "indelible impression", 
+                                        "warm and comforting", "exquisite taste", "mouthwatering delight", "taste buds rejoice", "unforgettable flavor", "gourmet bliss", "perfectly balanced flavors", "heavenly taste", "satisfying and rich",
+                                        "culinary masterpiece", "pure taste bliss", "harmonious flavors", "sensory pleasure" };
 
                                     salePrice = (int)(salePrice * (1.4 + rand.NextDouble() / 4) * Config.MoneyModifier);
                                     tip = (int)(salePrice * 0.2 * Config.MoneyModifier);
@@ -1256,6 +1285,9 @@ namespace MarketTown
                                 else if (taste == 2)    //Like
                                 {
                                     reply = SHelper.Translation.Get("foodstore.likerep." + rand.Next(20).ToString());
+                                    tasteCase = new List<string> { "satisfies my taste buds", "reliably tasty", "safe and satisfying pick", "reliably enjoyable", "quite palatable", "alright choice", "consistently good", "decent option",
+                                        "occasionally enjoyable", "acceptable choice", "decently satisfying", "fairly good", "pleasant enough", "does the job", "average taste", "adequately satisfying", "nothing special but fine", "mildly enjoyable", 
+                                        "works well enough", "dependable flavor" };
 
                                     salePrice = (int)(salePrice * (1.2 + rand.NextDouble() / 4) * Config.MoneyModifier);
                                     tip = (int)(salePrice * 0.1 * Config.MoneyModifier);
@@ -1264,7 +1296,10 @@ namespace MarketTown
                                 }          //like
                                 else if (taste == 4)    //Dislike
                                 {
-                                    reply = SHelper.Translation.Get("foodstore.dislikerep." + rand.Next(20).ToString());
+                                    reply = SHelper.Translation.Get("foodstore.dislikerep." + rand.Next(20).ToString()); 
+                                    tasteCase = new List<string> { "not my favorite", "less enjoyable", "not quite satisfying", "below average", "lacking flavor", "slightly disappointing", "could be better", "not too great", "somewhat bland", 
+                                        "doesn't impress", "a bit underwhelming", "just okay, not more", "not very appealing", "could use improvement", "less than expected", "barely passable", "not much flavor", "somewhat lacking", "not a top pick",
+                                        "not up to par" };
 
                                     salePrice = (int)(salePrice * (0.75 + rand.NextDouble() / 4) * Config.MoneyModifier);
                                     tip = (int)(2 * Config.MoneyModifier);
@@ -1272,6 +1307,10 @@ namespace MarketTown
                                 else if (taste == 6)    //Hate
                                 {
                                     reply = SHelper.Translation.Get("foodstore.haterep." + rand.Next(20).ToString());
+                                    tasteCase = new List<string> { "really dislike", "strongly unpleasant", "completely unsatisfying", "barely edible", "highly disappointing", "almost inedible", "really off-putting", "unbearably bad",
+                                        "totally unappealing", "strongly disliked", "horribly bland", "can't stand it", "downright awful", "absolutely terrible", "extremely unappetizing", "worst choice", "utterly flavorless", "disgustingly bad", 
+                                        "hate this dish", "repulsive taste" };
+
                                     salePrice = (int)(salePrice / 2 * Config.MoneyModifier);
                                     tip = 0;
 
@@ -1279,6 +1318,9 @@ namespace MarketTown
                                 else                    //Neutral
                                 {
                                     reply = SHelper.Translation.Get("foodstore.neutralrep." + rand.Next(20).ToString());
+                                    tasteCase = new List<string> { "standard dish", "neither good nor bad", "regular choice", "average dish", "middle-of-the-road", "neutral pick", "standard choice", "passable dish", "ordinary option",
+                                        "nothing exceptional", "nothing special", "doesn't stand out", "decent but unremarkable", "adequately average", "no strong impression", "not exciting, not disappointing", "fairly ordinary",
+                                        "neither here nor there", "just okay", "doesn't draw attention" };
 
                                     salePrice = (int)(salePrice * (1.1 + rand.NextDouble() / 4) * Config.MoneyModifier);
                                     tip = (int)(salePrice * 0.5 * Config.MoneyModifier);
@@ -1328,21 +1370,37 @@ namespace MarketTown
                                 {
                                     case 4:
                                         reply = SHelper.Translation.Get("foodstore.nonfood." + food.foodObject.Quality.ToString() + "." + rand.Next(9));
+                                        tasteCase = new List<string> { "exceeded my expectations", "exceptional quality", "outstanding craftsmanship", "truly remarkable", "top-notch quality", "well-made and durable", "phenomenal detail",
+                                            "highest quality", "extremely impressive", "incredible craftsmanship", "unmatched quality", "superior craftsmanship", "flawless construction", "exceptional durability", "unbelievable quality",
+                                            "amazing attention to detail", "premium quality", "truly impressive", "best I've seen", "perfectly crafted" };
+
                                         salePrice = (int)(salePrice * 2 * (1 + rand.NextDouble() / 4));
                                         tip = (int)(salePrice * 0.15);
                                         break;
                                     case 2:
                                         reply = SHelper.Translation.Get("foodstore.nonfood." + food.foodObject.Quality.ToString() + "." + rand.Next(9));
+                                        tasteCase = new List<string> { "stands out with great quality", "happy with my purchase", "overall quality is great", "value for money", "perfect balance", "great quality and cost", "affordable great quality",
+                                            "exactly what I wanted", "great quality and price", "impressive for the price", "great value", "satisfyingly high quality", "better than most", "exceeds expectations", "well-made and affordable", 
+                                            "great for the price", "better than expected", "solid and dependable", "pleasantly surprised", "really well-made" };
+
                                         salePrice = (int)(salePrice * 1.8 * (1 + rand.NextDouble() / 4));
                                         tip = (int)(salePrice * 0.10);
                                         break;
                                     case 1:
                                         reply = SHelper.Translation.Get("foodstore.nonfood." + food.foodObject.Quality.ToString() + "." + rand.Next(9));
+                                        tasteCase = new List<string> { "really good for the price", "good quality and durability", "purchase was worth it", "pleasantly surprised", "good quality without breaking the bank", "great value",
+                                            "better than I expected", "solid quality", "worth the money", "good for the price", "satisfyingly good", "quality you can count on", "good deal", "well-made for the price", "decently durable", 
+                                            "good overall quality", "worthwhile purchase", "meets expectations", "quite good", "good choice for the price" };
+
                                         salePrice = (int)(salePrice * 1.65 * (1 + rand.NextDouble() / 4));
                                         tip = (int)(salePrice * 0.05);
                                         break;
                                     default:
                                         reply = SHelper.Translation.Get("foodstore.nonfood." + food.foodObject.Quality.ToString() + "." + rand.Next(9));
+                                        tasteCase = new List<string> { "normal quality, as expected", "average with normal quality", "serves its purpose", "standard level of quality", "neither impressive nor disappointing", "normal range of quality", 
+                                            "what I expected", "nothing exceptional", "typical quality", "meets basic expectations", "standard item", "no surprises here", "adequate quality", "normal for the price", "just okay", 
+                                            "normal quality, does the job", "meets the standard", "average quality", "common quality", "not bad, not great" };
+
                                         salePrice = (int)(salePrice * 1.5 * (1 + rand.NextDouble() / 4));
                                         break;
                                 }
@@ -1406,9 +1464,35 @@ namespace MarketTown
                             {
                                 //Generate chat box
                                 if (tip != 0)
-                                    NPCShowTextAboveHead(__instance, reply + SHelper.Translation.Get("foodstore.tip", new { tipValue = tip }));
+                                {
+                                    if (Config.AdvanceAiContent && AILimitCount < AILimitBlock)
+                                    {
+                                        string ageCategory = __instance.Age == 0 ? "adult" : __instance.Age == 1 ? "teens" : "child";
+                                        string manner = __instance.Manners == 0 ? "friendly." : __instance.Manners == 1 ? "polite." : __instance.Manners == 2 ? "rude." : "friendly.";
+                                        Task.Run(() => SendMessageToAssistant(
+                                            npc: __instance,
+                                            userMessage: $"How do you think about the {food.foodObject.Name}?",
+                                            systemMessage: $"As NPC {__instance.Name} ({ageCategory}, {manner}) in Stardew Valley, you share your opinion about the {food.foodObject.Name} you just bought that it is {tasteCase[rand.Next(tasteCase.Count)]} and you gave extra {tip} gold tip, using under 25 text words")
+                                        );
+                                    }
+                                    else
+                                        NPCShowTextAboveHead(__instance, reply + SHelper.Translation.Get("foodstore.tip", new { tipValue = tip }));
+                                }
                                 else
-                                    NPCShowTextAboveHead(__instance, reply);
+                                {
+                                    if (Config.AdvanceAiContent && AILimitCount < AILimitBlock)
+                                    {
+                                        string ageCategory = __instance.Age == 0 ? "adult" : __instance.Age == 1 ? "teens" : "child";
+                                        string manner = __instance.Manners == 0 ? "friendly." : __instance.Manners == 1 ? "polite." : __instance.Manners == 2 ? "rude." : "friendly.";
+                                        Task.Run(() => SendMessageToAssistant(
+                                            npc: __instance,
+                                            userMessage: $"How do you think about the {food.foodObject.Name}?",
+                                            systemMessage: $"As NPC {__instance.Name} ({ageCategory}, {manner}) in Stardew Valley, you share your opinion about the {food.foodObject.Name} you just bought that it is {tasteCase[rand.Next(tasteCase.Count)]}, using under 22 text words")
+                                        );
+                                    }
+                                    else
+                                        NPCShowTextAboveHead(__instance, reply);
+                                }
 
                                 //Generate chat box
                                 if (Game1.IsMultiplayer)

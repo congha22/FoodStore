@@ -10,8 +10,10 @@ using Newtonsoft.Json;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
+using StardewValley.BellsAndWhistles;
 using StardewValley.Buildings;
 using StardewValley.Extensions;
+using StardewValley.GameData.Characters;
 using StardewValley.GameData.Objects;
 using StardewValley.GameData.Shops;
 using StardewValley.Locations;
@@ -19,6 +21,7 @@ using StardewValley.Menus;
 using StardewValley.Objects;
 using StardewValley.Pathfinding;
 using StardewValley.TerrainFeatures;
+using StardewValley.Tools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -66,7 +69,6 @@ namespace MarketTown
             helper.Events.GameLoop.UpdateTicked += GameLoop_UpdateTicked;
             Helper.Events.GameLoop.OneSecondUpdateTicked += GameLoop_OneSecondUpdateTicked;
             helper.Events.GameLoop.TimeChanged += this.OnTimeChange;
-            //helper.Events.GameLoop.TimeChanged += this.timechangetest;
 
             helper.Events.Multiplayer.PeerConnected += OnPeerConnected;
 
@@ -1626,77 +1628,114 @@ namespace MarketTown
         /// <summary>Selected NPC will share their opinion, and nearby NPCs will response to that.</summary>
         public static void SaySomething(NPC thisCharacter, GameLocation thisLocation, double lastTasteRate, double lastDecorRate)
         {
+            Random random = new Random();
+
             double chanceToVisit = lastTasteRate + lastDecorRate;
             double localNpcCount = 0.6;
 
-            Random rand = new Random();
-            double getChance = rand.NextDouble();
+            double getChance = random.NextDouble();
+            List<NPC> localNpc = new List<NPC>();
 
-            foreach (NPC newCharacter in thisLocation.characters)
+
+            foreach (NPC newCharacter in thisLocation.characters.Where(i => i.IsVillager && i.getMasterScheduleRawData != null))
             {
-                if (Utility.isThereAFarmerOrCharacterWithinDistance(new Vector2(thisCharacter.Tile.X, thisCharacter.Tile.Y), 13, thisCharacter.currentLocation) != null
-                    && localNpcCount > 0.2) localNpcCount -= 0.0175;
+                if (newCharacter != thisCharacter)
+                {
+                    var dx = newCharacter.Tile.X - thisCharacter.Tile.X;
+                    var dy = newCharacter.Tile.Y - thisCharacter.Tile.Y;
+
+                    if (Math.Abs(dx) <= 10 && Math.Abs(dy) <= 10 && localNpcCount > 0.2 && !localNpc.Contains(newCharacter))
+                    {
+                        localNpc.Add(newCharacter);
+                        localNpcCount -= 0.0175;
+                    }
+                }
+            }
+            int randomIndex = random.Next(5);
+            int randomIndex2 = random.Next(3);
+
+            List<string> tastePool = new List<string> { };
+            List<string> decorPool = new List<string> { };
+
+
+            //taste string
+            string tastestring = "string";
+            if (lastTasteRate > 0.3)
+            {
+                tastestring = SHelper.Translation.Get("foodstore.positiveTasteint." + randomIndex);
+                tastePool = new List<string> { "absolute amazing", "remarkable", "excellent and reliable" };
+            }
+            else if (lastTasteRate == 0.3)
+            {
+                tastestring = SHelper.Translation.Get("foodstore.normalTasteint." + randomIndex);
+                tastePool = new List<string> { "just meets the standard", "pretty average", "just a reliable choice" };
+            }
+            else if (lastTasteRate < 0.3)
+            {
+                tastestring = SHelper.Translation.Get("foodstore.negativeTasteint." + randomIndex);
+                tastePool = new List<string> { "extremely bad", "not up to the mark", "won't hold up for long." };
             }
 
-            foreach (NPC newCharacter in thisLocation.characters)
+            //decor string
+            string decorstring = "string";
+            if (lastDecorRate > 0)
             {
-                if (rand.NextDouble() < 0.66) continue;
+                decorstring = SHelper.Translation.Get("foodstore.positiveDecorint." + randomIndex);
+                decorPool = new List<string> { "absolutely stunning!", "exquisite design, truly eye-catching.", "masterpiece of style and taste." };
+            }
+            else if (lastDecorRate == 0)
+            {
+                decorstring = SHelper.Translation.Get("foodstore.normalDecorint." + randomIndex);
+                decorPool = new List<string> { "pretty standard, not stand out.", "just fit, nothing too fancy.", "blends in fine, nothing special."};
+            }
+            else if (lastDecorRate < 0)
+            {
+                decorstring = SHelper.Translation.Get("foodstore.negativeDecorint." + randomIndex);
+                decorPool = new List<string> { "feels out of place", "not as impressive as expected.", "falls short of making an impact." };
+            }
 
-                if (Vector2.Distance(newCharacter.Tile, thisCharacter.Tile) <= (float)10 && newCharacter.Name != thisCharacter.Name && !Config.DisableChatAll)
+
+            // main NPC show bubble
+            if (Config.AdvanceAiContent && AILimitCount < AILimitBlock)
+            {
+                string ageCategory = thisCharacter.Age == 0 ? "adult" : thisCharacter.Age == 1 ? "teens" : "child";
+                string manner = thisCharacter.Manners == 0 ? "friendly." : thisCharacter.Manners == 1 ? "polite." : thisCharacter.Manners == 2 ? "rude." : "friendly.";
+                Task.Run(() => SendMessageToAssistant(
+                                npc: thisCharacter,
+                                userMessage: $"",
+                                systemMessage: $"As NPC {thisCharacter.Name} ({ageCategory}, {manner}) in Stardew Valley, you share your opinion about {Game1.MasterPlayer.Name}'s store to others that the items quality is {tastePool[random.Next(tastePool.Count)]} and decoration style is {decorPool[random.Next(decorPool.Count)]}, with under 27 text words")
+                            );
+            }
+            else
+                NPCShowTextAboveHead(thisCharacter, tastestring + ". " + decorstring);
+
+            // other NPC
+            foreach (var newCharacter in localNpc)
+            {
+                if (random.NextDouble() > localNpcCount) continue;
+
+                if (getChance < chanceToVisit && lastTasteRate > 0.3 && lastDecorRate > 0)          //Will visit, positive Food, positive Decor
                 {
-                    Random random = new Random();
-                    int randomIndex = random.Next(5);
-                    int randomIndex2 = random.Next(3);
-
-                    //taste string
-                    string tastestring = "string";
-                    if (lastTasteRate > 0.3) tastestring = SHelper.Translation.Get("foodstore.positiveTasteint." + randomIndex);
-                    else if (lastTasteRate == 0.3) tastestring = SHelper.Translation.Get("foodstore.normalTasteint." + randomIndex);
-                    else if (lastTasteRate < 0.3) tastestring = SHelper.Translation.Get("foodstore.negativeTasteint." + randomIndex);
-
-                    //decor string
-                    string decorstring = "string";
-                    if (lastDecorRate > 0) decorstring = SHelper.Translation.Get("foodstore.positiveDecorint." + randomIndex);
-                    else if (lastDecorRate == 0) decorstring = SHelper.Translation.Get("foodstore.normalDecorint." + randomIndex);
-                    else if (lastDecorRate < 0) decorstring = SHelper.Translation.Get("foodstore.negativeDecorint." + randomIndex);
-
-                    //do the work
-                    if (getChance < chanceToVisit && lastTasteRate > 0.3 && lastDecorRate > 0)          //Will visit, positive Food, positive Decor
-                    {
-                        NPCShowTextAboveHead(thisCharacter, tastestring + ". " + decorstring);
-                        if (rand.NextDouble() > localNpcCount) continue;
-
-                        if (newCharacter.modData["hapyke.FoodStore/LastFood"] == null) newCharacter.modData["hapyke.FoodStore/LastFood"] = "0";
-                        newCharacter.modData["hapyke.FoodStore/LastFood"] = (Int32.Parse(newCharacter.modData["hapyke.FoodStore/LastFood"]) - Config.MinutesToHungry + 30).ToString();
-                        NPCShowTextAboveHead(newCharacter, SHelper.Translation.Get("foodstore.willVisit." + randomIndex2));
-                    }
-                    else if (getChance < chanceToVisit)                                                 //Will visit, normal or negative Food , Decor
-                    {
-                        NPCShowTextAboveHead(thisCharacter, tastestring + ". " + decorstring);
-                        if (rand.NextDouble() > localNpcCount) continue;
-
-                        if (newCharacter.modData["hapyke.FoodStore/LastFood"] == null) newCharacter.modData["hapyke.FoodStore/LastFood"] = "0";
-                        if (Config.MinutesToHungry >= 60)
-                            newCharacter.modData["hapyke.FoodStore/LastFood"] = (Int32.Parse(newCharacter.modData["hapyke.FoodStore/LastFood"]) - (Config.MinutesToHungry / 2)).ToString();
-                        NPCShowTextAboveHead(newCharacter, SHelper.Translation.Get("foodstore.mayVisit." + randomIndex2));
-                    }
-                    else if (getChance >= chanceToVisit && lastTasteRate < 0.3 && lastDecorRate < 0)     //No visit, negative Food, negative Decor
-                    {
-                        NPCShowTextAboveHead(thisCharacter, tastestring + ". " + decorstring);
-                        if (rand.NextDouble() > localNpcCount) continue;
-
-                        if (newCharacter.modData["hapyke.FoodStore/LastFood"] == null) newCharacter.modData["hapyke.FoodStore/LastFood"] = "2600";
-                        newCharacter.modData["hapyke.FoodStore/LastFood"] = "2600";
-                        NPCShowTextAboveHead(newCharacter, SHelper.Translation.Get("foodstore.noVisit." + randomIndex2));
-                    }
-                    else if (getChance >= chanceToVisit)                                                 //No visit, normal or positive Food, Decor
-                    {
-                        NPCShowTextAboveHead(thisCharacter, tastestring + ". " + decorstring);
-                        if (rand.NextDouble() > localNpcCount) continue;
-
-                        NPCShowTextAboveHead(newCharacter, SHelper.Translation.Get("foodstore.mayVisit." + randomIndex2));
-                    }
-                    else { }    //Handle
+                    if (newCharacter.modData["hapyke.FoodStore/LastFood"] == null) newCharacter.modData["hapyke.FoodStore/LastFood"] = "0";
+                    newCharacter.modData["hapyke.FoodStore/LastFood"] = (Int32.Parse(newCharacter.modData["hapyke.FoodStore/LastFood"]) - Config.MinutesToHungry + 30).ToString();
+                    NPCShowTextAboveHead(newCharacter, SHelper.Translation.Get("foodstore.willVisit." + randomIndex2));
+                }
+                else if (getChance < chanceToVisit)                                                 //Will visit, normal or negative Food , Decor
+                {
+                    if (newCharacter.modData["hapyke.FoodStore/LastFood"] == null) newCharacter.modData["hapyke.FoodStore/LastFood"] = "0";
+                    if (Config.MinutesToHungry >= 60)
+                        newCharacter.modData["hapyke.FoodStore/LastFood"] = (Int32.Parse(newCharacter.modData["hapyke.FoodStore/LastFood"]) - (Config.MinutesToHungry / 2)).ToString();
+                    NPCShowTextAboveHead(newCharacter, SHelper.Translation.Get("foodstore.mayVisit." + randomIndex2));
+                }
+                else if (getChance >= chanceToVisit && lastTasteRate < 0.3 && lastDecorRate < 0)     //No visit, negative Food, negative Decor
+                {
+                    if (newCharacter.modData["hapyke.FoodStore/LastFood"] == null) newCharacter.modData["hapyke.FoodStore/LastFood"] = "2600";
+                    newCharacter.modData["hapyke.FoodStore/LastFood"] = "2600";
+                    NPCShowTextAboveHead(newCharacter, SHelper.Translation.Get("foodstore.noVisit." + randomIndex2));
+                }
+                else if (getChance >= chanceToVisit)                                                 //No visit, normal or positive Food, Decor
+                {
+                    NPCShowTextAboveHead(newCharacter, SHelper.Translation.Get("foodstore.mayVisit." + randomIndex2));
                 }
             }
         }
@@ -2221,8 +2260,10 @@ namespace MarketTown
                 TotalClothesSold = TodayClothesSold + totalClothesSold,
 
                 TotalPointTaste = TodayPointTaste + totalPointTaste,
-                TotalPointDecor = TodayPointDecor + totalPointDecor
-                
+                TotalPointDecor = TodayPointDecor + totalPointDecor,
+
+                npcConversation = conversationSummaries
+
             };
             if (Game1.IsMasterGame)
             {
@@ -2637,8 +2678,23 @@ namespace MarketTown
                             }
                             else
                             {
-                                NPCShowTextAboveHead(npc, SHelper.Translation.Get($"foodstore.viewchat.fruittree.{fTree.daysUntilMature.Value <= 0}.{fTree.fruit.Any()}.{random.Next(1, 16)}",
-                                    new { treeName = fTree.GetDisplayName(), playerName = Game1.player.Name }));
+                                if (Config.AdvanceAiContent && AILimitCount < AILimitBlock)
+                                {
+                                    List<string> contextChoice = new List<string> { "still young", "need more time to grow", "seem to be a great tree", "will bear a lot of fruits" };
+                                    if (fTree.daysUntilMature.Value <= 0 && !fTree.fruit.Any()) contextChoice = new List<string> { "provides excellent shade", "strong and sturdy branches", "waiting for fruit", "beautiful colors", "birds nesting", "tall and impressive", "attractive foliage" };
+                                    else if (fTree.daysUntilMature.Value <= 0 && fTree.fruit.Any()) contextChoice = new List<string> { "bursting with fruit", "full of fruits", "wonderful tree", "great looking tree", "ready to harvest", "fruitful and abundant", "excited to taste" };
+
+                                    string ageCategory = npc.Age == 0 ? "adult" : npc.Age == 1 ? "teens" : "child";
+                                    string manner = npc.Manners == 0 ? "friendly." : npc.Manners == 1 ? "polite." : npc.Manners == 2 ? "rude." : "friendly.";
+                                    Task.Run(() => SendMessageToAssistant(
+                                        npc: npc,
+                                        userMessage: $"",
+                                        systemMessage: $"As NPC {npc.Name} ({ageCategory}, {manner}) in Stardew Valley, you will share your comment that this {fTree.GetDisplayName()} tree is {contextChoice[random.Next(contextChoice.Count)]}, using under 25 text words")
+                                    );
+                                }
+                                else 
+                                    NPCShowTextAboveHead(npc, SHelper.Translation.Get($"foodstore.viewchat.fruittree.{fTree.daysUntilMature.Value <= 0}.{fTree.fruit.Any()}.{random.Next(1, 16)}",
+                                        new { treeName = fTree.GetDisplayName(), playerName = Game1.player.Name }));
                                 return;
                             }
                         }
@@ -2659,8 +2715,21 @@ namespace MarketTown
 
                                 if (crop != null)
                                 {
-                                    NPCShowTextAboveHead(npc, SHelper.Translation.Get($"foodstore.viewchat.crop.{growth.Value >= 5}.{random.Next(1, 16)}",
-                                        new { playerName = Game1.player.Name, cropName = crop.DisplayName }));
+                                    if (Config.AdvanceAiContent && AILimitCount < AILimitBlock)
+                                    {
+                                        List<string> contextChoice = new List<string> { "good", "lovely", "great color" };
+                                        string ageCategory = npc.Age == 0 ? "adult" : npc.Age == 1 ? "teens" : "child";
+                                        string manner = npc.Manners == 0 ? "friendly." : npc.Manners == 1 ? "polite." : npc.Manners == 2 ? "rude." : "friendly.";
+                                        string ready = growth.Value >= 5 ? "ready" : "not ready";
+                                        Task.Run(() => SendMessageToAssistant(
+                                            npc: npc,
+                                            userMessage: $"",
+                                            systemMessage: $"As NPC {npc.Name} ({ageCategory}, {manner}) in Stardew Valley, you will share your comment that this {crop.DisplayName} is looking {contextChoice[random.Next(contextChoice.Count)]} and {ready} to harvest, using under 22 text words")
+                                        );
+                                    }
+                                    else
+                                        NPCShowTextAboveHead(npc, SHelper.Translation.Get($"foodstore.viewchat.crop.{growth.Value >= 5}.{random.Next(1, 16)}",
+                                            new { playerName = Game1.player.Name, cropName = crop.DisplayName }));
                                     return;
                                 }
                             }
@@ -2675,10 +2744,44 @@ namespace MarketTown
                     else if (obj != null && obj is Furniture furniture)
                     {
                         List<int> validCategory = new List<int> { 0, 1, 2, 3, 4, 6, 8, 10, 14, 17};
-                        if (validCategory.Contains(furniture.furniture_type.Value))
+                        if (Config.AdvanceAiContent && AILimitCount < AILimitBlock)
+                        {
+                            List<string> contextChoice = new List<string> { "good", "lovely", "great color" };
+                            string ageCategory = npc.Age == 0 ? "adult" : npc.Age == 1 ? "teens" : "child";
+                            string manner = npc.Manners == 0 ? "friendly." : npc.Manners == 1 ? "polite." : npc.Manners == 2 ? "rude." : "friendly.";
+                            string furnitureType = furniture.furniture_type.Value switch
+                            {
+                                0 => "chair",
+                                1 => "bench",
+                                2 => "couch",
+                                3 => "armchair",
+                                4 => "dresser",
+                                5 => "long table",
+                                6 => "painting",
+                                7 => "lamp",
+                                8 => "decor",
+                                9 => "furniture",
+                                10 => "bookcase",
+                                11 => "table",
+                                12 => "rug",
+                                13 => "window",
+                                14 => "fireplace",
+                                15 => "bed",
+                                16 => "torch",
+                                17 => "sconce",
+                                _ => "furniture"
+                            };
+
+                            Task.Run(() => SendMessageToAssistant(
+                                npc: npc,
+                                userMessage: $"",
+                                systemMessage: $"As NPC {npc.Name} ({ageCategory}, {manner}) in Stardew Valley, you will share your comment that this {furniture.DisplayName} {furnitureType}, using under 20 text words")
+                            );
+                        }
+                        else if (validCategory.Contains(furniture.furniture_type.Value))
                         {
                             NPCShowTextAboveHead(npc, SHelper.Translation.Get($"foodstore.viewchat.furniture.{furniture.furniture_type.Value}.{random.Next(1, 6)}",
-                                        new { playerName = Game1.player.Name, furniName = furniture.DisplayName }));
+                                    new { playerName = Game1.player.Name, furniName = furniture.DisplayName }));
                             return;
                         }
                     }
@@ -2836,34 +2939,62 @@ namespace MarketTown
                         if (chance < 0.04 && WantsToSay(npc, 360) && GetClosestFood(npc, location) is DataPlacedFood food && food != null)                    //If have item for sale
                         {
                             var decorPointComment = GetDecorPoint(food.foodTile, npc.currentLocation);
+                            string decorRate = decorPointComment >= 0.2 ? "absolute amazing decoration" : decorPointComment <= 0 ? "really bad decoration choice" : "just normal decoration";
 
                             //Send decorPoint message
-                            if (decorPointComment >= 0.2)
+                            if (Config.AdvanceAiContent && AILimitCount < AILimitBlock)
                             {
-                                NPCShowTextAboveHead(npc, SHelper.Translation.Get($"foodstore.gooddecor.{random.Next(5)}"));
+                                string ageCategory = npc.Age == 0 ? "adult" : npc.Age == 1 ? "teens" : "child";
+                                string manner = npc.Manners == 0 ? "friendly." : npc.Manners == 1 ? "polite." : npc.Manners == 2 ? "rude." : "friendly.";
+                                Task.Run(() => SendMessageToAssistant(
+                                    npc: npc,
+                                    userMessage: $"",
+                                    systemMessage: $"As NPC {npc.Name} ({ageCategory}, {manner}) in Stardew Valley, you will share your comment that the store has {decorRate} and wonder if that say something about the quality of product, using under 20 text words")
+                                );
                             }
-                            else if (decorPointComment <= 0)
+                            else
                             {
-                                NPCShowTextAboveHead(npc, SHelper.Translation.Get($"foodstore.baddecor.{random.Next(5)}"));
+                                if (decorPointComment >= 0.2)
+                                {
+                                    NPCShowTextAboveHead(npc, SHelper.Translation.Get($"foodstore.gooddecor.{random.Next(5)}"));
+                                }
+                                else if (decorPointComment <= 0)
+                                {
+                                    NPCShowTextAboveHead(npc, SHelper.Translation.Get($"foodstore.baddecor.{random.Next(5)}"));
+                                }
                             }
                         }
                         else if (chance < 0.12 && WantsToSay(npc, 300) 
                             && (location is FarmHouse || location == Game1.getFarm() || location.Name.Contains("Custom_MT_Island")))      //if in FarmHouse and have no item for sale
                         {
                             var decorPointComment = GetDecorPoint(npc.Tile, npc.currentLocation, 12);
+                            string decorRate = decorPointComment >= 0.2 ? "the best decoration" : decorPointComment <= 0 ? "terrible decoration" : "very normal simple decoration";
 
                             //Send decorPoint message
-                            if (decorPointComment >= 0.2)
+                            if (Config.AdvanceAiContent && AILimitCount < AILimitBlock)
                             {
-                                NPCShowTextAboveHead(npc, SHelper.Translation.Get($"foodstore.generalgooddecor.{random.Next(20)}", new {playerName = Game1.player.displayName}));
+                                string ageCategory = npc.Age == 0 ? "adult" : npc.Age == 1 ? "teens" : "child";
+                                string manner = npc.Manners == 0 ? "friendly." : npc.Manners == 1 ? "polite." : npc.Manners == 2 ? "rude." : "friendly.";
+                                Task.Run(() => SendMessageToAssistant(
+                                    npc: npc,
+                                    userMessage: $"",
+                                    systemMessage: $"As NPC {npc.Name} ({ageCategory}, {manner}) in Stardew Valley, you will share your comment that this place has {decorRate}, using under 23 text words")
+                                );
                             }
-                            else if (decorPointComment > 0)
+                            else
                             {
-                                NPCShowTextAboveHead(npc, SHelper.Translation.Get($"foodstore.generalnormaldecor.{random.Next(20)}", new { playerName = Game1.player.displayName }));
-                            }
-                            else if (decorPointComment <= 0)
-                            {
-                                NPCShowTextAboveHead(npc, SHelper.Translation.Get($"foodstore.generalbaddecor.{random.Next(20)}", new { playerName = Game1.player.displayName }));
+                                if (decorPointComment >= 0.2)
+                                {
+                                    NPCShowTextAboveHead(npc, SHelper.Translation.Get($"foodstore.generalgooddecor.{random.Next(20)}", new { playerName = Game1.player.displayName }));
+                                }
+                                else if (decorPointComment > 0)
+                                {
+                                    NPCShowTextAboveHead(npc, SHelper.Translation.Get($"foodstore.generalnormaldecor.{random.Next(20)}", new { playerName = Game1.player.displayName }));
+                                }
+                                else if (decorPointComment <= 0)
+                                {
+                                    NPCShowTextAboveHead(npc, SHelper.Translation.Get($"foodstore.generalbaddecor.{random.Next(20)}", new { playerName = Game1.player.displayName }));
+                                }
                             }
                         }
                         else if ((location is FarmHouse || location == Game1.getFarm() || location.Name.Contains("Custom_MT_Island")
@@ -3284,6 +3415,92 @@ namespace MarketTown
             );
 
             SHelper.Multiplayer.SendMessage(syncData, "10MinSyncData");
+        }
+
+        /// <summary>Call to OpenAI to generate a response</summary>
+        public static async Task SendMessageToAssistant(NPC npc, string userMessage, string systemMessage, bool isConversation = false, bool isForBubbleMessage = true)
+        {
+            if (AILimitCount >= AILimitBlock) return;
+            if (!Config.AdvanceDebug) AILimitCount++;
+
+            string k0 = "sk-proj-5ZtgwwTdLDxtQVijgYcGge9LMWn81SfX9tu8IncYl-";
+            string k1 = "IkSdH3qma7vBGiDgKmUEN0yh4iSVxN4UT3BlbkFJKL3VPfX5QfAhTlo8SziTERMlCjiizsk1z1s_";
+            string k2 = "KBVrA88aNDKTezkGiz5V0Qfx0CZKY8IVwvR3UA";
+
+            if (Config.AdvanceAiLanguage != "English") systemMessage += $".Use {Config.AdvanceAiLanguage} language";
+
+            string responseMessage = "";
+            using (var httpClient = new HttpClient())
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", k0 + k1 + k2);
+                var requestBody = new
+                {
+                    model = "gpt-4o-mini",
+                    messages = new[]
+                    {
+                        new { role = "system", content = systemMessage},
+                        new { role = "user", content = userMessage },
+                        new { role = "assistant", content = string.Join("\n", conversationSummaries) }
+                    },
+                    max_tokens = 50,
+                    temperature = 1.2
+                };
+
+                var jsonRequest = JsonConvert.SerializeObject(requestBody);
+                var httpContent = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
+                var httpResponse = await httpClient.PostAsync("https://api.openai.com/v1/chat/completions", httpContent);
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    var jsonResponse = await httpResponse.Content.ReadAsStringAsync();
+
+                    dynamic json = JsonConvert.DeserializeObject(jsonResponse);
+                    responseMessage = json.choices[0].message.content.ToString();
+
+                    SMonitor.Log($"Assistant Response: {json.choices[0].message.content.ToString()}\n{json.usage}\n", LogLevel.Trace);
+
+                    if (isForBubbleMessage) NPCShowTextAboveHead(npc, responseMessage, true);
+                    else npc.CurrentDialogue.Push(new Dialogue(npc, "key", responseMessage));
+
+
+                    // --------------------------
+                    // conversationSummaries.Clear();
+                    conversationSummaries.TryGetValue(npc.Name, out string history);
+
+                    if (isConversation)
+                    {
+                        var summaryRequestBody = new
+                        {
+                            model = "gpt-4o-mini",
+                            messages = new[]
+                            {
+                            new { role = "system", content = "Summarize the user's conversation in under 30 words, focusing on key details and relevant points. Remove any extraneous information and provide an empty string if there's nothing noteworthy." },
+                            new { role = "user", content = $"{userMessage}, {history}" }
+                        },
+                            max_tokens = 50,
+                            temperature = 0.7
+                        };
+
+                        var summaryRequest = JsonConvert.SerializeObject(summaryRequestBody);
+                        var summaryContent = new StringContent(summaryRequest, Encoding.UTF8, "application/json");
+                        var summaryResponse = await httpClient.PostAsync("https://api.openai.com/v1/chat/completions", summaryContent);
+
+                        if (summaryResponse.IsSuccessStatusCode)
+                        {
+                            var summaryJsonResponse = await summaryResponse.Content.ReadAsStringAsync();
+                            dynamic summaryJson = JsonConvert.DeserializeObject(summaryJsonResponse);
+                            string conversationSummary = summaryJson.choices[0].message.content.ToString();
+
+                            conversationSummaries[npc.Name] = conversationSummary;
+
+                            //SMonitor.Log($"conver sum: {conversationSummary}\n{summaryJson.usage}\n\n", LogLevel.Warn);
+                        }
+                    }
+                }
+                else
+                {
+                    SMonitor.Log(" Unable to retrieve response from AI content. Check for mod update or report this error!", LogLevel.Error);
+                }
+            }
         }
     }
 }
