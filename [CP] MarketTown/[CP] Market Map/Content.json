@@ -307,6 +307,10 @@
           }
         },
         "Custom_MT_Island": {
+          "CreateOnLoad": {
+            "MapPath": "Maps/Custom_MT_Island",
+            "AlwaysActive": true
+          },
           "MinDailyForageSpawn": 3,
           "MaxDailyForageSpawn": 5,
           "MaxSpawnedForageAtOnce": 9,
