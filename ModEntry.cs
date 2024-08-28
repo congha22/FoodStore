@@ -146,6 +146,21 @@ namespace MarketTown
 
         //***********************************************************************************************
 
+
+        /// <summary>List of tile to check at layer buildings1 to find valid shop</summary>
+        public static List<Vector2> shopLocations = new List<Vector2>
+            {
+                new Vector2(86, 31),
+                new Vector2(86, 36),
+                new Vector2(76, 26),
+                new Vector2(64, 28),
+                new Vector2(76, 36),
+                new Vector2(70, 24),
+                new Vector2(70, 29),
+                new Vector2(70, 34),
+                new Vector2(64, 33)
+            };
+
         /// <summary> If today is Festival day </summary>
         public static bool IsFestivalToday = false;
 
@@ -157,9 +172,6 @@ namespace MarketTown
 
         /// <summary>Clickable tile that will open the shop menu.</summary>
         public static IDictionary<Vector2, string> OpenShopTile = new Dictionary<Vector2, string>();
-
-        /// <summary>List of Shop, Tile and Shopstock list.</summary>
-        public static List<MarketShopData> TodayShopInventory = new List<MarketShopData>();
 
         /// <summary>Dictionary of shop id and shopstock read from Json file.</summary>
         public static IDictionary<string, List<string>> ShopsJsonData = new Dictionary<string, List<string>>();
@@ -202,11 +214,8 @@ namespace MarketTown
         public static int TodayFestivalIncome = 0;
         public static float TodayPointTaste = 0;
         public static float TodayPointDecor = 0;
-        // ####
-        public static Layer FestivalCheckMultiplayer;
-        public static int NewFarmhandConnected = 0;
 
-
+        
         // ===============================================================================================================================
         // ===============================================================================================================================
 
@@ -345,7 +354,6 @@ namespace MarketTown
             TodayCustomerNoteName.Clear();
             RandomOpenSpot.Clear();
 
-            TodayShopInventory.Clear();
             IsFestivalToday = false;
             TodayFestivalOwner.Clear();
             FestivalSellLog.Clear();
@@ -360,8 +368,7 @@ namespace MarketTown
 
             FestivalItemIndexGenerator = 0;
 
-            PossibleMarketLocation.Clear();
-
+            PossibleMarketLocation.Clear(); 
             Random rand = new Random();
 
             foreach ( var conversation in conversationSummaries) if(rand.NextBool()) conversationSummaries.Remove(conversation);
@@ -464,9 +471,6 @@ namespace MarketTown
                     if (locat != null && islandBrazier != null && islandBrazier.ItemId != null && islandBrazier.ItemId == "MT.Objects.ParadiseIslandBrazier" && islandBrazier.IsOn
                         && !((Game1.dayOfMonth == 15 || Game1.dayOfMonth == 16 || Game1.dayOfMonth == 17) && Game1.currentSeason == "winter" || Game1.isFestival()))
                     {
-                        // Set island is not build-able
-                        locat.isAlwaysActive.Value = false;
-
                         int dayOfWeek = Game1.dayOfMonth % 7;
                         bool festivalDay = false;
 
@@ -511,7 +515,7 @@ namespace MarketTown
                         {
                             var tempNPC = GlobalNPCList[rand.Next(GlobalNPCList.Count)];
                             tried--;
-                            if (tempNPC == null || Game1.getCharacterFromName(tempNPC) == null || Game1.getCharacterFromName(tempNPC).getMasterScheduleRawData() == null 
+                            if (tempNPC == null || Game1.getCharacterFromName(tempNPC) == null || Game1.getCharacterFromName(tempNPC).getMasterScheduleRawData() == null
                                 || Game1.getCharacterFromName(tempNPC).modData["hapyke.FoodStore/invited"] == "true") continue;
                             bool available = false;
 
@@ -575,16 +579,15 @@ namespace MarketTown
                             // create Player shop
                             var displayChest = new Chest(true);
                             displayChest.destroyOvernight = true;
+                            displayChest.modData["hapyke.FoodStore/festivalChestName"] = "MarketTown.playerShop";
                             while (displayChest.Items.Count < 9) displayChest.Items.Add(null);
-                            if (Game1.IsMasterGame) locat.setObjectAt(19309, 19309, displayChest);
+                            if (Game1.IsMasterGame) locat.setObjectAt(176, 31, displayChest);
 
                             List<string> displayChestItem = new List<string>();
                             foreach (var item in displayChest.Items)
                             {
                                 displayChestItem.Add(null);
                             }
-
-                            TodayShopInventory.Add(new MarketShopData("PlayerShop", new Vector2(76, 31), displayChestItem));
 
                             SetupShop(true);
                         }
@@ -622,7 +625,6 @@ namespace MarketTown
                             }
                         }
                     }
-                    else locat.isAlwaysActive.Value = true;         // If Fire is off, location is build-able
                 }
             } catch { }
 
@@ -778,7 +780,7 @@ namespace MarketTown
             GameLocation locat = Game1.getLocationFromName("Custom_MT_Island");
 
             if (locat != null && ( Game1.dayOfMonth != 28 && locat.GetSeasonKey().ToLower() == "fall" || locat.GetSeasonKey().ToLower() != "fall") 
-                && !locat.Map.Properties.ContainsKey("skipWeedGrowth") && !locat.IsGreenRainingHere()) 
+                && !locat.Map.Properties.ContainsKey("skipWeedGrowth") && !locat.IsGreenRainingHere())
                 locat.Map.Properties.Add("skipWeedGrowth", true);
 
             CloseShop(true);
@@ -823,7 +825,7 @@ namespace MarketTown
                 foreach (var realAni in animal.Values)
                 {
                     if (realAni.modData.ContainsKey("hapyke.FoodStore/isFakeAnimal") && realAni.modData["hapyke.FoodStore/isFakeAnimal"] == "true")
-                        locat.animals.Remove(realAni.myID.Value); 
+                        locat.animals.Remove(realAni.myID.Value);
 
                 }
             }
@@ -951,9 +953,9 @@ namespace MarketTown
 
             // Island Festival manager
             if (e.NewTime == Config.FestivalTimeEnd && IsFestivalToday ) CloseShop(false);
-            if ( (e.NewTime - Config.FestivalTimeStart) % 300 == 0 && IsFestivalIsCurrent || NewFarmhandConnected > 0) SetupShop(false, NewFarmhandConnected > 0);
+            if ( (e.NewTime - Config.FestivalTimeStart) % 300 == 0 && IsFestivalIsCurrent) SetupShop(false);
             if (IsFestivalIsCurrent && Game1.timeOfDay % 100 == 0 && random.NextDouble() < 1 / Math.Sqrt(IslandProgress()) && Game1.IsMasterGame) RestockPlayerFestival();
-            if (e.NewTime == Config.FestivalTimeStart && IsFestivalToday || NewFarmhandConnected > 0) OpenShop(OpenShopTile, NewFarmhandConnected > 0);
+            if (e.NewTime == Config.FestivalTimeStart && IsFestivalToday) OpenShop(OpenShopTile);
 
             //Send dish of the day
             if (Game1.timeOfDay == 900 && !Config.DisableChatAll && Game1.IsMasterGame)

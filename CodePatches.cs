@@ -1033,14 +1033,40 @@ namespace MarketTown
         {
             public static void Postfix(Chest __instance, SpriteBatch spriteBatch, int x, int y)
             {
-                if (TodayShopInventory.Count == 0) return;
                 if (__instance.Location.Name != "Custom_MT_Island" || __instance.TileLocation != new Vector2(73, 32)) return;
-                foreach (var shop in TodayShopInventory)
+
+                List<Vector2> tileList = new List<Vector2>
                 {
-                    var tileLocation = shop.Tile;
+                    new Vector2(86, 31),
+                    new Vector2(86, 36),
+                    new Vector2(76, 26),
+                    new Vector2(64, 28),
+                    new Vector2(76, 36),
+                    new Vector2(70, 24),
+                    new Vector2(70, 29),
+                    new Vector2(70, 34),
+                    new Vector2(64, 33),
+                    new Vector2(76, 31)
+                };
+
+                List<Chest> chestList = new List<Chest>();
+
+                foreach ( var tile in tileList ) 
+                {
+                    var location = Game1.getLocationFromName("Custom_MT_Island");
+                    var obj1 = location.getObjectAtTile((int)(tile.X + 100), (int)(tile.Y));
+                    if (obj1 is Chest chest && obj1 is not null && !chestList.Contains(chest))
+                    {
+                        chestList.Add(chest);
+                    }
+                }
+
+                foreach (var chest in chestList)
+                {
+                    var tileLocation = chest.TileLocation + new Vector2(-100, 0);
 
                     var drawLayer = Math.Max(0f, (tileLocation.Y * Game1.tileSize - 24) / 10000f) + tileLocation.X * 1E-05f;
-                    drawGrangeItems(tileLocation, spriteBatch, drawLayer, shop.ItemIds);
+                    drawGrangeItems(tileLocation, spriteBatch, drawLayer, chest.Items.Select(item => item != null ? item.QualifiedItemId : "").ToList()   );
                 }
 
             }
@@ -1058,7 +1084,7 @@ namespace MarketTown
 
             foreach (var itemId in shopItem)
             {
-                if (itemId is null)
+                if (itemId is null || itemId == "")
                 {
                     xStep += 54f;
                     if (xStep > 108f)
