@@ -79,8 +79,10 @@ namespace MarketTown
         /// <summary>List of location unique name that is valid when checking for market sell</summary>
         public static List<string> PossibleMarketLocation = new List<string>();
 
-        // ####
-        public static int FestivalItemIndexGenerator = 0;
+
+        // ==============================================================================================
+        // ==============================================================================================
+
 
         /// <summary>Count of AI request</summary>
         public static int AILimitCount = 0;
@@ -90,6 +92,11 @@ namespace MarketTown
 
         /// <summary>Conversation history with each NPC</summary>
         public static  IDictionary<string, string> conversationSummaries = new Dictionary<string, string>();
+
+        /// <summary>Key</summary>
+        public static string AIKey1 = "";
+        public static string AIKey2 = "";
+        public static string AIKey3 = "";
 
 
         // ==============================================================================================
@@ -179,6 +186,9 @@ namespace MarketTown
         /// <summary>Log letter to show festival sell</summary>
         public static List<string> FestivalSellLog = new List<string>();
 
+        /// <summary>When a shop inventory changed</summary>
+        public static bool ShopStockUpdate = false;
+
 
         //***********************************************************************************************
 
@@ -222,6 +232,7 @@ namespace MarketTown
 
         private void GameLoop_SaveLoaded(object sender, StardewModdingAPI.Events.SaveLoadedEventArgs e)
         {
+            if (Context.ScreenId > 0) return;
             emoteSprite = SHelper.ModContent.Load<Texture2D>(Path.Combine("Assets", "emote.png"));
 
             new MailLoader(SHelper);
@@ -298,18 +309,7 @@ namespace MarketTown
         [EventPriority(EventPriority.Low-9999)]
         private void GameLoop_DayStarted(object sender, StardewModdingAPI.Events.DayStartedEventArgs e)
         {
-            GlobalKidList.Clear();
-            GlobalNPCList.Clear();
-            foreach (NPC __instance in Utility.getAllVillagers())
-            {
-                if (__instance != null && __instance.IsVillager && __instance.getMasterScheduleRawData() != null && !GlobalNPCBlackList.Contains(__instance.Name) && __instance.currentLocation.Name == __instance.DefaultMap && __instance != Game1.player.getSpouse())
-                {
-                    GlobalNPCList.Add(__instance.Name);
-                    if (__instance.Age == 2) GlobalKidList.Add(__instance.Name);
-                }
-            }
-
-
+            if (Context.ScreenId > 0) return;
             if (Config.AdvanceOutputItemId) OutputItemId();
 
             RestockTable(true, true);
@@ -357,8 +357,7 @@ namespace MarketTown
             IsFestivalToday = false;
             TodayFestivalOwner.Clear();
             FestivalSellLog.Clear();
-
-            npcOrderNumbers.Value.Clear();
+            if (npcOrderNumbers?.Value != null && npcOrderNumbers.Value.Any()) npcOrderNumbers.Value.Clear();
             RestaurantSpot.Clear();
 
             OutOfMapNpc.Clear();
@@ -366,12 +365,22 @@ namespace MarketTown
             Config.RestaurantLocations.Add("Custom_MT_Island");
             Config.RestaurantLocations.Add("Custom_MT_Island_House");
 
-            FestivalItemIndexGenerator = 0;
-
             PossibleMarketLocation.Clear(); 
             Random rand = new Random();
 
-            foreach ( var conversation in conversationSummaries) if(rand.NextBool()) conversationSummaries.Remove(conversation);
+            GlobalKidList.Clear();
+            GlobalNPCList.Clear();
+            foreach (NPC __instance in Utility.getAllVillagers())
+            {
+                if (__instance != null && __instance.IsVillager && __instance.getMasterScheduleRawData() != null && !GlobalNPCBlackList.Contains(__instance.Name) && __instance.currentLocation.Name == __instance.DefaultMap && __instance != Game1.player.getSpouse())
+                {
+                    GlobalNPCList.Add(__instance.Name);
+                    if (__instance.Age == 2) GlobalKidList.Add(__instance.Name);
+                }
+            }
+
+            // Daily update
+            foreach ( var conversation in conversationSummaries) if(rand.NextDouble() < 0.25) conversationSummaries.Remove(conversation);
 
             if (Game1.IsMasterGame)             // Generate Dish of the week
             {
@@ -629,66 +638,36 @@ namespace MarketTown
             } catch { }
 
             // Check store and museum
-            List<int> categoryKeys = new List<int> { 0, -2, -12, -28, -102 };
-            int museumPieces = 0;
-            foreach (Building building in Game1.getFarm().buildings)
+            if (Game1.IsMasterGame)
             {
-                bool valid = false;
-
-                if ( building != null && building.GetIndoorsName() != null)
+                List<int> categoryKeys = new List<int> { 0, -2, -12, -28, -102 };
+                int museumPieces = 0;
+                foreach (Building building in Game1.getFarm().buildings)
                 {
-                    bool isMuseumBuilding = false;
-                    foreach (var obj in Game1.getLocationFromName(building.GetIndoorsName()).Objects.Values)
+                    bool valid = false;
+
+                    if (building != null && building.GetIndoorsName() != null)
                     {
-                        // Case Museum
-                        if (obj is Sign sign && sign.displayItem.Value != null && sign.displayItem.Value.Name == "Museum License")
-                        {
-                            GameLocation location = Game1.getLocationFromName(building.GetIndoorsName());
-
-                            FarmOutside.UpdateRandomLocationOpenTile(location);
-                            foreach (var f in location.furniture)
-                            {
-                                if (f.heldObject.Value != null && categoryKeys.Contains(f.heldObject.Value.Category)) { museumPieces++; }
-                                if (f is FishTankFurniture fishtank) { museumPieces += (int)(fishtank.tankFish.Count / 2); }
-                                if (f.Name.Contains("Statue")) { museumPieces += 2; }
-                            }
-
-                            ValidBuildingObjectPairs.Add(new BuildingObjectPair(building, obj, "museum", museumPieces));
-                            if (!Config.RestaurantLocations.Contains(Game1.getLocationFromName(building.GetIndoorsName()).Name)) 
-                                Config.RestaurantLocations.Add(Game1.getLocationFromName(building.GetIndoorsName()).Name);
-                            isMuseumBuilding = true;
-
-                            Vector2 indoorTile = new Vector2(0, 0);
-                            if (Game1.getLocationFromName(building.GetIndoorsName()) != null)
-                            {
-                                foreach (var warp in Game1.getLocationFromName(building.GetIndoorsName()).warps)
-                                {
-                                    if (warp.TargetName == "Farm") indoorTile = new(warp.X, warp.Y - 3);
-                                    break;
-                                }
-                            }
-                            var busWarp = new Warp(19309, 19309, building.GetIndoorsName(), (int)indoorTile.X, (int)indoorTile.Y, false, false);
-                            if (!Game1.getLocationFromName("BusStop").warps.Contains(busWarp)) Game1.getLocationFromName("BusStop").warps.Add(busWarp);
-
-                            valid = true;
-                            break;
-                        }
-                    }
-
-                    if (!isMuseumBuilding)
-                    {
+                        bool isMuseumBuilding = false;
                         foreach (var obj in Game1.getLocationFromName(building.GetIndoorsName()).Objects.Values)
                         {
-                            //Case Market or Restaurant
-                            if (obj is Sign sign1 && sign1.displayItem.Value != null && (sign1.displayItem.Value.Name == "Market License" || sign1.displayItem.Value.Name == "Restaurant License"))
+                            // Case Museum
+                            if (obj is Sign sign && sign.displayItem.Value != null && sign.displayItem.Value.Name == "Museum License")
                             {
-                                FarmOutside.UpdateRandomLocationOpenTile(Game1.getLocationFromName(building.GetIndoorsName()));
+                                GameLocation location = Game1.getLocationFromName(building.GetIndoorsName());
 
-                                if (sign1.displayItem.Value.Name == "Market License") ValidBuildingObjectPairs.Add(new BuildingObjectPair(building, obj, "market", 0));
-                                else ValidBuildingObjectPairs.Add(new BuildingObjectPair(building, obj, "restaurant", 0));
+                                FarmOutside.UpdateRandomLocationOpenTile(location);
+                                foreach (var f in location.furniture)
+                                {
+                                    if (f.heldObject.Value != null && categoryKeys.Contains(f.heldObject.Value.Category)) { museumPieces++; }
+                                    if (f is FishTankFurniture fishtank) { museumPieces += (int)(fishtank.tankFish.Count / 2); }
+                                    if (f.Name.Contains("Statue")) { museumPieces += 2; }
+                                }
 
-                                if (!Config.RestaurantLocations.Contains(Game1.getLocationFromName(building.GetIndoorsName()).Name)) 
+                                ValidBuildingObjectPairs.Add(new BuildingObjectPair(building, obj, "museum", museumPieces));
+                                if (!Config.RestaurantLocations.Contains(Game1.getLocationFromName(building.GetIndoorsName()).Name))
                                     Config.RestaurantLocations.Add(Game1.getLocationFromName(building.GetIndoorsName()).Name);
+                                isMuseumBuilding = true;
 
                                 Vector2 indoorTile = new Vector2(0, 0);
                                 if (Game1.getLocationFromName(building.GetIndoorsName()) != null)
@@ -706,41 +685,74 @@ namespace MarketTown
                                 break;
                             }
                         }
+
+                        if (!isMuseumBuilding)
+                        {
+                            foreach (var obj in Game1.getLocationFromName(building.GetIndoorsName()).Objects.Values)
+                            {
+                                //Case Market or Restaurant
+                                if (obj is Sign sign1 && sign1.displayItem.Value != null && (sign1.displayItem.Value.Name == "Market License" || sign1.displayItem.Value.Name == "Restaurant License"))
+                                {
+                                    FarmOutside.UpdateRandomLocationOpenTile(Game1.getLocationFromName(building.GetIndoorsName()));
+
+                                    if (sign1.displayItem.Value.Name == "Market License") ValidBuildingObjectPairs.Add(new BuildingObjectPair(building, obj, "market", 0));
+                                    else ValidBuildingObjectPairs.Add(new BuildingObjectPair(building, obj, "restaurant", 0));
+
+                                    if (!Config.RestaurantLocations.Contains(Game1.getLocationFromName(building.GetIndoorsName()).Name))
+                                        Config.RestaurantLocations.Add(Game1.getLocationFromName(building.GetIndoorsName()).Name);
+
+                                    Vector2 indoorTile = new Vector2(0, 0);
+                                    if (Game1.getLocationFromName(building.GetIndoorsName()) != null)
+                                    {
+                                        foreach (var warp in Game1.getLocationFromName(building.GetIndoorsName()).warps)
+                                        {
+                                            if (warp.TargetName == "Farm") indoorTile = new(warp.X, warp.Y - 3);
+                                            break;
+                                        }
+                                    }
+                                    var busWarp = new Warp(19309, 19309, building.GetIndoorsName(), (int)indoorTile.X, (int)indoorTile.Y, false, false);
+                                    if (!Game1.getLocationFromName("BusStop").warps.Contains(busWarp)) Game1.getLocationFromName("BusStop").warps.Add(busWarp);
+
+                                    valid = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    if (valid)
+                    {
+                        UpdateFurnitureTilePathProperties(Game1.getLocationFromName(building.GetIndoorsName()));
                     }
                 }
 
-                if (valid)
+                // Update open tile list
+                foreach (var buildingLocation in ValidBuildingObjectPairs)
                 {
-                    UpdateFurnitureTilePathProperties(Game1.getLocationFromName(building.GetIndoorsName()));
+                    var buildingInstanceName = buildingLocation.Building.GetIndoorsName();
+                    FarmOutside.UpdateRandomLocationOpenTile(Game1.getLocationFromName(buildingInstanceName));
                 }
+
+                // get all valid location unique name
+                try
+                {
+                    foreach (var i in Game1.locations.Where(i => (i.IsOutdoors || !i.IsOutdoors && Config.AllowIndoorStore)))
+                        PossibleMarketLocation.Add(i.NameOrUniqueName);
+
+                    foreach (var i in ValidBuildingObjectPairs)
+                        PossibleMarketLocation.Add(i.Building.GetIndoorsName());
+
+                    foreach (var i in Game1.getLocationFromName("Custom_MT_Island").buildings)
+                        PossibleMarketLocation.Add(i.GetIndoorsName());
+                    PossibleMarketLocation.Add("Custom_MT_Island_House");
+                }
+                catch (Exception ex) { SMonitor.Log("Error when getting location:" + ex.Message, LogLevel.Error); }
             }
-
-            // Update open tile list
-            foreach (var buildingLocation in ValidBuildingObjectPairs)
-            {
-                var buildingInstanceName = buildingLocation.Building.GetIndoorsName();
-                FarmOutside.UpdateRandomLocationOpenTile(Game1.getLocationFromName(buildingInstanceName));
-            }
-
-            // get all valid location unique name
-            try
-            {
-                foreach (var i in Game1.locations.Where(i => (i.IsOutdoors || !i.IsOutdoors && Config.AllowIndoorStore)))
-                    PossibleMarketLocation.Add(i.NameOrUniqueName);
-
-                foreach (var i in ValidBuildingObjectPairs)
-                    PossibleMarketLocation.Add(i.Building.GetIndoorsName());
-
-                foreach (var i in Game1.getLocationFromName("Custom_MT_Island").buildings)
-                    PossibleMarketLocation.Add(i.GetIndoorsName());
-                PossibleMarketLocation.Add("Custom_MT_Island_House");
-            }
-            catch (Exception ex) { SMonitor.Log("Error when getting location:" + ex.Message, LogLevel.Error); }
         }
 
         private void GameLoop_DayEnding(object sender, DayEndingEventArgs e)
         {
-            if ( Game1.stats.DaysPlayed == 0 ) return;
+            if ( Game1.stats.DaysPlayed == 0 || Context.ScreenId > 0) return;
 
             // Wipe invitation
             try
@@ -844,7 +856,7 @@ namespace MarketTown
 
         private void GameLoop_UpdateTicked(object sender, UpdateTickedEventArgs e)
         {
-            if (!Context.IsWorldReady || Game1.timeOfDay < 610) { return; }
+            if (!Context.IsWorldReady || Game1.timeOfDay < 610 || Context.ScreenId > 0) return;
 
             if (e.IsMultipleOf(30) && !Config.DisableTextChat)
             {
@@ -859,12 +871,12 @@ namespace MarketTown
 
         private void GameLoop_OneSecondUpdateTicked(object sender, StardewModdingAPI.Events.OneSecondUpdateTickedEventArgs e)
         {
-            if (!Game1.hasLoadedGame) return;
+            if (!Game1.hasLoadedGame || Context.ScreenId > 0) return;
 
             Random random = new Random();
 
             if (Context.IsPlayerFree && Game1.player != null && Game1.player.currentLocation != null
-                && (Config.RestaurantLocations.Contains(Game1.player.currentLocation.Name)) )
+                && Config.RestaurantLocations.Contains(Game1.player.currentLocation.Name))
             {
                 bool isMarket = false;
                 if (ValidBuildingObjectPairs.Any(i => i.Building.GetIndoorsName() == Game1.player.currentLocation.NameOrUniqueName && i.buildingType == "market")) 
@@ -874,16 +886,22 @@ namespace MarketTown
 
             if(IsFestivalIsCurrent && Game1.IsMasterGame) NpcFestivalPurchase();
 
-            if (!IsFestivalIsCurrent) NpcOneSecondUpdate();
+            NpcOneSecondUpdate();
+
+            if (ShopStockUpdate)
+            {
+                ShopStockUpdate = false;
+                var ShopDataLoader = StardewValley.DataLoader.Shops(Game1.content).Where(i => i.Key.StartsWith("MarketTown")).ToDictionary(i => i.Key, i => i.Value);
+                SHelper.Multiplayer.SendMessage(ShopDataLoader, "10MinSyncShopDataLoader");
+            }
         }
 
         private void OnTimeChange(object sender, TimeChangedEventArgs e)
         {
+            if (Context.ScreenId > 0) return;
             Random random = new Random();
 
             if (Game1.timeOfDay % 100 == 0)AILimitCount = 0;
-
-            if (Game1.IsMasterGame && IsFestivalIsCurrent) SyncMultiplayerData();
 
             if (Game1.timeOfDay == 610)
             {

@@ -166,121 +166,6 @@ namespace MarketTown
             harmony.PatchAll();
         }
 
-        private void OnPeerConnected(object sender, PeerConnectedEventArgs e)
-        {
-            if (Game1.IsMasterGame)
-            {
-                MailData dataToSend = Helper.Data.ReadSaveData<MailData>("MT.MailLog");
-                if (dataToSend != null)
-                {
-                    Helper.Multiplayer.SendMessage(dataToSend, "MT.MailLogUpdate", new[] {"d5a1lamdtd.MarketTown"}, new[] { e.Peer.PlayerID });
-                }
-
-                SHelper.Multiplayer.SendMessage($"{DailyFeatureDish}///{WeeklyFeatureDish}", "UpdateSpecialDish");
-                //SHelper.Multiplayer.SendMessage(TodayShopInventory, "TodayShopInventory");
-                SHelper.Multiplayer.SendMessage(TodayFestivalIncome, "TodayFestivalIncome");
-                SHelper.Multiplayer.SendMessage(FestivalSellLog, "FestivalSellLog");
-
-                var ShopDataLoader = StardewValley.DataLoader.Shops(Game1.content);
-                SHelper.Multiplayer.SendMessage(ShopDataLoader, "10MinSyncShopDataLoader");
-
-                SyncMultiplayerData();
-            }
-        }
-        private void OnModMessageReceived(object sender, ModMessageReceivedEventArgs e)
-        {
-            if (!Game1.IsMasterGame)
-            {
-                if (e.Type == "MT.MailLogUpdate" && e.FromModID == this.ModManifest.UniqueID)
-                {
-                    FarmhandSyncData = e.ReadAs<MailData>();
-                    Monitor.Log($"Received data: {FarmhandSyncData}", LogLevel.Warn);
-                    SHelper.Data.WriteJsonFile("markettowndata.json", FarmhandSyncData);
-                }
-
-                if (e.FromModID == this.ModManifest.UniqueID && e.Type == "ExampleMessageType" && !Config.DisableChatAll)
-                {
-                    MyMessage message = e.ReadAs<MyMessage>();
-                    Game1.chatBox.addInfoMessage(message.MessageContent);
-                }
-
-                if (e.FromModID == this.ModManifest.UniqueID && e.Type == "NpcShowText" && !Config.DisableChatAll)
-                {
-                    string content = e.ReadAs<MyMessage>().MessageContent;
-                    string[] data = content.Split("///");
-                    NPC i = Game1.getCharacterFromName(data[0]);
-                    if (i != null) NPCShowTextAboveHead(i, data[1]);
-                }
-
-                if (e.FromModID == this.ModManifest.UniqueID && e.Type == "UpdateSpecialDish" && !Config.DisableChatAll)
-                {
-                    string content = e.ReadAs<string>();
-                    string[] data = content.Split("///");
-                    DailyFeatureDish = data[0];
-                    WeeklyFeatureDish = data[1];
-                }
-
-                if (e.FromModID == this.ModManifest.UniqueID && e.Type == "10MinSyncShopDataLoader")
-                {
-                    var data = e.ReadAs<Dictionary<string, ShopData>>();
-                    var shops = StardewValley.DataLoader.Shops(Game1.content);
-
-                    foreach (var shop in shops)
-                    {
-                        if (shop.Key.StartsWith("MarketTown.") && data.ContainsKey(shop.Key))
-                        {
-                            var shopData = data[shop.Key];
-                            shop.Value.Items.Clear();
-
-                            foreach (var item in shopData.Items)
-                            {
-                                shop.Value.Items.Add(item);
-                            }
-                        }
-                    }
-                }
-
-                if (e.FromModID == this.ModManifest.UniqueID && e.Type == "UpdateLog")
-                {
-                    string content = e.ReadAs<MyMessage>().MessageContent;
-                    TodaySell.Add(content);
-                }
-
-                if (e.FromModID == this.ModManifest.UniqueID && e.Type == "UpdateTodayMoney")
-                {
-                    string content = e.ReadAs<MyMessage>().MessageContent;
-                    TodayMoney = Int32.Parse(content);
-                }
-
-                if (e.FromModID == this.ModManifest.UniqueID && e.Type == "UpdateTodayTaste")
-                {
-                    TodayPointTaste = e.ReadAs<float>();
-                }
-                if (e.FromModID == this.ModManifest.UniqueID && e.Type == "UpdateTodayDecor")
-                {
-                    TodayPointDecor = e.ReadAs<float>();
-                }
-
-                if (e.FromModID == this.ModManifest.UniqueID && e.Type == "TodayFestivalIncome")
-                {
-                    TodayFestivalIncome = e.ReadAs<int>();
-                }
-                if (e.FromModID == this.ModManifest.UniqueID && e.Type == "FestivalSellLog")
-                {
-                    FestivalSellLog = e.ReadAs<List<string>>();
-                }
-
-
-
-                if (e.FromModID == this.ModManifest.UniqueID && e.Type == "10MinSyncData")
-                {
-                    SyncData data = e.ReadAs<SyncData>();
-
-                    FestivalSellLog = data.FestivalSellLog;
-                    FestivalItemIndexGenerator = data.FestivalItemIndexGenerator;
-                }
-            }
-        }
         //
         // ***************************  END OF ENTRY ***************************
         //
@@ -331,13 +216,15 @@ namespace MarketTown
             if (Game1.currentLocation is null) return;
             if (!e.Button.IsActionButton()) return;
             if (Game1.player.currentLocation.Name != "Custom_MT_Island") return;
-            if (!Game1.IsMasterGame) return;
 
             var tile = e.Cursor.Tile;
             var player = Game1.player.Tile;
 
             if (tile.X > 75 && tile.X < 79 && tile.Y < 32 && tile.Y > 28 && player.X > 74 && player.X < 80 && player.Y > 27 && player.Y < 33)
                 OpenPlayerStore(e);
+
+            if (!Game1.IsMasterGame) return;
+
             if (tile.X > 62 && tile.X < 68 && tile.Y < 29 && tile.Y > 24 && player.X > 61 && player.X < 69 && player.Y > 23 && player.Y < 30
                 && Game1.timeOfDay >= Config.FestivalTimeStart && Game1.timeOfDay <= Config.FestivalTimeEnd)
             {
@@ -562,9 +449,7 @@ namespace MarketTown
                                 var index = stockChest.Items.IndexOf(itemItem);
                                 stockChest.Items[index] = null;
 
-                                // ############### needed?
-                                var ShopDataLoader = StardewValley.DataLoader.Shops(Game1.content);
-                                SHelper.Multiplayer.SendMessage(ShopDataLoader, "10MinSyncShopDataLoader");
+                                ShopStockUpdate = true;;
                                 break;
                             }
                         }
@@ -854,6 +739,8 @@ namespace MarketTown
 
             if (IsFestivalToday)
             {
+                SHelper.Multiplayer.SendMessage(FestivalSellLog, "FestivalSellLog");
+
                 string soldMessage = "";
                 foreach (var i in FestivalSellLog)
                     soldMessage += i + "^";
@@ -935,8 +822,8 @@ namespace MarketTown
                 foreach (var chest in chestList)
                 {
                     var tileCheck = chest.TileLocation;
-
-                    var npcL = Utility.GetNpcsWithinDistance(tileCheck + new Vector2(1, 0), 2, islandInstance).ToList();
+                    // back to the real tile
+                    var npcL = Utility.GetNpcsWithinDistance(tileCheck + new Vector2(-99, 0), 2, islandInstance).ToList();
                     var npcList = new List<NPC>();
                     var itemList = chest.Items.Where(item => item != null).Select(item => item.QualifiedItemId).ToList();
                     var itemItem = chest.Items[random.Next(chest.Items.Count)];
@@ -976,12 +863,15 @@ namespace MarketTown
                                 {
                                     chest.Items[index] = null;
 
-                                    npcBuy.showTextAboveHead(GetSoldMessage(randomItemSold, chest.modData["hapyke.FoodStore/festivalChestName"]), randomColor, 2, 4000, 1000);
+                                    string message = GetSoldMessage(randomItemSold, chest.modData["hapyke.FoodStore/festivalChestName"]);
+                                    npcBuy.showTextAboveHead(message, randomColor, 2, 4000, 1000);
+                                    var farmhandNpcBubbleMessage = new MyMessage($"{npcBuy.Name}///{message}");
+                                    SHelper.Multiplayer.SendMessage(farmhandNpcBubbleMessage, "NpcShowText");
+
                                     shopObj.Items.Remove(shopItem);
                                     npcBuy.modData["hapyke.FoodStore/festivalLastPurchase"] = Game1.timeOfDay.ToString();
-                                    // ######### need?
-                                    var ShopDataLoader = StardewValley.DataLoader.Shops(Game1.content);
-                                    SHelper.Multiplayer.SendMessage(ShopDataLoader, "10MinSyncShopDataLoader");
+
+                                    ShopStockUpdate = true;
                                     break;
                                 }
                             }
@@ -994,7 +884,11 @@ namespace MarketTown
 
                                     chest.Items[itemIndex] = null;
 
-                                    npcBuy.showTextAboveHead(GetSoldMessage(randomItemSold, "PlayerShop"), randomColor, 2, 4000, 1000);
+                                    string message = GetSoldMessage(randomItemSold, "PlayerShop");
+                                    npcBuy.showTextAboveHead(message, randomColor, 2, 4000, 1000);
+                                    var farmhandNpcBubbleMessage = new MyMessage($"{npcBuy.Name}///{message}");
+                                    SHelper.Multiplayer.SendMessage(farmhandNpcBubbleMessage, "NpcShowText");
+
                                     npcBuy.modData["hapyke.FoodStore/festivalLastPurchase"] = Game1.timeOfDay.ToString();
 
                                     var price = (int)(itemObj.sellToStorePrice() * (random.NextDouble() / 2 + 1.5) * 2 / Math.Sqrt(IslandProgress()) * Config.IslandMoneyModifier * (Config.UltimateChallenge ? 4 : 1));
@@ -1018,7 +912,6 @@ namespace MarketTown
                                     FestivalSellLog.Add($"  -{quality}{itemObj.DisplayName}: {price}G");
 
                                     SHelper.Multiplayer.SendMessage(TodayFestivalIncome, "TodayFestivalIncome");
-                                    SHelper.Multiplayer.SendMessage(FestivalSellLog, "FestivalSellLog");
 
                                     break;
                                 }
@@ -2645,8 +2538,10 @@ namespace MarketTown
 
                     // **************************** Control NPC walking to the food ****************************
                     string text = "";
-                    if (npc != null && npc.queuedSchedulePaths.Count == 0 && Game1.IsMasterGame && Game1.timeOfDay < 2530 && location.furniture.Where(i => i != null && (i.furniture_type.Value == 5 || i.furniture_type.Value == 9 || i.furniture_type.Value == 11) && i.heldObject.Value != null).Any()
-                        && (!npc.modData.ContainsKey("hapyke.FoodStore/shopOwnerToday") || npc.modData["hapyke.FoodStore/shopOwnerToday"] == "-1,-1"))
+                    if (npc != null && npc.queuedSchedulePaths.Count == 0 && Game1.IsMasterGame && Game1.timeOfDay < 2530 
+                        && location.furniture.Where(i => i != null && (i.furniture_type.Value == 5 || i.furniture_type.Value == 9 || i.furniture_type.Value == 11) && i.heldObject.Value != null).Any()
+                        && (!npc.modData.ContainsKey("hapyke.FoodStore/shopOwnerToday") || npc.modData["hapyke.FoodStore/shopOwnerToday"] == "-1,-1")
+                        && (!IsFestivalIsCurrent || location.Name != "Custom_MT_Island"))
                     {
                         double moveToFoodChance = Config.MoveToFoodChance;
                         try
@@ -3010,41 +2905,6 @@ namespace MarketTown
             }
         }
 
-        public class SyncData
-        {
-            public int TodayFestivalIncome { get; set; }
-            public List<string> FestivalSellLog { get; set; }
-            public int FestivalItemIndexGenerator { get; set; }
-            public IDictionary<Vector2, string> OpenShopTile {  get; set; }
-
-            public SyncData()
-            {
-                FestivalSellLog = new List<string>();
-            }
-
-            public SyncData(
-                int festivalIncome,List<string> sellLog, int itemIndexGenerator,
-                IDictionary<Vector2,string> openShopTile)
-            {
-                TodayFestivalIncome = festivalIncome;
-                FestivalSellLog = sellLog;
-                FestivalItemIndexGenerator = itemIndexGenerator;
-                OpenShopTile = openShopTile;
-            }
-        }
-
-        public static void SyncMultiplayerData()
-        {
-            // Creating a new message with all the data
-            SyncData syncData = new SyncData(
-                TodayFestivalIncome,
-                FestivalSellLog,
-                FestivalItemIndexGenerator,
-                OpenShopTile
-            );
-
-            SHelper.Multiplayer.SendMessage(syncData, "10MinSyncData");
-        }
 
         /// <summary>Call to OpenAI to generate a response</summary>
         public static async Task SendMessageToAssistant(NPC npc, string userMessage, string systemMessage, bool isConversation = false, bool isForBubbleMessage = true)
@@ -3061,7 +2921,7 @@ namespace MarketTown
             string responseMessage = "";
             using (var httpClient = new HttpClient())
             {
-                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", k0 + k1 + k2);
+                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", AIKey1 + AIKey2 + AIKey3);
                 var requestBody = new
                 {
                     model = "gpt-4o-mini",
@@ -3102,7 +2962,7 @@ namespace MarketTown
                             model = "gpt-4o-mini",
                             messages = new[]
                             {
-                            new { role = "system", content = "Summarize the user's conversation in under 30 words, focusing on key details and relevant points. Remove any extraneous information and provide an empty string if there's nothing noteworthy." },
+                            new { role = "system", content = "Summarize the user's conversation in under 45 words, focusing on key details and relevant points. Remove any extraneous information and provide an empty string if there's nothing noteworthy." },
                             new { role = "user", content = $"{userMessage}, {history}" }
                         },
                             max_tokens = 50,
@@ -3127,7 +2987,7 @@ namespace MarketTown
                 }
                 else
                 {
-                    SMonitor.Log(" Unable to retrieve response from AI content. Check for mod update or report this error!", LogLevel.Error);
+                    SMonitor.Log("Unable to retrieve response from AI content. Check for mod update first, and if it still not work then report this error!", LogLevel.Error);
                 }
             }
         }

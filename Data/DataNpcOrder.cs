@@ -1,6 +1,7 @@
 ﻿using MarketTown.Data;
 using Netcode;
 using Newtonsoft.Json;
+using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Extensions;
 using StardewValley.Locations;
@@ -33,6 +34,7 @@ namespace MarketTown
 
         private void CheckOrder(NPC npc, GameLocation location, bool bypass, bool marketOrder = false)
         {
+            if (Context.ScreenId > 0) return;
             Random rand = new Random();
             if (npc.modData.TryGetValue(orderKey, out string orderData)  )
             {

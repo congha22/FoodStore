@@ -225,7 +225,7 @@ namespace MarketTown
                     
                 string data = $"Current location: {Game1.currentLocation.Name}; Current time: {Game1.timeOfDay}; Weather:{Game1.currentLocation.GetWeather().Weather}; Day of months: {Game1.dayOfMonth}; Current season: {Game1.currentLocation.GetSeason()};";
                 
-                if (bestFriend != "") data += $"Player's closet friends: {bestFriend}; ";
+                if (bestFriend != "") data += $"Player's closet friends: {bestFriend}; ";   
 
                 conversationSummaries.TryGetValue(npc.Name, out string history);
                 if (history != "") data += $"Previous user message: {history}";
@@ -235,7 +235,7 @@ namespace MarketTown
                     Task.Run(() => ModEntry.SendMessageToAssistant(
                         npc: npc,
                         userMessage: textInput,
-                        systemMessage: $"As NPC {npc.Name} ({npcAge}, {npcManner} manner, {npcSocial} social anxiety, and in {relation} relationship with player {Game1.player.Name}), you will reply the user message if they ask question, or start a new conversation in context of Stardew Valley game. You can use this information if relevant: {data}. Limit to under 30 words",
+                        systemMessage: $"As NPC {npc.Name} ({npcAge}, {npcManner} manner, {npcSocial} social anxiety, and in {relation} relationship with player {Game1.player.Name}), you will reply the user message if they ask question, or start a new conversation in context of Stardew Valley game and its mods. You can use this information if relevant: {data}. Limit to under 30 words",
                         isConversation: true)
                     );
                 }

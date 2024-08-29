@@ -285,7 +285,7 @@
       "FromFile": "Assets/Custom_MT_Island_HouseEdit.tmx",
       "PatchMode": "Overlay",
       "When": {
-        "HasReadLetter": "MT.IslandBedroom"
+        "HasFlag": "{{HasFlag: anyPlayer}} MT.IslandBedroom"
       }
     },
     {
@@ -296,7 +296,7 @@
           "CreateOnLoad": {
             "MapPath": "Maps/Custom_MT_Island_House",
             "Type": "StardewValley.Locations.DecoratableLocation",
-            "AlwaysActive": false
+            "AlwaysActive": true
           }
         },
         "Custom_MT_Island_House_Floor": {
