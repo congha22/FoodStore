@@ -2912,10 +2912,6 @@ namespace MarketTown
             if (AILimitCount >= AILimitBlock) return;
             if (!Config.AdvanceDebug) AILimitCount++;
 
-            string k0 = "sk-proj-5ZtgwwTdLDxtQVijgYcGge9LMWn81SfX9tu8IncYl-";
-            string k1 = "IkSdH3qma7vBGiDgKmUEN0yh4iSVxN4UT3BlbkFJKL3VPfX5QfAhTlo8SziTERMlCjiizsk1z1s_";
-            string k2 = "KBVrA88aNDKTezkGiz5V0Qfx0CZKY8IVwvR3UA";
-
             if (Config.AdvanceAiLanguage != "English") systemMessage += $".Use {Config.AdvanceAiLanguage} language";
 
             string responseMessage = "";
@@ -2962,7 +2958,7 @@ namespace MarketTown
                             model = "gpt-4o-mini",
                             messages = new[]
                             {
-                            new { role = "system", content = "Summarize the user's conversation in under 45 words, focusing on key details and relevant points. Remove any extraneous information and provide an empty string if there's nothing noteworthy." },
+                            new { role = "system", content = "Summarize the user's conversation in under 40 words, focusing on key details and relevant points. Remove any extraneous information and provide an empty string if there's nothing noteworthy." },
                             new { role = "user", content = $"{userMessage}, {history}" }
                         },
                             max_tokens = 50,

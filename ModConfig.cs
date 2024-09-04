@@ -105,7 +105,7 @@ namespace MarketTown
 
         public int GrangeSellProgress = 2000000;
 
-        public bool AdvanceAiContent = false;
+        public bool AdvanceAiContent = true;
         public string AdvanceAiLanguage = "English";
     }
 }

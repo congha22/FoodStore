@@ -698,6 +698,7 @@ namespace MarketTown
             // Advance page
             configMenu.AddPage(mod: ModManifest, "advance", () => SHelper.Translation.Get("foodstore.config.advance"));
 
+            // **************************** AI content
             configMenu.AddBoolOption(
                 mod: ModManifest,
                 name: () => "Enable AI generated content?",

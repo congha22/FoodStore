@@ -285,7 +285,7 @@
       "FromFile": "Assets/Custom_MT_Island_HouseEdit.tmx",
       "PatchMode": "Overlay",
       "When": {
-        "HasFlag": "{{HasFlag: anyPlayer}} MT.IslandBedroom"
+        "HasReadLetter: anyPlayer": "MT.IslandBedroom"
       }
     },
     {
