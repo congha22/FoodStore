@@ -235,7 +235,7 @@ namespace MarketTown
                     Task.Run(() => ModEntry.SendMessageToAssistant(
                         npc: npc,
                         userMessage: textInput,
-                        systemMessage: $"As NPC {npc.Name} ({npcAge}, {npcManner} manner, {npcSocial} social anxiety, and in {relation} relationship with player {Game1.player.Name}), you will reply the user message if they ask question, or start a new conversation in context of Stardew Valley game and its mods. You can use this information if relevant: {data}. Limit to under 30 words",
+                        systemMessage: $"As NPC {npc.Name} in Stardew Valley, who is {npcAge}, {npcManner} manner, {npcSocial} social anxiety, and in {relation} relationship with player {Game1.player.Name}, you will reply the user message if they ask question, or start a new conversation in context of Stardew Valley world. You can use this information if relevant: {data}. Limit to under 30 words",
                         isConversation: true)
                     );
                 }

@@ -107,5 +107,7 @@ namespace MarketTown
 
         public bool AdvanceAiContent = true;
         public string AdvanceAiLanguage = "English";
+
+        public bool AdvanceResetProgress = false;
     }
 }

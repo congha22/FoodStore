@@ -716,6 +716,13 @@ namespace MarketTown
 
             configMenu.AddBoolOption(
                 mod: ModManifest,
+                name: () => "Reset progress",
+                getValue: () => Config.AdvanceResetProgress,
+                setValue: value => Config.AdvanceResetProgress = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
                 name: () => SHelper.Translation.Get("foodstore.config.allowindoorstore"),
                 tooltip: () => SHelper.Translation.Get("foodstore.config.allowindoorstoreText"),
                 getValue: () => Config.AllowIndoorStore,

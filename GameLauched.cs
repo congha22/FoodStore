@@ -1755,43 +1755,43 @@ namespace MarketTown
 
                 WeeklyDish = WeeklyFeatureDish,
 
-                TotalVisitorVisited = totalVisitorVisited + TodayVisitorVisited,
-                TotalFriendVisited = totalFriendVisited + TodayFriendVisited,
+                TotalVisitorVisited = Config.AdvanceResetProgress? 0 : totalVisitorVisited + TodayVisitorVisited,
+                TotalFriendVisited = Config.AdvanceResetProgress ? 0 : totalFriendVisited + TodayFriendVisited,
 
-                TotalEarning = totalMoney + TodayMoney,
-                TotalFestivalIncome = totalFestivalIncome + TodayFestivalIncome,
+                TotalEarning = Config.AdvanceResetProgress ? 0 : totalMoney + TodayMoney,
+                TotalFestivalIncome = Config.AdvanceResetProgress ? 0 : totalFestivalIncome + TodayFestivalIncome,
 
-                SellMoney = TodayMoney,
+                SellMoney = Config.AdvanceResetProgress ? 0 : TodayMoney,
                 YesterdaySellLog = TodaySell,
 
-                TodayCustomerInteraction = TodayCustomerInteraction,
+                TodayCustomerInteraction = Config.AdvanceResetProgress ? 0 : TodayCustomerInteraction,
 
-                TodayMuseumVisitor = TodayMuseumVisitor,
-                TodayMuseumEarning = TodayMuseumEarning,
+                TodayMuseumVisitor = Config.AdvanceResetProgress ? 0 : TodayMuseumVisitor,
+                TodayMuseumEarning = Config.AdvanceResetProgress ? 0 : TodayMuseumEarning,
 
-                TotalCustomerNote = TodayCustomerNoteYes + TodayCustomerNoteNo + TodayCustomerNoteNone + totalCustomerNote,
-                TotalCustomerNoteYes = TodayCustomerNoteYes + totalCustomerNoteYes,
-                TotalCustomerNoteNo = TodayCustomerNoteNo + totalCustomerNoteNo,
+                TotalCustomerNote = Config.AdvanceResetProgress ? 0 : TodayCustomerNoteYes + TodayCustomerNoteNo + TodayCustomerNoteNone + totalCustomerNote,
+                TotalCustomerNoteYes = Config.AdvanceResetProgress ? 0 : TodayCustomerNoteYes + totalCustomerNoteYes,
+                TotalCustomerNoteNo = Config.AdvanceResetProgress ? 0 : TodayCustomerNoteNo + totalCustomerNoteNo,
 
-                TotalForageSold = TodayForageSold + totalForageSold,
-                TotalFlowerSold = TodayFlowerSold + totalFlowerSold,
-                TotalFruitSold = TodayFruitSold + totalFruitSold,
-                TotalVegetableSold = TodayVegetableSold + totalVegetableSold,
-                TotalSeedSold = TodaySeedSold + totalSeedSold,
-                TotalMonsterLootSold = TodayMonsterLootSold + totalMonsterLootSold,
-                TotalSyrupSold = TodaySyrupSold + totalSyrupSold,
-                TotalArtisanGoodSold = TodayArtisanGoodSold + totalArtisanGoodSold,
-                TotalAnimalProductSold = TodayAnimalProductSold + totalAnimalProductSold,
-                TotalResourceMetalSold = TodayResourceMetalSold + totalResourceMetalSold,
-                TotalMineralSold = TodayMineralSold + totalMineralSold,
-                TotalCraftingSold = TodayCraftingSold + totalCraftingSold,
-                TotalCookingSold = TodayCookingSold + totalCookingSold,
-                TotalFishSold = TodayFishSold + totalFishSold,
-                TotalGemSold = TodayGemSold + totalGemSold,
-                TotalClothesSold = TodayClothesSold + totalClothesSold,
+                TotalForageSold = Config.AdvanceResetProgress ? 0 : TodayForageSold + totalForageSold,
+                TotalFlowerSold = Config.AdvanceResetProgress ? 0 : TodayFlowerSold + totalFlowerSold,
+                TotalFruitSold = Config.AdvanceResetProgress ? 0 : TodayFruitSold + totalFruitSold,
+                TotalVegetableSold = Config.AdvanceResetProgress ? 0 : TodayVegetableSold + totalVegetableSold,
+                TotalSeedSold = Config.AdvanceResetProgress ? 0 : TodaySeedSold + totalSeedSold,
+                TotalMonsterLootSold = Config.AdvanceResetProgress ? 0 : TodayMonsterLootSold + totalMonsterLootSold,
+                TotalSyrupSold = Config.AdvanceResetProgress ? 0 : TodaySyrupSold + totalSyrupSold,
+                TotalArtisanGoodSold = Config.AdvanceResetProgress ? 0 : TodayArtisanGoodSold + totalArtisanGoodSold,
+                TotalAnimalProductSold = Config.AdvanceResetProgress ? 0 : TodayAnimalProductSold + totalAnimalProductSold,
+                TotalResourceMetalSold = Config.AdvanceResetProgress ? 0 : TodayResourceMetalSold + totalResourceMetalSold,
+                TotalMineralSold = Config.AdvanceResetProgress ? 0 : TodayMineralSold + totalMineralSold,
+                TotalCraftingSold = Config.AdvanceResetProgress ? 0 : TodayCraftingSold + totalCraftingSold,
+                TotalCookingSold = Config.AdvanceResetProgress ? 0 : TodayCookingSold + totalCookingSold,
+                TotalFishSold = Config.AdvanceResetProgress ? 0 : TodayFishSold + totalFishSold,
+                TotalGemSold = Config.AdvanceResetProgress ? 0 : TodayGemSold + totalGemSold,
+                TotalClothesSold = Config.AdvanceResetProgress ? 0 : TodayClothesSold + totalClothesSold,
 
-                TotalPointTaste = TodayPointTaste + totalPointTaste,
-                TotalPointDecor = TodayPointDecor + totalPointDecor,
+                TotalPointTaste = Config.AdvanceResetProgress ? 0 : TodayPointTaste + totalPointTaste,
+                TotalPointDecor = Config.AdvanceResetProgress ? 0 : TodayPointDecor + totalPointDecor,
 
                 npcConversation = conversationSummaries
 
@@ -2913,21 +2913,22 @@ namespace MarketTown
             if (!Config.AdvanceDebug) AILimitCount++;
 
             if (Config.AdvanceAiLanguage != "English") systemMessage += $".Use {Config.AdvanceAiLanguage} language";
+            string model = isConversation ? "gpt-4o" : "gpt-4o-mini";
 
             string responseMessage = "";
             using (var httpClient = new HttpClient())
             {
-                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", AIKey1 + AIKey2 + AIKey3);
+                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "");
                 var requestBody = new
                 {
-                    model = "gpt-4o-mini",
+                    model = model,
                     messages = new[]
                     {
                         new { role = "system", content = systemMessage},
                         new { role = "user", content = userMessage },
                         new { role = "assistant", content = string.Join("\n", conversationSummaries) }
                     },
-                    max_tokens = 50,
+                    max_tokens = 55,
                     temperature = 1.2
                 };
 
@@ -2955,13 +2956,13 @@ namespace MarketTown
                     {
                         var summaryRequestBody = new
                         {
-                            model = "gpt-4o-mini",
+                            model = "gpt-3.5-turbo-0125",
                             messages = new[]
                             {
-                            new { role = "system", content = "Summarize the user's conversation in under 40 words, focusing on key details and relevant points. Remove any extraneous information and provide an empty string if there's nothing noteworthy." },
-                            new { role = "user", content = $"{userMessage}, {history}" }
+                            new { role = "system", content = "Summarize the user's conversation in under 45 words, focusing on key details and relevant points. Remove any extraneous information and provide an empty string if there's nothing noteworthy." },
+                            new { role = "user", content = $"New user message: {userMessage}. Previous summary: {history}" }
                         },
-                            max_tokens = 50,
+                            max_tokens = 60,
                             temperature = 0.7
                         };
 
@@ -2976,14 +2977,33 @@ namespace MarketTown
                             string conversationSummary = summaryJson.choices[0].message.content.ToString();
 
                             conversationSummaries[npc.Name] = conversationSummary;
-
+                            
                             //SMonitor.Log($"conver sum: {conversationSummary}\n{summaryJson.usage}\n\n", LogLevel.Warn);
                         }
                     }
                 }
                 else
                 {
-                    SMonitor.Log("Unable to retrieve response from AI content. Check for mod update first, and if it still not work then report this error!", LogLevel.Error);
+                    // Get the status code
+                    var statusCode = (int)httpResponse.StatusCode; // Convert to int for switch
+                    string errorMessage = "Check for mod update";
+                    switch (statusCode)
+                    {
+                        case 403:
+                            errorMessage = "Country, region, or territory not supported.";
+                            break;
+                        case 429:
+                            errorMessage = "Please try again in a few minutes. If not work, then total AI usage for all players has passed the limit set by OpenAI. This will be reset the next day in timezone UTC+0";
+                            break;
+                        case 500:
+                            errorMessage = "Server Error: The server had an issue while processing your request. Please try again.";
+                            break;
+                        case 503:
+                            errorMessage = "Server Overload: The server is experiencing high traffic. Please try again later.";
+                            break;
+                    }
+
+                    SMonitor.Log($"Unable to receive AI content. {errorMessage}\n\n", LogLevel.Error);
                 }
             }
         }
