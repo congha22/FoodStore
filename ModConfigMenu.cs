@@ -716,7 +716,7 @@ namespace MarketTown
 
             configMenu.AddBoolOption(
                 mod: ModManifest,
-                name: () => "Reset progress",
+                name: () => "Reset Market Town progress",
                 getValue: () => Config.AdvanceResetProgress,
                 setValue: value => Config.AdvanceResetProgress = value
             );

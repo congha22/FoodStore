@@ -2913,12 +2913,12 @@ namespace MarketTown
             if (!Config.AdvanceDebug) AILimitCount++;
 
             if (Config.AdvanceAiLanguage != "English") systemMessage += $".Use {Config.AdvanceAiLanguage} language";
-            string model = isConversation ? "gpt-4o" : "gpt-4o-mini";
+            string model = "gpt-4o-mini";
 
             string responseMessage = "";
             using (var httpClient = new HttpClient())
             {
-                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "");
+                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", AIKey1 + AIKey2 + AIKey3);
                 var requestBody = new
                 {
                     model = model,
@@ -2928,7 +2928,7 @@ namespace MarketTown
                         new { role = "user", content = userMessage },
                         new { role = "assistant", content = string.Join("\n", conversationSummaries) }
                     },
-                    max_tokens = 55,
+                    max_tokens = 65,
                     temperature = 1.2
                 };
 
@@ -2962,7 +2962,7 @@ namespace MarketTown
                             new { role = "system", content = "Summarize the user's conversation in under 45 words, focusing on key details and relevant points. Remove any extraneous information and provide an empty string if there's nothing noteworthy." },
                             new { role = "user", content = $"New user message: {userMessage}. Previous summary: {history}" }
                         },
-                            max_tokens = 60,
+                            max_tokens = 65,
                             temperature = 0.7
                         };
 
