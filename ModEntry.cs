@@ -88,12 +88,12 @@ namespace MarketTown
         public static int AILimitCount = 0;
 
         /// <summary>Limit of AI request per ingame hour</summary>
-        public static int AILimitBlock = 6;
+        public static int AILimitBlock = 10;
 
         /// <summary>Conversation history with each NPC</summary>
         public static  IDictionary<string, string> conversationSummaries = new Dictionary<string, string>();
 
-        /// <summary>Key</summary>
+        /// <summary>Key</summary>  
         public static string AIKey1 = "";
         public static string AIKey2 = "";
         public static string AIKey3 = "";

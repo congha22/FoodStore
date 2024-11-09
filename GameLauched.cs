@@ -437,7 +437,7 @@ namespace MarketTown
             {
                 if (shop.ShopId.Contains("MarketTown."))
                 {
-                    shop.onPurchase = (item, player, amount) =>
+                    shop.onPurchase = (item, player, amount, unuse) =>
                     {
                         var location = Game1.getLocationFromName("Custom_MT_Island");
                         foreach (var tile in shopLocations)
@@ -2956,10 +2956,10 @@ namespace MarketTown
                     {
                         var summaryRequestBody = new
                         {
-                            model = "gpt-3.5-turbo-0125",
+                            model = "gpt-4o-mini",
                             messages = new[]
                             {
-                            new { role = "system", content = "Summarize the user's conversation in under 45 words, focusing on key details and relevant points. Remove any extraneous information and provide an empty string if there's nothing noteworthy." },
+                            new { role = "system", content = "Summarize the user's conversation in under 60 words, focusing on key details and relevant points. Remove any extraneous information and provide an empty string if there's nothing noteworthy." },
                             new { role = "user", content = $"New user message: {userMessage}. Previous summary: {history}" }
                         },
                             max_tokens = 65,
