@@ -113,7 +113,7 @@
       "Action": "EditData",
       "Target": "Data/Events/Farm",
       "Entries": {
-        "1930900001": "continue/64 17/farmer 64 16 2 Lewis 64 18 0/pause 1500/speak Lewis \"{{i18n:foodstore.event.1930900001.1}}#$b#{{i18n:foodstore.event.1930900001.2}}#$b#{{i18n:foodstore.event.1930900001.3}}#$b#{{i18n:foodstore.event.1930900001.4}}\"/pause 700/end"
+        "1930900001": "continue/64 17/farmer 64 16 2 Lewis 64 18 0/pause 1500/speak Lewis \"{{i18n:foodstore.event.1930900001.1}}#$b#{{i18n:foodstore.event.1930900001.2}}#$b#{{i18n:foodstore.event.1930900001.3}}#$b#{{i18n:foodstore.event.1930900001.4}}#$b#{{i18n:foodstore.event.1930900001.5}}\"/pause 300/itemAboveHead/playSound getNewSpecialItem/addItem (F)MT.Objects.MarketLog/pause 700/end"
       }
     },
     {

@@ -222,20 +222,23 @@ namespace MarketTown
                 foreach (var f in Game1.player.friendshipData)
                     foreach (var f2 in f.Where(f2 => f2.Value.Points >= 750).OrderByDescending(f2 => f2.Value.Points).Take(3))
                         bestFriend += $"{f2.Key}, ";
-                    
-                string data = $"Current location: {Game1.currentLocation.Name}; Current time: {Game1.timeOfDay}; Weather:{Game1.currentLocation.GetWeather().Weather}; Day of months: {Game1.dayOfMonth}; Current season: {Game1.currentLocation.GetSeason()};";
+
+                string data = @$"Current location: {Game1.currentLocation.Name}; Current time: {Game1.timeOfDay}; Weather:{Game1.currentLocation.GetWeather().Weather}; Day of months: {Game1.dayOfMonth}; Current season: {Game1.currentLocation.GetSeason()};
+                                Voted dish of the day is {ItemRegistry.Create<Object>(DailyFeatureDish, allowNull: true)?.DisplayName ?? ""};
+                                Voted dish of this week is {ItemRegistry.Create<Object>(WeeklyFeatureDish, allowNull: true)?.DisplayName ?? ""}";
                 
                 if (bestFriend != "") data += $"Player's closet friends: {bestFriend}; ";   
 
                 conversationSummaries.TryGetValue(npc.Name, out string history);
                 if (history != "") data += $"Previous user message: {history}";
 
-                if (Config.AdvanceAiContent && AILimitCount < AILimitBlock)
+                if (Config.AdvanceAiContent && (AILimitCount < AILimitBlock || Config.AdvanceAiLimit != 0 && AILimitCount <= Config.AdvanceAiLimit))
                 {
                     Task.Run(() => ModEntry.SendMessageToAssistant(
                         npc: npc,
                         userMessage: textInput,
-                        systemMessage: $"As NPC {npc.Name} in Stardew Valley, who is {npcAge}, {npcManner} manner, {npcSocial} social anxiety, and in {relation} relationship with player {Game1.player.Name}, you will reply the user message if they ask question, or start a new conversation in context of Stardew Valley world. You can use this information if relevant: {data}. Limit to under 30 words",
+                        systemMessage: @$"As NPC {npc.Name} in Stardew Valley, who is {npcAge}, {npcManner} manner, {npcSocial} social anxiety, and in {relation} relationship with player {Game1.player.Name}, you will reply the user message if they ask question, or start a new conversation in context of Stardew Valley world.
+                                            You may use this information if relevant: {data}. Limit to under 30 words. Use approriate tone based on the characteristic and relationship with the player",
                         isConversation: true)
                     );
                 }

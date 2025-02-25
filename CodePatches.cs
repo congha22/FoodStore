@@ -21,6 +21,7 @@ using StardewValley.Network;
 using StardewValley.Objects;
 using StardewValley.Pathfinding;
 using StardewValley.TerrainFeatures;
+using StardewValley.Tools;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -110,7 +111,7 @@ namespace MarketTown
 
                     if (__instance.Name.Contains("MT.Guest_") || !Game1.player.friendshipData[__instance.Name].IsMarried() && !Config.DisableChatAll && Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) < 2)
                     {
-                        if (Config.AdvanceAiContent && AILimitCount < AILimitBlock)
+                        if (Config.AdvanceAiContent && (AILimitCount < AILimitBlock || Config.AdvanceAiLimit != 0 && AILimitCount <= Config.AdvanceAiLimit))
                         {
                             string relation = heartLevel <= 2 ? "stranger" : heartLevel <= 5 ? "acquaintance" : "best friend";
                             string bestFriend = "";
@@ -128,7 +129,7 @@ namespace MarketTown
                             Task.Run(() => ModEntry.SendMessageToAssistant(
                                 npc: __instance,
                                 userMessage: "",
-                                systemMessage: $"As NPC {__instance.Name} ({__instanceAge}, {__instanceManner} manner, {__instanceSocial} social anxiety, and in {relation} relationship with player {Game1.player.Name}), you will start a new conversation in context of Stardew Valley game. You can use this information if relevant: {data}. Limit to under 30 words",
+                                systemMessage: $"As NPC {__instance.Name} ({__instanceAge}, {__instanceManner} manner, {__instanceSocial} social anxiety, and in {relation} relationship with player {Game1.player.Name}), you will start a new conversation in context of Stardew Valley game. You can use this information if relevant: {data}. Limit to under 30 words. Use approriate tone based on the characteristic and relationship with the player",
                                 isConversation: true,
                                 isForBubbleMessage: false)
                             );
@@ -296,7 +297,7 @@ namespace MarketTown
                         if (storeTypeName != "") NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.loveWithType." + randomIndex, new { player = Game1.MasterPlayer.displayName, shopTypeName = storeTypeName }));
                         else
                         {
-                            if (Config.AdvanceAiContent && AILimitCount < AILimitBlock)
+                            if (Config.AdvanceAiContent && (AILimitCount < AILimitBlock || Config.AdvanceAiLimit != 0 && AILimitCount <= Config.AdvanceAiLimit))
                             {
                                 List<string> contextChoice = new List<string> { "love shopping there", "always has the best choice", "high-quality merchandise", "personalized shopping experience" };
                                 string ageCategory = __instance.Age == 0 ? "adult" : __instance.Age == 1 ? "teens" : "child";
@@ -320,7 +321,7 @@ namespace MarketTown
                         if (storeTypeName != "") NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.likeWithType." + randomIndex, new { player = Game1.MasterPlayer.displayName, shopTypeName = storeTypeName }));
                         else
                         {
-                            if (Config.AdvanceAiContent && AILimitCount < AILimitBlock)
+                            if (Config.AdvanceAiContent && (AILimitCount < AILimitBlock || Config.AdvanceAiLimit != 0 && AILimitCount <= Config.AdvanceAiLimit))
                             {
                                 List<string> contextChoice = new List<string> { "kinda like shopping here", "decent selection of products", "pleasant shopping experience", "solid range of option" };
                                 string ageCategory = __instance.Age == 0 ? "adult" : __instance.Age == 1 ? "teens" : "child";
@@ -344,7 +345,7 @@ namespace MarketTown
                         if (storeTypeName != "") NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.dislikeWithType." + randomIndex, new { player = Game1.MasterPlayer.displayName, shopTypeName = storeTypeName }));
                         else
                         {
-                            if (Config.AdvanceAiContent && AILimitCount < AILimitBlock)
+                            if (Config.AdvanceAiContent && (AILimitCount < AILimitBlock || Config.AdvanceAiLimit != 0 && AILimitCount <= Config.AdvanceAiLimit))
                             {
                                 List<string> contextChoice = new List<string> { "not my first choice", "not very inviting atmosphere", "prices seem high for the quality", "not even that good" };
                                 string ageCategory = __instance.Age == 0 ? "adult" : __instance.Age == 1 ? "teens" : "child";
@@ -368,7 +369,7 @@ namespace MarketTown
                         if (storeTypeName != "") NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.hateWithType." + randomIndex, new { player = Game1.MasterPlayer.displayName, shopTypeName = storeTypeName }));
                         else
                         {
-                            if (Config.AdvanceAiContent && AILimitCount < AILimitBlock)
+                            if (Config.AdvanceAiContent && (AILimitCount < AILimitBlock || Config.AdvanceAiLimit != 0 && AILimitCount <= Config.AdvanceAiLimit))
                             {
                                 List<string> contextChoice = new List<string> { "ultra low-quality items", "way to overpriced for the quality", "consistently bad experiences", "very disappointing overall" };
                                 string ageCategory = __instance.Age == 0 ? "adult" : __instance.Age == 1 ? "teens" : "child";
@@ -392,7 +393,7 @@ namespace MarketTown
                         if (storeTypeName != "") NPCShowTextAboveHead(__instance, SHelper.Translation.Get("foodstore.randomchat.neutralWithType." + randomIndex, new { player = Game1.MasterPlayer.displayName, shopTypeName = storeTypeName }));
                         else
                         {
-                            if (Config.AdvanceAiContent && AILimitCount < AILimitBlock)
+                            if (Config.AdvanceAiContent && (AILimitCount < AILimitBlock || Config.AdvanceAiLimit != 0 && AILimitCount <= Config.AdvanceAiLimit))
                             {
                                 List<string> contextChoice = new List<string> { "just minimum service and quality", "just meets expectations", "nothing exceptional", "just typical items" };
                                 string ageCategory = __instance.Age == 0 ? "adult" : __instance.Age == 1 ? "teens" : "child";
@@ -745,12 +746,25 @@ namespace MarketTown
                     if (Config.PriceMarkup > 0)
                     {
                         int price = (int)Math.Round(who.ActiveObject.Price * Config.PriceMarkup);
-                        AddToPlayerFunds((int)(price * Config.MoneyModifier * (Config.UltimateChallenge ? 4 : 1)));
+                        AddToPlayerFunds((int)(price * Config.MoneyModifier * (Config.UltimateChallenge ? 2.5 : 1)));
                     }
 
                     who.reduceActiveItemByOne();
                     who.completelyStopAnimatingOrDoingAction();
-                    Game1.DrawDialogue(new Dialogue(__instance, "key", reaction));
+                    if (Config.AdvanceAiContent && (AILimitCount < AILimitBlock || Config.AdvanceAiLimit != 0 && AILimitCount <= Config.AdvanceAiLimit))
+                    {
+                        string ageCategory = __instance.Age == 0 ? "adult" : __instance.Age == 1 ? "teens" : "child";
+                        string manner = __instance.Manners == 0 ? "friendly." : __instance.Manners == 1 ? "polite." : __instance.Manners == 2 ? "rude." : "friendly.";
+                        Task.Run(() => SendMessageToAssistant(
+                            npc: __instance,
+                            userMessage: $"Here is your {orderData.dish} your ordered. Enjoy!",
+                            systemMessage: $"As NPC {__instance.Name} ({ageCategory}, {manner}) in Stardew Valley, you share your opinion about the {orderData.dishName} you just ordered from {who.Name} that you {orderData.loved} it, using under 25 text words",
+                            isForBubbleMessage: false,
+                            isForDrawDialogue: true)
+                        );
+                    }
+                    else Game1.DrawDialogue(new Dialogue(__instance, "key", reaction));
+
                     __instance.faceTowardFarmerForPeriod(2000, 3, false, who);
                     __instance.modData.Remove(orderKey);
                     return false;
@@ -823,7 +837,7 @@ namespace MarketTown
 
                 if (!TodayCustomerNoteName.Contains(__instance.Name) && (lastTasteRate >= 0.3 && lastDecorRate > 0 || lastTasteRate > 0.3 && lastDecorRate >= 0))          // Normal food, good decor or like food, normal decor
                 {
-                    if (Config.AdvanceAiContent && AILimitCount < AILimitBlock)
+                    if (Config.AdvanceAiContent && (AILimitCount < AILimitBlock || Config.AdvanceAiLimit != 0 && AILimitCount <= Config.AdvanceAiLimit))
                     {
                         int wordCount = 20;
                         List<string> contextChoice = new List<string> { "amazing.", "the best ever.", "loved.", "absolute amazing." };
@@ -856,7 +870,7 @@ namespace MarketTown
                 }
                 else if (!TodayCustomerNoteName.Contains(__instance.Name) && (lastTasteRate <= 0.25 || lastTasteRate == 0.3 && lastDecorRate < 0))     // Dishlike food, or neutral food and bad decor
                 {
-                    if (Config.AdvanceAiContent && AILimitCount < AILimitBlock)
+                    if (Config.AdvanceAiContent && (AILimitCount < AILimitBlock || Config.AdvanceAiLimit != 0 && AILimitCount <= Config.AdvanceAiLimit))
                     {
                         List<string> contextChoice = new List<string> { "much disappointed", "never again", "disgusting", "absolute terrible" };
                         if (lastTasteRate <= 0.25 && lastDecorRate == -0.2) 
@@ -885,7 +899,7 @@ namespace MarketTown
                 }
                 else if (!TodayCustomerNoteName.Contains(__instance.Name))          // Other case
                 {
-                    if (Config.AdvanceAiContent && AILimitCount < AILimitBlock)
+                    if (Config.AdvanceAiContent && (AILimitCount < AILimitBlock || Config.AdvanceAiLimit != 0 && AILimitCount <= Config.AdvanceAiLimit))
                     {
                         List<string> contextChoice = new List<string> { "normal", "fine", "middle class", "just meet the expectation" };
                         string ageCategory = __instance.Age == 0 ? "adult" : __instance.Age == 1 ? "teens" : "child";

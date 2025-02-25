@@ -89,10 +89,19 @@ namespace MarketTown
 
         public bool SellFruitTree { get; set; } = true;
 
+        public float MoneyModifier { get; set; } = 1f;
+        public float IslandMoneyModifier { get; set; } = 1f;
+
+        public int GrangeSellProgress = 2000000;
+        public float HardMode { get; set; } = 0.05f;
+
+        public bool DisableSellNotice { get; set; } = false;
+
+
         public int AdvanceMenuOffsetX { get; set; } = 1000;
         public int AdvanceMenuOffsetY { get; set; } = 865;
         public int AdvanceMenuWidth { get; set; } = 1000;
-        public int AdvanceMenuHeight{ get; set; } = 910;
+        public int AdvanceMenuHeight { get; set; } = 910;
         public int AdvanceMenuRow { get; set; } = 22;
         public int AdvanceMenuSpace { get; set; } = 33;
 
@@ -100,13 +109,13 @@ namespace MarketTown
 
         public bool AdvanceDebug { get; set; } = false;
 
-        public float MoneyModifier { get; set; } = 1f;
-        public float IslandMoneyModifier { get; set; } = 1f;
-
-        public int GrangeSellProgress = 2000000;
-
-        public bool AdvanceAiContent = true;
+        //AI content
+        public bool AdvanceAiContent = false;
         public string AdvanceAiLanguage = "English";
+        public string AdvanceAiModel = "";
+        public string AdvanceAiKey = "";
+        public int AdvanceAiLimit = 0;
+        //end of AI content
 
         public bool AdvanceResetProgress = false;
     }

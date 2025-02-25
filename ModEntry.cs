@@ -93,7 +93,7 @@ namespace MarketTown
         /// <summary>Conversation history with each NPC</summary>
         public static  IDictionary<string, string> conversationSummaries = new Dictionary<string, string>();
 
-        /// <summary>Key</summary>  
+        /// <summary>Key</summary>
         public static string AIKey1 = "";
         public static string AIKey2 = "";
         public static string AIKey3 = "";
@@ -1245,8 +1245,8 @@ namespace MarketTown
         {
             if (Game1.timeOfDay >= 2530) return false;
 
-            int challengeMultiplier = 1;
-            if (Config.UltimateChallenge) challengeMultiplier = 4;
+            double challengeMultiplier = 1;
+            if (Config.UltimateChallenge) challengeMultiplier = 2.5;
 
             try
             {
@@ -1296,7 +1296,7 @@ namespace MarketTown
                                         "warm and comforting", "exquisite taste", "mouthwatering delight", "taste buds rejoice", "unforgettable flavor", "gourmet bliss", "perfectly balanced flavors", "heavenly taste", "satisfying and rich",
                                         "culinary masterpiece", "pure taste bliss", "harmonious flavors", "sensory pleasure" };
 
-                                    salePrice = (int)(salePrice * (1.4 + rand.NextDouble() / 4) * Config.MoneyModifier);
+                                    salePrice = (int)(salePrice * (1.3 + rand.NextDouble() / 5) * Config.MoneyModifier);
                                     tip = (int)(salePrice * 0.2 * Config.MoneyModifier);
 
                                     if (tip < 20) { tip = 20; }
@@ -1308,7 +1308,7 @@ namespace MarketTown
                                         "occasionally enjoyable", "acceptable choice", "decently satisfying", "fairly good", "pleasant enough", "does the job", "average taste", "adequately satisfying", "nothing special but fine", "mildly enjoyable", 
                                         "works well enough", "dependable flavor" };
 
-                                    salePrice = (int)(salePrice * (1.2 + rand.NextDouble() / 4) * Config.MoneyModifier);
+                                    salePrice = (int)(salePrice * (1.12 + rand.NextDouble() / 5) * Config.MoneyModifier);
                                     tip = (int)(salePrice * 0.1 * Config.MoneyModifier);
 
                                     if (tip < 10) { tip = 10; }
@@ -1320,7 +1320,7 @@ namespace MarketTown
                                         "doesn't impress", "a bit underwhelming", "just okay, not more", "not very appealing", "could use improvement", "less than expected", "barely passable", "not much flavor", "somewhat lacking", "not a top pick",
                                         "not up to par" };
 
-                                    salePrice = (int)(salePrice * (0.75 + rand.NextDouble() / 4) * Config.MoneyModifier);
+                                    salePrice = (int)(salePrice * (0.75 + rand.NextDouble() / 5) * Config.MoneyModifier);
                                     tip = (int)(2 * Config.MoneyModifier);
                                 }          //dislike
                                 else if (taste == 6)    //Hate
@@ -1341,7 +1341,7 @@ namespace MarketTown
                                         "nothing exceptional", "nothing special", "doesn't stand out", "decent but unremarkable", "adequately average", "no strong impression", "not exciting, not disappointing", "fairly ordinary",
                                         "neither here nor there", "just okay", "doesn't draw attention" };
 
-                                    salePrice = (int)(salePrice * (1.1 + rand.NextDouble() / 4) * Config.MoneyModifier);
+                                    salePrice = (int)(salePrice * (1.15 + rand.NextDouble() / 5) * Config.MoneyModifier);
                                     tip = (int)(salePrice * 0.5 * Config.MoneyModifier);
 
                                     if (tip < 5) { tip = 5; }
@@ -1353,13 +1353,13 @@ namespace MarketTown
                                     switch (food.foodObject.Quality)
                                     {
                                         case 4:
-                                            salePrice = (int)(salePrice * 1.3);
-                                            break;
-                                        case 2:
                                             salePrice = (int)(salePrice * 1.2);
                                             break;
-                                        case 1:
+                                        case 2:
                                             salePrice = (int)(salePrice * 1.1);
+                                            break;
+                                        case 1:
+                                            salePrice = (int)(salePrice * 1.05);
                                             break;
                                         default:
                                             salePrice = (int)(salePrice * 1.0);
@@ -1393,8 +1393,7 @@ namespace MarketTown
                                             "highest quality", "extremely impressive", "incredible craftsmanship", "unmatched quality", "superior craftsmanship", "flawless construction", "exceptional durability", "unbelievable quality",
                                             "amazing attention to detail", "premium quality", "truly impressive", "best I've seen", "perfectly crafted" };
 
-                                        salePrice = (int)(salePrice * 2 * (1 + rand.NextDouble() / 4));
-                                        tip = (int)(salePrice * 0.15);
+                                        salePrice = (int)(salePrice * 1.4 * (1 + rand.NextDouble() / 5) * Config.MoneyModifier);
                                         break;
                                     case 2:
                                         reply = SHelper.Translation.Get("foodstore.nonfood." + food.foodObject.Quality.ToString() + "." + rand.Next(9));
@@ -1402,8 +1401,7 @@ namespace MarketTown
                                             "exactly what I wanted", "great quality and price", "impressive for the price", "great value", "satisfyingly high quality", "better than most", "exceeds expectations", "well-made and affordable", 
                                             "great for the price", "better than expected", "solid and dependable", "pleasantly surprised", "really well-made" };
 
-                                        salePrice = (int)(salePrice * 1.8 * (1 + rand.NextDouble() / 4));
-                                        tip = (int)(salePrice * 0.10);
+                                        salePrice = (int)(salePrice * 1.3 * (1 + rand.NextDouble() / 5) * Config.MoneyModifier);
                                         break;
                                     case 1:
                                         reply = SHelper.Translation.Get("foodstore.nonfood." + food.foodObject.Quality.ToString() + "." + rand.Next(9));
@@ -1411,8 +1409,7 @@ namespace MarketTown
                                             "better than I expected", "solid quality", "worth the money", "good for the price", "satisfyingly good", "quality you can count on", "good deal", "well-made for the price", "decently durable", 
                                             "good overall quality", "worthwhile purchase", "meets expectations", "quite good", "good choice for the price" };
 
-                                        salePrice = (int)(salePrice * 1.65 * (1 + rand.NextDouble() / 4));
-                                        tip = (int)(salePrice * 0.05);
+                                        salePrice = (int)(salePrice * 1.2 * (1 + rand.NextDouble() / 5) * Config.MoneyModifier);
                                         break;
                                     default:
                                         reply = SHelper.Translation.Get("foodstore.nonfood." + food.foodObject.Quality.ToString() + "." + rand.Next(9));
@@ -1420,7 +1417,7 @@ namespace MarketTown
                                             "what I expected", "nothing exceptional", "typical quality", "meets basic expectations", "standard item", "no surprises here", "adequate quality", "normal for the price", "just okay", 
                                             "normal quality, does the job", "meets the standard", "average quality", "common quality", "not bad, not great" };
 
-                                        salePrice = (int)(salePrice * 1.5 * (1 + rand.NextDouble() / 4));
+                                        salePrice = (int)(salePrice * 1.1 * (1 + rand.NextDouble() / 5) * Config.MoneyModifier);
                                         break;
                                 }
                             }
@@ -1430,8 +1427,8 @@ namespace MarketTown
                             else decorPoint = 0.5;
 
                             //Feature dish
-                            if (food.foodObject.ItemId == DailyFeatureDish) { salePrice = (int)(salePrice * 1.5); }
-                            if (food.foodObject.ItemId == WeeklyFeatureDish) { salePrice = (int)(salePrice * 1.3); }
+                            if (food.foodObject.ItemId == DailyFeatureDish) { salePrice = (int)(salePrice * 1.3); }
+                            if (food.foodObject.ItemId == WeeklyFeatureDish) { salePrice = (int)(salePrice * 1.15); }
 
                             //Config Rush hours Price
                             if (Config.RushHour && tip != 0
@@ -1469,14 +1466,28 @@ namespace MarketTown
                             tip *= (1 + MarketRecognition() / 20);
 
                             // Ultimate challenge
-                            salePrice *= challengeMultiplier;
-                            tip *= challengeMultiplier;
+                            salePrice = (int)(challengeMultiplier * salePrice);
+                            tip = (int)(challengeMultiplier * tip);
 
                             //Config Tip when nearby
                             if (Config.TipWhenNeaBy && Utility.isThereAFarmerWithinDistance(food.foodTile, 15, __instance.currentLocation) == null) { tip = 0; }
-
+                           
                             string tipLog = "";
                             if (tip > 0) tipLog = $"+ {tip}G";
+
+                            if (rand.NextDouble() < Config.HardMode || (__instance.Manners == 2 && rand.NextDouble() < Config.HardMode * 1.5))
+                            {
+                                salePrice = (int)(salePrice * (1f - Config.HardMode));
+                                tip = (int)((float)tip * (1f - Config.HardMode));
+                                reply = SHelper.Translation.Get("foodstore.justdontlike." + rand.Next(9));
+                                tasteCase = new List<string> { "used to like it but something weird today", "this seem to be worse than normal", "what happened to this? it used to be good", "did you change the receipe? it is so bad today", "I don't like how it is today", "have all the good one sold?" };
+                                if (rand.NextDouble() < Config.HardMode)
+                                {
+                                    salePrice = (tip = 0);
+                                    reply = SHelper.Translation.Get("foodstore.justhate." + rand.Next(9));
+                                    tasteCase = new List<string> { "I don't feel well today. It change my taste on this", "hopefully nobody catch me snagged this one", "taken by me. Dont try talking to me because I am in bad mood", "just be taken from you because I chose to be a villain today" };
+                                }
+                            }
 
                             //Money on/off farm
                             if (__instance.currentLocation is not FarmHouse && __instance.currentLocation is not Farm && !Config.DisableChatAll && Game1.IsMasterGame)
@@ -1484,7 +1495,7 @@ namespace MarketTown
                                 //Generate chat box
                                 if (tip != 0)
                                 {
-                                    if (Config.AdvanceAiContent && AILimitCount < AILimitBlock)
+                                    if (Config.AdvanceAiContent && (AILimitCount < AILimitBlock || Config.AdvanceAiLimit != 0 && AILimitCount <= Config.AdvanceAiLimit))
                                     {
                                         string ageCategory = __instance.Age == 0 ? "adult" : __instance.Age == 1 ? "teens" : "child";
                                         string manner = __instance.Manners == 0 ? "friendly." : __instance.Manners == 1 ? "polite." : __instance.Manners == 2 ? "rude." : "friendly.";
@@ -1499,7 +1510,7 @@ namespace MarketTown
                                 }
                                 else
                                 {
-                                    if (Config.AdvanceAiContent && AILimitCount < AILimitBlock)
+                                    if (Config.AdvanceAiContent && (AILimitCount < AILimitBlock || Config.AdvanceAiLimit != 0 && AILimitCount <= Config.AdvanceAiLimit))
                                     {
                                         string ageCategory = __instance.Age == 0 ? "adult" : __instance.Age == 1 ? "teens" : "child";
                                         string manner = __instance.Manners == 0 ? "friendly." : __instance.Manners == 1 ? "polite." : __instance.Manners == 2 ? "rude." : "friendly.";
@@ -1516,9 +1527,12 @@ namespace MarketTown
                                 //Generate chat box
                                 if (Game1.IsMultiplayer)
                                 {
-                                    Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.sold", new { foodObjName = itemName, locationint = __instance.currentLocation.DisplayName, saleint = salePrice, tipint = tipLog }));
                                     MyMessage messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.sold", new { foodObjName = itemName, locationint = __instance.currentLocation.DisplayName, saleint = salePrice, tipint = tipLog }));
-                                    SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
+                                    if (!Config.DisableSellNotice)
+                                    {
+                                        Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.sold", new { foodObjName = itemName, locationint = __instance.currentLocation.DisplayName, saleint = salePrice, tipint = tipLog }));
+                                        SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
+                                    }
 
                                     if (!Config.DisableChat && Config.ExtraMessage)
                                     {
@@ -1539,7 +1553,7 @@ namespace MarketTown
                                         }
                                     }
                                 }
-                                else
+                                else if (!Config.DisableSellNotice)
                                 {
                                     Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.sold", new { foodObjName = itemName, locationint = __instance.currentLocation.DisplayName, saleint = salePrice, tipint = tipLog }));
                                     if (!Config.DisableChat && Config.ExtraMessage)
@@ -1744,12 +1758,12 @@ namespace MarketTown
                                 }
                             }
 
-                            salePrice *= challengeMultiplier;
+                            salePrice = (int)(challengeMultiplier * salePrice);
 
                             UpdateCount(-100, count);
                             if (Game1.IsMasterGame)
                             {
-                                if (!Config.DisableChatAll && !Config.DisableChat) Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.soldclothes", new { locationint = __instance.currentLocation.DisplayName, saleint = salePrice }));
+                                if (!Config.DisableChatAll && !Config.DisableChat && !Config.DisableSellNotice) Game1.chatBox.addInfoMessage(SHelper.Translation.Get("foodstore.soldclothes", new { locationint = __instance.currentLocation.DisplayName, saleint = salePrice }));
                                 MyMessage messageToSend = new MyMessage(SHelper.Translation.Get("foodstore.soldclothes", new { locationint = __instance.currentLocation.DisplayName, saleint = salePrice }));
                                 SHelper.Multiplayer.SendMessage(messageToSend, "ExampleMessageType");
 

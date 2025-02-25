@@ -1382,7 +1382,7 @@
   "foodstore.config.modadvance":                      "   Extra",
 
   "foodstore.config.ultimatechallenge":               "*** ULTIMATE CHALLENGE ***",
-  "foodstore.config.ultimatechallengeText":           "Default False. When True, money made from Shipping bins reduced by 50%. All money made by Market Town increased by 300%. NPC buy chance increase 100%.",
+  "foodstore.config.ultimatechallengeText":           "Default False. When True, money made from Shipping bins reduced by 50%. All money made by Market Town increased by 150%. NPC buy chance increase 100%.",
 
   "foodstore.config.lockultimatechallenge":           "*** Permanent lock ***",
   "foodstore.config.lockultimatechallengeText":       "*** WARNING: Once set to True and save the game (sleep), Ultimate Challenge will be PERMANENT on this save file. There is NO going back",
@@ -1767,13 +1767,35 @@
   "foodstore.config.grangeprogressText":              "Default 2000000. Amount of earning though Festival grange sell that determine your progress score",
 
   "foodstore.items.RestaurantDecor":                  "Customers would love to sit at the table that has this lovely decoration!",
-  "foodstore.items.MarketLog":                        "A log book for you to track your selling"
+  "foodstore.items.MarketLog":                        "A log book for you to track your selling",
 
   
-  
-  
-  
+  "foodstore.justdontlike.0":                         "I used to like it, but something feels off today.",
+  "foodstore.justdontlike.1":                         "This seems worse than usual, not sure what's different.",
+  "foodstore.justdontlike.2":                         "What happened to this? It was better before.",
+  "foodstore.justdontlike.3":                         "Did you change the recipe? It's really disappointing today.",
+  "foodstore.justdontlike.4":                         "I don't like how it is today, not the same.",
+  "foodstore.justdontlike.5":                         "Did all the good ones sell out already?",
+  "foodstore.justdontlike.6":                         "This doesn't be as it used to.",
+  "foodstore.justdontlike.7":                         "It’s not as enjoyable today, something's wrong.",
+  "foodstore.justdontlike.8":                         "The quality seems to have dropped, I don’t like it.",
 
+
+  "foodstore.justhate.0":                             "I don't feel well today. It changed my taste on this.",
+  "foodstore.justhate.1":                             "Hopefully nobody catches me snagging this one.",
+  "foodstore.justhate.2":                             "I am in a bad mood. Don't talk to me. Just consider this item gone for good",
+  "foodstore.justhate.3":                             "I choose to be a villain today, but you cant take me to the station",
+  "foodstore.justhate.4":                             "Let me try first and I will pay later.",
+  "foodstore.justhate.5":                             "I’m just not feeling like spending today. Is this one free sample?",
+  "foodstore.justhate.6":                             "Your inventory just reduced by one, but your wallet havent change",
+  "foodstore.justhate.7":                             "I’ve decided today is my no pay day. I still take this though",
+  "foodstore.justhate.8":                             "I just don’t like paying. You can't make me.",
+
+  "foodstore.config.hardmode":                        "Hard mode",
+  "foodstore.config.hardmodeText":                    "Sometime people just choose to be sassy about their purchase.",
+
+  "foodstore.config.disablesellnotice":               "Disable sell notice?",
+  "foodstore.config.disablesellnoticeText":           "Disable sell notice in chatbox"
 
 
 }

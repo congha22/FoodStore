@@ -863,11 +863,13 @@ namespace MarketTown
                                 {
                                     chest.Items[index] = null;
 
-                                    string message = GetSoldMessage(randomItemSold, chest.modData["hapyke.FoodStore/festivalChestName"]);
-                                    npcBuy.showTextAboveHead(message, randomColor, 2, 4000, 1000);
-                                    var farmhandNpcBubbleMessage = new MyMessage($"{npcBuy.Name}///{message}");
-                                    SHelper.Multiplayer.SendMessage(farmhandNpcBubbleMessage, "NpcShowText");
-
+                                    string message = GetSoldMessage(npcBuy, randomItemSold, chest.modData["hapyke.FoodStore/festivalChestName"]);
+                                    if (message != "")
+                                    {
+                                        npcBuy.showTextAboveHead(message, randomColor, 2, 4000, 1000);
+                                        var farmhandNpcBubbleMessage = new MyMessage($"{npcBuy.Name}///{message}");
+                                        SHelper.Multiplayer.SendMessage(farmhandNpcBubbleMessage, "NpcShowText");
+                                    }
                                     shopObj.Items.Remove(shopItem);
                                     npcBuy.modData["hapyke.FoodStore/festivalLastPurchase"] = Game1.timeOfDay.ToString();
 
@@ -884,14 +886,16 @@ namespace MarketTown
 
                                     chest.Items[itemIndex] = null;
 
-                                    string message = GetSoldMessage(randomItemSold, "PlayerShop");
-                                    npcBuy.showTextAboveHead(message, randomColor, 2, 4000, 1000);
-                                    var farmhandNpcBubbleMessage = new MyMessage($"{npcBuy.Name}///{message}");
-                                    SHelper.Multiplayer.SendMessage(farmhandNpcBubbleMessage, "NpcShowText");
-
+                                    string message = GetSoldMessage(npcBuy, randomItemSold, "PlayerShop");
+                                    if (message != "")
+                                    {
+                                        npcBuy.showTextAboveHead(message, randomColor, 2, 4000, 1000);
+                                        var farmhandNpcBubbleMessage = new MyMessage($"{npcBuy.Name}///{message}");
+                                        SHelper.Multiplayer.SendMessage(farmhandNpcBubbleMessage, "NpcShowText");
+                                    }
                                     npcBuy.modData["hapyke.FoodStore/festivalLastPurchase"] = Game1.timeOfDay.ToString();
 
-                                    var price = (int)(itemObj.sellToStorePrice() * (random.NextDouble() / 2 + 1.5) * 2 / Math.Sqrt(IslandProgress()) * Config.IslandMoneyModifier * (Config.UltimateChallenge ? 4 : 1));
+                                    var price = (int)(itemObj.sellToStorePrice() * (random.NextDouble() / 2 + 1.5) * 2 / Math.Sqrt(IslandProgress()) * Config.IslandMoneyModifier * (Config.UltimateChallenge ? 2.5 : 1));
                                     if (Game1.IsMasterGame) AddToPlayerFunds(price);
 
                                     string quality = " ";
@@ -992,7 +996,7 @@ namespace MarketTown
             }
         }       //Send and receive message
 
-        public static string GetSoldMessage(string itemId, string shop)
+        public static string GetSoldMessage(NPC npc, string itemId, string shop)
         {
             try
             {
@@ -1019,6 +1023,20 @@ namespace MarketTown
                 var displayName = ItemRegistry.GetData(itemId).DisplayName;
 
                 var stringValue = SHelper.Translation.Get("foodstore.festival.sold." + random.Next(20), new { itemName = displayName, shopName = result });
+
+                if ( random.NextDouble() < 0.2 && Config.AdvanceAiContent && (AILimitCount < AILimitBlock || Config.AdvanceAiLimit != 0 && AILimitCount <= Config.AdvanceAiLimit))
+                {
+                    int age = npc.Age;
+                    string npcAge = age == 0 ? "adult" : age == 1 ? "teens" : age == 2 ? "child" : "adult";
+                    Task.Run(() => ModEntry.SendMessageToAssistant(
+                        npc: npc,
+                        userMessage: "Hey what is that?",
+                        systemMessage: $"As NPC {npc.Name} in Stardew Valley, who is {npcAge}, you will share to everyone that you just bought a {displayName} from {result} stall and what you will do with it. Limit to under 18 words.",
+                        isForBubbleMessage: true)
+                    );
+
+                    return "";
+                }
 
                 return stringValue;
             }
@@ -1227,7 +1245,7 @@ namespace MarketTown
 
 
             // main NPC show bubble
-            if (Config.AdvanceAiContent && AILimitCount < AILimitBlock)
+            if (Config.AdvanceAiContent && (AILimitCount < AILimitBlock || Config.AdvanceAiLimit != 0 && AILimitCount <= Config.AdvanceAiLimit))
             {
                 string ageCategory = thisCharacter.Age == 0 ? "adult" : thisCharacter.Age == 1 ? "teens" : "child";
                 string manner = thisCharacter.Manners == 0 ? "friendly." : thisCharacter.Manners == 1 ? "polite." : thisCharacter.Manners == 2 ? "rude." : "friendly.";
@@ -2199,13 +2217,13 @@ namespace MarketTown
                                 NPCShowTextAboveHead(npc, SHelper.Translation.Get($"foodstore.viewchat.fruittreebuy.{random.Next(1, 10)}",
                                     new { fruitName = fruitSold.DisplayName, playerName = Game1.player.Name }));
 
-                                if (Game1.IsMasterGame) AddToPlayerFunds((int)(fruitSold.sellToStorePrice() * 4 * Config.MoneyModifier * (Config.UltimateChallenge ? 4 : 1)));
+                                if (Game1.IsMasterGame) AddToPlayerFunds((int)(fruitSold.sellToStorePrice() * 4 * Config.MoneyModifier * (Config.UltimateChallenge ? 2.5 : 1)));
                                 fTree.fruit.RemoveAt(0);
                                 return;
                             }
                             else
                             {
-                                if (Config.AdvanceAiContent && AILimitCount < AILimitBlock)
+                                if (Config.AdvanceAiContent && (AILimitCount < AILimitBlock || Config.AdvanceAiLimit != 0 && AILimitCount <= Config.AdvanceAiLimit))
                                 {
                                     List<string> contextChoice = new List<string> { "still young", "need more time to grow", "seem to be a great tree", "will bear a lot of fruits" };
                                     if (fTree.daysUntilMature.Value <= 0 && !fTree.fruit.Any()) contextChoice = new List<string> { "provides excellent shade", "strong and sturdy branches", "waiting for fruit", "beautiful colors", "birds nesting", "tall and impressive", "attractive foliage" };
@@ -2242,7 +2260,7 @@ namespace MarketTown
 
                                 if (crop != null)
                                 {
-                                    if (Config.AdvanceAiContent && AILimitCount < AILimitBlock)
+                                    if (Config.AdvanceAiContent && (AILimitCount < AILimitBlock || Config.AdvanceAiLimit != 0 && AILimitCount <= Config.AdvanceAiLimit))
                                     {
                                         List<string> contextChoice = new List<string> { "good", "lovely", "great color" };
                                         string ageCategory = npc.Age == 0 ? "adult" : npc.Age == 1 ? "teens" : "child";
@@ -2271,7 +2289,7 @@ namespace MarketTown
                     else if (obj != null && obj is Furniture furniture)
                     {
                         List<int> validCategory = new List<int> { 0, 1, 2, 3, 4, 6, 8, 10, 14, 17};
-                        if (Config.AdvanceAiContent && AILimitCount < AILimitBlock)
+                        if (Config.AdvanceAiContent && (AILimitCount < AILimitBlock || Config.AdvanceAiLimit != 0 && AILimitCount <= Config.AdvanceAiLimit))
                         {
                             List<string> contextChoice = new List<string> { "good", "lovely", "great color" };
                             string ageCategory = npc.Age == 0 ? "adult" : npc.Age == 1 ? "teens" : "child";
@@ -2469,7 +2487,7 @@ namespace MarketTown
                             string decorRate = decorPointComment >= 0.2 ? "absolute amazing decoration" : decorPointComment <= 0 ? "really bad decoration choice" : "just normal decoration";
 
                             //Send decorPoint message
-                            if (Config.AdvanceAiContent && AILimitCount < AILimitBlock)
+                            if (Config.AdvanceAiContent && (AILimitCount < AILimitBlock || Config.AdvanceAiLimit != 0 && AILimitCount <= Config.AdvanceAiLimit))
                             {
                                 string ageCategory = npc.Age == 0 ? "adult" : npc.Age == 1 ? "teens" : "child";
                                 string manner = npc.Manners == 0 ? "friendly." : npc.Manners == 1 ? "polite." : npc.Manners == 2 ? "rude." : "friendly.";
@@ -2498,7 +2516,7 @@ namespace MarketTown
                             string decorRate = decorPointComment >= 0.2 ? "the best decoration" : decorPointComment <= 0 ? "terrible decoration" : "very normal simple decoration";
 
                             //Send decorPoint message
-                            if (Config.AdvanceAiContent && AILimitCount < AILimitBlock)
+                            if (Config.AdvanceAiContent && (AILimitCount < AILimitBlock || Config.AdvanceAiLimit != 0 && AILimitCount <= Config.AdvanceAiLimit))
                             {
                                 string ageCategory = npc.Age == 0 ? "adult" : npc.Age == 1 ? "teens" : "child";
                                 string manner = npc.Manners == 0 ? "friendly." : npc.Manners == 1 ? "polite." : npc.Manners == 2 ? "rude." : "friendly.";
@@ -2907,18 +2925,30 @@ namespace MarketTown
 
 
         /// <summary>Call to OpenAI to generate a response</summary>
-        public static async Task SendMessageToAssistant(NPC npc, string userMessage, string systemMessage, bool isConversation = false, bool isForBubbleMessage = true)
+        public static async Task SendMessageToAssistant(NPC npc, string userMessage, string systemMessage, bool isConversation = false, bool isForBubbleMessage = true, bool isForDrawDialogue = false)
         {
-            if (AILimitCount >= AILimitBlock) return;
+
+            SMonitor.Log($"Gotcha. You cannot enable AI that easy. Use Remaster version");
+            return;
+
+            if (AILimitCount >= AILimitBlock && Config.AdvanceAiKey == "" || (AILimitCount >= Config.AdvanceAiLimit || AILimitCount >= 40 ) && Config.AdvanceAiKey != "") return;
             if (!Config.AdvanceDebug) AILimitCount++;
 
-            if (Config.AdvanceAiLanguage != "English") systemMessage += $".Use {Config.AdvanceAiLanguage} language";
+            if (Config.AdvanceAiLanguage.ToLower() != "english") systemMessage += $".Use {Config.AdvanceAiLanguage} language";
+
             string model = "gpt-4o-mini";
+            string key = AIKey1 + AIKey2 + AIKey3;
+
+            if (Config.AdvanceAiKey != "")
+            {
+                model = Config.AdvanceAiModel;
+                key = Config.AdvanceAiKey;
+            }
 
             string responseMessage = "";
             using (var httpClient = new HttpClient())
             {
-                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", AIKey1 + AIKey2 + AIKey3);
+                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", key);
                 var requestBody = new
                 {
                     model = model,
@@ -2942,9 +2972,14 @@ namespace MarketTown
                     dynamic json = JsonConvert.DeserializeObject(jsonResponse);
                     responseMessage = json.choices[0].message.content.ToString();
 
-                    SMonitor.Log($"Assistant Response: {json.choices[0].message.content.ToString()}\n{json.usage}\n", LogLevel.Trace);
+                    SMonitor.Log($"Assistant Response: {responseMessage}\n{json.usage}\n", LogLevel.Trace);
 
-                    if (isForBubbleMessage) NPCShowTextAboveHead(npc, responseMessage, true);
+                    if (isForBubbleMessage) {
+                        NPCShowTextAboveHead(npc, responseMessage, true);
+                        var farmhandNpcBubbleMessage = new MyMessage($"{npc.Name}///{responseMessage}");
+                        SHelper.Multiplayer.SendMessage(farmhandNpcBubbleMessage, "NpcShowText");
+                    }
+                    else if (isForDrawDialogue) Game1.DrawDialogue(new Dialogue(npc, "key", responseMessage));
                     else npc.CurrentDialogue.Push(new Dialogue(npc, "key", responseMessage));
 
 
@@ -2959,8 +2994,8 @@ namespace MarketTown
                             model = "gpt-4o-mini",
                             messages = new[]
                             {
-                            new { role = "system", content = "Summarize the user's conversation in under 60 words, focusing on key details and relevant points. Remove any extraneous information and provide an empty string if there's nothing noteworthy." },
-                            new { role = "user", content = $"New user message: {userMessage}. Previous summary: {history}" }
+                            new { role = "system", content = "Summarize the conversation in under 70 words, focusing on key details and relevant points. Remove any extraneous information and provide an empty string if there's nothing noteworthy." },
+                            new { role = "user", content = $"New message: {userMessage}. Previous summary: {history}" }
                         },
                             max_tokens = 65,
                             temperature = 0.7
