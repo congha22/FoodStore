@@ -94,9 +94,9 @@ namespace MarketTown
         public static  IDictionary<string, string> conversationSummaries = new Dictionary<string, string>();
 
         /// <summary>Key</summary>
-        public static string AIKey1 = "";
-        public static string AIKey2 = "";
-        public static string AIKey3 = "";
+        public static string AIKey1 = "sk-proj-k2DvKU-2dmrvmsj-";
+        public static string AIKey2 = "wcfHwa1mZObS7fTFq7W5PYf0Z0ocHmO9npp1ExL6GYzQwjXsbI015MZe08T3BlbkFJQQ7fWH_";
+        public static string AIKey3 = "RrPDn0b2ZHEQoCv2tqFrx8BmqIDa0-uZUW-ypWmXv0zc_OmyJ6PmpXxQB1MGfXPa7wA";
 
         // ==============================================================================================
         // ==============================================================================================
@@ -744,6 +744,73 @@ namespace MarketTown
                     foreach (var i in Game1.getLocationFromName("Custom_MT_Island").buildings)
                         PossibleMarketLocation.Add(i.GetIndoorsName());
                     PossibleMarketLocation.Add("Custom_MT_Island_House");
+
+                    GameLocation shedLocation = Game1.getLocationFromName("Custom_GrandpasShed");
+                    if (shedLocation != null)
+                    {
+                        bool isMuseumBuilding = false;
+                        foreach (var obj in shedLocation.Objects.Values)
+                        {
+                            // Case Museum
+                            if (obj is Sign sign && sign.displayItem.Value != null && sign.displayItem.Value.Name == "Museum License")
+                            {
+                                FarmOutside.UpdateRandomLocationOpenTile(shedLocation);
+                                foreach (var f in shedLocation.furniture)
+                                {
+                                    if (f.heldObject.Value != null && categoryKeys.Contains(f.heldObject.Value.Category)) { museumPieces++; }
+                                    if (f is FishTankFurniture fishtank) { museumPieces += (int)(fishtank.tankFish.Count / 2); }
+                                    if (f.Name.Contains("Statue")) { museumPieces += 2; }
+                                }
+
+                                ValidBuildingObjectPairs.Add(new BuildingObjectPair(shedLocation, obj, "museum", museumPieces));
+                                if (!Config.RestaurantLocations.Contains("Custom_GrandpasShed"))
+                                    Config.RestaurantLocations.Add("Custom_GrandpasShed");
+                                isMuseumBuilding = true;
+
+                                Vector2 indoorTile = new Vector2(15, 15);
+                                var busWarp = new Warp(19309, 19309, "Custom_GrandpasShed", (int)indoorTile.X, (int)indoorTile.Y, false, false);
+                                if (!Game1.getLocationFromName("BusStop").warps.Contains(busWarp)) Game1.getLocationFromName("BusStop").warps.Add(busWarp);
+
+                                UpdateFurnitureTilePathProperties(shedLocation);
+                                break;
+                            }
+                        }
+
+                        if (!isMuseumBuilding)
+                        {
+                            foreach (var obj in shedLocation.Objects.Values)
+                            {
+                                //Case Market or Restaurant
+                                if (obj is Sign sign1 && sign1.displayItem.Value != null && (sign1.displayItem.Value.Name == "Market License" || sign1.displayItem.Value.Name == "Restaurant License"))
+                                {
+                                    FarmOutside.UpdateRandomLocationOpenTile(shedLocation);
+
+                                    if (sign1.displayItem.Value.Name == "Market License") ValidBuildingObjectPairs.Add(new BuildingObjectPair(shedLocation, obj, "market", 0));
+                                    else ValidBuildingObjectPairs.Add(new BuildingObjectPair(shedLocation, obj, "restaurant", 0));
+
+                                    if (!Config.RestaurantLocations.Contains(shedLocation.Name))
+                                        Config.RestaurantLocations.Add(shedLocation.Name);
+
+                                    Vector2 indoorTile = new Vector2(0, 0);
+                                    if (shedLocation != null)
+                                    {
+                                        foreach (var warp in shedLocation.warps)
+                                        {
+                                            if (warp.TargetName == "Farm") indoorTile = new(warp.X, warp.Y - 3);
+                                            break;
+                                        }
+                                    }
+                                    var busWarp = new Warp(19309, 19309, "Custom_GrandpasShed", (int)indoorTile.X, (int)indoorTile.Y, false, false);
+                                    if (!Game1.getLocationFromName("BusStop").warps.Contains(busWarp)) Game1.getLocationFromName("BusStop").warps.Add(busWarp);
+
+                                    UpdateFurnitureTilePathProperties(shedLocation);
+                                    break;
+                                }
+                            }
+                        }
+
+                        PossibleMarketLocation.Add("Custom_GrandpasShed"); 
+                    }
                 }
                 catch (Exception ex) { SMonitor.Log("Error when getting location:" + ex.Message, LogLevel.Error); }
             }
@@ -878,7 +945,7 @@ namespace MarketTown
                 && Config.RestaurantLocations.Contains(Game1.player.currentLocation.Name))
             {
                 bool isMarket = false;
-                if (ValidBuildingObjectPairs.Any(i => i.Building.GetIndoorsName() == Game1.player.currentLocation.NameOrUniqueName && i.buildingType == "market")) 
+                if (ValidBuildingObjectPairs.Any(i => i.Building != null && i.Building.GetIndoorsName() == Game1.player.currentLocation.NameOrUniqueName && i.buildingType == "market" || i.Location != null && i.Location.NameOrUniqueName == Game1.player.currentLocation.NameOrUniqueName && i.buildingType == "market")) 
                     isMarket = true;
                 UpdateOrders(isMarket);
             }
@@ -935,8 +1002,13 @@ namespace MarketTown
 
                 foreach (var building in ValidBuildingObjectPairs)
                 {
-                    var buildingInstanceName = Game1.getLocationFromName(building.Building.GetIndoorsName());
-                    FarmOutside.UpdateRandomLocationOpenTile(buildingInstanceName);
+                    if (building.Building != null)
+                    {
+                        var buildingInstanceName = Game1.getLocationFromName(building.Building.GetIndoorsName());
+                        FarmOutside.UpdateRandomLocationOpenTile(buildingInstanceName);
+                    }
+                    else if (building.Location != null)
+                        FarmOutside.UpdateRandomLocationOpenTile(building.Location);
                 }
             }
 
@@ -1055,21 +1127,30 @@ namespace MarketTown
                 foreach (var pair in ValidBuildingObjectPairs)
                 {
                     Building building = pair.Building;
+                    GameLocation location = pair.Location;
                     Object obj = pair.Object;
                     string buildingType = pair.buildingType;
                     int ticketValue = pair.ticketValue;
 
                     Vector2 doorTile = new(0f, 0f);
 
-                    if (GlobalNPCList.Count == 0 || building == null || obj == null || building.GetIndoorsName() == null
-                        || CountShedVisitor(Game1.getLocationFromName(building.GetIndoorsName())) >= Config.MaxShedCapacity 
+                    if (GlobalNPCList.Count == 0 || (building == null && location == null) || obj == null || (building != null && building.GetIndoorsName() == null)
                         || ( buildingType == "museum" && Config.MuseumPriceMarkup / 4.1 > random.NextDouble()) ) return;
 
-                    foreach (var warp in Game1.getLocationFromName(building.GetIndoorsName()).warps)
-                    {
-                        if (warp.TargetName == "Farm") doorTile = new(warp.X, warp.Y - 3);
-                        break;
-                    }
+                    if (building != null && CountShedVisitor(Game1.getLocationFromName(building.GetIndoorsName())) >= Config.MaxShedCapacity)
+                        return;
+                    else if (location != null && CountShedVisitor(location) >= Config.MaxShedCapacity)
+                        return;
+
+                    if (building != null)
+                        foreach (var warp in Game1.getLocationFromName(building.GetIndoorsName()).warps)
+                        {
+                            if (warp.TargetName == "Farm") doorTile = new(warp.X, warp.Y - 3);
+                            break;
+                        }
+
+                    if (location != null)
+                        doorTile = new Vector2(15, 15);
                     
                     string randomNPCName = GlobalNPCList[new Random().Next(0, GlobalNPCList.Count)];
                     var visit = Game1.getCharacterFromName(randomNPCName);
@@ -1110,13 +1191,20 @@ namespace MarketTown
                         if (clearTiles.Count > 0)
                         {
                             Vector2 randomClearTile = clearTiles[Game1.random.Next(clearTiles.Count)];
-                            Game1.warpCharacter(visit, building.GetIndoorsName(), randomClearTile);
+
+                            if (building != null)
+                                Game1.warpCharacter(visit, building.GetIndoorsName(), randomClearTile);
+                            else
+                                Game1.warpCharacter(visit, location.NameOrUniqueName, randomClearTile);
 
                             visit.modData["hapyke.FoodStore/shedEntry"] = $"{randomClearTile.X},{randomClearTile.Y}";
                         }
                         else
                         {
-                            Game1.warpCharacter(visit, building.GetIndoorsName(), doorTile);
+                            if (building != null)
+                                Game1.warpCharacter(visit, building.GetIndoorsName(), doorTile);
+                            else
+                                Game1.warpCharacter(visit, location.NameOrUniqueName, doorTile);
 
                             visit.modData["hapyke.FoodStore/shedEntry"] = doorTile.X.ToString() + doorTile.Y.ToString();
                         }
@@ -1138,13 +1226,20 @@ namespace MarketTown
                         {
                             Vector2 randomClearTile = clearTiles[Game1.random.Next(clearTiles.Count)];
 
-                            Game1.warpCharacter(visit, building.GetIndoorsName(), randomClearTile);
+                            if (building != null)
+                                Game1.warpCharacter(visit, building.GetIndoorsName(), randomClearTile);
+                            else
+                                Game1.warpCharacter(visit, location.NameOrUniqueName, randomClearTile);
 
                             visit.modData["hapyke.FoodStore/shedEntry"] = $"{randomClearTile.X},{randomClearTile.Y}";
                         }
                         else
                         {
-                            Game1.warpCharacter(visit, building.GetIndoorsName(), new Vector2(obj.TileLocation.X, obj.TileLocation.Y));
+
+                            if (building != null)
+                                Game1.warpCharacter(visit, building.GetIndoorsName(), new Vector2(obj.TileLocation.X, obj.TileLocation.Y));
+                            else
+                                Game1.warpCharacter(visit, location.NameOrUniqueName, new Vector2(obj.TileLocation.X, obj.TileLocation.Y));
 
                             visit.modData["hapyke.FoodStore/shedEntry"] = (obj.TileLocation.X).ToString() + "," + (obj.TileLocation.Y).ToString();
                         }
@@ -1164,11 +1259,12 @@ namespace MarketTown
                     }
 
                     // If Location has table with Restaurant decor, NPC have chance to make special order
-                    if (random.NextDouble() < Config.TableSit && buildingType != "museum")
+                    if (Config.TableSit < random.NextDouble() && buildingType != "restaurant" || Config.TableSit * 2 < random.NextDouble() && buildingType != "market")
                     {
                         Dictionary<Vector2, int> surroundingTiles = new Dictionary<Vector2, int>();
-
-                        foreach ( var table in Game1.getLocationFromName(building.GetIndoorsName()).furniture.Where(i => i.furniture_type.Value == 11))
+                        if (building != null && location == null)
+                            location = Game1.getLocationFromName(building.GetIndoorsName());
+                        foreach ( var table in location.furniture.Where(i => i.furniture_type.Value == 11))
                         {
                             if (table != null && table.heldObject.Value != null && table.heldObject.Value.QualifiedItemId == "(F)MT.Objects.RestaurantDecor")
                             {
@@ -1609,6 +1705,7 @@ namespace MarketTown
                             }           //Food in farmhouse
 
                             UpdateCount(food.foodObject.Category);
+                            AddToShippingAchievements(food.foodObject.ItemId, 1);
                             float tastePointTrack = 3;
                             float decorPointTrack = 3;
 
@@ -1814,7 +1911,7 @@ namespace MarketTown
 
             var locationType = "default";
 
-            var pair = ValidBuildingObjectPairs.FirstOrDefault(i => i.Building.GetIndoorsName() == location.NameOrUniqueName);
+            var pair = ValidBuildingObjectPairs.FirstOrDefault(i => i.Building != null && i.Building.GetIndoorsName() == location.NameOrUniqueName || i.Location != null && i.Location.NameOrUniqueName == location.NameOrUniqueName);
             if (pair != null) locationType = pair.buildingType;
 
             if (locationType == null || locationType == "museum") return null;

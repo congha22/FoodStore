@@ -958,6 +958,7 @@ namespace MarketTown
         public class BuildingObjectPair
         {
             public Building Building { get; set; }
+            public GameLocation Location { get; set; }
             public Object Object { get; set; }
             public string buildingType { get; set; }
             public int ticketValue { get; set; }
@@ -965,6 +966,14 @@ namespace MarketTown
             public BuildingObjectPair(Building building, Object obj, string buildingType, int ticketValue)
             {
                 Building = building;
+                Object = obj;
+                this.buildingType = buildingType;
+                this.ticketValue = ticketValue;
+            }
+
+            public BuildingObjectPair(GameLocation location, Object obj, string buildingType, int ticketValue)
+            {
+                Location = location;
                 Object = obj;
                 this.buildingType = buildingType;
                 this.ticketValue = ticketValue;
@@ -1360,6 +1369,15 @@ namespace MarketTown
             {
                 categoryActions[category].Invoke();
             }
+        }
+
+        public static void AddToShippingAchievements(string qualifiedItemId, int amount)
+        {
+            Farmer player = Game1.player;
+
+            player.shippedBasic(qualifiedItemId, 1);
+            player.stats.ItemsShipped += 1;
+            Game1.stats.checkForShippingAchievements();
         }
 
         private static void NPCShowTextAboveHead(NPC npc, string message, bool bypass = false)
@@ -2455,6 +2473,8 @@ namespace MarketTown
                         PossibleMarketLocation.Add(i.GetIndoorsName());
                     PossibleMarketLocation.Add("Custom_MT_Island_House");
 
+                    if (Game1.getLocationFromName("Custom_GrandpasShed") is not null)
+                        PossibleMarketLocation.Add("Custom_GrandpasShed");
                     if (Game1.player.currentLocation != null && !PossibleMarketLocation.Contains(Game1.player.currentLocation.NameOrUniqueName))
                         PossibleMarketLocation.Add(Game1.player.currentLocation.NameOrUniqueName);
                 }
@@ -2557,7 +2577,7 @@ namespace MarketTown
                     // **************************** Control NPC walking to the food ****************************
                     string text = "";
                     if (npc != null && npc.queuedSchedulePaths.Count == 0 && Game1.IsMasterGame && Game1.timeOfDay < 2530 
-                        && location.furniture.Where(i => i != null && (i.furniture_type.Value == 5 || i.furniture_type.Value == 9 || i.furniture_type.Value == 11) && i.heldObject.Value != null).Any()
+                        && (location.furniture.Where(i => i != null && (i.furniture_type.Value == 5 || i.furniture_type.Value == 9 || i.furniture_type.Value == 11) && i.heldObject.Value != null).Any() || (location.Objects.Values.Where(i => i != null && i is Mannequin)).Any())
                         && (!npc.modData.ContainsKey("hapyke.FoodStore/shopOwnerToday") || npc.modData["hapyke.FoodStore/shopOwnerToday"] == "-1,-1")
                         && (!IsFestivalIsCurrent || location.Name != "Custom_MT_Island"))
                     {
@@ -2587,7 +2607,7 @@ namespace MarketTown
 
                                 if (food == null || (!Config.AllowRemoveNonFood && food.foodObject.Edibility <= 0 && (npc.currentLocation == Game1.getFarm() || npc.currentLocation is FarmHouse)))
                                     continue;
-                                
+
                                 if (TryToEatFood(npc, food))
                                     continue;
 

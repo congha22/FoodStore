@@ -366,6 +366,9 @@ namespace MarketTown
         {
             try
             {
+                if (location is null)
+                    return;
+
                 Random r = new Random();
                 var map = location.Map;
 
