@@ -1795,7 +1795,13 @@
   "foodstore.config.hardmodeText":                    "Sometime people just choose to be sassy about their purchase.",
 
   "foodstore.config.disablesellnotice":               "Disable sell notice?",
-  "foodstore.config.disablesellnoticeText":           "Disable sell notice in chatbox"
+  "foodstore.config.disablesellnoticeText":           "Disable sell notice in chatbox",
+
+  "foodstore.config.smartphone":                      "Smartphone intergration - Required mod Smartphone",
+  "foodstore.config.smartphoneEnable":                "Enable?",
+  "foodstore.config.smartphoneEnableText":            "Receive notification when storage empty and some other messages.",
+  "foodstore.config.smartphoneMessageChance":         "Customer message chance",
+  "foodstore.config.smartphoneMessageChanceText":     "Customer can text you on the quality of your produce"
 
 
 }

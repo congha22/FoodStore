@@ -1,3 +1,12 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Reflection;
+using System.Text;
+using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 using ContentPatcher;
 using HarmonyLib;
 using MailFrameworkMod;
@@ -22,18 +31,11 @@ using StardewValley.Objects;
 using StardewValley.Pathfinding;
 using StardewValley.TerrainFeatures;
 using StardewValley.Tools;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Reflection;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using xTile.Dimensions;
 using xTile.Layers;
 using static MarketTown.ModEntry;
 using Object = StardewValley.Object;
+using Newtonsoft.Json.Linq;
 
 namespace MarketTown
 {
@@ -177,11 +179,36 @@ namespace MarketTown
 
             ConfigMenu(api, this.ModManifest, Helper);
 
+
+            iSmartphoneApi = Helper.ModRegistry.GetApi<ISmartPhoneApi>("d5a1lamdtd.Smartphone");
+            if (iSmartphoneApi != null)
+            {
+                Texture2D icon = Helper.ModContent.Load<Texture2D>("assets/market_app.png");
+                iSmartphoneApi.RegisterPhoneApp(
+                     ownerModId: this.ModManifest.UniqueID,
+                     appId: "d5a1lamdtd.markettown.marketlog",
+                     displayName: "Market Log",
+                     iconTexture: icon,
+                     onClick: () => OpenMarketTownMenu(),
+                     closePhoneOnLaunch: true,
+                     sortOrder: 0,
+                     sourceRect: null,
+                     isVisible: () => Context.IsWorldReady,
+                     getBadgeCount: () => 0
+                );
+            }
+
+            iFerngillSimpleEconomyApi = Helper.ModRegistry.GetApi<IFerngillSimpleEconomyApi>("paulsteele.fse");
+            if (iFerngillSimpleEconomyApi != null)
+            {
+                this.Monitor.Log("Ferngill's Simple Economy API found. Integrating with it.", LogLevel.Info);
+            }
+
         }       // **** Config Handle ****
 
         private void HandleCommand(string cmd, string[] args)
         {
-            if (args.Length == 0) return; 
+            if (args.Length == 0) return;
 
             if (args[0] == "fix")
             {
@@ -449,17 +476,17 @@ namespace MarketTown
                                 var index = stockChest.Items.IndexOf(itemItem);
                                 stockChest.Items[index] = null;
 
-                                ShopStockUpdate = true;;
+                                ShopStockUpdate = true; ;
                                 break;
                             }
                         }
-                        
+
                         return false;
                     };
                 }
             }
 
-            if(e.NewMenu is CarpenterMenu centerMenu)
+            if (e.NewMenu is CarpenterMenu centerMenu)
             {
                 bool islandStatus = Game1.getLocationFromName("Custom_MT_Island").isAlwaysActive.Value;
                 if (!islandStatus) { Game1.addHUDMessage(new HUDMessage(SHelper.Translation.Get("foodstore.island.building"), 5000, true)); }
@@ -854,7 +881,7 @@ namespace MarketTown
                         {
                             double nonPlayerChance = random.NextDouble();
                             double playerChance = random.NextDouble();
-                            if ( chest.modData.ContainsKey("hapyke.FoodStore/festivalChestName") && chest.modData["hapyke.FoodStore/festivalChestName"] != "MarketTown.playerShop" && nonPlayerChance < Config.FestivalMaxSellChance / Math.Sqrt(IslandProgress()) + 0.3)
+                            if (chest.modData.ContainsKey("hapyke.FoodStore/festivalChestName") && chest.modData["hapyke.FoodStore/festivalChestName"] != "MarketTown.playerShop" && nonPlayerChance < Config.FestivalMaxSellChance / Math.Sqrt(IslandProgress()) + 0.3)
                             {
                                 var shopObj = StardewValley.DataLoader.Shops(Game1.content)[chest.modData["hapyke.FoodStore/festivalChestName"]];
 
@@ -932,20 +959,16 @@ namespace MarketTown
         }
 
         /// <summary>Add Money to all online players.</summary>
-        private static void AddToPlayerFunds(int salePrice)
+        private static void AddToPlayerFunds(int salePrice, long itemOwner = 0)
         {
             var farmers = Game1.getAllFarmers().Where(f => f.isActive()).ToList();
             var multiplayer = farmers.Count > 1;
 
-            if (Game1.player.team.useSeparateWallets.Value && multiplayer)
+            if (Game1.player.team.useSeparateWallets.Value && multiplayer && itemOwner != 0)
             {
                 try
                 {
-                    foreach (var farmer in farmers)
-                    {
-                        Game1.player.team.AddIndividualMoney(farmer, (int)salePrice / farmers.Count);
-                    }
-
+                    Game1.player.team.AddIndividualMoney(Game1.GetPlayer(itemOwner), salePrice);
                 }
                 catch { Game1.player.Money += salePrice; }
             }
@@ -1033,13 +1056,13 @@ namespace MarketTown
 
                 var stringValue = SHelper.Translation.Get("foodstore.festival.sold." + random.Next(20), new { itemName = displayName, shopName = result });
 
-                if ( random.NextDouble() < 0.2 && Config.AdvanceAiContent && (AILimitCount < AILimitBlock || Config.AdvanceAiLimit != 0 && AILimitCount <= Config.AdvanceAiLimit))
+                if (random.NextDouble() < 0.2 && Config.AdvanceAiContent && (AILimitCount < AILimitBlock || Config.AdvanceAiLimit != 0 && AILimitCount <= Config.AdvanceAiLimit))
                 {
                     int age = npc.Age;
                     string npcAge = age == 0 ? "adult" : age == 1 ? "teens" : age == 2 ? "child" : "adult";
                     Task.Run(() => ModEntry.SendMessageToAssistant(
                         npc: npc,
-                        userMessage: "Hey what is that?",
+                        userMessage: "",
                         systemMessage: $"As NPC {npc.Name} in Stardew Valley, who is {npcAge}, you will share to everyone that you just bought a {displayName} from {result} stall and what you will do with it. Limit to under 18 words.",
                         isForBubbleMessage: true)
                     );
@@ -1244,7 +1267,7 @@ namespace MarketTown
             else if (lastDecorRate == 0)
             {
                 decorstring = SHelper.Translation.Get("foodstore.normalDecorint." + randomIndex);
-                decorPool = new List<string> { "pretty standard, not stand out.", "just fit, nothing too fancy.", "blends in fine, nothing special."};
+                decorPool = new List<string> { "pretty standard, not stand out.", "just fit, nothing too fancy.", "blends in fine, nothing special." };
             }
             else if (lastDecorRate < 0)
             {
@@ -1300,7 +1323,7 @@ namespace MarketTown
 
         public static string GetRandomDish()
         {
-            var resultList = Game1.objectData.Where(x => x.Value != null && x.Value.Category == -7).Select(x => x.Key ).ToList();
+            var resultList = Game1.objectData.Where(x => x.Value != null && x.Value.Category == -7).Select(x => x.Key).ToList();
 
             if (resultList.Count > 0)
             {
@@ -1371,13 +1394,22 @@ namespace MarketTown
             }
         }
 
-        public static void AddToShippingAchievements(string qualifiedItemId, int amount)
+        public static void AddToShippingAchievements(string qualifiedItemId, int amount, long playerId)
         {
-            Farmer player = Game1.player;
+            Farmer player = Game1.GetPlayer(playerId);
+
+            if (player is null)
+                player = Game1.player;
 
             player.shippedBasic(qualifiedItemId, 1);
             player.stats.ItemsShipped += 1;
             Game1.stats.checkForShippingAchievements();
+        }
+
+        public static void UpdateIFerngillSimpleEconomy(string itemId)
+        {
+            var itemObj = new Object(itemId, 1);
+            iFerngillSimpleEconomyApi.AdjustSupply(itemObj, 1);
         }
 
         private static void NPCShowTextAboveHead(NPC npc, string message, bool bypass = false)
@@ -1396,8 +1428,8 @@ namespace MarketTown
 
                     foreach (string split in splits)
                     {
-                        float minDisplayTime = 2000f;
-                        float maxDisplayTime = 3500f;
+                        float minDisplayTime = 3000f;
+                        float maxDisplayTime = 4000f;
                         float percentOfMax = (float)split.Length / (float)60;
                         int duration = (int)(minDisplayTime + (maxDisplayTime - minDisplayTime) * percentOfMax);
                         npc.showTextAboveHead(split, default, default, duration, default);
@@ -1510,11 +1542,11 @@ namespace MarketTown
             float totalCustomerNoteYes = model.TotalCustomerNoteYes;
             float totalCustomerNoteNo = model.TotalCustomerNoteNo + 1;
 
-            if      (Game1.stats.DaysPlayed > 84 && totalCustomerNote > 150 && totalCustomerNoteYes / totalCustomerNote > 0.90) return 5;
+            if (Game1.stats.DaysPlayed > 84 && totalCustomerNote > 150 && totalCustomerNoteYes / totalCustomerNote > 0.90) return 5;
             else if (Game1.stats.DaysPlayed > 56 && totalCustomerNote > 100 && totalCustomerNoteYes / totalCustomerNote > 0.85) return 4;
-            else if (Game1.stats.DaysPlayed > 42 && totalCustomerNote > 70 &&  totalCustomerNoteYes / totalCustomerNote > 0.80) return 3;
-            else if (Game1.stats.DaysPlayed > 28 && totalCustomerNote > 40 &&  totalCustomerNoteYes / totalCustomerNote > 0.75) return 2;
-            else if (Game1.stats.DaysPlayed > 14 && totalCustomerNote > 20 &&  totalCustomerNoteYes / totalCustomerNote > 0.70) return 1;
+            else if (Game1.stats.DaysPlayed > 42 && totalCustomerNote > 70 && totalCustomerNoteYes / totalCustomerNote > 0.80) return 3;
+            else if (Game1.stats.DaysPlayed > 28 && totalCustomerNote > 40 && totalCustomerNoteYes / totalCustomerNote > 0.75) return 2;
+            else if (Game1.stats.DaysPlayed > 14 && totalCustomerNote > 20 && totalCustomerNoteYes / totalCustomerNote > 0.70) return 1;
             else return 0;
         }
 
@@ -1791,7 +1823,7 @@ namespace MarketTown
 
                 WeeklyDish = WeeklyFeatureDish,
 
-                TotalVisitorVisited = Config.AdvanceResetProgress? 0 : totalVisitorVisited + TodayVisitorVisited,
+                TotalVisitorVisited = Config.AdvanceResetProgress ? 0 : totalVisitorVisited + TodayVisitorVisited,
                 TotalFriendVisited = Config.AdvanceResetProgress ? 0 : totalFriendVisited + TodayFriendVisited,
 
                 TotalEarning = Config.AdvanceResetProgress ? 0 : totalMoney + TodayMoney,
@@ -1964,42 +1996,55 @@ namespace MarketTown
 
                                 if (Math.Abs(x) <= range && Math.Abs(y) <= range)
                                 {
-                                    Vector2 currentTile = new Vector2(currentX, currentY);
                                     Object obj = location.getObjectAtTile(currentX, currentY, true);
 
-                                    if (obj != null && obj is Chest mtChest && mtChest.Items.Count > 0
+                                    if (obj != null && obj is Chest mtChest
                                         && (obj.QualifiedItemId == "(BC)MT.Objects.MarketTownStorageLarge" && (random.NextDouble() < Config.RestockChance || bypass)
                                         || obj.QualifiedItemId == "(BC)MT.Objects.MarketTownStorageSmall" && Math.Abs(x) <= 5 && Math.Abs(y) <= 5 && (random.NextDouble() < Config.RestockChance / 1.5 || bypass)))
                                     {
-                                        List<int> categoryKeys = new List<int> { -81, -80, -79, -75, -74, -28, -27, -26, -23, -22, -21, -20, -19, -18, -17, -16, -15, -12, -8, -7, -6, -5, -4, -2 };
-                                        
-                                        int tried = 10;
-                                        while (fChest.Items.Count(i => i == null) > 0 && tried > 0)
+                                        if (mtChest.Items.Count == 0)
                                         {
-                                            tried--;
-                                            List<Item> filteredItems = mtChest.Items.Where(item => item.QualifiedItemId.StartsWith("(O)") && categoryKeys.Contains(item.Category)).ToList();
-                                            if (filteredItems.Count > 0)
+                                            if (!MarketChestMap.Contains((location.Name, new Vector2(currentX, currentY))))
                                             {
-                                                int index = random.Next(filteredItems.Count);
-
-                                                var itemItem = filteredItems[index];
-
-                                                var fIndex = fChest.Items.IndexOf(fChest.Items.FirstOrDefault(i => i == null));
-                                                if (fIndex >= 0) fChest.Items[fIndex] = itemItem.getOne();
-
-                                                var chestItem = mtChest.Items.Where(item => item == itemItem).FirstOrDefault();
-                                                var chestIndex = mtChest.Items.IndexOf(chestItem);
-
-                                                if (mtChest.Items[chestIndex].Stack > 1) mtChest.Items[chestIndex].Stack -= 1;
-                                                else mtChest.Items.Remove(chestItem);
-
-                                                if (fChest.Items.Count(i => i == null) == 0) flag = true;
-                                                continue;
+                                                MarketChestMap.Add((location.Name, new Vector2(currentX, currentY)));
+                                                iSmartphoneApi.SendSmartphoneNotification($"Market Town Storage at {location.Name} is empty. Consider restock it soon!", "Market Town");
                                             }
-                                            else break;
                                         }
+                                        else
+                                        {
+                                            if (MarketChestMap.Contains((location.Name, new Vector2(currentX, currentY))))
+                                            {
+                                                MarketChestMap.Remove((location.Name, new Vector2(currentX, currentY)));
+                                            }
+                                            List<int> categoryKeys = new List<int> { -81, -80, -79, -75, -74, -28, -27, -26, -23, -22, -21, -20, -19, -18, -17, -16, -15, -12, -8, -7, -6, -5, -4, -2 };
+                                            int tried = 10;
+                                            while (fChest.Items.Count(i => i == null) > 0 && tried > 0)
+                                            {
+                                                tried--;
+                                                List<Item> filteredItems = mtChest.Items.Where(item => item.QualifiedItemId.StartsWith("(O)") && categoryKeys.Contains(item.Category)).ToList();
+                                                if (filteredItems.Count > 0)
+                                                {
+                                                    int index = random.Next(filteredItems.Count);
 
-                                        if (flag) RecentSoldTable.Remove(kvp);
+                                                    var itemItem = filteredItems[index];
+
+                                                    var fIndex = fChest.Items.IndexOf(fChest.Items.FirstOrDefault(i => i == null));
+                                                    if (fIndex >= 0) fChest.Items[fIndex] = itemItem.getOne();
+
+                                                    var chestItem = mtChest.Items.Where(item => item == itemItem).FirstOrDefault();
+                                                    var chestIndex = mtChest.Items.IndexOf(chestItem);
+
+                                                    if (mtChest.Items[chestIndex].Stack > 1) mtChest.Items[chestIndex].Stack -= 1;
+                                                    else mtChest.Items.Remove(chestItem);
+
+                                                    if (fChest.Items.Count(i => i == null) == 0) flag = true;
+                                                    continue;
+                                                }
+                                                else break;
+                                            }
+
+                                            if (flag) RecentSoldTable.Remove(kvp);
+                                        }
                                     }
                                 }
 
@@ -2026,32 +2071,48 @@ namespace MarketTown
                                     Vector2 currentTile = new Vector2(currentX, currentY);
                                     Object obj = location.getObjectAtTile(currentX, currentY, true);
 
-                                    if (obj != null && obj is Chest mtChest && mtChest.Items.Count > 0
+                                    if (obj != null && obj is Chest mtChest
                                         && (obj.QualifiedItemId == "(BC)MT.Objects.MarketTownStorageLarge" && (random.NextDouble() < Config.RestockChance || bypass)
                                         || obj.QualifiedItemId == "(BC)MT.Objects.MarketTownStorageSmall" && Math.Abs(x) <= 5 && Math.Abs(y) <= 5 && (random.NextDouble() < Config.RestockChance / 2 || bypass)))
                                     {
-                                        List<int> categoryKeys = new List<int> { -81, -80, -79, -75, -74, -28, -27, -26, -23, -22, -21, -20, -19, -18, -17, -16, -15, -12, -8, -7, -6, -5, -4, -2 };
-
-                                        List<Item> filteredItems = mtChest.Items.Where(item => item.QualifiedItemId.StartsWith("(O)") && categoryKeys.Contains(item.Category)).ToList();
-                                        if (filteredItems.Count > 0)
+                                        if (mtChest.Items.Count == 0)
                                         {
-                                            int index = random.Next(filteredItems.Count);
-
-                                            var itemItem = filteredItems[index];
-                                            var itemToSell = itemItem.getOne();
-
-                                            if (itemToSell is Object itemObject)
+                                            if (!MarketChestMap.Contains((location.Name, new Vector2(currentX, currentY))))
                                             {
-                                                table.SetHeldObject(itemObject);
+                                                MarketChestMap.Add((location.Name, new Vector2(currentX, currentY)));
+                                                iSmartphoneApi.SendSmartphoneNotification($"Market Town Storage at {location.Name} is empty. Consider restock it soon!", "Market Town");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (MarketChestMap.Contains((location.Name, new Vector2(currentX, currentY))))
+                                            {
+                                                MarketChestMap.Remove((location.Name, new Vector2(currentX, currentY)));
+                                            }
 
-                                                var chestItem = mtChest.Items.Where(item => item == itemItem).FirstOrDefault();
-                                                var chestIndex = mtChest.Items.IndexOf(chestItem);
+                                            List<int> categoryKeys = new List<int> { -81, -80, -79, -75, -74, -28, -27, -26, -23, -22, -21, -20, -19, -18, -17, -16, -15, -12, -8, -7, -6, -5, -4, -2 };
 
-                                                if (mtChest.Items[chestIndex].Stack > 1) mtChest.Items[chestIndex].Stack -= 1;
-                                                else mtChest.Items.Remove(chestItem);
+                                            List<Item> filteredItems = mtChest.Items.Where(item => item.QualifiedItemId.StartsWith("(O)") && categoryKeys.Contains(item.Category)).ToList();
+                                            if (filteredItems.Count > 0)
+                                            {
+                                                int index = random.Next(filteredItems.Count);
 
-                                                RecentSoldTable.Remove(kvp);
-                                                break;
+                                                var itemItem = filteredItems[index];
+                                                var itemToSell = itemItem.getOne();
+
+                                                if (itemToSell is Object itemObject)
+                                                {
+                                                    table.SetHeldObject(itemObject);
+
+                                                    var chestItem = mtChest.Items.Where(item => item == itemItem).FirstOrDefault();
+                                                    var chestIndex = mtChest.Items.IndexOf(chestItem);
+
+                                                    if (mtChest.Items[chestIndex].Stack > 1) mtChest.Items[chestIndex].Stack -= 1;
+                                                    else mtChest.Items.Remove(chestItem);
+
+                                                    RecentSoldTable.Remove(kvp);
+                                                    break;
+                                                }
                                             }
                                         }
                                     }
@@ -2215,7 +2276,8 @@ namespace MarketTown
             //--------------
 
 
-            if ( random.NextDouble() < 0.5) {
+            if (random.NextDouble() < 0.5)
+            {
                 while (tried < 10 && checkingTile.Any())
                 {
                     tried++;
@@ -2255,7 +2317,7 @@ namespace MarketTown
                                         systemMessage: $"As NPC {npc.Name} ({ageCategory}, {manner}) in Stardew Valley, you will share your comment that this {fTree.GetDisplayName()} tree is {contextChoice[random.Next(contextChoice.Count)]}, using under 25 text words")
                                     );
                                 }
-                                else 
+                                else
                                     NPCShowTextAboveHead(npc, SHelper.Translation.Get($"foodstore.viewchat.fruittree.{fTree.daysUntilMature.Value <= 0}.{fTree.fruit.Any()}.{random.Next(1, 16)}",
                                         new { treeName = fTree.GetDisplayName(), playerName = Game1.player.Name }));
                                 return;
@@ -2264,7 +2326,7 @@ namespace MarketTown
                         else if (value is Tree tree)
                         {
                             NPCShowTextAboveHead(npc, SHelper.Translation.Get($"foodstore.viewchat.wildtree.{tree.growthStage.Value >= 5}.{random.Next(1, 16)}",
-                                new {playerName = Game1.player.Name }));
+                                new { playerName = Game1.player.Name }));
                             return;
                         }
                         else if (value is HoeDirt hoeDirt)
@@ -2306,7 +2368,7 @@ namespace MarketTown
                     }
                     else if (obj != null && obj is Furniture furniture)
                     {
-                        List<int> validCategory = new List<int> { 0, 1, 2, 3, 4, 6, 8, 10, 14, 17};
+                        List<int> validCategory = new List<int> { 0, 1, 2, 3, 4, 6, 8, 10, 14, 17 };
                         if (Config.AdvanceAiContent && (AILimitCount < AILimitBlock || Config.AdvanceAiLimit != 0 && AILimitCount <= Config.AdvanceAiLimit))
                         {
                             List<string> contextChoice = new List<string> { "good", "lovely", "great color" };
@@ -2364,7 +2426,7 @@ namespace MarketTown
             }
         }
 
-        public static void UpdateFurnitureTilePathProperties (GameLocation location)
+        public static void UpdateFurnitureTilePathProperties(GameLocation location)
         {
             if (location == null || !Game1.IsMasterGame) return;
 
@@ -2427,9 +2489,9 @@ namespace MarketTown
                 }
             }
 
-            foreach ( var z in location.buildings )
+            foreach (var z in location.buildings)
             {
-                Vector2 buildingTile = new Vector2(z.tileX.Value, z.tileY.Value) ;
+                Vector2 buildingTile = new Vector2(z.tileX.Value, z.tileY.Value);
 
                 int tileWide = z.tilesWide.Value;
                 int tileHigh = z.tilesHigh.Value;
@@ -2487,7 +2549,7 @@ namespace MarketTown
                 var location = Game1.getLocationFromName(name);
                 if (location == null) continue;
 
-                foreach (NPC npc in location.characters.Where(i => i.IsVillager && i.getMasterScheduleRawData() != null && i.getMasterScheduleRawData().Count > 0 
+                foreach (NPC npc in location.characters.Where(i => i.IsVillager && i.getMasterScheduleRawData() != null && i.getMasterScheduleRawData().Count > 0
                                 && !i.Name.Contains("Chicken") && !i.Name.Contains("Cow")))
                 {
                     double talkChance = 0.05;
@@ -2529,7 +2591,7 @@ namespace MarketTown
                                 }
                             }
                         }
-                        else if (chance < 0.12 && WantsToSay(npc, 300) 
+                        else if (chance < 0.12 && WantsToSay(npc, 300)
                             && (location is FarmHouse || location == Game1.getFarm() || location.Name.Contains("Custom_MT_Island")))      //if in FarmHouse and have no item for sale
                         {
                             var decorPointComment = GetDecorPoint(npc.Tile, npc.currentLocation, 12);
@@ -2570,13 +2632,13 @@ namespace MarketTown
                         }
                         else if (random.NextDouble() < (talkChance / localNpcCount) && WantsToSay(npc, 400))            //Send Dish of Week message
                         {
-                            NPCShowTextAboveHead(npc, SHelper.Translation.Get($"foodstore.dishweek.{random.Next(5)}", new { dishWeek = ItemRegistry.Create<Object>(WeeklyFeatureDish, allowNull:true)?.DisplayName ?? "" }));
+                            NPCShowTextAboveHead(npc, SHelper.Translation.Get($"foodstore.dishweek.{random.Next(5)}", new { dishWeek = ItemRegistry.Create<Object>(WeeklyFeatureDish, allowNull: true)?.DisplayName ?? "" }));
                         }
                     }
 
                     // **************************** Control NPC walking to the food ****************************
                     string text = "";
-                    if (npc != null && npc.queuedSchedulePaths.Count == 0 && Game1.IsMasterGame && Game1.timeOfDay < 2530 
+                    if (npc != null && npc.queuedSchedulePaths.Count == 0 && Game1.IsMasterGame && Game1.timeOfDay < 2530
                         && (location.furniture.Where(i => i != null && (i.furniture_type.Value == 5 || i.furniture_type.Value == 9 || i.furniture_type.Value == 11) && i.heldObject.Value != null).Any() || (location.Objects.Values.Where(i => i != null && i is Mannequin)).Any())
                         && (!npc.modData.ContainsKey("hapyke.FoodStore/shopOwnerToday") || npc.modData["hapyke.FoodStore/shopOwnerToday"] == "-1,-1")
                         && (!IsFestivalIsCurrent || location.Name != "Custom_MT_Island"))
@@ -2586,9 +2648,9 @@ namespace MarketTown
                         {
                             if (npc.currentLocation.Name == "Custom_MT_Island" || npc.currentLocation.GetParentLocation() != null && npc.currentLocation.GetParentLocation().Name == "Custom_MT_Island")
                                 moveToFoodChance = Config.MoveToFoodChance * 2;
-                            else if (npc.currentLocation.Name == "Custom_MT_Island_House") 
+                            else if (npc.currentLocation.Name == "Custom_MT_Island_House")
                                 moveToFoodChance = Config.MoveToFoodChance * 3;
-                            else if (npc.currentLocation.GetParentLocation() != null && npc.currentLocation.GetParentLocation() is Farm) 
+                            else if (npc.currentLocation.GetParentLocation() != null && npc.currentLocation.GetParentLocation() is Farm)
                                 moveToFoodChance = Config.ShedMoveToFoodChance;
 
                             if (Config.UltimateChallenge)
@@ -2678,7 +2740,7 @@ namespace MarketTown
         }
 
         /// <summary>Warp NPC back to their schedule and reset if found</summary>
-        public static void ResetNpcSchedule (NPC npc)
+        public static void ResetNpcSchedule(NPC npc)
         {
             if (npc == null) return;
 
@@ -2720,7 +2782,7 @@ namespace MarketTown
             }
         }
 
-        public static void TenMinuteUpdateIslandNpc (NPC __instance, GameLocation __instanceLocation)
+        public static void TenMinuteUpdateIslandNpc(NPC __instance, GameLocation __instanceLocation)
         {
             if (!Game1.IsMasterGame) return;
             Random random = new Random();
@@ -2757,7 +2819,7 @@ namespace MarketTown
                     else if (Game1.timeOfDay > 2330 && Game1.timeOfDay < 2530)
                     {
                         __instance.reloadDefaultLocation();
-                        if (!__instance.DefaultMap.Contains("HiddenWarp") && !__instance.DefaultMap.Contains("WarpRoom") )
+                        if (!__instance.DefaultMap.Contains("HiddenWarp") && !__instance.DefaultMap.Contains("WarpRoom"))
                         {
                             FarmOutside.AddNextMoveSchedulePoint(__instance, $"{ConvertToHour(Game1.timeOfDay + 10)}", $"{__instance.DefaultMap}",
                                 $"{__instance.DefaultPosition.X / 64}", $"{__instance.DefaultPosition.Y / 64}", $"{__instance.DefaultFacingDirection}");
@@ -2945,122 +3007,158 @@ namespace MarketTown
 
 
         /// <summary>Call to OpenAI to generate a response</summary>
-        public static async Task SendMessageToAssistant(NPC npc, string userMessage, string systemMessage, bool isConversation = false, bool isForBubbleMessage = true, bool isForDrawDialogue = false)
+        public static async Task SendMessageToAssistant(NPC npc, string userMessage = "", string systemMessage = "", bool isConversation = false, bool isForBubbleMessage = true, bool isForDrawDialogue = false, bool canUseSmartphoneApi = false)
         {
+            bool isNotPlayerWithinDistance = Utility.isThereAFarmerWithinDistance(npc.Tile, 15, npc.currentLocation) == null;
+            if (isNotPlayerWithinDistance && (!Config.SmartphoneEnable || !canUseSmartphoneApi || Game1.random.NextDouble() < Config.SmartphoneMessageChange)) 
+                return;
 
-            SMonitor.Log($"Gotcha. You cannot enable AI that easy. Use Remaster version");
-            return;
-
-            if (AILimitCount >= AILimitBlock && Config.AdvanceAiKey == "" || (AILimitCount >= Config.AdvanceAiLimit || AILimitCount >= 40 ) && Config.AdvanceAiKey != "") return;
+            if (AILimitCount >= AILimitBlock && Config.AdvanceAiKey == "" || (AILimitCount >= Config.AdvanceAiLimit || AILimitCount >= 40) && Config.AdvanceAiKey != "") return;
             if (!Config.AdvanceDebug) AILimitCount++;
 
             if (Config.AdvanceAiLanguage.ToLower() != "english") systemMessage += $".Use {Config.AdvanceAiLanguage} language";
 
-            string model = "gpt-4o-mini";
-            string key = AIKey1 + AIKey2 + AIKey3;
 
+
+            string aiModel = "gpt-5-nano";
+            string key = AIKey1 + AIKey2 + AIKey3;
+            key = "";
             if (Config.AdvanceAiKey != "")
             {
-                model = Config.AdvanceAiModel;
+                aiModel = Config.AdvanceAiModel;
                 key = Config.AdvanceAiKey;
             }
 
-            string responseMessage = "";
-            using (var httpClient = new HttpClient())
+            var responseMessageasd = await RequestOpenAiResponseAsync(systemMessage, userMessage, aiModel, key);
+            SMonitor.Log(responseMessageasd, LogLevel.Error);
+
+
+            if (isForBubbleMessage)
             {
-                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", key);
-                var requestBody = new
+                if (canUseSmartphoneApi)
                 {
-                    model = model,
-                    messages = new[]
-                    {
-                        new { role = "system", content = systemMessage},
-                        new { role = "user", content = userMessage },
-                        new { role = "assistant", content = string.Join("\n", conversationSummaries) }
-                    },
-                    max_tokens = 65,
-                    temperature = 1.2
-                };
-
-                var jsonRequest = JsonConvert.SerializeObject(requestBody);
-                var httpContent = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
-                var httpResponse = await httpClient.PostAsync("https://api.openai.com/v1/chat/completions", httpContent);
-                if (httpResponse.IsSuccessStatusCode)
-                {
-                    var jsonResponse = await httpResponse.Content.ReadAsStringAsync();
-
-                    dynamic json = JsonConvert.DeserializeObject(jsonResponse);
-                    responseMessage = json.choices[0].message.content.ToString();
-
-                    SMonitor.Log($"Assistant Response: {responseMessage}\n{json.usage}\n", LogLevel.Trace);
-
-                    if (isForBubbleMessage) {
-                        NPCShowTextAboveHead(npc, responseMessage, true);
-                        var farmhandNpcBubbleMessage = new MyMessage($"{npc.Name}///{responseMessage}");
-                        SHelper.Multiplayer.SendMessage(farmhandNpcBubbleMessage, "NpcShowText");
-                    }
-                    else if (isForDrawDialogue) Game1.DrawDialogue(new Dialogue(npc, "key", responseMessage));
-                    else npc.CurrentDialogue.Push(new Dialogue(npc, "key", responseMessage));
-
-
-                    // --------------------------
-                    // conversationSummaries.Clear();
-                    conversationSummaries.TryGetValue(npc.Name, out string history);
-
-                    if (isConversation)
-                    {
-                        var summaryRequestBody = new
-                        {
-                            model = "gpt-4o-mini",
-                            messages = new[]
-                            {
-                            new { role = "system", content = "Summarize the conversation in under 70 words, focusing on key details and relevant points. Remove any extraneous information and provide an empty string if there's nothing noteworthy." },
-                            new { role = "user", content = $"New message: {userMessage}. Previous summary: {history}" }
-                        },
-                            max_tokens = 65,
-                            temperature = 0.7
-                        };
-
-                        var summaryRequest = JsonConvert.SerializeObject(summaryRequestBody);
-                        var summaryContent = new StringContent(summaryRequest, Encoding.UTF8, "application/json");
-                        var summaryResponse = await httpClient.PostAsync("https://api.openai.com/v1/chat/completions", summaryContent);
-
-                        if (summaryResponse.IsSuccessStatusCode)
-                        {
-                            var summaryJsonResponse = await summaryResponse.Content.ReadAsStringAsync();
-                            dynamic summaryJson = JsonConvert.DeserializeObject(summaryJsonResponse);
-                            string conversationSummary = summaryJson.choices[0].message.content.ToString();
-
-                            conversationSummaries[npc.Name] = conversationSummary;
-                            
-                            //SMonitor.Log($"conver sum: {conversationSummary}\n{summaryJson.usage}\n\n", LogLevel.Warn);
-                        }
-                    }
+                    iSmartphoneApi.SendSmartphoneMessageFromNPC(npc.Name, responseMessageasd);
                 }
                 else
                 {
-                    // Get the status code
-                    var statusCode = (int)httpResponse.StatusCode; // Convert to int for switch
-                    string errorMessage = "Check for mod update";
-                    switch (statusCode)
-                    {
-                        case 403:
-                            errorMessage = "Country, region, or territory not supported.";
-                            break;
-                        case 429:
-                            errorMessage = "Please try again in a few minutes. If not work, then total AI usage for all players has passed the limit set by OpenAI. This will be reset the next day in timezone UTC+0";
-                            break;
-                        case 500:
-                            errorMessage = "Server Error: The server had an issue while processing your request. Please try again.";
-                            break;
-                        case 503:
-                            errorMessage = "Server Overload: The server is experiencing high traffic. Please try again later.";
-                            break;
-                    }
+                    NPCShowTextAboveHead(npc, responseMessageasd, true);
+                    var farmhandNpcBubbleMessage = new MyMessage($"{npc.Name}///{responseMessageasd}");
+                    SHelper.Multiplayer.SendMessage(farmhandNpcBubbleMessage, "NpcShowText");
 
-                    SMonitor.Log($"Unable to receive AI content. {errorMessage}\n\n", LogLevel.Error);
                 }
             }
+            else if (isForDrawDialogue) Game1.DrawDialogue(new Dialogue(npc, "key", responseMessageasd));
+            else npc.CurrentDialogue.Push(new Dialogue(npc, "key", responseMessageasd));
+
+            if (isConversation)
+            {
+                conversationSummaries.TryGetValue(npc.Name, out string history);
+                var systemMessageSummary = "Summarize the conversation in under 70 words, focusing on key details and relevant points. Remove any extraneous information and provide an empty string if there's nothing noteworthy.";
+                var userMessageSummary = $"New message: {userMessage}. Previous summary: {history}";
+                var summaryJsonResponse = await RequestOpenAiResponseAsync(systemMessageSummary, userMessageSummary, aiModel, key);
+                conversationSummaries[npc.Name] = summaryJsonResponse;
+            }
         }
+
+
+
+
+
+        private static async Task<string> RequestOpenAiResponseAsync(string instructionPrompt, string userPrompt, string aiModel, string key)
+        {
+            using var httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", key);
+
+            var requestBody = new Dictionary<string, object>
+            {
+                { "model", aiModel },
+                { "input", new object[]
+                    {
+                        new
+                        {
+                            role = "developer",
+                            content = new object[]
+                            {
+                                new { type = "input_text", text = instructionPrompt }
+                            }
+                        },
+                        new
+                        {
+                            role = "user",
+                            content = new object[]
+                            {
+                                new { type = "input_text", text = userPrompt }
+                            }
+                        }
+                    }
+                },
+                { "text", new { format = new { type = "text" }, verbosity = "low" } },
+                { "reasoning", new { effort = "minimal" } }
+            };
+
+            var jsonRequest = JsonConvert.SerializeObject(requestBody);
+            var httpContent = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
+            var httpResponse = await httpClient.PostAsync("https://api.openai.com/v1/responses", httpContent);
+            var jsonResponse = await httpResponse.Content.ReadAsStringAsync();
+
+            if (httpResponse.IsSuccessStatusCode)
+            {
+                SMonitor.Log(jsonResponse, LogLevel.Error);
+
+                if (TryExtractResponseMessage(jsonResponse, out var responseMessage))
+                    return responseMessage;
+
+                return string.Empty;
+            }
+
+            LogOpenAiError(httpResponse, jsonResponse);
+            return string.Empty;
+        }
+
+        private static bool TryExtractResponseMessage(string jsonResponse, out string responseMessage)
+        {
+            responseMessage = string.Empty;
+
+            var responseJson = JObject.Parse(jsonResponse);
+            responseMessage = responseJson.Value<string>("output_text") ?? string.Empty;
+
+            if (string.IsNullOrWhiteSpace(responseMessage))
+            {
+                responseMessage = string.Join("\n", responseJson
+                    .SelectTokens("$.output[*].content[*]")
+                    .OfType<JObject>()
+                    .Where(content => string.Equals(content.Value<string>("type"), "output_text", StringComparison.OrdinalIgnoreCase))
+                    .Select(content => content.Value<string>("text"))
+                    .Where(text => !string.IsNullOrWhiteSpace(text)));
+            }
+
+            return !string.IsNullOrWhiteSpace(responseMessage);
+        }
+        private static void LogOpenAiError(HttpResponseMessage httpResponse, string responseBody)
+        {
+            var statusCode = (int)httpResponse.StatusCode;
+            string errorMessage = "Check for mod update";
+
+            switch (statusCode)
+            {
+                case 403:
+                    errorMessage = "Country, region, or territory not supported.";
+                    break;
+                case 429:
+                    errorMessage = "Please try again in a few minutes. If not work, then total AI usage for all players has passed the limit set by OpenAI. This will be reset the next day in timezone UTC+0";
+                    break;
+                case 500:
+                    errorMessage = "Server Error: The server had an issue while processing your request. Please try again.";
+                    break;
+                case 503:
+                    errorMessage = "Server Overload: The server is experiencing high traffic. Please try again later.";
+                    break;
+            }
+
+            SMonitor.Log($"OpenAI error {statusCode}: {responseBody}", LogLevel.Error);
+            SMonitor.Log($"Unable to receive AI content. {errorMessage}\n\n", LogLevel.Error);
+        }
+
+
     }
 }

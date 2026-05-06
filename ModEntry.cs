@@ -1,32 +1,33 @@
-using HarmonyLib;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using StardewModdingAPI;
-using StardewModdingAPI.Events;
-using StardewValley;
-using StardewValley.Buildings;
-using StardewValley.Locations;
-using StardewValley.Objects;
-using StardewValley.Tools;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Object = StardewValley.Object;
-using StardewModdingAPI.Utilities;
+using System.Threading.Tasks;
+using HarmonyLib;
 using MailFrameworkMod;
 using MarketTown.Data;
-using StardewValley.TerrainFeatures;
-using StardewValley.Minigames;
-using xTile.Dimensions;
-using System.Threading.Tasks;
-using xTile.Layers;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using StardewModdingAPI;
+using StardewModdingAPI.Events;
+using StardewModdingAPI.Utilities;
+using StardewValley;
+using StardewValley.Buildings;
 using StardewValley.Extensions;
+using StardewValley.Locations;
+using StardewValley.Minigames;
+using StardewValley.Objects;
+using StardewValley.TerrainFeatures;
+using StardewValley.Tools;
+using xTile.Dimensions;
+using xTile.Layers;
+using static MarketTown.ModEntry;
+using Object = StardewValley.Object;
 
 namespace MarketTown
 {
     /// <summary>The mod entry point.</summary>
-
+    
     public partial class ModEntry : Mod
     {
 
@@ -39,6 +40,8 @@ namespace MarketTown
         public static ModEntry context;
 
         private Harmony harmony;
+        public static ISmartPhoneApi iSmartphoneApi = null;
+        public static IFerngillSimpleEconomyApi iFerngillSimpleEconomyApi = null;
 
         // ==============================================================================================
         // ============================================GLOBAL============================================
@@ -57,6 +60,7 @@ namespace MarketTown
 
         /// <summary>Dictionary of table and sold time that pending for restock from nearby storage</summary>
         public static IDictionary<Furniture, int> RecentSoldTable = new Dictionary<Furniture, int>();
+        public static List<(string, Vector2)> MarketChestMap = new List<(string, Vector2)>();
 
         /// <summary>Handle player typing interact</summary>
         private PlayerChat playerChatInstance;
@@ -224,10 +228,16 @@ namespace MarketTown
         public static float TodayPointTaste = 0;
         public static float TodayPointDecor = 0;
 
-        
-        // ===============================================================================================================================
-        // ===============================================================================================================================
 
+        // ===============================================================================================================================
+        // ===============================================================================================================================
+        public void OpenMarketTownMenu()
+        {
+            if (Game1.activeClickableMenu is not null)
+                Game1.activeClickableMenu.exitThisMenu();
+
+            Game1.activeClickableMenu = new MarketLogMenu(ModEntry.SHelper);
+        }
 
         private void GameLoop_SaveLoaded(object sender, StardewModdingAPI.Events.SaveLoadedEventArgs e)
         {
@@ -1597,8 +1607,9 @@ namespace MarketTown
                                         string manner = __instance.Manners == 0 ? "friendly." : __instance.Manners == 1 ? "polite." : __instance.Manners == 2 ? "rude." : "friendly.";
                                         Task.Run(() => SendMessageToAssistant(
                                             npc: __instance,
-                                            userMessage: $"How do you think about the {food.foodObject.Name}?",
-                                            systemMessage: $"As NPC {__instance.Name} ({ageCategory}, {manner}) in Stardew Valley, you share your opinion about the {food.foodObject.Name} you just bought that it is {tasteCase[rand.Next(tasteCase.Count)]} and you gave extra {tip} gold tip, using under 25 text words")
+                                            systemMessage: $"You are NPC {__instance.Name} ({ageCategory}, {manner}) in Stardew Valley. The player {Game1.MasterPlayer.Name} has a store at {__instance.currentLocation.Name}. You just bought the {food.foodObject.Name} from the store and you think it is {tasteCase[rand.Next(tasteCase.Count)]} and gave an extra {tip} gold tip. Now you will text the player sharing your opinion, using under 25 text words",
+                                            isForBubbleMessage: true,
+                                            canUseSmartphoneApi: true)
                                         );
                                     }
                                     else
@@ -1612,8 +1623,9 @@ namespace MarketTown
                                         string manner = __instance.Manners == 0 ? "friendly." : __instance.Manners == 1 ? "polite." : __instance.Manners == 2 ? "rude." : "friendly.";
                                         Task.Run(() => SendMessageToAssistant(
                                             npc: __instance,
-                                            userMessage: $"How do you think about the {food.foodObject.Name}?",
-                                            systemMessage: $"As NPC {__instance.Name} ({ageCategory}, {manner}) in Stardew Valley, you share your opinion about the {food.foodObject.Name} you just bought that it is {tasteCase[rand.Next(tasteCase.Count)]}, using under 22 text words")
+                                            systemMessage: $"You are NPC {__instance.Name} ({ageCategory}, {manner}) in Stardew Valley. The player {Game1.MasterPlayer.Name} has a store at {__instance.currentLocation.Name}. You just bought the {food.foodObject.Name} from the store and you think it is {tasteCase[rand.Next(tasteCase.Count)]}. Now you will text the player sharing your opinion, using under 22 text words",
+                                            isForBubbleMessage: true,
+                                            canUseSmartphoneApi: true)
                                         );
                                     }
                                     else
@@ -1705,7 +1717,9 @@ namespace MarketTown
                             }           //Food in farmhouse
 
                             UpdateCount(food.foodObject.Category);
-                            AddToShippingAchievements(food.foodObject.ItemId, 1);
+                            AddToShippingAchievements(food.foodObject.ItemId, 1, food.furniture.owner.Value);
+                            if (iFerngillSimpleEconomyApi != null) 
+                                UpdateIFerngillSimpleEconomy(food.foodObject.ItemId);
                             float tastePointTrack = 3;
                             float decorPointTrack = 3;
 
@@ -1720,7 +1734,8 @@ namespace MarketTown
                                 messageToSend = new MyMessage(TodayMoney.ToString());
                                 SHelper.Multiplayer.SendMessage(messageToSend, "UpdateTodayMoney");
 
-                                AddToPlayerFunds(salePrice + tip);
+                                long itemOwner = food.furniture.owner.Value;
+                                AddToPlayerFunds(salePrice + tip, itemOwner);
                                 
                                 __instance.modData["hapyke.FoodStore/LastFood"] = Game1.timeOfDay.ToString();
                                 __instance.modData["hapyke.FoodStore/LastPurchase"] = food.foodObject.DisplayName;

@@ -746,7 +746,7 @@ namespace MarketTown
                     if (Config.PriceMarkup > 0)
                     {
                         int price = (int)Math.Round(who.ActiveObject.Price * Config.PriceMarkup);
-                        AddToPlayerFunds((int)(price * Config.MoneyModifier * (Config.UltimateChallenge ? 2.5 : 1)));
+                        AddToPlayerFunds((int)(price * Config.MoneyModifier * (Config.UltimateChallenge ? 2.5 : 1)), who.UniqueMultiplayerID);
                     }
 
                     who.reduceActiveItemByOne();

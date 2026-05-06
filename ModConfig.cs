@@ -118,5 +118,10 @@ namespace MarketTown
         //end of AI content
 
         public bool AdvanceResetProgress = false;
+
+        //smartphone
+        public bool SmartphoneEnable = true;
+        public float SmartphoneMessageChange { get; set; } = 0.05f;
+
     }
 }

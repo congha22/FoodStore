@@ -297,20 +297,23 @@
             "MapPath": "Maps/Custom_MT_Island_House",
             "Type": "StardewValley.Locations.DecoratableLocation",
             "AlwaysActive": true
-          }
+          },
+          "DisplayName": "Paradise Island House"
         },
         "Custom_MT_Island_House_Floor": {
           "CreateOnLoad": {
             "MapPath": "Maps/Custom_MT_Island_House_Floor",
             "Type": "StardewValley.Locations.DecoratableLocation",
             "AlwaysActive": false
-          }
+          },
+          "DisplayName": "Paradise Island House 2nd Floor"
         },
         "Custom_MT_Island": {
           "CreateOnLoad": {
             "MapPath": "Maps/Custom_MT_Island",
             "AlwaysActive": true
           },
+          "DisplayName": "Paradise Island",
           "MinDailyForageSpawn": 3,
           "MaxDailyForageSpawn": 5,
           "MaxSpawnedForageAtOnce": 9,
