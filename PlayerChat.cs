@@ -203,51 +203,52 @@ namespace MarketTown
             }
             else                        // All other message
             {
-                int randomIndex = random.Next(1, 8);
-                string npcAge, npcManner, npcSocial, npcHeartLevel;
+                return;
+                // int randomIndex = random.Next(1, 8);
+                // string npcAge, npcManner, npcSocial, npcHeartLevel;
 
-                int age = npc.Age;
-                int manner = npc.Manners;
-                int social = npc.SocialAnxiety;
-                int heartLevel = 0;
-                if (Game1.player.friendshipData.ContainsKey(npc.Name)) heartLevel = (int)Game1.player.friendshipData[npc.Name].Points / 250;
+                // int age = npc.Age;
+                // int manner = npc.Manners;
+                // int social = npc.SocialAnxiety;
+                // int heartLevel = 0;
+                // if (Game1.player.friendshipData.ContainsKey(npc.Name)) heartLevel = (int)Game1.player.friendshipData[npc.Name].Points / 250;
 
-                npcAge = age == 0 ? "adult." : age == 1 ? "teens." : age == 2 ? "child." : "adult.";
-                npcManner = manner == 0 ? "neutral." : manner == 1 ? "polite." : manner == 2 ? "rude." : "neutral.";
-                npcSocial = social == 0 ? "outgoing." : social == 1 ? "shy." : social == 2 ? "neutral." : "neutral.";
-                npcHeartLevel = heartLevel <= 2 ? ".0" : heartLevel <= 5 ? ".3" : ".6";
+                // npcAge = age == 0 ? "adult." : age == 1 ? "teens." : age == 2 ? "child." : "adult.";
+                // npcManner = manner == 0 ? "neutral." : manner == 1 ? "polite." : manner == 2 ? "rude." : "neutral.";
+                // npcSocial = social == 0 ? "outgoing." : social == 1 ? "shy." : social == 2 ? "neutral." : "neutral.";
+                // npcHeartLevel = heartLevel <= 2 ? ".0" : heartLevel <= 5 ? ".3" : ".6";
 
-                string relation = heartLevel <= 2 ? "stranger" : heartLevel <= 5 ? "acquaintance" : "best friend";
-                string bestFriend = "";
-                foreach (var f in Game1.player.friendshipData)
-                    foreach (var f2 in f.Where(f2 => f2.Value.Points >= 750).OrderByDescending(f2 => f2.Value.Points).Take(3))
-                        bestFriend += $"{f2.Key}, ";
+                // string relation = heartLevel <= 2 ? "stranger" : heartLevel <= 5 ? "acquaintance" : "best friend";
+                // string bestFriend = "";
+                // foreach (var f in Game1.player.friendshipData)
+                //     foreach (var f2 in f.Where(f2 => f2.Value.Points >= 750).OrderByDescending(f2 => f2.Value.Points).Take(3))
+                //         bestFriend += $"{f2.Key}, ";
 
-                string data = @$"Current location: {Game1.currentLocation.Name}; Current time: {Game1.timeOfDay}; Weather:{Game1.currentLocation.GetWeather().Weather}; Day of months: {Game1.dayOfMonth}; Current season: {Game1.currentLocation.GetSeason()};
-                                Voted dish of the day is {ItemRegistry.Create<Object>(DailyFeatureDish, allowNull: true)?.DisplayName ?? ""};
-                                Voted dish of this week is {ItemRegistry.Create<Object>(WeeklyFeatureDish, allowNull: true)?.DisplayName ?? ""}";
+                // string data = @$"Current location: {Game1.currentLocation.Name}; Current time: {Game1.timeOfDay}; Weather:{Game1.currentLocation.GetWeather().Weather}; Day of months: {Game1.dayOfMonth}; Current season: {Game1.currentLocation.GetSeason()};
+                //                 Voted dish of the day is {ItemRegistry.Create<Object>(DailyFeatureDish, allowNull: true)?.DisplayName ?? ""};
+                //                 Voted dish of this week is {ItemRegistry.Create<Object>(WeeklyFeatureDish, allowNull: true)?.DisplayName ?? ""}";
                 
-                if (bestFriend != "") data += $"Player's closet friends: {bestFriend}; ";   
+                // if (bestFriend != "") data += $"Player's closet friends: {bestFriend}; ";   
 
-                conversationSummaries.TryGetValue(npc.Name, out string history);
-                if (history != "") data += $"Previous user message: {history}";
+                // conversationSummaries.TryGetValue(npc.Name, out string history);
+                // if (history != "") data += $"Previous user message: {history}";
 
-                if (Config.AdvanceAiContent && (AILimitCount < AILimitBlock || Config.AdvanceAiLimit != 0 && AILimitCount <= Config.AdvanceAiLimit))
-                {
-                    Task.Run(() => ModEntry.SendMessageToAssistant(
-                        npc: npc,
-                        userMessage: textInput,
-                        systemMessage: @$"As NPC {npc.Name} in Stardew Valley, who is {npcAge}, {npcManner} manner, {npcSocial} social anxiety, and in {relation} relationship with player {Game1.player.Name}, you will reply the user message if they ask question, or start a new conversation in context of Stardew Valley world.
-                                            You may use this information if relevant: {data}. Limit to under 30 words. Use approriate tone based on the characteristic and relationship with the player",
-                        isConversation: true)
-                    );
-                }
-                else
-                {
-                    string text = SHelper.Translation.Get("foodstore.general." + npcAge + npcManner + npcSocial + randomIndex.ToString() + npcHeartLevel);
-                    //SHelper.Events.Input.ButtonPressed += (sender, args) => { Game1.chatBox.addInfoMessage(args.Button.ToString()); };
-                    NPCShowTextAboveHead(npc, text);
-                }
+                // if (Config.AdvanceAiContent && (AILimitCount < AILimitBlock || Config.AdvanceAiLimit != 0 && AILimitCount <= Config.AdvanceAiLimit))
+                // {
+                //     Task.Run(() => ModEntry.SendMessageToAssistant(
+                //         npc: npc,
+                //         userMessage: textInput,
+                //         systemMessage: @$"As NPC {npc.Name} in Stardew Valley, who is {npcAge}, {npcManner} manner, {npcSocial} social anxiety, and in {relation} relationship with player {Game1.player.Name}, you will reply the user message if they ask question, or start a new conversation in context of Stardew Valley world.
+                //                             You may use this information if relevant: {data}. Limit to under 30 words. Use approriate tone based on the characteristic and relationship with the player",
+                //         isConversation: true)
+                //     );
+                // }
+                // else
+                // {
+                //     string text = SHelper.Translation.Get("foodstore.general." + npcAge + npcManner + npcSocial + randomIndex.ToString() + npcHeartLevel);
+                //     //SHelper.Events.Input.ButtonPressed += (sender, args) => { Game1.chatBox.addInfoMessage(args.Button.ToString()); };
+                //     NPCShowTextAboveHead(npc, text);
+                // }
             }
             ActionList.Clear();
         }

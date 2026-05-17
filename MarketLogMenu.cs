@@ -44,6 +44,7 @@ namespace MarketTown
             private MailData model;
             private readonly IModHelper helper;
             private readonly List<string[]> dataLines;
+            private readonly ClickableComponent feedbackButton;
             private int currentScrollIndex;
             private int maxVisibleLines = Config.AdvanceMenuRow;
             private int lineHeight = Config.AdvanceMenuSpace;
@@ -56,13 +57,15 @@ namespace MarketTown
                 this.helper = helper;
                 this.dataLines = new List<string[]>();
                 this.tooltips = new Dictionary<string, string>();
+                this.feedbackButton = new ClickableComponent(
+                    bounds: new Microsoft.Xna.Framework.Rectangle(this.xPositionOnScreen + this.width - 255, this.yPositionOnScreen + 58, 185, 48),
+                    name: "View Feedback");
                 LoadData();
             }
 
             private void LoadData()
             {
-                if (Game1.IsMasterGame) model = helper.Data.ReadSaveData<MailData>("MT.MailLog") ?? new MailData();
-                else model = SHelper.Data.ReadJsonFile<MailData>("markettowndata.json") ?? new MailData();
+                model = GetCurrentMailData();
 
                 if (model == null)
                 {
@@ -209,11 +212,30 @@ namespace MarketTown
             public override void draw(SpriteBatch b)
             {
 
-                if (Game1.IsMasterGame) model = helper.Data.ReadSaveData<MailData>("MT.MailLog") ?? new MailData();
-                else model = SHelper.Data.ReadJsonFile<MailData>("markettowndata.json") ?? new MailData();
+                model = GetCurrentMailData();
 
                 // Draw the menu background
                 Game1.drawDialogueBox(this.xPositionOnScreen, this.yPositionOnScreen, this.width, this.height, false, true);
+
+                // Fallback navigation when Smartphone API is not available.
+                if (iSmartphoneApi == null && Config.AdvanceAiContent)
+                {
+                    bool hoverButton = this.feedbackButton.containsPoint(Game1.getMouseX(), Game1.getMouseY());
+                    IClickableMenu.drawTextureBox(
+                        b,
+                        this.feedbackButton.bounds.X,
+                        this.feedbackButton.bounds.Y,
+                        this.feedbackButton.bounds.Width,
+                        this.feedbackButton.bounds.Height,
+                        hoverButton ? Color.Wheat : Color.White);
+
+                    string buttonText = "View Feedback";
+                    Vector2 textSize = Game1.smallFont.MeasureString(buttonText);
+                    Vector2 textPosition = new Vector2(
+                        this.feedbackButton.bounds.Center.X - textSize.X / 2f,
+                        this.feedbackButton.bounds.Center.Y - textSize.Y / 2f);
+                    Utility.drawTextWithShadow(b, buttonText, Game1.smallFont, textPosition, Color.DarkBlue);
+                }
 
                 // Draw the headers
                 Vector2 position = new Vector2(this.xPositionOnScreen + 50, this.yPositionOnScreen + 105);
@@ -378,7 +400,150 @@ namespace MarketTown
 
             public override void receiveLeftClick(int x, int y, bool playSound = true)
             {
+                if (iSmartphoneApi == null && this.feedbackButton.containsPoint(x, y)  && Config.AdvanceAiContent)
+                {
+                    Game1.playSound("bigSelect");
+                    this.exitThisMenu();
+                    Game1.activeClickableMenu = new FeedbackMenu();
+                    return;
+                }
+
                 base.receiveLeftClick(x, y, playSound);
+            }
+        }
+
+        /// <summary>Draw daily NPC feedback list.</summary>
+        public class FeedbackMenu : IClickableMenu
+        {
+            private int currentScrollIndex;
+            private readonly int rowHeight;
+            private readonly int maxVisibleRows;
+
+            public FeedbackMenu()
+                : base((int)Utility.getTopLeftPositionForCenteringOnScreen(1100, 760).X, (int)Utility.getTopLeftPositionForCenteringOnScreen(1100, 760).Y,
+                      1100, 760, showUpperRightCloseButton: true)
+            {
+                this.rowHeight = 112;
+                this.maxVisibleRows = Math.Max(1, (this.height - 170) / this.rowHeight);
+            }
+
+            public override void receiveScrollWheelAction(int direction)
+            {
+                int count = GetFeedbackCount();
+
+                int maxScroll = Math.Max(0, count - this.maxVisibleRows);
+                if (direction > 0 && this.currentScrollIndex > 0)
+                    this.currentScrollIndex--;
+                else if (direction < 0 && this.currentScrollIndex < maxScroll)
+                    this.currentScrollIndex++;
+
+                base.receiveScrollWheelAction(direction);
+            }
+
+            public override void draw(SpriteBatch b)
+            {
+                List<FeedbackEntry> entries = GetFeedbackSnapshot();
+                entries.Reverse();
+
+                int maxScroll = Math.Max(0, entries.Count - this.maxVisibleRows);
+                if (this.currentScrollIndex > maxScroll)
+                    this.currentScrollIndex = maxScroll;
+
+                Game1.drawDialogueBox(this.xPositionOnScreen, this.yPositionOnScreen, this.width, this.height, false, true);
+
+                Utility.drawTextWithShadow(
+                    b,
+                    "Market Town Feedback",
+                    Game1.dialogueFont,
+                    new Vector2(this.xPositionOnScreen + 64, this.yPositionOnScreen + 32),
+                    Color.DarkGreen);
+
+                int contentX = this.xPositionOnScreen + 54;
+                int contentY = this.yPositionOnScreen + 100;
+                int contentWidth = this.width - 108;
+
+                if (!entries.Any())
+                {
+                    Utility.drawTextWithShadow(
+                        b,
+                        "No feedback yet today.",
+                        Game1.smallFont,
+                        new Vector2(contentX + 16, contentY + 12),
+                        Color.Gray);
+
+                    base.draw(b);
+                    this.drawMouse(b);
+                    return;
+                }
+
+                for (int i = this.currentScrollIndex; i < this.currentScrollIndex + this.maxVisibleRows && i < entries.Count; i++)
+                {
+                    int drawIndex = i - this.currentScrollIndex;
+                    int rowY = contentY + drawIndex * this.rowHeight + 5;
+
+                    IClickableMenu.drawTextureBox(b, contentX, rowY, contentWidth, this.rowHeight + 0, Color.White);
+
+                    var entry = entries[i];
+                    string npcName = entry.NpcName;
+                    string feedback = entry.Message ?? string.Empty;
+
+                    NPC npc = Game1.getCharacterFromName(npcName);
+                    string displayName = npc?.displayName ?? npcName;
+
+                    var portraitRect = new Microsoft.Xna.Framework.Rectangle(contentX + 18, rowY + 16, 64, 64);
+                    Texture2D portrait = TryGetNpcPortrait(npcName, npc);
+                    if (portrait != null)
+                    {
+                        int sourceW = Math.Min(64, portrait.Width);
+                        int sourceH = Math.Min(64, portrait.Height);
+                        b.Draw(portrait, portraitRect, new Microsoft.Xna.Framework.Rectangle(0, 0, sourceW, sourceH), Color.White);
+                    }
+                    else
+                    {
+                        b.Draw(Game1.mouseCursors, portraitRect, new Microsoft.Xna.Framework.Rectangle(338, 400, 8, 8), Color.LightGray);
+                    }
+
+                    Utility.drawTextWithShadow(
+                        b,
+                        displayName,
+                        Game1.smallFont,
+                        new Vector2(contentX + 98, rowY + 14),
+                        Color.DarkBlue);
+
+                    string wrapped = Game1.parseText(feedback, Game1.smallFont, contentWidth - 130);
+                    Utility.drawTextWithShadow(
+                        b,
+                        wrapped,
+                        Game1.smallFont,
+                        new Vector2(contentX + 98, rowY + 44),
+                        Color.DarkSlateGray);
+                }
+
+                string footer = $"Showing {Math.Min(entries.Count, this.currentScrollIndex + this.maxVisibleRows)} / {entries.Count}";
+                Utility.drawTextWithShadow(
+                    b,
+                    footer,
+                    Game1.smallFont,
+                    new Vector2(this.xPositionOnScreen + this.width - 280, this.yPositionOnScreen + this.height - 52),
+                    Color.Gray);
+
+                base.draw(b);
+                this.drawMouse(b);
+            }
+
+            private static Texture2D TryGetNpcPortrait(string npcName, NPC npc)
+            {
+                if (npc?.Portrait != null)
+                    return npc.Portrait;
+
+                try
+                {
+                    return Game1.content.Load<Texture2D>($"Portraits/{npcName}");
+                }
+                catch
+                {
+                    return null;
+                }
             }
         }
 

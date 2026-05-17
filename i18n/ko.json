@@ -37,6 +37,8 @@
     "foodstore.config.enabletipText": "팁 값은 판매 가격의 일부입니다. 기본값은 -1, 무작위입니다.",
     "foodstore.config.enabletipclose": "가까운 곳에서만 팁 받기",
     "foodstore.config.enabletipcloseText": "활성화 하면, 플레이어가 상점 근처에 있을 때만 팁을 받을 수 있습니다.",
+    "foodstore.config.onlyknowrecipe": "아는 레시피만 주문?",
+    "foodstore.config.onlyknowrecipeText": "활성화하면 NPC는 플레이어가 만들 수 있는 요리만 주문합니다. (프라이드 에그와 빵은 항상 포함)",
     "foodstore.config.enabletipcloselove": "사랑하는 음식 팁 배수",
     "foodstore.config.enabletipcloselike": "좋아하는 음식을 팁 배수",
     "foodstore.config.enabletipcloseneutral": "중립적인 음식 팁 배수",

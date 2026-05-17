@@ -3,7 +3,7 @@
 		<Version>1.0.0</Version>
 		<TargetFramework>net6.0</TargetFramework>
 		<EnableHarmony>true</EnableHarmony>
-		<Platforms>AnyCPU;x64</Platforms>
+		<!-- <Platforms>AnyCPU;x64</Platforms> -->
 	</PropertyGroup>
 	<ItemGroup>
 		<Compile Remove="FrameWorkNPC\**" />

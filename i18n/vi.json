@@ -37,6 +37,8 @@
     "foodstore.config.enabletipText": "Giá trị tiền tip là một phần của giá bán. Mặc định là -1 để chọn tiền tip ngẫu nhiên.",
     "foodstore.config.enabletipclose": "Chỉ nên cho tiền boa khi ở gần?",
     "foodstore.config.enabletipcloseText": "Khi được đặt thành True, chỉ nhận được Mẹo khi người chơi gần cửa hàng.",
+    "foodstore.config.onlyknowrecipe": "Chỉ món đã biết công thức?",
+    "foodstore.config.onlyknowrecipeText": "Khi bật, NPC chỉ gọi các món bạn có thể nấu, cộng thêm Trứng chiên và Bánh mì luôn khả dụng.",
     "foodstore.config.enabletipcloselove": "Giá trị nhân của mẹo thực phẩm yêu thích.",
     "foodstore.config.enabletipcloselike": "Giá trị nhân của mẹo về món ăn yêu thích.",
     "foodstore.config.enabletipcloseneutral": "Hệ số nhân giá trị mẹo thực phẩm trung tính",

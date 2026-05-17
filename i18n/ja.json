@@ -37,6 +37,8 @@
     "foodstore.config.enabletipText": "チップの値は販売価格の一部です。デフォルトはランダムなチップのために-1です。",
     "foodstore.config.enabletipclose": "近くにいるときだけチップを渡す？",
     "foodstore.config.enabletipcloseText": "Trueに設定されている場合、プレイヤーが店の近くにいるときのみ、Tipを受け取ります。",
+    "foodstore.config.onlyknowrecipe": "覚えているレシピのみ？",
+    "foodstore.config.onlyknowrecipeText": "有効にすると、NPCの注文はあなたが作れる料理のみになります（目玉焼きとパンは常に含む）。",
     "foodstore.config.enabletipcloselove": "「好きな食べ物のヒント価値乗数」",
     "foodstore.config.enabletipcloselike": "「好まれた食べ物のヒント価値乗数」",
     "foodstore.config.enabletipcloseneutral": "ニュートラルな食事のヒントの価値倍率",

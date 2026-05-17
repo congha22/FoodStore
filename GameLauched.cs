@@ -183,19 +183,65 @@ namespace MarketTown
             iSmartphoneApi = Helper.ModRegistry.GetApi<ISmartPhoneApi>("d5a1lamdtd.Smartphone");
             if (iSmartphoneApi != null)
             {
-                Texture2D icon = Helper.ModContent.Load<Texture2D>("assets/market_app.png");
-                iSmartphoneApi.RegisterPhoneApp(
-                     ownerModId: this.ModManifest.UniqueID,
-                     appId: "d5a1lamdtd.markettown.marketlog",
-                     displayName: "Market Log",
-                     iconTexture: icon,
-                     onClick: () => OpenMarketTownMenu(),
-                     closePhoneOnLaunch: true,
-                     sortOrder: 0,
-                     sourceRect: null,
-                     isVisible: () => Context.IsWorldReady,
-                     getBadgeCount: () => 0
-                );
+                Texture2D marketIcon = Helper.ModContent.Load<Texture2D>("assets/market_app.png");
+                Texture2D feedbackIcon = Game1.mouseCursors;
+                Microsoft.Xna.Framework.Rectangle feedbackIconSourceRect = new Microsoft.Xna.Framework.Rectangle(66, 4, 14, 13);
+                if (Config.AdvanceAiContent)
+                {
+                    iSmartphoneApi.RegisterPhoneAppGroup(
+                         ownerModId: this.ModManifest.UniqueID,
+                         groupId: "d5a1lamdtd.markettown.group",
+                         displayName: "Market Town",
+                         iconTexture: marketIcon,
+                         sortOrder: 0,
+                         sourceRect: null,
+                         isVisible: () => Context.IsWorldReady,
+                         getBadgeCount: () => GetFeedbackCount()
+                    );
+
+                    iSmartphoneApi.RegisterPhoneAppGroupItem(
+                         ownerModId: this.ModManifest.UniqueID,
+                         groupId: "d5a1lamdtd.markettown.group",
+                         itemId: "d5a1lamdtd.markettown.marketlog",
+                         displayName: "Market Log",
+                         iconTexture: marketIcon,
+                         onClick: () => OpenMarketTownMenu(),
+                         closePhoneOnLaunch: true,
+                         sortOrder: 0,
+                         sourceRect: null,
+                         isVisible: () => Context.IsWorldReady,
+                         getBadgeCount: () => 0
+                    );
+
+                    iSmartphoneApi.RegisterPhoneAppGroupItem(
+                         ownerModId: this.ModManifest.UniqueID,
+                         groupId: "d5a1lamdtd.markettown.group",
+                         itemId: "d5a1lamdtd.markettown.feedback",
+                         displayName: "Feedback",
+                         iconTexture: feedbackIcon,
+                         onClick: () => OpenFeedbackMenu(),
+                         closePhoneOnLaunch: true,
+                         sortOrder: 1,
+                         sourceRect: feedbackIconSourceRect,
+                         isVisible: () => Context.IsWorldReady,
+                         getBadgeCount: () => GetFeedbackCount()
+                    );
+                }
+                else
+                {
+                    iSmartphoneApi.RegisterPhoneApp(
+                         ownerModId: this.ModManifest.UniqueID,
+                         appId: "d5a1lamdtd.markettown.marketlog",
+                         displayName: "Market Log",
+                         iconTexture: marketIcon,
+                         onClick: () => OpenMarketTownMenu(),
+                         closePhoneOnLaunch: true,
+                         sortOrder: 0,
+                         sourceRect: null,
+                         isVisible: () => Context.IsWorldReady,
+                         getBadgeCount: () => 0
+                    );
+                }
             }
 
             iFerngillSimpleEconomyApi = Helper.ModRegistry.GetApi<IFerngillSimpleEconomyApi>("paulsteele.fse");
@@ -1284,7 +1330,7 @@ namespace MarketTown
                 Task.Run(() => SendMessageToAssistant(
                                 npc: thisCharacter,
                                 userMessage: $"",
-                                systemMessage: $"As NPC {thisCharacter.Name} ({ageCategory}, {manner}) in Stardew Valley, you share your opinion about {Game1.MasterPlayer.Name}'s store to others that the items quality is {tastePool[random.Next(tastePool.Count)]} and decoration style is {decorPool[random.Next(decorPool.Count)]}, with under 27 text words")
+                                systemMessage: $"As NPC {thisCharacter.Name} ({ageCategory}, {manner}) in Stardew Valley, you share your opinion about the player store to others that the items quality is {tastePool[random.Next(tastePool.Count)]} and decoration style is {decorPool[random.Next(decorPool.Count)]}, with under 27 text words")
                             );
             }
             else
@@ -1517,8 +1563,7 @@ namespace MarketTown
         private static double IslandProgress()
         {
             MailData model = null;
-            if (Game1.IsMasterGame) model = SHelper.Data.ReadSaveData<MailData>("MT.MailLog");
-            else model = SHelper.Data.ReadJsonFile<MailData>("markettowndata.json") ?? new MailData();
+            model = GetCurrentMailData();
 
             if (!Config.IslandProgress) return 1;
             if (model == null || model.TotalFestivalIncome == 0) return 4;
@@ -1533,8 +1578,7 @@ namespace MarketTown
         private static int MarketRecognition()
         {
             MailData model = null;
-            if (Game1.IsMasterGame) model = SHelper.Data.ReadSaveData<MailData>("MT.MailLog");
-            else model = SHelper.Data.ReadJsonFile<MailData>("markettowndata.json") ?? new MailData();
+            model = GetCurrentMailData();
 
             if (model == null || model.TotalCustomerNote == 0) return 0;
 
@@ -1780,9 +1824,7 @@ namespace MarketTown
             float totalPointDecor = 0;
 
             MailData model = null;
-
-            if (Game1.IsMasterGame) model = SHelper.Data.ReadSaveData<MailData>("MT.MailLog");
-            else model = SHelper.Data.ReadJsonFile<MailData>("markettowndata.json") ?? new MailData();
+            model = GetCurrentMailData();
 
             if (model != null)
             {
@@ -1952,6 +1994,41 @@ namespace MarketTown
         {
             if (!Game1.IsMasterGame) return;
             Random random = new Random();
+            const string recentSoldItemKey = "hapyke.FoodStore/recentSoldItemId";
+            const string recentSoldCategoryKey = "hapyke.FoodStore/recentSoldItemCategory";
+
+            Item PickItemToRestock(Chest sourceChest, string soldItemId, int? soldCategory)
+            {
+                List<Item> objectItems = sourceChest.Items
+                    .Where(item => item != null && !string.IsNullOrEmpty(item.QualifiedItemId) && item.QualifiedItemId.StartsWith("(O)"))
+                    .ToList();
+
+                if (objectItems.Count == 0)
+                {
+                    return null;
+                }
+
+                if (!string.IsNullOrEmpty(soldItemId))
+                {
+                    List<Item> sameItemPool = objectItems.Where(item => item.QualifiedItemId == soldItemId).ToList();
+                    if (sameItemPool.Count > 0)
+                    {
+                        return sameItemPool[random.Next(sameItemPool.Count)];
+                    }
+                }
+
+                if (soldCategory.HasValue)
+                {
+                    List<Item> sameCategoryPool = objectItems.Where(item => item.Category == soldCategory.Value).ToList();
+                    if (sameCategoryPool.Count > 0)
+                    {
+                        return sameCategoryPool[random.Next(sameCategoryPool.Count)];
+                    }
+                }
+
+                return objectItems[random.Next(objectItems.Count)];
+            }
+
             try
             {
                 if (RecentSoldTable.Count > 0)
@@ -1962,6 +2039,14 @@ namespace MarketTown
                         var table = kvp.Key;
                         var timeOfSold = kvp.Value;
                         var location = table.Location;
+                        table.modData.TryGetValue(recentSoldItemKey, out string recentSoldItemId);
+
+                        int? recentSoldCategory = null;
+                        if (table.modData.TryGetValue(recentSoldCategoryKey, out string soldCategoryText)
+                            && int.TryParse(soldCategoryText, out int parsedSoldCategory))
+                        {
+                            recentSoldCategory = parsedSoldCategory;
+                        }
 
                         var baseTile = table.TileLocation;
                         int range = 10, x = 0, y = 0, dx = 0, dy = -1, max = range * 2 + 1;
@@ -2007,7 +2092,10 @@ namespace MarketTown
                                             if (!MarketChestMap.Contains((location.Name, new Vector2(currentX, currentY))))
                                             {
                                                 MarketChestMap.Add((location.Name, new Vector2(currentX, currentY)));
-                                                iSmartphoneApi.SendSmartphoneNotification($"Market Town Storage at {location.Name} is empty. Consider restock it soon!", "Market Town");
+                                                if (iSmartphoneApi != null)
+                                                    iSmartphoneApi.SendSmartphoneNotification($"Market Town Storage at {location.Name} is empty. Consider restock it soon!", "Market Town");
+                                                
+                                                Game1.addHUDMessage(new HUDMessage($"Market Town Storage at {location.Name} is empty. Consider restock it soon!", 3));
                                             }
                                         }
                                         else
@@ -2016,23 +2104,20 @@ namespace MarketTown
                                             {
                                                 MarketChestMap.Remove((location.Name, new Vector2(currentX, currentY)));
                                             }
-                                            List<int> categoryKeys = new List<int> { -81, -80, -79, -75, -74, -28, -27, -26, -23, -22, -21, -20, -19, -18, -17, -16, -15, -12, -8, -7, -6, -5, -4, -2 };
                                             int tried = 10;
                                             while (fChest.Items.Count(i => i == null) > 0 && tried > 0)
                                             {
                                                 tried--;
-                                                List<Item> filteredItems = mtChest.Items.Where(item => item.QualifiedItemId.StartsWith("(O)") && categoryKeys.Contains(item.Category)).ToList();
-                                                if (filteredItems.Count > 0)
+                                                var itemItem = PickItemToRestock(mtChest, recentSoldItemId, recentSoldCategory);
+                                                if (itemItem != null)
                                                 {
-                                                    int index = random.Next(filteredItems.Count);
-
-                                                    var itemItem = filteredItems[index];
-
                                                     var fIndex = fChest.Items.IndexOf(fChest.Items.FirstOrDefault(i => i == null));
                                                     if (fIndex >= 0) fChest.Items[fIndex] = itemItem.getOne();
 
                                                     var chestItem = mtChest.Items.Where(item => item == itemItem).FirstOrDefault();
                                                     var chestIndex = mtChest.Items.IndexOf(chestItem);
+
+                                                    if (chestIndex < 0) continue;
 
                                                     if (mtChest.Items[chestIndex].Stack > 1) mtChest.Items[chestIndex].Stack -= 1;
                                                     else mtChest.Items.Remove(chestItem);
@@ -2090,14 +2175,9 @@ namespace MarketTown
                                                 MarketChestMap.Remove((location.Name, new Vector2(currentX, currentY)));
                                             }
 
-                                            List<int> categoryKeys = new List<int> { -81, -80, -79, -75, -74, -28, -27, -26, -23, -22, -21, -20, -19, -18, -17, -16, -15, -12, -8, -7, -6, -5, -4, -2 };
-
-                                            List<Item> filteredItems = mtChest.Items.Where(item => item.QualifiedItemId.StartsWith("(O)") && categoryKeys.Contains(item.Category)).ToList();
-                                            if (filteredItems.Count > 0)
+                                            var itemItem = PickItemToRestock(mtChest, recentSoldItemId, recentSoldCategory);
+                                            if (itemItem != null)
                                             {
-                                                int index = random.Next(filteredItems.Count);
-
-                                                var itemItem = filteredItems[index];
                                                 var itemToSell = itemItem.getOne();
 
                                                 if (itemToSell is Object itemObject)
@@ -2106,6 +2186,8 @@ namespace MarketTown
 
                                                     var chestItem = mtChest.Items.Where(item => item == itemItem).FirstOrDefault();
                                                     var chestIndex = mtChest.Items.IndexOf(chestItem);
+
+                                                    if (chestIndex < 0) continue;
 
                                                     if (mtChest.Items[chestIndex].Stack > 1) mtChest.Items[chestIndex].Stack -= 1;
                                                     else mtChest.Items.Remove(chestItem);
@@ -3007,10 +3089,12 @@ namespace MarketTown
 
 
         /// <summary>Call to OpenAI to generate a response</summary>
-        public static async Task SendMessageToAssistant(NPC npc, string userMessage = "", string systemMessage = "", bool isConversation = false, bool isForBubbleMessage = true, bool isForDrawDialogue = false, bool canUseSmartphoneApi = false)
+        public static async Task SendMessageToAssistant(NPC npc, string userMessage = "", string systemMessage = "", bool isForBubbleMessage = true, bool isForDrawDialogue = false, bool canUseSmartphoneApi = false)
         {
+            if (!Config.AdvanceAiContent)
+                return;
             bool isNotPlayerWithinDistance = Utility.isThereAFarmerWithinDistance(npc.Tile, 15, npc.currentLocation) == null;
-            if (isNotPlayerWithinDistance && (!Config.SmartphoneEnable || !canUseSmartphoneApi || Game1.random.NextDouble() < Config.SmartphoneMessageChange)) 
+            if (isNotPlayerWithinDistance && !canUseSmartphoneApi)
                 return;
 
             if (AILimitCount >= AILimitBlock && Config.AdvanceAiKey == "" || (AILimitCount >= Config.AdvanceAiLimit || AILimitCount >= 40) && Config.AdvanceAiKey != "") return;
@@ -3022,7 +3106,7 @@ namespace MarketTown
 
             string aiModel = "gpt-5-nano";
             string key = AIKey1 + AIKey2 + AIKey3;
-            key = "";
+
             if (Config.AdvanceAiKey != "")
             {
                 aiModel = Config.AdvanceAiModel;
@@ -3030,14 +3114,21 @@ namespace MarketTown
             }
 
             var responseMessageasd = await RequestOpenAiResponseAsync(systemMessage, userMessage, aiModel, key);
-            SMonitor.Log(responseMessageasd, LogLevel.Error);
+            // SMonitor.Log(responseMessageasd, LogLevel.Error);
 
 
             if (isForBubbleMessage)
             {
                 if (canUseSmartphoneApi)
                 {
-                    iSmartphoneApi.SendSmartphoneMessageFromNPC(npc.Name, responseMessageasd);
+                    if (!string.IsNullOrWhiteSpace(responseMessageasd))
+                    {
+                        var entry = new FeedbackEntry(npc.Name, responseMessageasd);
+                        AddFeedbackEntry(entry);
+
+                        if (Game1.IsMasterGame)
+                            SHelper.Multiplayer.SendMessage(entry, "MT.FeedbackAdd");
+                    }
                 }
                 else
                 {
@@ -3050,14 +3141,14 @@ namespace MarketTown
             else if (isForDrawDialogue) Game1.DrawDialogue(new Dialogue(npc, "key", responseMessageasd));
             else npc.CurrentDialogue.Push(new Dialogue(npc, "key", responseMessageasd));
 
-            if (isConversation)
-            {
-                conversationSummaries.TryGetValue(npc.Name, out string history);
-                var systemMessageSummary = "Summarize the conversation in under 70 words, focusing on key details and relevant points. Remove any extraneous information and provide an empty string if there's nothing noteworthy.";
-                var userMessageSummary = $"New message: {userMessage}. Previous summary: {history}";
-                var summaryJsonResponse = await RequestOpenAiResponseAsync(systemMessageSummary, userMessageSummary, aiModel, key);
-                conversationSummaries[npc.Name] = summaryJsonResponse;
-            }
+            // if (isConversation)
+            // {
+            //     conversationSummaries.TryGetValue(npc.Name, out string history);
+            //     var systemMessageSummary = "Summarize the conversation in under 70 words, focusing on key details and relevant points. Remove any extraneous information and provide an empty string if there's nothing noteworthy.";
+            //     var userMessageSummary = $"New message: {userMessage}. Previous summary: {history}";
+            //     var summaryJsonResponse = await RequestOpenAiResponseAsync(systemMessageSummary, userMessageSummary, aiModel, key);
+            //     conversationSummaries[npc.Name] = summaryJsonResponse;
+            // }
         }
 
 
@@ -3103,7 +3194,7 @@ namespace MarketTown
 
             if (httpResponse.IsSuccessStatusCode)
             {
-                SMonitor.Log(jsonResponse, LogLevel.Error);
+                // SMonitor.Log(jsonResponse, LogLevel.Error);
 
                 if (TryExtractResponseMessage(jsonResponse, out var responseMessage))
                     return responseMessage;
@@ -3155,7 +3246,7 @@ namespace MarketTown
                     break;
             }
 
-            SMonitor.Log($"OpenAI error {statusCode}: {responseBody}", LogLevel.Error);
+            // SMonitor.Log($"OpenAI error {statusCode}: {responseBody}", LogLevel.Error);
             SMonitor.Log($"Unable to receive AI content. {errorMessage}\n\n", LogLevel.Error);
         }
 

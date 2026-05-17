@@ -37,6 +37,8 @@
     "foodstore.config.enabletipText": "El valor de la propina es una fracción del precio de venta. Por defecto, -1 significa una propina aleatoria.",
     "foodstore.config.enabletipclose": "¿Solo dar propina cuando estás cerca?",
     "foodstore.config.enabletipcloseText": "Cuando se establece en Verdadero, solo se recibe el consejo cuando el jugador está cerca de la tienda.",
+    "foodstore.config.onlyknowrecipe": "¿Solo recetas conocidas?",
+    "foodstore.config.onlyknowrecipeText": "Cuando está activado, los NPC solo pedirán platos que puedas cocinar, además de Huevo frito y Pan.",
     "foodstore.config.enabletipcloselove": "Multiplicador de valor de consejos sobre comida que se ama.",
     "foodstore.config.enabletipcloselike": "Valor multiplicador de la propina por alimentos que gustaron.",
     "foodstore.config.enabletipcloseneutral": "Multiplicador de valor de consejos de comida neutra",

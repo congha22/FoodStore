@@ -50,18 +50,26 @@ namespace MarketTown
         {
             if (Game1.IsMasterGame)
             {
-                MailData dataToSend = Helper.Data.ReadSaveData<MailData>("MT.MailLog");
+                var targetModIds = new[] { this.ModManifest.UniqueID };
+
+                MailData dataToSend = GetCurrentMailData();
                 if (dataToSend != null)
                 {
-                    Helper.Multiplayer.SendMessage(dataToSend, "MT.MailLogUpdate", new[] { "d5a1lamdtd.MarketTown" }, new[] { e.Peer.PlayerID });
+                    Helper.Multiplayer.SendMessage(dataToSend, "MT.MailLogUpdate", targetModIds, new[] { e.Peer.PlayerID });
                 }
 
-                SHelper.Multiplayer.SendMessage($"{DailyFeatureDish}///{WeeklyFeatureDish}", "UpdateSpecialDish");
-                //SHelper.Multiplayer.SendMessage(TodayShopInventory, "TodayShopInventory");
-                SHelper.Multiplayer.SendMessage(TodayFestivalIncome, "TodayFestivalIncome");
+                Helper.Multiplayer.SendMessage($"{DailyFeatureDish}///{WeeklyFeatureDish}", "UpdateSpecialDish", targetModIds, new[] { e.Peer.PlayerID });
+                Helper.Multiplayer.SendMessage(TodayFestivalIncome, "TodayFestivalIncome", targetModIds, new[] { e.Peer.PlayerID });
+
+                Helper.Multiplayer.SendMessage(TodaySell.ToList(), "MT.TodaySellSync", targetModIds, new[] { e.Peer.PlayerID });
+                Helper.Multiplayer.SendMessage(TodayMoney, "MT.TodayMoneySync", targetModIds, new[] { e.Peer.PlayerID });
+                Helper.Multiplayer.SendMessage(TodayPointTaste, "MT.TodayTasteSync", targetModIds, new[] { e.Peer.PlayerID });
+                Helper.Multiplayer.SendMessage(TodayPointDecor, "MT.TodayDecorSync", targetModIds, new[] { e.Peer.PlayerID });
+
+                Helper.Multiplayer.SendMessage(GetFeedbackSnapshot(), "MT.FeedbackSync", targetModIds, new[] { e.Peer.PlayerID });
 
                 var ShopDataLoader = StardewValley.DataLoader.Shops(Game1.content);
-                SHelper.Multiplayer.SendMessage(ShopDataLoader, "10MinSyncShopDataLoader");
+                Helper.Multiplayer.SendMessage(ShopDataLoader, "10MinSyncShopDataLoader", targetModIds, new[] { e.Peer.PlayerID });
             }
         }
 
@@ -73,8 +81,36 @@ namespace MarketTown
                 if (e.Type == "MT.MailLogUpdate" && e.FromModID == this.ModManifest.UniqueID)
                 {
                     FarmhandSyncData = e.ReadAs<MailData>();
-                    Monitor.Log($"Received data: {FarmhandSyncData}", LogLevel.Warn);
-                    SHelper.Data.WriteJsonFile("markettowndata.json", FarmhandSyncData);
+                }
+
+                if (e.Type == "MT.TodaySellSync" && e.FromModID == this.ModManifest.UniqueID)
+                {
+                    TodaySell = e.ReadAs<List<string>>() ?? new List<string>();
+                }
+
+                if (e.Type == "MT.TodayMoneySync" && e.FromModID == this.ModManifest.UniqueID)
+                {
+                    TodayMoney = e.ReadAs<int>();
+                }
+
+                if (e.Type == "MT.TodayTasteSync" && e.FromModID == this.ModManifest.UniqueID)
+                {
+                    TodayPointTaste = e.ReadAs<float>();
+                }
+
+                if (e.Type == "MT.TodayDecorSync" && e.FromModID == this.ModManifest.UniqueID)
+                {
+                    TodayPointDecor = e.ReadAs<float>();
+                }
+
+                if (e.Type == "MT.FeedbackSync" && e.FromModID == this.ModManifest.UniqueID)
+                {
+                    ReplaceFeedbackList(e.ReadAs<List<FeedbackEntry>>());
+                }
+
+                if (e.Type == "MT.FeedbackAdd" && e.FromModID == this.ModManifest.UniqueID)
+                {
+                    AddFeedbackEntry(e.ReadAs<FeedbackEntry>());
                 }
 
                 if (e.FromModID == this.ModManifest.UniqueID && e.Type == "ExampleMessageType" && !Config.DisableChatAll)

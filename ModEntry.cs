@@ -91,16 +91,32 @@ namespace MarketTown
         /// <summary>Count of AI request</summary>
         public static int AILimitCount = 0;
 
-        /// <summary>Limit of AI request per ingame hour</summary>
-        public static int AILimitBlock = 10;
+        /// <summary>Limit of AI request per 3 ingame hour</summary>
+        public static int AILimitBlock = 1;
 
         /// <summary>Conversation history with each NPC</summary>
         public static  IDictionary<string, string> conversationSummaries = new Dictionary<string, string>();
 
+        /// <summary>Temporary daily feedback messages in receive order.</summary>
+        public static List<FeedbackEntry> feedbackList = new List<FeedbackEntry>();
+        private static readonly object FeedbackListLock = new object();
+
+        public class FeedbackEntry
+        {
+            public string NpcName { get; set; } = string.Empty;
+            public string Message { get; set; } = string.Empty;
+
+            public FeedbackEntry(string npcName, string message)
+            {
+                NpcName = npcName ?? string.Empty;
+                Message = message ?? string.Empty;
+            }
+        }
+
         /// <summary>Key</summary>
-        public static string AIKey1 = "sk-proj-k2DvKU-2dmrvmsj-";
-        public static string AIKey2 = "wcfHwa1mZObS7fTFq7W5PYf0Z0ocHmO9npp1ExL6GYzQwjXsbI015MZe08T3BlbkFJQQ7fWH_";
-        public static string AIKey3 = "RrPDn0b2ZHEQoCv2tqFrx8BmqIDa0-uZUW-ypWmXv0zc_OmyJ6PmpXxQB1MGfXPa7wA";
+        public static string AIKey1 = "";
+        public static string AIKey2 = "";
+        public static string AIKey3 = "";
 
         // ==============================================================================================
         // ==============================================================================================
@@ -239,9 +255,76 @@ namespace MarketTown
             Game1.activeClickableMenu = new MarketLogMenu(ModEntry.SHelper);
         }
 
+        internal static MailData GetCurrentMailData()
+        {
+            if (SHelper == null)
+                return new MailData();
+
+            if (Game1.IsMasterGame)
+                return SHelper.Data.ReadSaveData<MailData>("MT.MailLog") ?? new MailData();
+
+            return FarmhandSyncData ?? SHelper.Data.ReadSaveData<MailData>("MT.MailLog") ?? new MailData();
+        }
+
+        public static int GetFeedbackCount()
+        {
+            lock (FeedbackListLock)
+            {
+                return feedbackList.Count;
+            }
+        }
+
+        public static List<FeedbackEntry> GetFeedbackSnapshot()
+        {
+            lock (FeedbackListLock)
+            {
+                return feedbackList.Select(entry => new FeedbackEntry(entry.NpcName, entry.Message)).ToList();
+            }
+        }
+
+        public static void ReplaceFeedbackList(IEnumerable<FeedbackEntry> entries)
+        {
+            lock (FeedbackListLock)
+            {
+                feedbackList.Clear();
+                if (entries == null)
+                    return;
+
+                foreach (var entry in entries)
+                {
+                    if (entry == null || string.IsNullOrWhiteSpace(entry.NpcName) || string.IsNullOrWhiteSpace(entry.Message))
+                        continue;
+
+                    feedbackList.Add(new FeedbackEntry(entry.NpcName, entry.Message));
+                }
+            }
+        }
+
+        public static void AddFeedbackEntry(FeedbackEntry entry)
+        {
+            if (entry == null || string.IsNullOrWhiteSpace(entry.NpcName) || string.IsNullOrWhiteSpace(entry.Message))
+                return;
+
+            lock (FeedbackListLock)
+            {
+                feedbackList.Add(new FeedbackEntry(entry.NpcName, entry.Message));
+            }
+        }
+
+        public void OpenFeedbackMenu()
+        {
+            if (Game1.activeClickableMenu is not null)
+                Game1.activeClickableMenu.exitThisMenu();
+
+            Game1.activeClickableMenu = new FeedbackMenu();
+        }
+
         private void GameLoop_SaveLoaded(object sender, StardewModdingAPI.Events.SaveLoadedEventArgs e)
         {
             if (Context.ScreenId > 0) return;
+
+            ReplaceFeedbackList(Array.Empty<FeedbackEntry>());
+
             emoteSprite = SHelper.ModContent.Load<Texture2D>(Path.Combine("Assets", "emote.png"));
 
             new MailLoader(SHelper);
@@ -310,8 +393,7 @@ namespace MarketTown
             }
 
             MailData model = null;
-            if (Game1.IsMasterGame) model = SHelper.Data.ReadSaveData<MailData>("MT.MailLog");
-            else model = SHelper.Data.ReadJsonFile<MailData>("markettowndata.json") ?? new MailData();
+            model = GetCurrentMailData();
             if (model != null) conversationSummaries = model.npcConversation;
         }
 
@@ -327,6 +409,7 @@ namespace MarketTown
 
             TodayVisitorVisited = 0;
             TodaySell.Clear();
+            ReplaceFeedbackList(Array.Empty<FeedbackEntry>());
             TodayMoney = 0;
             TodayCustomerInteraction = 0;
             TodayCustomerNote = 0;
@@ -396,8 +479,7 @@ namespace MarketTown
                 DailyFeatureDish = GetRandomDish();
 
                 MailData model = null;
-                if (Game1.IsMasterGame) model = SHelper.Data.ReadSaveData<MailData>("MT.MailLog");
-                else model = SHelper.Data.ReadJsonFile<MailData>("markettowndata.json") ?? new MailData();
+                model = GetCurrentMailData();
                 if (model != null) WeeklyFeatureDish = model.WeeklyDish;
 
                 SHelper.Multiplayer.SendMessage($"{DailyFeatureDish}///{WeeklyFeatureDish}", "UpdateSpecialDish");
@@ -425,8 +507,7 @@ namespace MarketTown
                 if (true)
                 {
                     var model = new MailData();
-                    if (Game1.IsMasterGame) model = Helper.Data.ReadSaveData<MailData>("MT.MailLog");
-                    else model = SHelper.Data.ReadJsonFile<MailData>("markettowndata.json") ?? new MailData();
+                    model = GetCurrentMailData();
 
 
                     float islandCount = 0f;
@@ -932,17 +1013,18 @@ namespace MarketTown
 
         private void GameLoop_UpdateTicked(object sender, UpdateTickedEventArgs e)
         {
-            if (!Context.IsWorldReady || Game1.timeOfDay < 610 || Context.ScreenId > 0) return;
+            return;
+            // if (!Context.IsWorldReady || Game1.timeOfDay < 610 || Context.ScreenId > 0) return;
 
-            if (e.IsMultipleOf(30) && !Config.DisableTextChat)
-            {
-                if (playerChatInstance == null)
-                {
-                    playerChatInstance = new PlayerChat();
-                }
-                playerChatInstance.Validate();
+            // if (e.IsMultipleOf(30) && !Config.DisableTextChat)
+            // {
+            //     if (playerChatInstance == null)
+            //     {
+            //         playerChatInstance = new PlayerChat();
+            //     }
+            //     playerChatInstance.Validate();
 
-            }
+            // }
         }
 
         private void GameLoop_OneSecondUpdateTicked(object sender, StardewModdingAPI.Events.OneSecondUpdateTickedEventArgs e)
@@ -977,7 +1059,7 @@ namespace MarketTown
             if (Context.ScreenId > 0) return;
             Random random = new Random();
 
-            if (Game1.timeOfDay % 100 == 0)AILimitCount = 0;
+            if (Game1.timeOfDay % 300 == 0)AILimitCount = 0;
 
             if (Game1.timeOfDay == 610)
             {
@@ -1373,6 +1455,12 @@ namespace MarketTown
                             if (enumerator.Current.heldObject.Value is not Chest) enumerator.Current.heldObject.Value = null;
                             else if (enumerator.Current.heldObject.Value is Chest chest) chest.Items[food.slot] = null;
 
+                            if (food.foodObject != null)
+                            {
+                                food.furniture.modData["hapyke.FoodStore/recentSoldItemId"] = food.foodObject.QualifiedItemId;
+                                food.furniture.modData["hapyke.FoodStore/recentSoldItemCategory"] = food.foodObject.Category.ToString();
+                            }
+
                             if (!RecentSoldTable.ContainsKey(food.furniture)) RecentSoldTable.Add(food.furniture, Game1.timeOfDay);
                             else RecentSoldTable[food.furniture] = Game1.timeOfDay;
 
@@ -1605,9 +1693,10 @@ namespace MarketTown
                                     {
                                         string ageCategory = __instance.Age == 0 ? "adult" : __instance.Age == 1 ? "teens" : "child";
                                         string manner = __instance.Manners == 0 ? "friendly." : __instance.Manners == 1 ? "polite." : __instance.Manners == 2 ? "rude." : "friendly.";
+
                                         Task.Run(() => SendMessageToAssistant(
                                             npc: __instance,
-                                            systemMessage: $"You are NPC {__instance.Name} ({ageCategory}, {manner}) in Stardew Valley. The player {Game1.MasterPlayer.Name} has a store at {__instance.currentLocation.Name}. You just bought the {food.foodObject.Name} from the store and you think it is {tasteCase[rand.Next(tasteCase.Count)]} and gave an extra {tip} gold tip. Now you will text the player sharing your opinion, using under 25 text words",
+                                            systemMessage: $"You are NPC {__instance.Name} ({ageCategory}, {manner}) in Stardew Valley. The player has a store at {__instance.currentLocation.Name}. You just bought the {food.foodObject.Name} from the store and you think it is {tasteCase[rand.Next(tasteCase.Count)]} and gave an extra {tip} gold tip. Now you will text the player sharing your opinion, using under 25 text words",
                                             isForBubbleMessage: true,
                                             canUseSmartphoneApi: true)
                                         );
@@ -1623,7 +1712,7 @@ namespace MarketTown
                                         string manner = __instance.Manners == 0 ? "friendly." : __instance.Manners == 1 ? "polite." : __instance.Manners == 2 ? "rude." : "friendly.";
                                         Task.Run(() => SendMessageToAssistant(
                                             npc: __instance,
-                                            systemMessage: $"You are NPC {__instance.Name} ({ageCategory}, {manner}) in Stardew Valley. The player {Game1.MasterPlayer.Name} has a store at {__instance.currentLocation.Name}. You just bought the {food.foodObject.Name} from the store and you think it is {tasteCase[rand.Next(tasteCase.Count)]}. Now you will text the player sharing your opinion, using under 22 text words",
+                                            systemMessage: $"You are NPC {__instance.Name} ({ageCategory}, {manner}) in Stardew Valley. The player has a store at {__instance.currentLocation.Name}. You just bought the {food.foodObject.Name} from the store and you think it is {tasteCase[rand.Next(tasteCase.Count)]}. Now you will text the player sharing your opinion, using under 22 text words",
                                             isForBubbleMessage: true,
                                             canUseSmartphoneApi: true)
                                         );

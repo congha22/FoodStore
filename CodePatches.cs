@@ -83,65 +83,65 @@ namespace MarketTown
             NetStringDictionary<Friendship, NetRef<Friendship>> friendshipData = Game1.player.friendshipData;
             GameLocation __instanceLocation = __instance.currentLocation;
 
-            if (random.NextDouble() < 0.5 && Game1.hasLoadedGame && __instanceLocation == Game1.player.currentLocation
-                && ((friendshipData.TryGetValue(__instance.Name, out var friendship) && !__instance.Name.Contains("MT.Guest_") && friendshipData[__instance.Name].TalkedToToday) || __instance.Name.Contains("MT.Guest_"))
-                && __instance.CurrentDialogue.Count == 0 && __instance.Name != "Krobus" && __instance.Name != "Dwarf"
-                && !(Game1.currentLocation == null
-                    || Game1.eventUp
-                    || Game1.isFestival()
-                    || Game1.IsFading()
-                    || Game1.activeClickableMenu != null))
-            {
-                try
-                {
-                    int randomIndex = random.Next(1, 8);
+            // if (random.NextDouble() < 0.5 && Game1.hasLoadedGame && __instanceLocation == Game1.player.currentLocation
+            //     && ((friendshipData.TryGetValue(__instance.Name, out var friendship) && !__instance.Name.Contains("MT.Guest_") && friendshipData[__instance.Name].TalkedToToday) || __instance.Name.Contains("MT.Guest_"))
+            //     && __instance.CurrentDialogue.Count == 0 && __instance.Name != "Krobus" && __instance.Name != "Dwarf"
+            //     && !(Game1.currentLocation == null
+            //         || Game1.eventUp
+            //         || Game1.isFestival()
+            //         || Game1.IsFading()
+            //         || Game1.activeClickableMenu != null))
+            // {
+            //     try
+            //     {
+            //         int randomIndex = random.Next(1, 8);
 
-                    string __instanceAge, __instanceManner, __instanceSocial, __instanceHeartLevel;
+            //         string __instanceAge, __instanceManner, __instanceSocial, __instanceHeartLevel;
 
-                    int age = __instance.Age;
-                    int manner = __instance.Manners;
-                    int social = __instance.SocialAnxiety;
-                    int heartLevel = 0;
-                    if (Game1.player.friendshipData.ContainsKey(__instance.Name)) heartLevel = (int)Game1.player.friendshipData[__instance.Name].Points / 250;
+            //         int age = __instance.Age;
+            //         int manner = __instance.Manners;
+            //         int social = __instance.SocialAnxiety;
+            //         int heartLevel = 0;
+            //         if (Game1.player.friendshipData.ContainsKey(__instance.Name)) heartLevel = (int)Game1.player.friendshipData[__instance.Name].Points / 250;
 
-                    __instanceAge = age == 0 ? "adult." : age == 1 ? "teens." : age == 2 ? "child." : "adult.";
-                    __instanceManner = manner == 0 ? "neutral." : manner == 1 ? "polite." : manner == 2 ? "rude." : "neutral.";
-                    __instanceSocial = social == 0 ? "outgoing." : social == 1 ? "shy." : social == 2 ? "neutral." : "neutral.";
-                    __instanceHeartLevel = heartLevel <= 2 ? ".0" : heartLevel <= 5 ? ".3" : ".6";
+            //         __instanceAge = age == 0 ? "adult." : age == 1 ? "teens." : age == 2 ? "child." : "adult.";
+            //         __instanceManner = manner == 0 ? "neutral." : manner == 1 ? "polite." : manner == 2 ? "rude." : "neutral.";
+            //         __instanceSocial = social == 0 ? "outgoing." : social == 1 ? "shy." : social == 2 ? "neutral." : "neutral.";
+            //         __instanceHeartLevel = heartLevel <= 2 ? ".0" : heartLevel <= 5 ? ".3" : ".6";
 
-                    if (__instance.Name.Contains("MT.Guest_") || !Game1.player.friendshipData[__instance.Name].IsMarried() && !Config.DisableChatAll && Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) < 2)
-                    {
-                        if (Config.AdvanceAiContent && (AILimitCount < AILimitBlock || Config.AdvanceAiLimit != 0 && AILimitCount <= Config.AdvanceAiLimit))
-                        {
-                            string relation = heartLevel <= 2 ? "stranger" : heartLevel <= 5 ? "acquaintance" : "best friend";
-                            string bestFriend = "";
-                            foreach (var f in Game1.player.friendshipData)
-                                foreach (var f2 in f.Where(f2 => f2.Value.Points >= 750).OrderByDescending(f2 => f2.Value.Points).Take(3))
-                                    bestFriend += $"{f2.Key}, ";
+            //         if (__instance.Name.Contains("MT.Guest_") || !Game1.player.friendshipData[__instance.Name].IsMarried() && !Config.DisableChatAll && Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) < 2)
+            //         {
+            //             if (Config.AdvanceAiContent && (AILimitCount < AILimitBlock || Config.AdvanceAiLimit != 0 && AILimitCount <= Config.AdvanceAiLimit))
+            //             {
+            //                 string relation = heartLevel <= 2 ? "stranger" : heartLevel <= 5 ? "acquaintance" : "best friend";
+            //                 string bestFriend = "";
+            //                 foreach (var f in Game1.player.friendshipData)
+            //                     foreach (var f2 in f.Where(f2 => f2.Value.Points >= 750).OrderByDescending(f2 => f2.Value.Points).Take(3))
+            //                         bestFriend += $"{f2.Key}, ";
 
-                            string data = $"Current location: {Game1.currentLocation.Name}; Current time: {Game1.timeOfDay}; Weather:{Game1.currentLocation.GetWeather().Weather}; Day of months: {Game1.dayOfMonth}; Current season: {Game1.currentLocation.GetSeason()};";
+            //                 string data = $"Current location: {Game1.currentLocation.Name}; Current time: {Game1.timeOfDay}; Weather:{Game1.currentLocation.GetWeather().Weather}; Day of months: {Game1.dayOfMonth}; Current season: {Game1.currentLocation.GetSeason()};";
 
-                            if (bestFriend != "") data += $"Player's closet friends: {bestFriend}; ";
+            //                 if (bestFriend != "") data += $"Player's closet friends: {bestFriend}; ";
 
-                            conversationSummaries.TryGetValue(__instance.Name, out string history);
-                            if (history != "") data += $"Previous user message: {history}";
+            //                 conversationSummaries.TryGetValue(__instance.Name, out string history);
+            //                 if (history != "") data += $"Previous user message: {history}";
 
-                            Task.Run(() => ModEntry.SendMessageToAssistant(
-                                npc: __instance,
-                                userMessage: "",
-                                systemMessage: $"As NPC {__instance.Name} ({__instanceAge}, {__instanceManner} manner, {__instanceSocial} social anxiety, and in {relation} relationship with player {Game1.player.Name}), you will start a new conversation in context of Stardew Valley game. You can use this information if relevant: {data}. Limit to under 30 words. Use approriate tone based on the characteristic and relationship with the player",
-                                isConversation: true,
-                                isForBubbleMessage: false)
-                            );
+            //                 Task.Run(() => ModEntry.SendMessageToAssistant(
+            //                     npc: __instance,
+            //                     userMessage: "",
+            //                     systemMessage: $"As NPC {__instance.Name} ({__instanceAge}, {__instanceManner} manner, {__instanceSocial} social anxiety, and in {relation} relationship with player {Game1.player.Name}), you will start a new conversation in context of Stardew Valley game. You can use this information if relevant: {data}. Limit to under 30 words. Use approriate tone based on the characteristic and relationship with the player",
+            //                     isConversation: true,
+            //                     isForBubbleMessage: false)
+            //                 );
 
-                        }
-                        else
-                            __instance.CurrentDialogue.Push(new Dialogue(__instance, "key", SHelper.Translation.Get("foodstore.general." + __instanceAge + __instanceManner + __instanceSocial + randomIndex.ToString() + __instanceHeartLevel)));
-                        __instance.modData["hapyke.FoodStore/TotalCustomerResponse"] = (Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) + 1).ToString();
-                    }
-                }
-                catch (NullReferenceException) { }
-            }
+            //             }
+            //             else
+            //                 __instance.CurrentDialogue.Push(new Dialogue(__instance, "key", SHelper.Translation.Get("foodstore.general." + __instanceAge + __instanceManner + __instanceSocial + randomIndex.ToString() + __instanceHeartLevel)));
+            //             __instance.modData["hapyke.FoodStore/TotalCustomerResponse"] = (Int32.Parse(__instance.modData["hapyke.FoodStore/TotalCustomerResponse"]) + 1).ToString();
+            //         }
+            //     }
+            //     catch (NullReferenceException) { }
+            // }
 
             //Get taste and decoration score, call to SaySomething for __instance to send bubble text
             if (random.NextDouble() < 0.033 && !Game1.eventUp && __instanceLocation is not null && !WantsToEat(__instance)
@@ -304,8 +304,8 @@ namespace MarketTown
                                 string manner = __instance.Manners == 0 ? "friendly." : __instance.Manners == 1 ? "polite." : __instance.Manners == 2 ? "rude." : "friendly.";
                                 Task.Run(() => SendMessageToAssistant(
                                                 npc: __instance,
-                                                userMessage: $"How do you feel about my {Game1.MasterPlayer.Name}'s store?",
-                                                systemMessage: $"As NPC {__instance.Name} ({ageCategory}, {manner}) in Stardew Valley, you will reply the user with a text only message under 25 words that your feeling with the {Game1.MasterPlayer.Name} store is that {contextChoice[random.Next(contextChoice.Count)]}")
+                                                userMessage: $"How do you feel about my store?",
+                                                systemMessage: $"As NPC {__instance.Name} ({ageCategory}, {manner}) in Stardew Valley, you will reply the user with a text only message under 25 words that your feeling with the store is that {contextChoice[random.Next(contextChoice.Count)]}")
                                             );
                             }
                             else
@@ -328,8 +328,8 @@ namespace MarketTown
                                 string manner = __instance.Manners == 0 ? "friendly." : __instance.Manners == 1 ? "polite." : __instance.Manners == 2 ? "rude." : "friendly.";
                                 Task.Run(() => SendMessageToAssistant(
                                                 npc: __instance,
-                                                userMessage: $"How do you feel about my {Game1.MasterPlayer.Name}'s store?",
-                                                systemMessage: $"As NPC {__instance.Name} ({ageCategory}, {manner}) in Stardew Valley, you will reply the user with a text only message under 20 words that your feeling with the {Game1.MasterPlayer.Name} store is that {contextChoice[random.Next(contextChoice.Count)]}")
+                                                userMessage: $"How do you feel about my store?",
+                                                systemMessage: $"As NPC {__instance.Name} ({ageCategory}, {manner}) in Stardew Valley, you will reply the user with a text only message under 20 words that your feeling with the store is that {contextChoice[random.Next(contextChoice.Count)]}")
                                             );
                             }
                             else
@@ -352,8 +352,8 @@ namespace MarketTown
                                 string manner = __instance.Manners == 0 ? "friendly." : __instance.Manners == 1 ? "polite." : __instance.Manners == 2 ? "rude." : "friendly.";
                                 Task.Run(() => SendMessageToAssistant(
                                                 npc: __instance,
-                                                userMessage: $"How do you feel about my {Game1.MasterPlayer.Name}'s store?",
-                                                systemMessage: $"As NPC {__instance.Name} ({ageCategory}, {manner}) in Stardew Valley, you will reply the user with a text only message under 20 words that your feeling with the {Game1.MasterPlayer.Name} store is that {contextChoice[random.Next(contextChoice.Count)]}")
+                                                userMessage: $"How do you feel about my store?",
+                                                systemMessage: $"As NPC {__instance.Name} ({ageCategory}, {manner}) in Stardew Valley, you will reply the user with a text only message under 20 words that your feeling with the store is that {contextChoice[random.Next(contextChoice.Count)]}")
                                             );
                             }
                             else
@@ -376,8 +376,8 @@ namespace MarketTown
                                 string manner = __instance.Manners == 0 ? "friendly." : __instance.Manners == 1 ? "polite." : __instance.Manners == 2 ? "rude." : "friendly.";
                                 Task.Run(() => SendMessageToAssistant(
                                                 npc: __instance,
-                                                userMessage: $"How do you feel about my {Game1.MasterPlayer.Name}'s store?",
-                                                systemMessage: $"As NPC {__instance.Name} ({ageCategory}, {manner}) in Stardew Valley, you will reply the user with a text only message under 20 words that your feeling with the {Game1.MasterPlayer.Name} store is that {contextChoice[random.Next(contextChoice.Count)]}")
+                                                userMessage: $"How do you feel about my store?",
+                                                systemMessage: $"As NPC {__instance.Name} ({ageCategory}, {manner}) in Stardew Valley, you will reply the user with a text only message under 20 words that your feeling with the store is that {contextChoice[random.Next(contextChoice.Count)]}")
                                             );
                             }
                             else
@@ -400,8 +400,8 @@ namespace MarketTown
                                 string manner = __instance.Manners == 0 ? "friendly." : __instance.Manners == 1 ? "polite." : __instance.Manners == 2 ? "rude." : "friendly.";
                                 Task.Run(() => SendMessageToAssistant(
                                                 npc: __instance,
-                                                userMessage: $"How do you feel about my {Game1.MasterPlayer.Name}'s store?",
-                                                systemMessage: $"As NPC {__instance.Name} ({ageCategory}, {manner}) in Stardew Valley, you will reply the user with a text only message under 20 words that your feeling with the {Game1.MasterPlayer.Name} store is that {contextChoice[random.Next(contextChoice.Count)]}")
+                                                userMessage: $"How do you feel about my store?",
+                                                systemMessage: $"As NPC {__instance.Name} ({ageCategory}, {manner}) in Stardew Valley, you will reply the user with a text only message under 20 words that your feeling with the store is that {contextChoice[random.Next(contextChoice.Count)]}")
                                             );
                             }
                             else

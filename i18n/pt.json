@@ -37,6 +37,8 @@
     "foodstore.config.enabletipText": "O valor da gorjeta é uma fração do preço de venda. O padrão é -1 para uma gorjeta aleatória.",
     "foodstore.config.enabletipclose": "Apenas dar gorjeta quando estiver por perto?",
     "foodstore.config.enabletipcloseText": "Quando definido como Verdadeiro, apenas receba a Dica quando o jogador estiver perto da loja.",
+    "foodstore.config.onlyknowrecipe": "Apenas receitas conhecidas?",
+    "foodstore.config.onlyknowrecipeText": "Quando ativado, NPCs só pedem pratos que você pode cozinhar, além de Ovo frito e Pão.",
     "foodstore.config.enabletipcloselove": "Amado multiplicador de valor de dicas de comida.",
     "foodstore.config.enabletipcloselike": "Multiplicador de valor da dica de comida apreciada.",
     "foodstore.config.enabletipcloseneutral": "Multiplicador de valor de dica de comida neutra",

@@ -7,6 +7,7 @@ namespace MarketTown
     public class ModConfig
     {
         public bool TipWhenNeaBy { get; set; } = true;
+        public bool OnlyKnowRecipe { get; set; } = true;
         public bool RushHour { get; set; } = true;
         public bool EnableDecor { get; set; } = true;
         public bool DisableChat { get; set; } = false;
@@ -52,7 +53,7 @@ namespace MarketTown
         public float MuseumPriceMarkup { get; set; } = 1.0f;
         public bool MultiplayerMode { get; set; } = false;
         public bool EasyLicense { get; set; } = false;
-        public bool DisableTextChat { get; set; } = false;
+        // public bool DisableTextChat { get; set; } = false;
 
         public int ParadiseIslandNPC { get; set; } = 40;
         public bool IslandProgress { get; set; } = true;
@@ -118,10 +119,6 @@ namespace MarketTown
         //end of AI content
 
         public bool AdvanceResetProgress = false;
-
-        //smartphone
-        public bool SmartphoneEnable = true;
-        public float SmartphoneMessageChange { get; set; } = 0.05f;
 
     }
 }

@@ -17,6 +17,82 @@ namespace MarketTown
 {
     public partial class ModEntry
     {
+        private static readonly HashSet<string> AlwaysAvailableOrderIds = new() { };
+
+        private static string NormalizeOrderDishId(string dishId)
+        {
+            if (string.IsNullOrWhiteSpace(dishId))
+                return string.Empty;
+
+            string normalized = dishId.Trim();
+            if (normalized.StartsWith("(O)", StringComparison.OrdinalIgnoreCase))
+                return normalized.Substring(3);
+
+            if (normalized.Length > 1
+                && (normalized[0] == 'O' || normalized[0] == 'o')
+                && normalized.Substring(1).All(char.IsDigit))
+            {
+                return normalized.Substring(1);
+            }
+
+            return normalized;
+        }
+
+        private static string ResolveObjectDataKey(string dishId)
+        {
+            if (string.IsNullOrWhiteSpace(dishId))
+                return null;
+
+            if (Game1.objectData.ContainsKey(dishId))
+                return dishId;
+
+            string normalized = NormalizeOrderDishId(dishId);
+            if (Game1.objectData.ContainsKey(normalized))
+                return normalized;
+
+            string qualified = "(O)" + normalized;
+            if (Game1.objectData.ContainsKey(qualified))
+                return qualified;
+
+            return null;
+        }
+
+        private bool CanPlayerCookOrderDish(string dishId)
+        {
+            if (!Config.OnlyKnowRecipe)
+                return true;
+
+            string objectDataKey = ResolveObjectDataKey(dishId);
+            if (objectDataKey is null || Game1.player is null)
+                return false;
+
+            string recipeName = Game1.objectData[objectDataKey].Name;
+            return Game1.player.cookingRecipes?.ContainsKey(recipeName) == true;
+        }
+
+        private static void AddAlwaysAvailableFallbackOrderDishes(List<string> dishIds)
+        {
+            foreach (string fallbackId in AlwaysAvailableOrderIds)
+            {
+                if (!dishIds.Any(id => NormalizeOrderDishId(id) == fallbackId))
+                    dishIds.Add(fallbackId);
+            }
+        }
+
+        private static void AddAlwaysAvailableFallbackOrderItems(List<Object> orderItems)
+        {
+            foreach (string fallbackId in AlwaysAvailableOrderIds)
+            {
+                if (orderItems.Any(item => NormalizeOrderDishId(item?.ItemId) == fallbackId))
+                    continue;
+
+                Object fallbackItem = ItemRegistry.Create<Object>("(O)" + fallbackId, allowNull: true)
+                    ?? ItemRegistry.Create<Object>(fallbackId, allowNull: true);
+                if (fallbackItem != null)
+                    orderItems.Add(fallbackItem);
+            }
+        }
+
         private void UpdateOrders(bool marketOrder = false)
         {
             foreach (var c in Game1.player.currentLocation.characters)
@@ -35,7 +111,7 @@ namespace MarketTown
         private void CheckOrder(NPC npc, GameLocation location, bool bypass, bool marketOrder = false)
         {
             if (Context.ScreenId > 0) return;
-            Random rand = new Random();
+            Random rand = Game1.random;
             if (npc.modData.TryGetValue(orderKey, out string orderData)  )
             {
                 //npc.modData.Remove(orderKey);
@@ -113,8 +189,10 @@ namespace MarketTown
                 }
                 foreach ( var obj in GiftableObject)
                 {
+                    string objDataKey = ResolveObjectDataKey(obj.ItemId);
                     if (!loves.Contains(obj.ItemId) && !likes.Contains(obj.ItemId) && !neutral.Contains(obj.ItemId) 
-                        && CraftingRecipe.cookingRecipes.ContainsKey(obj.ItemId) 
+                        && objDataKey != null
+                        && CraftingRecipe.cookingRecipes.ContainsKey(Game1.objectData[objDataKey].Name) 
                         && !Game1.NPCGiftTastes["Universal_Hate"].Split(' ').Contains(obj.ItemId) 
                         && npc.getGiftTasteForThisItem(obj) != 6 ) 
                     {
@@ -122,8 +200,19 @@ namespace MarketTown
                     }
                 }
 
+                if (Config.OnlyKnowRecipe)
+                {
+                    loves = loves.Where(CanPlayerCookOrderDish).Distinct().ToList();
+                    likes = likes.Where(CanPlayerCookOrderDish).Distinct().ToList();
+                    neutral = neutral.Where(CanPlayerCookOrderDish).Distinct().ToList();
 
-                Random rand = new Random();
+                    // Keep Fried Egg/Bread as base fallback only when no known dish is available.
+                    if (!loves.Any() && !likes.Any() && !neutral.Any())
+                        AddAlwaysAvailableFallbackOrderDishes(neutral);
+                }
+
+
+                Random rand = Game1.random;
 
                 string taste = "like";
                 string dish = "240";
@@ -132,7 +221,7 @@ namespace MarketTown
 
                 if (!marketOrder)
                 {
-                    if (taste.Any() && (rand.NextDouble() < Config.LovedDishChance || !likes.Any() && !neutral.Any()))
+                    if (loves.Any() && (rand.NextDouble() < Config.LovedDishChance || !likes.Any() && !neutral.Any()))
                     {
                         taste = "love";
                         dish = loves[rand.Next(loves.Count)];
@@ -148,22 +237,38 @@ namespace MarketTown
                         dish = neutral[rand.Next(neutral.Count)];
                     }
 
-                    name = Game1.objectData[dish.ToString()].Name;
-                    price = Game1.objectData[dish.ToString()].Price;
+                    string dishDataKey = ResolveObjectDataKey(dish);
+                    if (dishDataKey != null)
+                    {
+                        dish = NormalizeOrderDishId(dish);
+                        name = Game1.objectData[dishDataKey].Name;
+                        price = Game1.objectData[dishDataKey].Price;
+                    }
                 }
                 else
                 {
+                    List<Object> marketOrderCandidates = GiftableObject;
+                    if (Config.OnlyKnowRecipe)
+                    {
+                        marketOrderCandidates = GiftableObject.Where(item => item != null && CanPlayerCookOrderDish(item.ItemId)).ToList();
+
+                        // Keep Fried Egg/Bread as base fallback only when no known candidate exists.
+                        if (!marketOrderCandidates.Any())
+                            AddAlwaysAvailableFallbackOrderItems(marketOrderCandidates);
+                    }
+
                     int tried = 0;
-                    while (tried < 5)
+                    bool selectedMarketDish = false;
+                    while (tried < 5 && marketOrderCandidates.Any())
                     {
                         tried++;
 
-                        var selectItem = GiftableObject[rand.Next(GiftableObject.Count)];
+                        var selectItem = marketOrderCandidates[rand.Next(marketOrderCandidates.Count)];
 
                         int tasteInt = npc.getGiftTasteForThisItem(selectItem);
                         if (tasteInt == 6 || tasteInt == 4 && rand.NextBool()) continue;
 
-                        dish = selectItem.ItemId;
+                        dish = NormalizeOrderDishId(selectItem.ItemId);
                         name = selectItem.DisplayName;
                         price = selectItem.Price;
                         switch (tasteInt)
@@ -178,7 +283,17 @@ namespace MarketTown
                                 taste = "neutral";
                                 break;
                         }
+                        selectedMarketDish = true;
                         break;
+                    }
+
+                    if (!selectedMarketDish && marketOrderCandidates.Any())
+                    {
+                        var fallbackItem = marketOrderCandidates[rand.Next(marketOrderCandidates.Count)];
+                        dish = NormalizeOrderDishId(fallbackItem.ItemId);
+                        name = fallbackItem.DisplayName;
+                        price = fallbackItem.Price;
+                        taste = "neutral";
                     }
 
                 }
