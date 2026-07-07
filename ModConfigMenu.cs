@@ -42,7 +42,7 @@ namespace MarketTown
     public partial class ModEntry
     {
 
-        public static void ConfigMenu (IContentPatcherAPI api, IManifest ModManifest, IModHelper Helper)
+        public static void ConfigMenu(IContentPatcherAPI api, IManifest ModManifest, IModHelper Helper)
         {
             api.RegisterToken(ModManifest, "IslandSign", () =>
             {
@@ -108,7 +108,7 @@ namespace MarketTown
                 if (Context.IsWorldReady)
                 {
                     var model = GetCurrentMailData();
-                    
+
                     if (model == null) return null;
 
                     int level = model.FestivalEarning;
@@ -300,7 +300,7 @@ namespace MarketTown
             configMenu.AddPageLink(mod: ModManifest, "inviteTime", () => SHelper.Translation.Get("foodstore.config.invitetime"));
             configMenu.AddPageLink(mod: ModManifest, "salePrice", () => SHelper.Translation.Get("foodstore.config.saleprice"));
             configMenu.AddPageLink(mod: ModManifest, "advance", () => SHelper.Translation.Get("foodstore.config.advance"));
-            
+
 
             // Island setting
             configMenu.AddPage(mod: ModManifest, "island", () => SHelper.Translation.Get("foodstore.config.island"));
@@ -717,7 +717,7 @@ namespace MarketTown
                 max: 5f,
                 interval: 0.01f
             );
-            
+
             // Advance page
             configMenu.AddPage(mod: ModManifest, "advance", () => SHelper.Translation.Get("foodstore.config.advance"));
 

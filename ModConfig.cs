@@ -30,11 +30,11 @@ namespace MarketTown
 
 
         public bool DoorEntry { get; set; } = true;
-        public float ShedVisitChance { get; set;} = 0.2f;
+        public float ShedVisitChance { get; set; } = 0.2f;
         public int MaxShedCapacity { get; set; } = 7;
         public int TimeStay { get; set; } = 130;
         public int OpenHour { get; set; } = 800;
-        public int CloseHour { get;set; } = 2200;
+        public int CloseHour { get; set; } = 2200;
 
         public float ShedMoveToFoodChance { get; set; } = 0.1f;
         public int ShedMinuteToHungry { get; set; } = 90;
@@ -83,7 +83,7 @@ namespace MarketTown
 
         public bool UltimateChallenge { get; set; } = false;
         public bool GlobalPathUpdate { get; set; } = false;
-        
+
         public bool ExtraMessage { get; set; } = false;
 
         public bool AllowIndoorStore { get; set; } = false;

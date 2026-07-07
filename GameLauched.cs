@@ -188,43 +188,36 @@ namespace MarketTown
                 Microsoft.Xna.Framework.Rectangle feedbackIconSourceRect = new Microsoft.Xna.Framework.Rectangle(66, 4, 14, 13);
                 if (Config.AdvanceAiContent)
                 {
-                    iSmartphoneApi.RegisterPhoneAppGroup(
+                    iSmartphoneApi.RegisterPhoneApp(
                          ownerModId: this.ModManifest.UniqueID,
-                         groupId: "d5a1lamdtd.markettown.group",
-                         displayName: "Market Town",
-                         iconTexture: marketIcon,
-                         sortOrder: 0,
-                         sourceRect: null,
-                         isVisible: () => Context.IsWorldReady,
-                         getBadgeCount: () => GetFeedbackCount()
-                    );
-
-                    iSmartphoneApi.RegisterPhoneAppGroupItem(
-                         ownerModId: this.ModManifest.UniqueID,
-                         groupId: "d5a1lamdtd.markettown.group",
-                         itemId: "d5a1lamdtd.markettown.marketlog",
+                         appId: "d5a1lamdtd.markettown.marketlog",
                          displayName: "Market Log",
-                         iconTexture: marketIcon,
                          onClick: () => OpenMarketTownMenu(),
                          closePhoneOnLaunch: true,
-                         sortOrder: 0,
                          sourceRect: null,
-                         isVisible: () => Context.IsWorldReady,
-                         getBadgeCount: () => 0
+                         getBadgeCount: () => 0,
+                         supportedSizes: new[] { AppSize.Size1x1 },
+                         onDrawWidget: null,
+                         themedIconTextures: new Dictionary<string, Texture2D>(StringComparer.OrdinalIgnoreCase)
+                         {
+                             { "default", marketIcon }
+                         }
                     );
 
-                    iSmartphoneApi.RegisterPhoneAppGroupItem(
+                    iSmartphoneApi.RegisterPhoneApp(
                          ownerModId: this.ModManifest.UniqueID,
-                         groupId: "d5a1lamdtd.markettown.group",
-                         itemId: "d5a1lamdtd.markettown.feedback",
+                         appId: "d5a1lamdtd.markettown.feedback",
                          displayName: "Feedback",
-                         iconTexture: feedbackIcon,
                          onClick: () => OpenFeedbackMenu(),
                          closePhoneOnLaunch: true,
-                         sortOrder: 1,
                          sourceRect: feedbackIconSourceRect,
-                         isVisible: () => Context.IsWorldReady,
-                         getBadgeCount: () => GetFeedbackCount()
+                         getBadgeCount: () => GetFeedbackCount(),
+                         supportedSizes: new[] { AppSize.Size1x1 },
+                         onDrawWidget: null,
+                         themedIconTextures: new Dictionary<string, Texture2D>(StringComparer.OrdinalIgnoreCase)
+                         {
+                             { "default", feedbackIcon }
+                         }
                     );
                 }
                 else
@@ -233,13 +226,16 @@ namespace MarketTown
                          ownerModId: this.ModManifest.UniqueID,
                          appId: "d5a1lamdtd.markettown.marketlog",
                          displayName: "Market Log",
-                         iconTexture: marketIcon,
                          onClick: () => OpenMarketTownMenu(),
                          closePhoneOnLaunch: true,
-                         sortOrder: 0,
                          sourceRect: null,
-                         isVisible: () => Context.IsWorldReady,
-                         getBadgeCount: () => 0
+                         getBadgeCount: () => 0,
+                         supportedSizes: new[] { AppSize.Size1x1 },
+                         onDrawWidget: null,
+                         themedIconTextures: new Dictionary<string, Texture2D>(StringComparer.OrdinalIgnoreCase)
+                         {
+                             { "default", marketIcon }
+                         }
                     );
                 }
             }
@@ -2094,7 +2090,7 @@ namespace MarketTown
                                                 MarketChestMap.Add((location.Name, new Vector2(currentX, currentY)));
                                                 if (iSmartphoneApi != null)
                                                     iSmartphoneApi.SendSmartphoneNotification($"Market Town Storage at {location.Name} is empty. Consider restock it soon!", "Market Town");
-                                                
+
                                                 Game1.addHUDMessage(new HUDMessage($"Market Town Storage at {location.Name} is empty. Consider restock it soon!", 3));
                                             }
                                         }
@@ -3086,6 +3082,55 @@ namespace MarketTown
                 }
             }
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
         /// <summary>Call to OpenAI to generate a response</summary>
