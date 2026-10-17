@@ -1,0 +1,14 @@
+{
+  "item.RestaurantDecor.name": "餐厅装饰",
+  "item.MarketLog.name": "集镇日志",
+  "item.MarketLicense.name": "商店营业执照",
+  "item.MarketLicense.description": "将执照展示在农场建筑内的标牌上，即可将建筑用作出售各类商品的商店。次日生效。天堂岛上的建筑无需执照。",
+  "item.RestaurantLicense.name": "餐厅营业执照",
+  "item.RestaurantLicense.description": "将执照展示在农场建筑内的标牌上，即可将建筑用作出售食物的餐厅。次日生效。天堂岛上的建筑无需执照。",
+  "item.MuseumLicense.name": "博物馆许可证",
+  "item.MuseumLicense.description": "将许可证展示在农场建筑内的标牌上，即可将建筑登记为供游客参观的博物馆。次日生效。天堂岛上的建筑无需许可证。",
+  "item.InviteLetter.name": "邀请函",
+  "item.InviteLetter.description": "将这封信交给想邀请到你家做客的人。",
+  "item.CustomerNote.name": "顾客意见单",
+  "item.CustomerNote.description": "将这张意见单交给顾客，收集他们对所售菜肴的评价。"
+}

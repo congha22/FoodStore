@@ -761,7 +761,7 @@ namespace MarketTown
 
             configMenu.AddBoolOption(
                 mod: ModManifest,
-                name: () => "Reset Market Town progress",
+                name: () => SHelper.Translation.Get("foodstore.config.reset-progress"),
                 getValue: () => Config.AdvanceResetProgress,
                 setValue: value => Config.AdvanceResetProgress = value
             );
@@ -784,15 +784,15 @@ namespace MarketTown
 
             configMenu.AddBoolOption(
                 mod: ModManifest,
-                name: () => "Auto fix stuck/error NPC",
+                name: () => SHelper.Translation.Get("foodstore.config.auto-fix-npc"),
                 getValue: () => Config.AdvanceAutoFixNpc,
                 setValue: value => Config.AdvanceAutoFixNpc = value
             );
 
             configMenu.AddBoolOption(
                 mod: ModManifest,
-                name: () => "***DEBUG",
-                tooltip: () => "This is just made for my testing. Who know what it does...",
+                name: () => SHelper.Translation.Get("foodstore.config.debug"),
+                tooltip: () => SHelper.Translation.Get("foodstore.config.debug-description"),
                 getValue: () => Config.AdvanceDebug,
                 setValue: value => Config.AdvanceDebug = value
             );
@@ -807,32 +807,32 @@ namespace MarketTown
 
             configMenu.AddTextOption(
                 mod: ModManifest,
-                name: () => "Log Menu Offset X",
+                name: () => SHelper.Translation.Get("foodstore.config.log-offset-x"),
                 getValue: () => "" + Config.AdvanceMenuOffsetX,
                 setValue: delegate (string value) { try { Config.AdvanceMenuOffsetX = int.Parse(value, CultureInfo.InvariantCulture); } catch { } }
             ); configMenu.AddTextOption(
                 mod: ModManifest,
-                name: () => "Log Menu Offset Y",
+                name: () => SHelper.Translation.Get("foodstore.config.log-offset-y"),
                 getValue: () => "" + Config.AdvanceMenuOffsetY,
                 setValue: delegate (string value) { try { Config.AdvanceMenuOffsetY = int.Parse(value, CultureInfo.InvariantCulture); } catch { } }
             ); configMenu.AddTextOption(
                 mod: ModManifest,
-                name: () => "Log Menu Width",
+                name: () => SHelper.Translation.Get("foodstore.config.log-width"),
                 getValue: () => "" + Config.AdvanceMenuWidth,
                 setValue: delegate (string value) { try { Config.AdvanceMenuWidth = int.Parse(value, CultureInfo.InvariantCulture); } catch { } }
             ); configMenu.AddTextOption(
                 mod: ModManifest,
-                name: () => "Log Menu Height",
+                name: () => SHelper.Translation.Get("foodstore.config.log-height"),
                 getValue: () => "" + Config.AdvanceMenuHeight,
                 setValue: delegate (string value) { try { Config.AdvanceMenuHeight = int.Parse(value, CultureInfo.InvariantCulture); } catch { } }
             ); configMenu.AddTextOption(
                 mod: ModManifest,
-                name: () => "Number of Row",
+                name: () => SHelper.Translation.Get("foodstore.config.log-rows"),
                 getValue: () => "" + Config.AdvanceMenuRow,
                 setValue: delegate (string value) { try { Config.AdvanceMenuRow = int.Parse(value, CultureInfo.InvariantCulture); } catch { } }
             ); configMenu.AddTextOption(
                 mod: ModManifest,
-                name: () => "Line space",
+                name: () => SHelper.Translation.Get("foodstore.config.log-line-spacing"),
                 getValue: () => "" + Config.AdvanceMenuSpace,
                 setValue: delegate (string value) { try { Config.AdvanceMenuSpace = int.Parse(value, CultureInfo.InvariantCulture); } catch { } }
             );

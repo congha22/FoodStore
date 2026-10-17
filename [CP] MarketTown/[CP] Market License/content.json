@@ -14,8 +14,8 @@
       "Action": "EditData",
       "Target": "Data/Furniture",
       "Entries": {
-        "MT.Objects.RestaurantDecor": "Restaurant Decor/decor/2 2/1 1/1/300/-1/Restaurant Decor/0/Mods\\d5a1lamdtd.MarketTown.Item\\RestaurantDecor/true",
-        "MT.Objects.MarketLog": "Market Log/decor/1 2/1 1/1/300/-1/Market Log/0/Mods\\d5a1lamdtd.MarketTown.Item\\MarketLog/false"
+        "MT.Objects.RestaurantDecor": "Restaurant Decor/decor/2 2/1 1/1/300/-1/{{i18n:item.RestaurantDecor.name}}/0/Mods\\d5a1lamdtd.MarketTown.Item\\RestaurantDecor/true",
+        "MT.Objects.MarketLog": "Market Log/decor/1 2/1 1/1/300/-1/{{i18n:item.MarketLog.name}}/0/Mods\\d5a1lamdtd.MarketTown.Item\\MarketLog/false"
 
       }
     },
@@ -25,8 +25,8 @@
       "Entries": {
         "MT.Objects.MarketLicense": {
           "Name": "Market License",
-          "Displayname": "Market License",
-          "Description": "Display on a Sign inside a Farm Building to use it as a Store that can sell everything. Change take effect the next day. Buildings on Paradise Island are NOT required a License",
+          "Displayname": "{{i18n:item.MarketLicense.name}}",
+          "Description": "{{i18n:item.MarketLicense.description}}",
           "Type": "Basic",
           "Price": 7500,
           "Texture": "{{InternalAssetKey: assets/MarketLicense.png}}",
@@ -34,8 +34,8 @@
         },
         "MT.Objects.RestaurantLicense": {
           "Name": "Restaurant License",
-          "Displayname": "Restaurant License",
-          "Description": "Display on a Sign inside a Farm Building to use it as a Restaurant and sell food items. Change take effect the next day. Buildings on Paradise Island are NOT required a License",
+          "Displayname": "{{i18n:item.RestaurantLicense.name}}",
+          "Description": "{{i18n:item.RestaurantLicense.description}}",
           "Type": "Basic",
           "Price": 4000,
           "Texture": "{{InternalAssetKey: assets/RestaurantLicense.png}}",
@@ -43,8 +43,8 @@
         },
         "MT.Objects.MuseumLicense": {
           "Name": "Museum License",
-          "Displayname": "Museum License",
-          "Description": "Display on a Sign inside a Farm Building to register it as a Museum where guests can visit. Change take effect the next day. Buildings on Paradise Island are NOT required a License",
+          "Displayname": "{{i18n:item.MuseumLicense.name}}",
+          "Description": "{{i18n:item.MuseumLicense.description}}",
           "Type": "Basic",
           "Price": 5000,
           "Texture": "{{InternalAssetKey: assets/MuseumLicense.png}}",
@@ -52,8 +52,8 @@
         },
         "MT.Objects.InviteLetter": {
           "Name": "Invite Letter",
-          "Displayname": "Invite Letter",
-          "Description": "Give this Letter to the guest you want to invite to your place.",
+          "Displayname": "{{i18n:item.InviteLetter.name}}",
+          "Description": "{{i18n:item.InviteLetter.description}}",
           "Type": "Basic",
           "Price": 200,
           "ContextTags": [
@@ -64,8 +64,8 @@
         },
         "MT.Objects.CustomerNote": {
           "Name": "Customer Note",
-          "Displayname": "Customer Note",
-          "Description": "Give this Note to your customer to gather their opinion about your sold dish.",
+          "Displayname": "{{i18n:item.CustomerNote.name}}",
+          "Description": "{{i18n:item.CustomerNote.description}}",
           "Type": "Basic",
           "Price": 20,
           "ContextTags": [

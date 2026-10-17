@@ -1,0 +1,6 @@
+{
+  "item.MarketTownStorageLarge.name": "集镇大型储物箱",
+  "item.MarketTownStorageLarge.description": "商品售出后，自动为 10 格范围内的桌子补货。",
+  "item.MarketTownStorageSmall.name": "集镇小型储物箱",
+  "item.MarketTownStorageSmall.description": "商品售出后，自动为 5 格范围内的桌子补货。"
+}

@@ -1,0 +1,14 @@
+{
+  "item.RestaurantDecor.name": "Restaurant Decor",
+  "item.MarketLog.name": "Market Log",
+  "item.MarketLicense.name": "Market License",
+  "item.MarketLicense.description": "Display on a Sign inside a Farm Building to use it as a Store that can sell everything. Change take effect the next day. Buildings on Paradise Island are NOT required a License",
+  "item.RestaurantLicense.name": "Restaurant License",
+  "item.RestaurantLicense.description": "Display on a Sign inside a Farm Building to use it as a Restaurant and sell food items. Change take effect the next day. Buildings on Paradise Island are NOT required a License",
+  "item.MuseumLicense.name": "Museum License",
+  "item.MuseumLicense.description": "Display on a Sign inside a Farm Building to register it as a Museum where guests can visit. Change take effect the next day. Buildings on Paradise Island are NOT required a License",
+  "item.InviteLetter.name": "Invite Letter",
+  "item.InviteLetter.description": "Give this Letter to the guest you want to invite to your place.",
+  "item.CustomerNote.name": "Customer Note",
+  "item.CustomerNote.description": "Give this Note to your customer to gather their opinion about your sold dish."
+}

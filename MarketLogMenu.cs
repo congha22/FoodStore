@@ -20,6 +20,12 @@ namespace MarketTown
 {
     public partial class ModEntry
     {
+        /// <summary>Get localized text for the market log and feedback menus.</summary>
+        private static string MarketLogText(string key, object tokens = null)
+        {
+            return SHelper.Translation.Get("foodstore.log." + key, tokens);
+        }
+
         private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
         {
             if (!Context.IsWorldReady) return;
@@ -59,7 +65,7 @@ namespace MarketTown
                 this.tooltips = new Dictionary<string, string>();
                 this.feedbackButton = new ClickableComponent(
                     bounds: new Microsoft.Xna.Framework.Rectangle(this.xPositionOnScreen + this.width - 255, this.yPositionOnScreen + 58, 185, 48),
-                    name: "View Feedback");
+                    name: MarketLogText("view-feedback"));
                 LoadData();
             }
 
@@ -69,32 +75,32 @@ namespace MarketTown
 
                 if (model == null)
                 {
-                    dataLines.Add(new string[] { "Cannot find save data.", "", $"", "" });
+                    dataLines.Add(new string[] { MarketLogText("missing-save"), "", $"", "" });
                 }
                 else
                 {
-                    dataLines.Add(new string[] { "Total market earning:", "", $"    {model.TotalEarning + TodayMoney}G", "" });
-                    dataLines.Add(new string[] { "Total festival earning:", "", $"    {model.TotalFestivalIncome + TodayFestivalIncome}G", "" });
-                    dataLines.Add(new string[] { "Reviews:", $"Total:{model.TotalCustomerNote + TodayCustomerNote}", $"  Positive: {model.TotalCustomerNoteYes + TodayCustomerNoteYes}", $"  Negative: {model.TotalCustomerNoteNo + TodayCustomerNoteNo}" });
+                    dataLines.Add(new string[] { MarketLogText("total-market-earning"), "", $"    {model.TotalEarning + TodayMoney}G", "" });
+                    dataLines.Add(new string[] { MarketLogText("total-festival-earning"), "", $"    {model.TotalFestivalIncome + TodayFestivalIncome}G", "" });
+                    dataLines.Add(new string[] { MarketLogText("reviews"), MarketLogText("review-total", new { count = model.TotalCustomerNote + TodayCustomerNote }), MarketLogText("review-positive", new { count = model.TotalCustomerNoteYes + TodayCustomerNoteYes }), MarketLogText("review-negative", new { count = model.TotalCustomerNoteNo + TodayCustomerNoteNo }) });
 
                     dataLines.Add(new string[] { "", "", "", "" });
                     dataLines.Add(new string[] { "---------------------------------------------------------------------------------", "", "", "" });
-                    dataLines.Add(new string[] { "Category", "Total", "Restaurant", "Market Town" });
+                    dataLines.Add(new string[] { MarketLogText("category"), MarketLogText("total"), MarketLogText("restaurant"), MarketLogText("market-town") });
                     dataLines.Add(new string[] { "---------------------------------------------------------------------------------", "", "", "" });
-                    dataLines.Add(new string[] { "Forage", $"{model.TotalForageSold + TodayForageSold}", "-", $"{model.TotalForageSold + TodayForageSold} / 30" });
-                    dataLines.Add(new string[] { "Flower", $"{model.TotalFlowerSold + TodayFlowerSold}", "-", $"{model.TotalFlowerSold + TodayFlowerSold} / 30" });
-                    dataLines.Add(new string[] { "Fruit", $"{model.TotalFruitSold + TodayFruitSold}", "-", $"{model.TotalFruitSold + TodayFruitSold} / 30" });
-                    dataLines.Add(new string[] { "Vegetable", $"{model.TotalVegetableSold + TodayVegetableSold}", "-", $"{model.TotalVegetableSold + TodayVegetableSold} / 30" });
-                    dataLines.Add(new string[] { "Artisan Good", $"{model.TotalArtisanGoodSold + TodayArtisanGoodSold}", "-", $"{model.TotalArtisanGoodSold + TodayArtisanGoodSold} / 30" });
-                    dataLines.Add(new string[] { "Cooking", $"{model.TotalCookingSold + TodayCookingSold}", $"{model.TotalCookingSold + TodayCookingSold} / 20", $"{model.TotalCookingSold + TodayCookingSold} / 30" });
-                    dataLines.Add(new string[] { "Fish", $"{model.TotalFishSold + TodayFishSold}", "-", $"{model.TotalFishSold + TodayFishSold} / 30" });
-                    dataLines.Add(new string[] { "Animal Product", $"{model.TotalAnimalProductSold + TodayAnimalProductSold}", "-", $"{model.TotalAnimalProductSold + TodayAnimalProductSold} / 30" });
-                    dataLines.Add(new string[] { "Gem & Mineral", $"{model.TotalMineralSold + TodayMineralSold}", "-", $"{model.TotalMineralSold + TodayMineralSold} / 30" });
-                    dataLines.Add(new string[] { "Clothes", $"{model.TotalClothesSold + TodayClothesSold}", "-", "-" });
-                    dataLines.Add(new string[] { "Seed", $"{model.TotalSeedSold + TodaySeedSold}", "-", "-" });
-                    dataLines.Add(new string[] { "Monster Loot", $"{model.TotalMonsterLootSold + TodayMonsterLootSold}", "-", "-" });
-                    dataLines.Add(new string[] { "Resource", $"{model.TotalResourceMetalSold + TodayResourceMetalSold}", "-", "-" });
-                    dataLines.Add(new string[] { "Crafting", $"{model.TotalCraftingSold + TodayCraftingSold}", "-", "-" });
+                    dataLines.Add(new string[] { MarketLogText("forage"), $"{model.TotalForageSold + TodayForageSold}", "-", $"{model.TotalForageSold + TodayForageSold} / 30" });
+                    dataLines.Add(new string[] { MarketLogText("flower"), $"{model.TotalFlowerSold + TodayFlowerSold}", "-", $"{model.TotalFlowerSold + TodayFlowerSold} / 30" });
+                    dataLines.Add(new string[] { MarketLogText("fruit"), $"{model.TotalFruitSold + TodayFruitSold}", "-", $"{model.TotalFruitSold + TodayFruitSold} / 30" });
+                    dataLines.Add(new string[] { MarketLogText("vegetable"), $"{model.TotalVegetableSold + TodayVegetableSold}", "-", $"{model.TotalVegetableSold + TodayVegetableSold} / 30" });
+                    dataLines.Add(new string[] { MarketLogText("artisan-good"), $"{model.TotalArtisanGoodSold + TodayArtisanGoodSold}", "-", $"{model.TotalArtisanGoodSold + TodayArtisanGoodSold} / 30" });
+                    dataLines.Add(new string[] { MarketLogText("cooking"), $"{model.TotalCookingSold + TodayCookingSold}", $"{model.TotalCookingSold + TodayCookingSold} / 20", $"{model.TotalCookingSold + TodayCookingSold} / 30" });
+                    dataLines.Add(new string[] { MarketLogText("fish"), $"{model.TotalFishSold + TodayFishSold}", "-", $"{model.TotalFishSold + TodayFishSold} / 30" });
+                    dataLines.Add(new string[] { MarketLogText("animal-product"), $"{model.TotalAnimalProductSold + TodayAnimalProductSold}", "-", $"{model.TotalAnimalProductSold + TodayAnimalProductSold} / 30" });
+                    dataLines.Add(new string[] { MarketLogText("mineral"), $"{model.TotalMineralSold + TodayMineralSold}", "-", $"{model.TotalMineralSold + TodayMineralSold} / 30" });
+                    dataLines.Add(new string[] { MarketLogText("clothes"), $"{model.TotalClothesSold + TodayClothesSold}", "-", "-" });
+                    dataLines.Add(new string[] { MarketLogText("seed"), $"{model.TotalSeedSold + TodaySeedSold}", "-", "-" });
+                    dataLines.Add(new string[] { MarketLogText("monster-loot"), $"{model.TotalMonsterLootSold + TodayMonsterLootSold}", "-", "-" });
+                    dataLines.Add(new string[] { MarketLogText("resource"), $"{model.TotalResourceMetalSold + TodayResourceMetalSold}", "-", "-" });
+                    dataLines.Add(new string[] { MarketLogText("crafting"), $"{model.TotalCraftingSold + TodayCraftingSold}", "-", "-" });
                     dataLines.Add(new string[] { "---------------------------------------------------------------------------------", "", "", "" });
 
                     int totalAllCategory = model.TotalForageSold
@@ -126,86 +132,85 @@ namespace MarketTown
                                          + TodayFishSold
                                          + TodayClothesSold;
 
-                    dataLines.Add(new string[] { "Total", $"{totalAllCategory}", "", "" });
-                    dataLines.Add(new string[] { $"Satisfaction score", $"Aesthetic Rating" });
+                    dataLines.Add(new string[] { MarketLogText("total"), $"{totalAllCategory}", "", "" });
+                    dataLines.Add(new string[] { MarketLogText("satisfaction"), MarketLogText("aesthetic") });
                     dataLines.Add(new string[] { "---------------------------------------------------------------------------------", "", "", "" });
 
-                    dataLines.Add(new string[] { "Museum visitors:", "", $"{model.TodayMuseumVisitor + TodayMuseumVisitor}", "" });
-                    dataLines.Add(new string[] { "Paradise Island visitors:", "", $"{model.TotalVisitorVisited + TodayVisitorVisited}", "" });
-                    dataLines.Add(new string[] { "Friends invited:", "", $"{model.TotalFriendVisited}", "" });
+                    dataLines.Add(new string[] { MarketLogText("museum-visitors"), "", $"{model.TodayMuseumVisitor + TodayMuseumVisitor}", "" });
+                    dataLines.Add(new string[] { MarketLogText("island-visitors"), "", $"{model.TotalVisitorVisited + TodayVisitorVisited}", "" });
+                    dataLines.Add(new string[] { MarketLogText("friends-invited"), "", $"{model.TotalFriendVisited}", "" });
                     dataLines.Add(new string[] { "---------------------------------------------------------------------------------", "", "", "" });
 
-                    string level = "Mysterious Stalls";
+                    string level = MarketLogText("rank-0");
                     string nextLevel = "";
                     switch (MarketRecognition())
                     {
                         case 0:
-                            level = "Mysterious Stalls";
-                            nextLevel = "Day played > 14; Customer Note > 20; Feedback > 70%";
+                            level = MarketLogText("rank-0");
+                            nextLevel = MarketLogText("rank-condition-0");
                             break;
                         case 1:
-                            level = "Humble Stand";
-                            nextLevel = "Day played > 28; Customer Note > 40; Feedback > 75%";
+                            level = MarketLogText("rank-1");
+                            nextLevel = MarketLogText("rank-condition-1");
                             break;
                         case 2:
-                            level = "Emerging Bazaar";
-                            nextLevel = "Day played > 42; Customer Note > 70; Feedback > 80%";
+                            level = MarketLogText("rank-2");
+                            nextLevel = MarketLogText("rank-condition-2");
                             break;
                         case 3:
-                            level = "Popular Marketplace";
-                            nextLevel = "Day played > 56; Customer Note > 100; Feedback > 85%";
+                            level = MarketLogText("rank-3");
+                            nextLevel = MarketLogText("rank-condition-3");
                             break;
                         case 4:
-                            level = "Trusted Farmer";
-                            nextLevel = "Day played > 84; Customer Note > 150; Feedback > 90%";
+                            level = MarketLogText("rank-4");
+                            nextLevel = MarketLogText("rank-condition-4");
                             break;
                         case 5:
-                            level = "Prestigious Market";
+                            level = MarketLogText("rank-5");
                             break;
                     }
 
-                    dataLines.Add(new string[] { "Market recognition:", $"{level}", "", "" }); // 26
-                    dataLines.Add(new string[] { "Paradise Island Progress:", "", "", "" });
+                    dataLines.Add(new string[] { MarketLogText("recognition"), $"{level}", "", "" }); // 26
+                    dataLines.Add(new string[] { MarketLogText("island-progress"), "", "", "" });
 
                     dataLines.Add(new string[] { "", "", "", "" });
-                    dataLines.Add(new string[] { $"      Yesterday: {model.SellMoney}G", "", $"    Today: {TodayMoney}G", "" });
-                    dataLines.Add(new string[] { "   Today log:", "", "", "" });
+                    dataLines.Add(new string[] { MarketLogText("yesterday", new { amount = model.SellMoney }), "", MarketLogText("today", new { amount = TodayMoney }), "" });
+                    dataLines.Add(new string[] { MarketLogText("today-log"), "", "", "" });
                     foreach (var line in TodaySell)
                     {
                         dataLines.Add(new string[] { $"{line}", "", "", "" });
                     }
 
                     // Populate tooltips
-                    tooltips.Add("Total market earning:", "Total earning though selling items");
-                    tooltips.Add("Total festival earning:", "Total earning during Paradise Island's festival day");
-                    tooltips.Add("Reviews:", "Total number of 'Customer Note' given.");
-                    tooltips.Add("Category", "Total items sold in each category and progress to unlock License");
-                    tooltips.Add("Forage", "e.g. Leek, Spring Onion, Dandelion,...");
-                    tooltips.Add("Flower", "e.g. Tulip, Sunflower, Poppy, ...");
-                    tooltips.Add("Fruit", "e.g. Apple, Blackberry, Crystalfruit, ...");
-                    tooltips.Add("Vegetable", "e.g. Carrot, Parsnip, Tomato, ...");
-                    tooltips.Add("Artisan Good", "e.g. Wine, Honey, Cheese, ...");
-                    tooltips.Add("Cooking", "e.g. Salad, Baked Fish, Cookie, ...");
-                    tooltips.Add("Fish", "e.g. Squid, Carp, Pike, ...");
-                    tooltips.Add("Animal Product", "e.g. Egg, Milk, Truffle, ...");
-                    tooltips.Add("Gem & Mineral", "e.g. Ruby, Quartz, Sandstone, ...");
-                    tooltips.Add("Clothes", "Hats, Shirts, Pants, Boots");
-                    tooltips.Add("Seed", "umm... seeds");
-                    tooltips.Add("Monster Loot", "e.g. Slime, Bat Wings, Bug Meat, ...");
-                    tooltips.Add("Resource", "e.g. Gold bar, Batterry, Hardwood, ...");
-                    tooltips.Add("Crafting", "e.g. Fences, Sprinker, Paths");
+                    tooltips.Add(MarketLogText("total-market-earning"), MarketLogText("market-earning-tooltip"));
+                    tooltips.Add(MarketLogText("total-festival-earning"), MarketLogText("festival-earning-tooltip"));
+                    tooltips.Add(MarketLogText("reviews"), MarketLogText("reviews-tooltip"));
+                    tooltips.Add(MarketLogText("category"), MarketLogText("category-tooltip"));
+                    tooltips.Add(MarketLogText("forage"), MarketLogText("forage-tooltip"));
+                    tooltips.Add(MarketLogText("flower"), MarketLogText("flower-tooltip"));
+                    tooltips.Add(MarketLogText("fruit"), MarketLogText("fruit-tooltip"));
+                    tooltips.Add(MarketLogText("vegetable"), MarketLogText("vegetable-tooltip"));
+                    tooltips.Add(MarketLogText("artisan-good"), MarketLogText("artisan-good-tooltip"));
+                    tooltips.Add(MarketLogText("cooking"), MarketLogText("cooking-tooltip"));
+                    tooltips.Add(MarketLogText("fish"), MarketLogText("fish-tooltip"));
+                    tooltips.Add(MarketLogText("animal-product"), MarketLogText("animal-product-tooltip"));
+                    tooltips.Add(MarketLogText("mineral"), MarketLogText("mineral-tooltip"));
+                    tooltips.Add(MarketLogText("clothes"), MarketLogText("clothes-tooltip"));
+                    tooltips.Add(MarketLogText("seed"), MarketLogText("seed-tooltip"));
+                    tooltips.Add(MarketLogText("monster-loot"), MarketLogText("monster-loot-tooltip"));
+                    tooltips.Add(MarketLogText("resource"), MarketLogText("resource-tooltip"));
+                    tooltips.Add(MarketLogText("crafting"), MarketLogText("crafting-tooltip"));
 
-                    tooltips.Add("Satisfaction score", $"How much customer like the item ( taste and quality ). Current: {((model.TotalPointTaste + TodayPointTaste) / totalAllCategory):F2}\n" +
-                                                       $"How well is the decoration in the market. Current: {((model.TotalPointDecor + TodayPointDecor) / totalAllCategory):F2}");
+                    tooltips.Add(MarketLogText("satisfaction"), MarketLogText("taste-tooltip", new { score = ((model.TotalPointTaste + TodayPointTaste) / totalAllCategory).ToString("F2") }) +
+                                                       MarketLogText("decor-tooltip", new { score = ((model.TotalPointDecor + TodayPointDecor) / totalAllCategory).ToString("F2") }));
 
-                    tooltips.Add("Museum visitors:", "Number of visitors to building with Museum License");
-                    tooltips.Add("Paradise Island visitors:", "Number of visitors to Paradise Island");
-                    tooltips.Add("Friends invited:", "Total friends accepted 'Invite Letter'");
+                    tooltips.Add(MarketLogText("museum-visitors"), MarketLogText("museum-visitors-tooltip"));
+                    tooltips.Add(MarketLogText("island-visitors"), MarketLogText("island-visitors-tooltip"));
+                    tooltips.Add(MarketLogText("friends-invited"), MarketLogText("friends-invited-tooltip"));
 
                     var x = (model.TotalCustomerNote + TodayCustomerNote) == 0 ? 0 : ((float)(100 * (model.TotalCustomerNoteYes + TodayCustomerNoteYes) / (model.TotalCustomerNote + TodayCustomerNote)));
-                    tooltips.Add("Market recognition:", $"Next level: {nextLevel}." +
-                        $"\nCurrent customer positive feedback: {x}%");
-                    tooltips.Add("Paradise Island Progress:", $"Grange earning: {model.TotalFestivalIncome + TodayFestivalIncome}G / {Config.GrangeSellProgress}G");
+                    tooltips.Add(MarketLogText("recognition"), MarketLogText("recognition-tooltip", new { requirements = nextLevel, percent = x }));
+                    tooltips.Add(MarketLogText("island-progress"), MarketLogText("island-progress-tooltip", new { amount = model.TotalFestivalIncome + TodayFestivalIncome, target = Config.GrangeSellProgress }));
                 }
             }
 
@@ -229,7 +234,7 @@ namespace MarketTown
                         this.feedbackButton.bounds.Height,
                         hoverButton ? Color.Wheat : Color.White);
 
-                    string buttonText = "View Feedback";
+                    string buttonText = MarketLogText("view-feedback");
                     Vector2 textSize = Game1.smallFont.MeasureString(buttonText);
                     Vector2 textPosition = new Vector2(
                         this.feedbackButton.bounds.Center.X - textSize.X / 2f,
@@ -453,7 +458,7 @@ namespace MarketTown
 
                 Utility.drawTextWithShadow(
                     b,
-                    "Market Town Feedback",
+                    MarketLogText("feedback-title"),
                     Game1.dialogueFont,
                     new Vector2(this.xPositionOnScreen + 64, this.yPositionOnScreen + 32),
                     Color.DarkGreen);
@@ -466,7 +471,7 @@ namespace MarketTown
                 {
                     Utility.drawTextWithShadow(
                         b,
-                        "No feedback yet today.",
+                        MarketLogText("feedback-empty"),
                         Game1.smallFont,
                         new Vector2(contentX + 16, contentY + 12),
                         Color.Gray);
@@ -519,7 +524,7 @@ namespace MarketTown
                         Color.DarkSlateGray);
                 }
 
-                string footer = $"Showing {Math.Min(entries.Count, this.currentScrollIndex + this.maxVisibleRows)} / {entries.Count}";
+                string footer = MarketLogText("feedback-showing", new { shown = Math.Min(entries.Count, this.currentScrollIndex + this.maxVisibleRows), total = entries.Count });
                 Utility.drawTextWithShadow(
                     b,
                     footer,

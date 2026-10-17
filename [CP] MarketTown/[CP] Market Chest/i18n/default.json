@@ -1,0 +1,6 @@
+{
+  "item.MarketTownStorageLarge.name": "Market Town Storage Large",
+  "item.MarketTownStorageLarge.description": "Automatically restock table within 10 tiles after an item is sold.",
+  "item.MarketTownStorageSmall.name": "Market Town Storage Small",
+  "item.MarketTownStorageSmall.description": "Automatically restock table within 5 tiles after an item is sold."
+}

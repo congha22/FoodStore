@@ -6,8 +6,8 @@
       "Entries": {
         "MT.Objects.MarketTownStorageSmall": {
           "Name": "Market Town Storage Small",
-          "DisplayName": "Market Town Storage Small",
-          "Description": "Automatically restock table within 5 tiles after an item is sold.",
+          "DisplayName": "{{i18n:item.MarketTownStorageSmall.name}}",
+          "Description": "{{i18n:item.MarketTownStorageSmall.description}}",
     	  "CanBePlacedOutdoors": true,
           "CanBePlacedIndoors": false,
           "Texture": "Mods/d5a1lamdtd.MarketTown.Chest/MarketTownStorageSmall",
@@ -22,7 +22,7 @@
       "Action": "EditData",
       "Target": "Data/CraftingRecipes",
       "Entries": {
-        "MT.Objects.MarketTownStorageSmall": "709 25 787 1 621 5/Field/MT.Objects.MarketTownStorageSmall/true/default/Market Town Storage Small"
+        "MT.Objects.MarketTownStorageSmall": "709 25 787 1 621 5/Field/MT.Objects.MarketTownStorageSmall/true/default/{{i18n:item.MarketTownStorageSmall.name}}"
       }
     }
   ]
